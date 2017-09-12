@@ -1,0 +1,19 @@
+{
+	"results": [
+		{
+			"id": 1,
+			"name": "Open",
+			"category": "primary"
+		},
+		{
+			"id": 2,
+			"name": "Investigated",
+			"category": "success"
+		},
+		{
+			"id": 3,
+			"name": "Failed",
+			"category": "error"
+		}
+	]
+}

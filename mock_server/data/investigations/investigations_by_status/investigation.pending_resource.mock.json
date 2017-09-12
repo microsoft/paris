@@ -1,0 +1,109 @@
+{
+	"id": 18,
+	"start_date": "2017-04-12T08:24:00.243260Z",
+	"end_date": null,
+	"status": 2,
+	"comments": 0,
+	"actions": {
+		"remediated": 0,
+		"total": 2,
+		"running": 0,
+		"pending": 1
+	},
+	"hosts": [
+		{
+			"status": 3,
+			"is_unmanaged": null,
+			"ip": null,
+			"reason": "The endpoint is not found",
+			"logged_in_users": null,
+			"id": 80,
+			"group": null,
+			"name": "YOSSI-TEST.auto.lab",
+			"protection_level_name": "Not Found",
+			"protection_level_type": 4,
+			"os": null
+		}
+	],
+	"title": "User Initiated - Endpoint Investigation",
+	"requested_status": null,
+	"dismissed": false,
+	"important": false,
+	"user": null,
+	"external_sources": {
+		"mitigation_source": [],
+		"data_source": [
+			13
+		]
+	},
+	"alert_count": 1,
+	"entity_count": 0,
+	"attention_required": 1,
+	"running_time": 1070.471335,
+	"pending_action_types": {
+		"data": [
+			{
+				"action": 13,
+				"count": 0
+			},
+			{
+				"action": 12,
+				"count": 0
+			},
+			{
+				"action": 8,
+				"count": 1
+			}
+		]
+	},
+	"threat_types": [],
+	"alert": {
+		"AlertId": "636219966081943637_-467964911",
+		"WcdMachineId": null,
+		"SenseMachineId": "4799f85552c638acceda6bbdd1c27d81ed98f2bd",
+		"MachineId": "4799f85552c638acceda6bbdd1c27d81ed98f2bd",
+		"ComputerDnsName": "cont-jonathanw.contoso.org",
+		"Severity": 256,
+		"Status": 4,
+		"LastEventTime": "2017-04-17T16:37:47.8018798Z",
+		"FirstEventTime": "2017-04-17T13:12:20.2461196Z",
+		"FirstSeen": "2017-04-17T16:50:07.754788Z",
+		"Classification": 0,
+		"Determination": 0,
+		"DomainName": "CONTOSO",
+		"AccountName": "jonathan.wolcott",
+		"AccountSid": "S-1-5-21-2649156466-80624164-2033095608-1113",
+		"AssignedTo": "Analyst@WDATPContosoFld.onmicrosoft.com",
+		"Category": "PrivilegeEscalation",
+		"Title": "Process privilege escalation due to kernel exploit",
+		"ActorName": null,
+		"TiProvider": null,
+		"GroupId": null,
+		"GroupKey": null,
+		"MachineCount": 1,
+		"UserCount": 1,
+		"AssignedToCount": 1,
+		"AlertCount": 0,
+		"IoaDefinitionId": "6f36a53b-7229-471e-9c91-ea473a50b95d",
+		"InternalMachineId": 8,
+		"ContainedAlerts": null,
+		"IsSealedGroup": null,
+		"DetectionSource": 1,
+		"ThreatFamilyName": null,
+		"SuppressionRuleId": null
+	},
+	"pending_since": "2017-04-12T08:24:00.721169Z",
+	"alert_to_remediation_time": 0,
+	"is_cleanup_applied": false,
+	"errors": [
+		6
+	],
+	"pending_actions": [],
+	"reasons": [
+		"Endpoint does not exist in the Active Directory"
+	],
+	"pending_type": 6,
+	"remediation_pending_time": 0,
+	"resource_pending_time": 0,
+	"tags": []
+}

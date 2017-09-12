@@ -1,0 +1,38 @@
+{
+	"count": 765438,
+	"results": [
+		{
+			"id": "123",
+			"title": "Something bad happened",
+			"status": 1,
+			"machine": "yossi-pc",
+			"host": {
+				"id": "yossi_comp",
+				"name": "Yossi's comp",
+				"domain": "HEXADITE"
+			}
+		},
+		{
+			"id": "234",
+			"title": "A process rewrote Windows!",
+			"status": 2,
+			"machine": "yossi-pc",
+			"host": {
+				"id": "yossi_comp",
+				"name": "Yossi's comp",
+				"domain": "HEXADITE"
+			}
+		},
+		{
+			"id": "345",
+			"title": "A process did something. You won't believe what happened next!",
+			"status": 1,
+			"machine": "test-lab",
+			"host": {
+				"id": "yossi_comp",
+				"name": "Yossi's comp",
+				"domain": "HEXADITE"
+			}
+		}
+	]
+}

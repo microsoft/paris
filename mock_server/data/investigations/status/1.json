@@ -1,0 +1,48 @@
+{
+	"count": 1,
+	"next": null,
+	"previous": null,
+	"results": [
+		{
+			"id": 34,
+			"name": "Symantec Virus Found",
+			"start_date": "2015-07-12T12:05:33.043Z",
+			"end_date": null,
+			"affected_hosts": [
+				"WIN7-X64-NO-SP.auto.lab"
+			],
+			"affected_groups": [
+				"GROUP-1"
+			],
+			"affected_users": [],
+			"total_actions": 9,
+			"remediation_actions": [
+				{
+					"details": "Quarantine \"C:\\Windows\\sus.exe\".",
+					"id": 831,
+					"name": "Quarantine A File"
+				}
+			],
+			"pending_actions": [
+				{
+					"details": "Quarantine \"C:\\Windows\\sus.exe\".",
+					"id": 831,
+					"name": "Quarantine A File"
+				}
+			],
+			"failed_actions": [],
+			"last_action": {
+				"details": "Quarantine \"C:\\Windows\\sus.exe\".",
+				"is_remediation": true,
+				"id": 831,
+				"name": "Quarantine A File"
+			},
+			"important": true,
+			"detection_system": "DS-1",
+			"error_description": "",
+			"status": 1,
+			"user": "",
+			"comments": 0
+		}
+	]
+}

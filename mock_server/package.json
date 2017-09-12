@@ -1,0 +1,11 @@
+{
+  "name": "mockAPI",
+  "version": "0.0.0",
+  "dependencies": {
+    "body-parser": "^1.14.1",
+    "connect-busboy": "0.0.2",
+    "express": "5.0.0-alpha.5",
+    "express-ws": "^3.0.0",
+    "http2": "latest"
+  }
+}

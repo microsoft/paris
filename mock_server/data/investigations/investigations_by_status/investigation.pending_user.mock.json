@@ -1,0 +1,160 @@
+{
+	"id": 16,
+	"start_date": "2017-05-14T07:51:23.917267Z",
+	"end_date": null,
+	"status": 2,
+	"comments": 3,
+	"actions": {
+		"remediated": 8,
+		"total": 38,
+		"running": 0,
+		"pending": 3
+	},
+	"hosts": [
+		{
+			"status": 0,
+			"is_unmanaged": false,
+			"ip": "2.0.0.1",
+			"reason": null,
+			"logged_in_users": [
+				"AUTO\\Administrator"
+			],
+			"id": 253,
+			"group": 1,
+			"name": "WIN71X6401.auto.lab",
+			"protection_level_name": "Semi Automated - Require Approval",
+			"protection_level_type": 1,
+			"os": "Windows 7 Enterprise"
+		}
+	],
+	"title": "Suspicious - User",
+	"requested_status": null,
+	"dismissed": false,
+	"important": false,
+	"user": null,
+	"external_sources": {
+		"mitigation_source": [],
+		"data_source": [
+			13
+		]
+	},
+	"alert_count": 1,
+	"entity_count": 2114,
+	"attention_required": 3,
+	"running_time": 21626.848919,
+	"pending_action_types": {
+		"data": [
+			{
+				"action": 18,
+				"count": 1
+			}
+		]
+	},
+	"threat_types": [
+		{
+			"count": 3,
+			"threat_type": 0
+		},
+		{
+			"count": 3,
+			"threat_type": 10
+		}
+	],
+	"alert": {
+		"AlertId": "636219966081943637_-467964911",
+		"WcdMachineId": null,
+		"SenseMachineId": "4799f85552c638acceda6bbdd1c27d81ed98f2bd",
+		"MachineId": "4799f85552c638acceda6bbdd1c27d81ed98f2bd",
+		"ComputerDnsName": "cont-jonathanw.contoso.org",
+		"Severity": 256,
+		"Status": 4,
+		"LastEventTime": "2017-04-17T16:37:47.8018798Z",
+		"FirstEventTime": "2017-04-17T13:12:20.2461196Z",
+		"FirstSeen": "2017-04-17T16:50:07.754788Z",
+		"Classification": 0,
+		"Determination": 0,
+		"DomainName": "CONTOSO",
+		"AccountName": "jonathan.wolcott",
+		"AccountSid": "S-1-5-21-2649156466-80624164-2033095608-1113",
+		"AssignedTo": "Analyst@WDATPContosoFld.onmicrosoft.com",
+		"Category": "PrivilegeEscalation",
+		"Title": "Process privilege escalation due to kernel exploit",
+		"ActorName": null,
+		"TiProvider": null,
+		"GroupId": null,
+		"GroupKey": null,
+		"MachineCount": 1,
+		"UserCount": 1,
+		"AssignedToCount": 1,
+		"AlertCount": 0,
+		"IoaDefinitionId": "6f36a53b-7229-471e-9c91-ea473a50b95d",
+		"InternalMachineId": 8,
+		"ContainedAlerts": null,
+		"IsSealedGroup": null,
+		"DetectionSource": 1,
+		"ThreatFamilyName": null,
+		"SuppressionRuleId": null
+	},
+	"pending_since": "2017-05-14T07:57:12.818586Z",
+	"alert_to_remediation_time": 207.064145,
+	"is_cleanup_applied": false,
+	"errors": [],
+	"pending_actions": [
+		{
+			"waiting_time": 6.651541,
+			"entities": [
+				{
+					"entity_id": 110129,
+					"entity_type": 1
+				}
+			],
+			"end_time": "2017-05-14T07:57:09.400549Z",
+			"entity_name": "trojan.exe",
+			"action_type": 0,
+			"decision": "Declined",
+			"action_id": 5175,
+			"user": "administrator",
+			"start_time": "2017-05-14T07:57:02.749008Z",
+			"action_name": "Quarantine a File"
+		},
+		{
+			"waiting_time": 6.221275,
+			"entities": [
+				{
+					"entity_id": 109334,
+					"entity_type": 1
+				}
+			],
+			"end_time": "2017-05-14T07:55:11.407090Z",
+			"entity_name": "trojan.exe",
+			"action_type": 0,
+			"decision": "Declined",
+			"action_id": 5157,
+			"user": "administrator",
+			"start_time": "2017-05-14T07:55:05.185815Z",
+			"action_name": "Quarantine a File"
+		},
+		{
+			"waiting_time": 13.785844,
+			"entities": [
+				{
+					"entity_id": 4976,
+					"entity_type": 2
+				}
+			],
+			"end_time": "2017-05-14T07:55:04.767256Z",
+			"entity_name": "trojan.exe",
+			"action_type": 3,
+			"decision": "Declined",
+			"action_id": 5156,
+			"user": "administrator",
+			"start_time": "2017-05-14T07:54:50.981412Z",
+			"action_name": "Kill Process"
+		}
+	],
+	"reasons": null,
+	"pending_type": 3,
+	"remediation_pending_time": 26,
+	"resource_pending_time": 0,
+	"tags": []
+}

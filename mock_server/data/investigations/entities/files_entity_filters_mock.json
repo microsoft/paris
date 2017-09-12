@@ -1,0 +1,44 @@
+{
+	"name": {
+		"count": 1236,
+		"values": [
+			{
+				"count": 2,
+				"value": "compatprovider.dll"
+			},
+			{
+				"count": 2,
+				"value": "api-ms-win-core-errorhandling-l1-1-0.dll"
+			},
+			{
+				"count": 2,
+				"value": "compatprovider.dll.mui"
+			},
+			{
+				"count": 2,
+				"value": "api-ms-win-core-privateprofile-l1-1-0.dll"
+			},
+			{
+				"count": 2,
+				"value": "api-ms-win-core-rtlsupport-l1-1-0.dll"
+			}
+		]
+	},
+	"entity_status": {
+		"count": 3,
+		"values": [
+			{
+				"count": 1374,
+				"value": 3
+			},
+			{
+				"count": 7,
+				"value": 4
+			},
+			{
+				"count": 2,
+				"value": 0
+			}
+		]
+	}
+}

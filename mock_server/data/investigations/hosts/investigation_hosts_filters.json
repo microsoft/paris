@@ -1,0 +1,187 @@
+{
+	"group": {
+		"count": 3,
+		"values": [
+			{
+				"count": 895,
+				"value": "Enterprise"
+			},
+			{
+				"count": 452,
+				"value": "Italy"
+			},
+			{
+				"count": 2,
+				"value": null
+			}
+		]
+	},
+	"name": {
+		"count": 1349,
+		"values": [
+			{
+				"count": 1,
+				"value": "WIN7_X64_1.auto.lab"
+			},
+			{
+				"count": 1,
+				"value": "WIN7_X64_12.auto.lab"
+			},
+			{
+				"count": 1,
+				"value": "WIN7_X64_1111"
+			},
+			{
+				"count": 1,
+				"value": "D0398"
+			},
+			{
+				"count": 1,
+				"value": "D0366"
+			}
+		]
+	},
+	"investigation_id": {
+		"count": 1331,
+		"values": [
+			{
+				"count": 10,
+				"value": 21411
+			},
+			{
+				"count": 5,
+				"value": 21643
+			},
+			{
+				"count": 3,
+				"value": 19814
+			},
+			{
+				"count": 2,
+				"value": 21251
+			},
+			{
+				"count": 2,
+				"value": 20969
+			}
+		]
+	},
+	"ip": {
+		"count": 994,
+		"values": [
+			{
+				"count": 298,
+				"value": null
+			},
+			{
+				"count": 3,
+				"value": "172.22.71.22"
+			},
+			{
+				"count": 2,
+				"value": "10.0.111.2"
+			},
+			{
+				"count": 2,
+				"value": "10.0.111.5"
+			},
+			{
+				"count": 2,
+				"value": "10.113.75.94"
+			}
+		]
+	},
+	"is_unprotected": {
+		"count": 1,
+		"values": [
+			{
+				"count": 1349,
+				"value": false
+			}
+		]
+	},
+	"protection_level_type": {
+		"count": 3,
+		"values": [
+			{
+				"count": 1347,
+				"value": 1
+			},
+			{
+				"count": 1,
+				"value": 0
+			},
+			{
+				"count": 1,
+				"value": 4
+			}
+		]
+	},
+	"protection_level_name": {
+		"count": 3,
+		"values": [
+			{
+				"count": 1347,
+				"value": "Semi Automated - Require Approval"
+			},
+			{
+				"count": 1,
+				"value": "Not Found"
+			},
+			{
+				"count": 1,
+				"value": "Not Protected"
+			}
+		]
+	},
+	"os": {
+		"count": 15,
+		"values": [
+			{
+				"count": 664,
+				"value": "Windows 7 Enterprise"
+			},
+			{
+				"count": 432,
+				"value": "Windows 7 Professional"
+			},
+			{
+				"count": 125,
+				"value": "Windows 10 Enterprise"
+			},
+			{
+				"count": 43,
+				"value": "Windows XP Professional"
+			},
+			{
+				"count": 34,
+				"value": "Windows 8.1 Enterprise"
+			}
+		]
+	},
+	"id": {
+		"count": 1349,
+		"values": [
+			{
+				"count": 1,
+				"value": 8734
+			},
+			{
+				"count": 1,
+				"value": 8988
+			},
+			{
+				"count": 1,
+				"value": 9047
+			},
+			{
+				"count": 1,
+				"value": 9272
+			},
+			{
+				"count": 1,
+				"value": 8691
+			}
+		]
+	}
+}

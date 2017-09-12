@@ -1,0 +1,148 @@
+{
+	"id": 9,
+	"start_date": "2017-02-09T09:27:54.326390Z",
+	"end_date": "2017-02-09T09:48:31.120821Z",
+	"status": 3,
+	"comments": 1,
+	"actions": {
+		"remediated": 1,
+		"total": 29,
+		"running": 0,
+		"pending": 0
+	},
+	"hosts": [
+		{
+			"status": 0,
+			"is_unmanaged": false,
+			"ip": "2.0.0.22",
+			"reason": null,
+			"logged_in_users": [
+				"AUTO\\bingo",
+				"AUTO\\lateral"
+			],
+			"id": 9,
+			"group": 1,
+			"name": "WIN7-ULT-X86.auto.lab",
+			"protection_level_name": "Semi Automated - Require Approval",
+			"protection_level_type": 1,
+			"os": "Windows 7 Ultimate"
+		}
+	],
+	"title": "User Initiated - Endpoint Investigation",
+	"requested_status": null,
+	"dismissed": false,
+	"important": false,
+	"user": null,
+	"external_sources": {
+		"mitigation_source": [],
+		"data_source": [
+			43
+		]
+	},
+	"alert_count": 1,
+	"entity_count": 1635,
+	"attention_required": 0,
+	"running_time": 1236.794431,
+	"pending_action_types": {
+		"data": [
+			{
+				"action": 13,
+				"count": 0
+			},
+			{
+				"action": 12,
+				"count": 0
+			},
+			{
+				"action": 8,
+				"count": 0
+			}
+		]
+	},
+	"threat_types": [
+		{
+			"count": 1,
+			"threat_type": 0
+		}
+	],
+	"alert": {
+		"AlertId": "636219966081943637_-467964911",
+		"WcdMachineId": null,
+		"SenseMachineId": "4799f85552c638acceda6bbdd1c27d81ed98f2bd",
+		"MachineId": "4799f85552c638acceda6bbdd1c27d81ed98f2bd",
+		"ComputerDnsName": "cont-jonathanw.contoso.org",
+		"Severity": 256,
+		"Status": 4,
+		"LastEventTime": "2017-04-17T16:37:47.8018798Z",
+		"FirstEventTime": "2017-04-17T13:12:20.2461196Z",
+		"FirstSeen": "2017-04-17T16:50:07.754788Z",
+		"Classification": 0,
+		"Determination": 0,
+		"DomainName": "CONTOSO",
+		"AccountName": "jonathan.wolcott",
+		"AccountSid": "S-1-5-21-2649156466-80624164-2033095608-1113",
+		"AssignedTo": "Analyst@WDATPContosoFld.onmicrosoft.com",
+		"Category": "PrivilegeEscalation",
+		"Title": "Process privilege escalation due to kernel exploit",
+		"ActorName": null,
+		"TiProvider": null,
+		"GroupId": null,
+		"GroupKey": null,
+		"MachineCount": 1,
+		"UserCount": 1,
+		"AssignedToCount": 1,
+		"AlertCount": 0,
+		"IoaDefinitionId": "6f36a53b-7229-471e-9c91-ea473a50b95d",
+		"InternalMachineId": 8,
+		"ContainedAlerts": null,
+		"IsSealedGroup": null,
+		"DetectionSource": 1,
+		"ThreatFamilyName": null,
+		"SuppressionRuleId": null
+	},
+	"pending_since": null,
+	"alert_to_remediation_time": 206.592362,
+	"is_cleanup_applied": false,
+	"errors": [
+		3,
+		37
+	],
+	"pending_actions": [
+		{
+			"waiting_time": 360.718514,
+			"entities": [
+				{
+					"entity_id": 12523,
+					"entity_type": 1
+				}
+			],
+			"end_time": "2017-02-09T09:37:21.637Z",
+			"entity_name": "trojan.exe",
+			"action_type": 0,
+			"decision": "Skip",
+			"action_id": 275,
+			"user": "administrator",
+			"start_time": "2017-02-09T09:31:20.918Z",
+			"action_name": "Quarantine a File"
+		},
+		{
+			"waiting_time": 305.053733,
+			"entities": [],
+			"end_time": "2017-02-09T09:48:31.031Z",
+			"entity_name": null,
+			"action_type": 8,
+			"decision": "Timed out",
+			"action_id": 276,
+			"user": null,
+			"start_time": "2017-02-09T09:43:25.977Z",
+			"action_name": "Wait for Endpoint Resource"
+		}
+	],
+	"reasons": [
+		"Pending action exceeded timeout",
+		"Endpoint is not reachable"
+	],
+	"pending_type": null,
+	"remediation_pending_time": 360,
+	"resource_pending_time": 305
+}

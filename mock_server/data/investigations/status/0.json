@@ -1,0 +1,72 @@
+{
+	"count": 2,
+	"next": "https://172.2.0.200/api/investigation/all?status=5&perPage=10&page=2",
+	"previous": null,
+	"results": [
+		{
+			"id": 163,
+			"name": "McAfee Abnormal Host Behavior",
+			"start_date": "2015-04-22T10:21:51.361Z",
+			"end_date": "2015-04-22T10:27:35.177Z",
+			"affected_hosts": ["XP-X64"],
+			"affected_groups": [""],
+			"affected_users": ["AUTO\\Administrator"],
+			"total_actions": 26,
+			"remediation_actions": [
+				{
+					"details": "Quarantine \"c:\\windows\\syswow64\\z5eqa8h9.exe\" with passphrase:None.",
+					"id": 3963,
+					"name": "Quarantine A File"
+				},
+				{
+					"details": "Quarantine \"c:\\windows\\syswow64\\z5eqa8h9.exe\" with passphrase:None.",
+					"id": 3961,
+					"name": "Quarantine A File"
+				},
+				{
+					"details": "Quarantine \"c:\\windows\\syswow64\\z5eqa8h9.exe\" with passphrase:None.",
+					"id": 3959,
+					"name": "Quarantine A File"
+				},
+				{
+					"details": "Quarantine 1 files in directory \"c:\\windows\\syswow64\".",
+					"id": 3955,
+					"name": "Quarantine Files In Directory"
+				}
+			],
+			"pending_actions": [],
+			"failed_actions": [
+				{
+					"details": "Quarantine \"c:\\windows\\syswow64\\z5eqa8h9.exe\" with passphrase:None.",
+					"id": 3963,
+					"name": "Quarantine A File"
+				},
+				{
+					"details": "Quarantine \"c:\\windows\\syswow64\\z5eqa8h9.exe\" with passphrase:None.",
+					"id": 3961,
+					"name": "Quarantine A File"
+				},
+				{
+					"details": "Quarantine \"c:\\windows\\syswow64\\z5eqa8h9.exe\" with passphrase:None.",
+					"id": 3959,
+					"name": "Quarantine A File"
+				},
+				{
+					"details": "Get browsing history from ()XP-X64@2.0.0.12.",
+					"id": 3942,
+					"name": "Get Host Browsing History"
+				}
+			],
+			"last_action": {
+				"details": "Analyze and devide 3 hashes into 3 categories: whitelist, blacklist, unknown.",
+				"is_remediation": false,
+				"id": 3966,
+				"name": "Group Hash Analysis"
+			},
+			"important": true,
+			"detection_system": "e2e",
+			"error_description": "Some general error",
+			"status": 0
+		}
+	]
+}

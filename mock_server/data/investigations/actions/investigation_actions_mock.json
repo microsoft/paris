@@ -1,0 +1,41 @@
+{
+	"count": 1,
+	"next": null,
+	"previous": null,
+	"results": [
+		{
+			"id": 397,
+			"host_ip": null,
+			"host_name": "WIN7-X64-1.auto.lab",
+			"group": "auto.lab",
+			"investigation_id": 19,
+			"approval_status": 1,
+			"execution_status": 130,
+			"name": "Wait for Host Resource",
+			"category": "Network",
+			"created": 1465211571519,
+			"status": 5,
+			"details": "Waits for host (auto.lab)WIN7-X64-1@None resource.",
+			"comment_count": 0,
+			"duration": 0,
+			"pending_duration": 0.0
+		},
+		{
+			"id": 39732,
+			"host_ip": null,
+			"host_name": "WIN7-X64-2",
+			"group": "auto.lab",
+			"investigation_id": 19,
+			"approval_status": 1,
+			"execution_status": 130,
+			"name": "Wait for Host Resource",
+			"category": "Network",
+			"created": 1465211571519,
+			"status": 5,
+			"details": "Waits for host (auto.sdfdsfddslab)WIN7-X64-1@None resource.",
+			"comment_count": 0,
+			"duration": 331,
+			"pending_duration": 0.0
+		}
+	]
+}

@@ -57,3 +57,8 @@ typings/
 # dotenv environment variables file
 .env
 
+#Builds folder
+dist/
+
+#NPM package-lock
+package-lock.json

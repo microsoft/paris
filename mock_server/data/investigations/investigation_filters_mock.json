@@ -1,0 +1,242 @@
+{
+	"status": {
+		"count": 7,
+		"values": [
+			{
+				"count": 211,
+				"value": 1
+			},
+			{
+				"count": 35,
+				"value": 4
+			},
+			{
+				"count": 9,
+				"value": 2
+			},
+			{
+				"count": 7,
+				"value": 5
+			},
+			{
+				"count": 6,
+				"value": 6
+			},
+			{
+				"count": 1,
+				"value": 0
+			},
+			{
+				"count": 1,
+				"value": 7
+			}
+		]
+	},
+	"tags": {
+		"count": 11,
+		"values": [
+			{
+				"count": 3,
+				"value": "important"
+			},
+			{
+				"count": 4,
+				"value": "not important"
+			},
+			{
+				"count": 4,
+				"value": "bla bla bla"
+			}
+		]
+	},
+	"reasons": {
+		"count": 19,
+		"values": [
+			{
+				"count": 19,
+				"value": "Endpoint does not exist in the Active Directory"
+			},
+			{
+				"count": 14,
+				"value": "Windows Defender ATP shouldn't analyze this endpoint"
+			},
+			{
+				"count": 14,
+				"value": "Endpoint is not covered by any Asset Group"
+			},
+			{
+				"count": 11,
+				"value": "Endpoint name does not match the resolved name"
+			},
+			{
+				"count": 11,
+				"value": "This is a duplicated Investigation"
+			}
+		]
+	},
+	"user": {
+		"count": 3,
+		"values": [
+			{
+				"count": 94,
+				"value": null
+			},
+			{
+				"count": 32,
+				"value": "administrator"
+			},
+			{
+				"count": 3,
+				"value": "max-admin"
+			}
+		]
+	},
+	"created_by": {
+		"count": 3,
+		"values": [
+			{
+				"count": 61,
+				"value": null
+			},
+			{
+				"count": 53,
+				"value": "administrator"
+			},
+			{
+				"count": 16,
+				"value": "max-admin"
+			}
+		]
+	},
+	"important": {
+		"count": 2,
+		"values": [
+			{
+				"count": 128,
+				"value": false
+			},
+			{
+				"count": 1,
+				"value": true
+			}
+		]
+	},
+	"hosts": {
+		"count": 20,
+		"values": [
+			{
+				"count": 51,
+				"value": null
+			},
+			{
+				"count": 27,
+				"value": "WIN7-X64-NO-SP.auto.lab"
+			},
+			{
+				"count": 18,
+				"value": "XP-X86-SP3"
+			},
+			{
+				"count": 8,
+				"value": "WIN8-X86"
+			},
+			{
+				"count": 7,
+				"value": "WIN7_X64_1.auto.lab"
+			}
+		]
+	},
+	"comments": {
+		"count": 2,
+		"values": [
+			{
+				"count": 86,
+				"value": false
+			},
+			{
+				"count": 43,
+				"value": true
+			}
+		]
+	},
+	"host_groups": {
+		"count": 3,
+		"values": [
+			{
+				"count": 75,
+				"value": null
+			},
+			{
+				"count": 31,
+				"value": "Unmanaged"
+			},
+			{
+				"count": 24,
+				"value": "auto.lab"
+			}
+		]
+	},
+	"detection_system": {
+		"count": 5,
+		"values": [
+			{
+				"count": 73,
+				"value": 66
+			}
+		]
+	},
+	"threat_types": {
+		"count": 6,
+		"values": [
+			{
+				"count": 124,
+				"value": null
+			},
+			{
+				"count": 3,
+				"value": 5
+			},
+			{
+				"count": 2,
+				"value": 10
+			},
+			{
+				"count": 1,
+				"value": 0
+			},
+			{
+				"count": 1,
+				"value": 6
+			},
+			{
+				"count": 1,
+				"value": 7
+			}
+		]
+	},
+	"names": {
+		"count": 8,
+		"values": [
+			{
+				"count": 1520,
+				"value": "User Initiated - Endpoint Investigation"
+			},
+			{
+				"count": 20,
+				"value": "Phishing Mail"
+			},
+			{
+				"count": 19,
+				"value": "Cloud Initiated - Changed File Analysis"
+			},
+			{
+				"count": 1620,
+				"value": "Hunter Scheduler - Endpoint Investigation"
+			},
+			{
+				"count": 9,
+				"value": "User Initiated - Suspicious User Logon"
+			}
+		]
+	}
+}

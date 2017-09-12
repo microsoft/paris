@@ -1,0 +1,142 @@
+{
+	"id": 2,
+	"start_date": "2017-01-31T16:40:42.075387Z",
+	"end_date": "2017-01-31T16:47:27.132345Z",
+	"status": 1,
+	"comments": 0,
+	"tags": null,
+	"actions": {
+		"remediated": 0,
+		"total": 105,
+		"running": 0,
+		"pending": 0
+	},
+	"hosts": [
+		{
+			"status": 2,
+			"is_unmanaged": false,
+			"ip": "2.0.0.6",
+			"reason": null,
+			"logged_in_users": [
+				"AUTO\\bingo"
+			],
+			"id": 8,
+			"group": 1,
+			"name": "WIN7_X64_1.auto.lab",
+			"protection_level_name": "Semi Automated - Require Approval",
+			"protection_level_type": 1,
+			"os": "Windows 7 Enterprise"
+		},
+		{
+			"status": 3,
+			"is_unmanaged": false,
+			"ip": "2.0.0.3",
+			"reason": null,
+			"logged_in_users": [
+				"AUTO\\bingo"
+			],
+			"id": 7,
+			"group": 1,
+			"name": "WIN81-X64",
+			"protection_level_name": "Semi Automated - Require Approval",
+			"protection_level_type": 1,
+			"os": "Windows 8.1 Enterprise"
+		},
+		{
+			"status": 1,
+			"is_unmanaged": false,
+			"ip": "2.0.0.14",
+			"reason": null,
+			"logged_in_users": [
+				"AUTO\\bingo"
+			],
+			"id": 6,
+			"group": 1,
+			"name": "WIN8-X86",
+			"protection_level_name": "Semi Automated - Require Approval",
+			"protection_level_type": 1,
+			"os": "Windows 8 Enterprise"
+		},
+		{
+			"status": 1,
+			"is_unmanaged": false,
+			"ip": "2.0.0.22",
+			"reason": null,
+			"logged_in_users": [
+				"AUTO\\bingo"
+			],
+			"id": 5,
+			"group": 1,
+			"name": "WIN7-ULT-X86.auto.lab",
+			"protection_level_name": "Semi Automated - Require Approval",
+			"protection_level_type": 1,
+			"os": "Windows 7 Ultimate"
+		}
+	],
+	"title": "User Initiated - Suspicious Email Address",
+	"requested_status": null,
+	"dismissed": false,
+	"important": false,
+	"user": null,
+	"external_sources": {
+		"mitigation_source": [],
+		"data_source": [
+			10,
+			47
+		]
+	},
+	"alert_count": 1,
+	"entity_count": 6901,
+	"attention_required": 0,
+	"running_time": 405.056958,
+	"pending_action_types": {
+		"data": [
+			{
+				"action": 13,
+				"count": 0
+			},
+			{
+				"action": 12,
+				"count": 0
+			},
+			{
+				"action": 8,
+				"count": 0
+			}
+		]
+	},
+	"threat_types": [],
+	"alert": {
+		"received_time": "2017-01-31T16:40:42.014Z",
+		"template_name": "User Initiated - Suspicious Email Address",
+		"variables": {
+			"email_addresses": [
+				"bingo@auto.lab"
+			]
+		},
+		"source": "internal_source:User Initiated",
+		"detection_system": 50,
+		"id": 2
+	},
+	"pending_since": null,
+	"alert_to_remediation_time": 0,
+	"errors": [],
+	"pending_actions": [
+		{
+			"waiting_time": 15.467473,
+			"entities": [],
+			"end_time": "2017-01-31T16:41:30.071Z",
+			"entity_name": null,
+			"action_type": 12,
+			"decision": "Approved",
+			"action_id": 104,
+			"user": "administrator",
+			"start_time": "2017-01-31T16:41:14.604Z",
+			"action_name": "Start investigation on multiple endpoints"
+		}
+	],
+	"reasons": null,
+	"pending_type": null,
+	"remediation_pending_time": 0,
+	"resource_pending_time": 15
+}

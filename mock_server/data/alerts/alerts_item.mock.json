@@ -1,0 +1,11 @@
+{
+	"id": "123",
+	"title": "Something bad happened",
+	"status": 1,
+	"machine": "yossi-pc",
+	"host": {
+		"id": "yossi_comp",
+		"name": "Yossi's comp",
+		"domain": "HEXADITE"
+	}
+}

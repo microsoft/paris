@@ -1,0 +1,307 @@
+{
+	"id": 3,
+	"start_date": "2017-02-08T14:27:18.300693Z",
+	"end_date": "2017-02-08T14:33:42.445535Z",
+	"status": 6,
+	"comments": 10,
+	"actions": {
+		"remediated": 10,
+		"total": 115,
+		"running": 0,
+		"pending": 0
+	},
+	"hosts": [
+		{
+			"status": 2,
+			"is_unmanaged": false,
+			"ip": "2.0.0.22",
+			"reason": null,
+			"logged_in_users": [
+				"AUTO\\bingo",
+				"AUTO\\lateral"
+			],
+			"id": 3,
+			"group": 1,
+			"name": "WIN7-ULT-X86.auto.lab",
+			"protection_level_name": "Semi Automated - Require Approval",
+			"protection_level_type": 1,
+			"os": "Windows 7 Ultimate"
+		}
+	],
+	"title": "User Initiated - Endpoint Investigation",
+	"requested_status": null,
+	"dismissed": false,
+	"important": false,
+	"user": null,
+	"external_sources": {
+		"mitigation_source": [],
+		"data_source": [
+			3222
+		]
+	},
+	"alert_count": 2,
+	"entity_count": 1645,
+	"attention_required": 0,
+	"running_time": 384.144842,
+	"pending_action_types": {
+		"data": [
+			{
+				"action": 13,
+				"count": 0
+			},
+			{
+				"action": 12,
+				"count": 0
+			},
+			{
+				"action": 8,
+				"count": 0
+			}
+		]
+	},
+	"threat_types": [
+		{
+			"count": 1,
+			"threat_type": 0
+		},
+		{
+			"count": 1,
+			"threat_type": 1
+		},
+		{
+			"count": 1,
+			"threat_type": 3
+		},
+		{
+			"count": 1,
+			"threat_type": 5
+		},
+		{
+			"count": 4,
+			"threat_type": 6
+		},
+		{
+			"count": 1,
+			"threat_type": 7
+		},
+		{
+			"count": 1,
+			"threat_type": 9
+		}
+	],
+	"alert": {
+		"AlertId": "636219966081943637_-467964911",
+		"WcdMachineId": null,
+		"SenseMachineId": "4799f85552c638acceda6bbdd1c27d81ed98f2bd",
+		"MachineId": "4799f85552c638acceda6bbdd1c27d81ed98f2bd",
+		"ComputerDnsName": "cont-jonathanw.contoso.org",
+		"Severity": 256,
+		"Status": 4,
+		"LastEventTime": "2017-04-17T16:37:47.8018798Z",
+		"FirstEventTime": "2017-04-17T13:12:20.2461196Z",
+		"FirstSeen": "2017-04-17T16:50:07.754788Z",
+		"Classification": 0,
+		"Determination": 0,
+		"DomainName": "CONTOSO",
+		"AccountName": "jonathan.wolcott",
+		"AccountSid": "S-1-5-21-2649156466-80624164-2033095608-1113",
+		"AssignedTo": "Analyst@WDATPContosoFld.onmicrosoft.com",
+		"Category": "PrivilegeEscalation",
+		"Title": "Process privilege escalation due to kernel exploit",
+		"ActorName": null,
+		"TiProvider": null,
+		"GroupId": null,
+		"GroupKey": null,
+		"MachineCount": 1,
+		"UserCount": 1,
+		"AssignedToCount": 1,
+		"AlertCount": 0,
+		"IoaDefinitionId": "6f36a53b-7229-471e-9c91-ea473a50b95d",
+		"InternalMachineId": 8,
+		"ContainedAlerts": null,
+		"IsSealedGroup": null,
+		"DetectionSource": 1,
+		"ThreatFamilyName": null,
+		"SuppressionRuleId": null
+	},
+	"pending_since": null,
+	"alert_to_remediation_time": 211.247341,
+	"is_cleanup_applied": false,
+	"errors": [],
+	"pending_actions": [
+		{
+			"waiting_time": 48.320925,
+			"entities": [
+				{
+					"entity_id": 4504,
+					"entity_type": 1
+				}
+			],
+			"end_time": "2017-02-08T14:31:40.875Z",
+			"entity_name": "יוניקוד.exe",
+			"action_type": 0,
+			"decision": "Approved",
+			"action_id": 108,
+			"user": "administrator",
+			"start_time": "2017-02-08T14:30:52.554Z",
+			"action_name": "Quarantine a File"
+		},
+		{
+			"waiting_time": 47.359767,
+			"entities": [
+				{
+					"entity_id": 4534,
+					"entity_type": 1
+				}
+			],
+			"end_time": "2017-02-08T14:31:40.911Z",
+			"entity_name": "generic.exe",
+			"action_type": 0,
+			"decision": "Approved",
+			"action_id": 110,
+			"user": "administrator",
+			"start_time": "2017-02-08T14:30:53.551Z",
+			"action_name": "Quarantine a File"
+		},
+		{
+			"waiting_time": 46.176443,
+			"entities": [
+				{
+					"entity_id": 4528,
+					"entity_type": 1
+				}
+			],
+			"end_time": "2017-02-08T14:31:40.949Z",
+			"entity_name": "adware.exe",
+			"action_type": 0,
+			"decision": "Approved",
+			"action_id": 113,
+			"user": "administrator",
+			"start_time": "2017-02-08T14:30:54.773Z",
+			"action_name": "Quarantine a File"
+		},
+		{
+			"waiting_time": 51.168596,
+			"entities": [
+				{
+					"entity_id": 4529,
+					"entity_type": 1
+				}
+			],
+			"end_time": "2017-02-08T14:31:40.716Z",
+			"entity_name": "trojan.exe",
+			"action_type": 0,
+			"decision": "Approved",
+			"action_id": 100,
+			"user": "administrator",
+			"start_time": "2017-02-08T14:30:49.548Z",
+			"action_name": "Quarantine a File"
+		},
+		{
+			"waiting_time": 49.985677,
+			"entities": [
+				{
+					"entity_id": 4503,
+					"entity_type": 1
+				}
+			],
+			"end_time": "2017-02-08T14:31:40.765Z",
+			"entity_name": "heuristic.exe",
+			"action_type": 0,
+			"decision": "Approved",
+			"action_id": 103,
+			"user": "administrator",
+			"start_time": "2017-02-08T14:30:50.779Z",
+			"action_name": "Quarantine a File"
+		},
+		{
+			"waiting_time": 49.308228,
+			"entities": [
+				{
+					"entity_id": 4509,
+					"entity_type": 1
+				}
+			],
+			"end_time": "2017-02-08T14:31:40.842Z",
+			"entity_name": "worm.exe",
+			"action_type": 0,
+			"decision": "Approved",
+			"action_id": 106,
+			"user": "administrator",
+			"start_time": "2017-02-08T14:30:51.533Z",
+			"action_name": "Quarantine a File"
+		},
+		{
+			"waiting_time": 49.921516,
+			"entities": [
+				{
+					"entity_id": 4536,
+					"entity_type": 1
+				}
+			],
+			"end_time": "2017-02-08T14:31:40.801Z",
+			"entity_name": "new_mal.exe",
+			"action_type": 0,
+			"decision": "Approved",
+			"action_id": 104,
+			"user": "administrator",
+			"start_time": "2017-02-08T14:30:50.879Z",
+			"action_name": "Quarantine a File"
+		},
+		{
+			"waiting_time": 46.120698,
+			"entities": [
+				{
+					"entity_id": 4537,
+					"entity_type": 1
+				}
+			],
+			"end_time": "2017-02-08T14:31:40.989Z",
+			"entity_name": "hoax.exe",
+			"action_type": 0,
+			"decision": "Approved",
+			"action_id": 114,
+			"user": "administrator",
+			"start_time": "2017-02-08T14:30:54.868Z",
+			"action_name": "Quarantine a File"
+		},
+		{
+			"waiting_time": 26.460095,
+			"entities": [
+				{
+					"entity_id": 4689,
+					"entity_type": 1
+				}
+			],
+			"end_time": "2017-02-08T14:33:28.089Z",
+			"entity_name": "exploit.exe",
+			"action_type": 0,
+			"decision": "Approved",
+			"action_id": 157,
+			"user": "administrator",
+			"start_time": "2017-02-08T14:33:01.629Z",
+			"action_name": "Quarantine a File"
+		},
+		{
+			"waiting_time": 29.232141,
+			"entities": [
+				{
+					"entity_id": 4690,
+					"entity_type": 1
+				}
+			],
+			"end_time": "2017-02-08T14:33:29.802Z",
+			"entity_name": "rootkit.exe",
+			"action_type": 0,
+			"decision": "Approved",
+			"action_id": 155,
+			"user": "administrator",
+			"start_time": "2017-02-08T14:33:00.569Z",
+			"action_name": "Quarantine a File"
+		}
+	],
+	"reasons": null,
+	"pending_type": null,
+	"remediation_pending_time": 80,
+	"resource_pending_time": 0
+}

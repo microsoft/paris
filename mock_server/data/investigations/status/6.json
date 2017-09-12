@@ -1,0 +1,240 @@
+{
+	"count": 3857,
+	"next": "https://172.2.0.200/api/investigation/all?status=6&perPage=10&page=2",
+	"previous": null,
+	"results": [
+		{
+			"id": 135,
+			"name": "Symantec Virus Found syslog",
+			"start_date": "2015-04-21T14:28:42.870Z",
+			"end_date": "2015-04-21T14:30:33.197Z",
+			"affected_hosts": ["WIN7-ULT-X86.auto.lab"],
+			"affected_groups": [""],
+			"affected_users": ["AUTO\\Administrator"],
+			"total_actions": 16,
+			"remediation_actions": [],
+			"pending_actions": [],
+			"failed_actions": [],
+			"last_action": {
+				"details": "Analyzing 695 files using AIRS Cloud srvice.",
+				"is_remediation": false,
+				"id": 3384,
+				"name": "Analyze Multiple Files"
+			},
+			"important": false,
+			"detection_system": "e2e",
+			"error_description": "",
+			"status": 6
+		},
+		{
+			"id": 127,
+			"name": "Symantec Virus Found syslog",
+			"start_date": "2015-04-21T12:56:03.672Z",
+			"end_date": "2015-04-21T12:58:05.840Z",
+			"affected_hosts": ["WIN7-ULT-X86.auto.lab"],
+			"affected_groups": [""],
+			"affected_users": ["AUTO\\Administrator"],
+			"total_actions": 16,
+			"remediation_actions": [],
+			"pending_actions": [],
+			"failed_actions": [],
+			"last_action": {
+				"details": "Analyzing 693 files using AIRS Cloud srvice.",
+				"is_remediation": false,
+				"id": 3112,
+				"name": "Analyze Multiple Files"
+			},
+			"important": false,
+			"detection_system": "e2e",
+			"error_description": "",
+			"status": 6
+		},
+		{
+			"id": 120,
+			"name": "McAfee Abnormal Host Behavior",
+			"start_date": "2015-04-21T10:35:58.521Z",
+			"end_date": "2015-04-21T10:36:01.443Z",
+			"affected_hosts": [],
+			"affected_groups": [],
+			"affected_users": [],
+			"total_actions": 1,
+			"remediation_actions": [],
+			"pending_actions": [],
+			"failed_actions": [],
+			"last_action": {
+				"details": "The alert is already being investigated (inv#118).",
+				"is_remediation": false,
+				"id": 2873,
+				"name": "Alert Correlation"
+			},
+			"important": false,
+			"detection_system": "e2e",
+			"error_description": "",
+			"status": 6
+		},
+		{
+			"id": 119,
+			"name": "McAfee Endpoint Security Tampered",
+			"start_date": "2015-04-21T10:35:54.338Z",
+			"end_date": "2015-04-21T10:44:36.168Z",
+			"affected_hosts": ["WIN8-X86"],
+			"affected_groups": [""],
+			"affected_users": [
+				"AUTO\\Administrator",
+				"WIN8-X86\\DWM-1"
+			],
+			"total_actions": 14,
+			"remediation_actions": [],
+			"pending_actions": [],
+			"failed_actions": [],
+			"last_action": {
+				"details": "Analyzing 762 files using AIRS Cloud srvice.",
+				"is_remediation": false,
+				"id": 2899,
+				"name": "Analyze Multiple Files"
+			},
+			"important": false,
+			"detection_system": "e2e",
+			"error_description": "",
+			"status": 6
+		},
+		{
+			"id": 110,
+			"name": "Symantec Virus Found syslog",
+			"start_date": "2015-04-21T08:44:56.457Z",
+			"end_date": "2015-04-21T08:47:08.130Z",
+			"affected_hosts": ["WIN7-X64-NO-SP.auto.lab"],
+			"affected_groups": [""],
+			"affected_users": ["AUTO\\Administrator"],
+			"total_actions": 16,
+			"remediation_actions": [],
+			"pending_actions": [],
+			"failed_actions": [],
+			"last_action": {
+				"details": "Analyzing 681 files using AIRS Cloud srvice.",
+				"is_remediation": false,
+				"id": 2619,
+				"name": "Analyze Multiple Files"
+			},
+			"important": false,
+			"detection_system": "e2e",
+			"error_description": "",
+			"status": 6
+		},
+		{
+			"id": 84,
+			"name": "McAfee Abnormal Host Behavior",
+			"start_date": "2015-04-20T13:01:51.372Z",
+			"end_date": "2015-04-20T13:01:52.003Z",
+			"affected_hosts": [],
+			"affected_groups": [],
+			"affected_users": [],
+			"total_actions": 1,
+			"remediation_actions": [],
+			"pending_actions": [],
+			"failed_actions": [],
+			"last_action": {
+				"details": "The alert is already being investigated (inv#82).",
+				"is_remediation": false,
+				"id": 2041,
+				"name": "Alert Correlation"
+			},
+			"important": false,
+			"detection_system": "e2e",
+			"error_description": "",
+			"status": 6
+		},
+		{
+			"id": 83,
+			"name": "McAfee Endpoint Security Tampered",
+			"start_date": "2015-04-20T13:01:40.821Z",
+			"end_date": "2015-04-20T13:01:40.984Z",
+			"affected_hosts": [],
+			"affected_groups": [],
+			"affected_users": [],
+			"total_actions": 1,
+			"remediation_actions": [],
+			"pending_actions": [],
+			"failed_actions": [],
+			"last_action": {
+				"details": "The alert is already being investigated (inv#82).",
+				"is_remediation": false,
+				"id": 2040,
+				"name": "Alert Correlation"
+			},
+			"important": false,
+			"detection_system": "e2e",
+			"error_description": "",
+			"status": 6
+		},
+		{
+			"id": 79,
+			"name": "Symantec Virus Found syslog",
+			"start_date": "2015-04-19T15:23:23.021Z",
+			"end_date": "2015-04-19T15:23:23.078Z",
+			"affected_hosts": [],
+			"affected_groups": [],
+			"affected_users": [],
+			"total_actions": 1,
+			"remediation_actions": [],
+			"pending_actions": [],
+			"failed_actions": [],
+			"last_action": {
+				"details": "The alert is already being investigated (inv#77).",
+				"is_remediation": false,
+				"id": 1994,
+				"name": "Alert Correlation"
+			},
+			"important": false,
+			"detection_system": "e2e",
+			"error_description": "",
+			"status": 6
+		},
+		{
+			"id": 78,
+			"name": "Symantec Virus Found syslog",
+			"start_date": "2015-04-19T15:23:18.238Z",
+			"end_date": "2015-04-19T15:23:18.314Z",
+			"affected_hosts": [],
+			"affected_groups": [],
+			"affected_users": [],
+			"total_actions": 1,
+			"remediation_actions": [],
+			"pending_actions": [],
+			"failed_actions": [],
+			"last_action": {
+				"details": "The alert is already being investigated (inv#75).",
+				"is_remediation": false,
+				"id": 1993,
+				"name": "Alert Correlation"
+			},
+			"important": false,
+			"detection_system": "e2e",
+			"error_description": "",
+			"status": 6
+		},
+		{
+			"id": 76,
+			"name": "Symantec Virus Found syslog",
+			"start_date": "2015-04-19T15:21:57.648Z",
+			"end_date": "2015-04-19T15:21:57.710Z",
+			"affected_hosts": [],
+			"affected_groups": [],
+			"affected_users": [],
+			"total_actions": 1,
+			"remediation_actions": [],
+			"pending_actions": [],
+			"failed_actions": [],
+			"last_action": {
+				"details": "The alert is already being investigated (inv#75).",
+				"is_remediation": false,
+				"id": 1990,
+				"name": "Alert Correlation"
+			},
+			"important": false,
+			"detection_system": "e2e",
+			"error_description": "",
+			"status": 6
+		}
+	]
+}

@@ -1,0 +1,25 @@
+{
+	"remediated": [
+		{
+			"entities": [
+				{
+					"host": "WIN7-X86-JAKE.auto.lab",
+					"errors": [],
+					"name": "$r6bq1c4.exe | c:\\$recycle.bin\\s-1-5-21-1697185450-2076875350-1481720747-500\\$r6bq1c4.exe",
+					"action_type": 0,
+					"threat_type": "Heuristic",
+					"id": 182329
+				},
+				{
+					"host": "WIN7-X86-JAKE.auto.lab",
+					"errors": [],
+					"name": "minimalware.exe | c:\\users\\bingo\\desktop\\minimalware.exe",
+					"action_type": 0,
+					"threat_type": "Trojan",
+					"id": 182324
+				}
+			],
+			"entity_type": 1
+		}
+	]
+}

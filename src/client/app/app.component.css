@@ -1,0 +1,26 @@
+:host {
+  flex: 1 1 100%;
+  display: flex;
+  flex-flow: column;
+	padding: 1rem;
+}
+
+table{
+	border: solid 1px #ddd;
+}
+
+table td, table th{
+	text-align: left;
+	padding: 6px 10px;
+}
+
+thead tr{
+	background: #106cc8;
+	color: White;
+}
+
+tr + tr{
+	border-top: solid 1px #eaeaea;
+}
+
+

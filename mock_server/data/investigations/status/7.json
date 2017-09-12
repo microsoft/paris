@@ -1,0 +1,783 @@
+{
+	"count": 21,
+	"next": "https://172.2.0.200/api/investigation/all?status=7&perPage=10&page=2",
+	"previous": null,
+	"results": [
+		{
+			"id": 156,
+			"name": "McAfee Endpoint Security Tampered",
+			"start_date": "2015-04-22T08:29:24.666Z",
+			"end_date": "2015-04-22T08:37:06.417Z",
+			"affected_hosts": ["XP-X64"],
+			"affected_groups": [""],
+			"affected_users": [],
+			"total_actions": 44,
+			"remediation_actions": [
+				{
+					"details": "Quarantine \"C:\\WINDOWS\\najort5g.exe\" with passphrase:None.",
+					"id": 3759,
+					"name": "Quarantine A File"
+				},
+				{
+					"details": "Quarantine 1 files in directory \"C:\\WINDOWS\".",
+					"id": 3756,
+					"name": "Quarantine Files In Directory"
+				},
+				{
+					"details": "Quarantine \"c:\\windows\\sus.exe\" with passphrase:None.",
+					"id": 3751,
+					"name": "Quarantine A File"
+				},
+				{
+					"details": "Terminate(kill) process name:\"sus.exe\" pid:340.",
+					"id": 3750,
+					"name": "Kill Process"
+				},
+				{
+					"details": "Release \"c:\\windows\\sus.exe\" from process name:\"sus.exe\" pid:340.",
+					"id": 3744,
+					"name": "Release File Handle"
+				},
+				{
+					"details": "Quarantine 1 files in directory \"c:\\\".",
+					"id": 3745,
+					"name": "Quarantine Files In Directory"
+				},
+				{
+					"details": "Quarantine \"c:\\windows\\sus.exe\" with passphrase:None.",
+					"id": 3738,
+					"name": "Quarantine A File"
+				},
+				{
+					"details": "Quarantine \"c:\\system volume information\\_restore{f4e3a6d0-3705-48cb-b8b6-bf9553179a3f}\\rp23\\a0001090.exe\" with passphrase:None.",
+					"id": 3739,
+					"name": "Quarantine A File"
+				},
+				{
+					"details": "Quarantine 1 files in directory \"c:\\windows\".",
+					"id": 3731,
+					"name": "Quarantine Files In Directory"
+				},
+				{
+					"details": "Quarantine 2 files in directory \"c:\\system volume information\\_restore{f4e3a6d0-3705-48cb-b8b6-bf9553179a3f}\\rp23\".",
+					"id": 3730,
+					"name": "Quarantine Files In Directory"
+				}
+			],
+			"pending_actions": [],
+			"failed_actions": [
+				{
+					"details": "Calculate hash values for 343 files.",
+					"id": 3749,
+					"name": "Get Files Hashes"
+				},
+				{
+					"details": "Release \"c:\\windows\\sus.exe\" from process name:\"sus.exe\" pid:340.",
+					"id": 3744,
+					"name": "Release File Handle"
+				},
+				{
+					"details": "Calculate hash values for 343 files.",
+					"id": 3743,
+					"name": "Get Files Hashes"
+				},
+				{
+					"details": "Quarantine \"c:\\windows\\sus.exe\" with passphrase:None.",
+					"id": 3738,
+					"name": "Quarantine A File"
+				},
+				{
+					"details": "Get browsing history from ()XP-X64@2.0.0.12.",
+					"id": 3717,
+					"name": "Get Host Browsing History"
+				}
+			],
+			"last_action": {
+				"details": "Quarantine \"C:\\WINDOWS\\najort5g.exe\" with passphrase:None.",
+				"is_remediation": true,
+				"id": 3759,
+				"name": "Quarantine A File"
+			},
+			"important": false,
+			"detection_system": "e2e",
+			"error_description": "",
+			"status": 7
+		},
+		{
+			"id": 131,
+			"name": "Symantec Virus Found syslog",
+			"start_date": "2015-04-21T13:15:36.687Z",
+			"end_date": "2015-04-21T13:20:14.179Z",
+			"affected_hosts": ["WIN7-ULT-X86.auto.lab"],
+			"affected_groups": [""],
+			"affected_users": ["AUTO\\Administrator"],
+			"total_actions": 36,
+			"remediation_actions": [
+				{
+					"details": "Quarantine \"C:\\temp\\file in space.exe\" with passphrase:None.",
+					"id": 3247,
+					"name": "Quarantine A File"
+				},
+				{
+					"details": "Terminate(kill) process name:\"file in space.exe\" pid:372.",
+					"id": 3246,
+					"name": "Kill Process"
+				},
+				{
+					"details": "Release \"C:\\temp\\file in space.exe\" from process name:\"file in space.exe\" pid:372.",
+					"id": 3244,
+					"name": "Release File Handle"
+				},
+				{
+					"details": "Quarantine \"C:\\temp\\file in space.exe\" with passphrase:None.",
+					"id": 3242,
+					"name": "Quarantine A File"
+				}
+			],
+			"pending_actions": [],
+			"failed_actions": [
+				{
+					"details": "Analyzing 689 files using AIRS Cloud srvice.",
+					"id": 3269,
+					"name": "Analyze Multiple Files"
+				},
+				{
+					"details": "Release \"C:\\temp\\file in space.exe\" from process name:\"file in space.exe\" pid:372.",
+					"id": 3244,
+					"name": "Release File Handle"
+				},
+				{
+					"details": "Quarantine \"C:\\temp\\file in space.exe\" with passphrase:None.",
+					"id": 3242,
+					"name": "Quarantine A File"
+				}
+			],
+			"last_action": {
+				"details": "Analyzing 689 files using AIRS Cloud srvice.",
+				"is_remediation": false,
+				"id": 3269,
+				"name": "Analyze Multiple Files"
+			},
+			"important": false,
+			"detection_system": "e2e",
+			"error_description": "",
+			"status": 7
+		},
+		{
+			"id": 123,
+			"name": "McAfee Abnormal Host Behavior",
+			"start_date": "2015-04-21T12:09:30.090Z",
+			"end_date": "2015-04-21T12:21:29.607Z",
+			"affected_hosts": ["WIN8-X86"],
+			"affected_groups": [""],
+			"affected_users": ["AUTO\\Administrator"],
+			"total_actions": 33,
+			"remediation_actions": [
+				{
+					"details": "Quarantine \"c:\\windows\\system32\\z5eqa8h9.exe\" with passphrase:None.",
+					"id": 2988,
+					"name": "Quarantine A File"
+				},
+				{
+					"details": "Terminate(kill) process name:\"z5eQA8h9.exe\" pid:3628.",
+					"id": 2987,
+					"name": "Kill Process"
+				},
+				{
+					"details": "Release \"c:\\windows\\system32\\z5eqa8h9.exe\" from process name:\"z5eQA8h9.exe\" pid:3628.",
+					"id": 2985,
+					"name": "Release File Handle"
+				},
+				{
+					"details": "Quarantine \"c:\\windows\\system32\\z5eqa8h9.exe\" with passphrase:None.",
+					"id": 2983,
+					"name": "Quarantine A File"
+				},
+				{
+					"details": "Quarantine 1 files in directory \"c:\\windows\\system32\".",
+					"id": 2979,
+					"name": "Quarantine Files In Directory"
+				}
+			],
+			"pending_actions": [],
+			"failed_actions": [
+				{
+					"details": "Release \"c:\\windows\\system32\\z5eqa8h9.exe\" from process name:\"z5eQA8h9.exe\" pid:3628.",
+					"id": 2985,
+					"name": "Release File Handle"
+				},
+				{
+					"details": "Quarantine \"c:\\windows\\system32\\z5eqa8h9.exe\" with passphrase:None.",
+					"id": 2983,
+					"name": "Quarantine A File"
+				},
+				{
+					"details": "Check 2 addresses whether are known as malicious",
+					"id": 2970,
+					"name": "Analyze Multiple IP Addresses"
+				}
+			],
+			"last_action": {
+				"details": "Checks that file C:\\Windows\\System32\\drivers\\etc\\hosts status \"not_found\" requires quarantine.",
+				"is_remediation": false,
+				"id": 2997,
+				"name": "Decide On File Quarantine"
+			},
+			"important": false,
+			"detection_system": "e2e",
+			"error_description": "",
+			"status": 7
+		},
+		{
+			"id": 121,
+			"name": "McAfee Port Blocking",
+			"start_date": "2015-04-21T11:56:49.023Z",
+			"end_date": "2015-04-21T12:03:13.866Z",
+			"affected_hosts": ["WIN8-X86"],
+			"affected_groups": [""],
+			"affected_users": [
+				"AUTO\\Administrator",
+				"WIN8-X86\\DWM-1"
+			],
+			"total_actions": 32,
+			"remediation_actions": [
+				{
+					"details": "Quarantine \"c:\\windows\\sus.exe\" with passphrase:None.",
+					"id": 2922,
+					"name": "Quarantine A File"
+				},
+				{
+					"details": "Terminate(kill) process name:\"sus.exe\" pid:908.",
+					"id": 2921,
+					"name": "Kill Process"
+				},
+				{
+					"details": "Release \"c:\\windows\\sus.exe\" from process name:\"sus.exe\" pid:908.",
+					"id": 2919,
+					"name": "Release File Handle"
+				},
+				{
+					"details": "Quarantine \"c:\\windows\\sus.exe\" with passphrase:None.",
+					"id": 2917,
+					"name": "Quarantine A File"
+				},
+				{
+					"details": "Quarantine 1 files in directory \"c:\\windows\".",
+					"id": 2913,
+					"name": "Quarantine Files In Directory"
+				}
+			],
+			"pending_actions": [],
+			"failed_actions": [
+				{
+					"details": "Release \"c:\\windows\\sus.exe\" from process name:\"sus.exe\" pid:908.",
+					"id": 2919,
+					"name": "Release File Handle"
+				},
+				{
+					"details": "Quarantine \"c:\\windows\\sus.exe\" with passphrase:None.",
+					"id": 2917,
+					"name": "Quarantine A File"
+				},
+				{
+					"details": "Get active connections list.",
+					"id": 2902,
+					"name": "Get All Active Connections"
+				},
+				{
+					"details": "Get browsing history from ()WIN8-X86@2.0.0.6.",
+					"id": 2901,
+					"name": "Get Host Browsing History"
+				}
+			],
+			"last_action": {
+				"details": "Checks that file C:\\Windows\\System32\\drivers\\etc\\hosts status \"not_found\" requires quarantine.",
+				"is_remediation": false,
+				"id": 2931,
+				"name": "Decide On File Quarantine"
+			},
+			"important": false,
+			"detection_system": "e2e",
+			"error_description": "",
+			"status": 7
+		},
+		{
+			"id": 116,
+			"name": "McAfee Endpoint Security Tampered",
+			"start_date": "2015-04-21T09:25:49.802Z",
+			"end_date": "2015-04-21T09:31:03.850Z",
+			"affected_hosts": ["WIN8-X86"],
+			"affected_groups": [""],
+			"affected_users": ["AUTO\\Administrator"],
+			"total_actions": 28,
+			"remediation_actions": [
+				{
+					"details": "Quarantine \"c:\\users\\administrator\\eq58r9.exe\" with passphrase:None.",
+					"id": 2833,
+					"name": "Quarantine A File"
+				},
+				{
+					"details": "Terminate(kill) process name:\"eQ58r9.exe\" pid:3196.",
+					"id": 2832,
+					"name": "Kill Process"
+				},
+				{
+					"details": "Release \"c:\\users\\administrator\\eq58r9.exe\" from process name:\"eQ58r9.exe\" pid:3196.",
+					"id": 2830,
+					"name": "Release File Handle"
+				},
+				{
+					"details": "Quarantine \"c:\\users\\administrator\\eq58r9.exe\" with passphrase:None.",
+					"id": 2828,
+					"name": "Quarantine A File"
+				},
+				{
+					"details": "Quarantine 1 files in directory \"c:\\users\\administrator\".",
+					"id": 2824,
+					"name": "Quarantine Files In Directory"
+				}
+			],
+			"pending_actions": [],
+			"failed_actions": [
+				{
+					"details": "Analyzing 3 files using AIRS Cloud srvice.",
+					"id": 2837,
+					"name": "Analyze Multiple Files"
+				},
+				{
+					"details": "Release \"c:\\users\\administrator\\eq58r9.exe\" from process name:\"eQ58r9.exe\" pid:3196.",
+					"id": 2830,
+					"name": "Release File Handle"
+				},
+				{
+					"details": "Quarantine \"c:\\users\\administrator\\eq58r9.exe\" with passphrase:None.",
+					"id": 2828,
+					"name": "Quarantine A File"
+				}
+			],
+			"last_action": {
+				"details": "Analyzing 3 files using AIRS Cloud srvice.",
+				"is_remediation": false,
+				"id": 2837,
+				"name": "Analyze Multiple Files"
+			},
+			"important": false,
+			"detection_system": "e2e",
+			"error_description": "",
+			"status": 7
+		},
+		{
+			"id": 104,
+			"name": "McAfee Port Blocking",
+			"start_date": "2015-04-21T07:57:19.474Z",
+			"end_date": "2015-04-21T08:02:58.720Z",
+			"affected_hosts": ["WIN8-X86"],
+			"affected_groups": [""],
+			"affected_users": [
+				"AUTO\\Administrator",
+				"WIN8-X86\\DWM-1"
+			],
+			"total_actions": 32,
+			"remediation_actions": [
+				{
+					"details": "Quarantine \"c:\\windows\\sus.exe\" with passphrase:None.",
+					"id": 2429,
+					"name": "Quarantine A File"
+				},
+				{
+					"details": "Terminate(kill) process name:\"sus.exe\" pid:2680.",
+					"id": 2428,
+					"name": "Kill Process"
+				},
+				{
+					"details": "Release \"c:\\windows\\sus.exe\" from process name:\"sus.exe\" pid:2680.",
+					"id": 2426,
+					"name": "Release File Handle"
+				},
+				{
+					"details": "Quarantine \"c:\\windows\\sus.exe\" with passphrase:None.",
+					"id": 2424,
+					"name": "Quarantine A File"
+				},
+				{
+					"details": "Quarantine 1 files in directory \"c:\\windows\".",
+					"id": 2420,
+					"name": "Quarantine Files In Directory"
+				}
+			],
+			"pending_actions": [],
+			"failed_actions": [
+				{
+					"details": "Release \"c:\\windows\\sus.exe\" from process name:\"sus.exe\" pid:2680.",
+					"id": 2426,
+					"name": "Release File Handle"
+				},
+				{
+					"details": "Quarantine \"c:\\windows\\sus.exe\" with passphrase:None.",
+					"id": 2424,
+					"name": "Quarantine A File"
+				},
+				{
+					"details": "Get active connections list.",
+					"id": 2409,
+					"name": "Get All Active Connections"
+				},
+				{
+					"details": "Get browsing history from ()WIN8-X86@2.0.0.6.",
+					"id": 2408,
+					"name": "Get Host Browsing History"
+				}
+			],
+			"last_action": {
+				"details": "Checks that file C:\\Windows\\System32\\drivers\\etc\\hosts status \"not_found\" requires quarantine.",
+				"is_remediation": false,
+				"id": 2438,
+				"name": "Decide On File Quarantine"
+			},
+			"important": false,
+			"detection_system": "e2e",
+			"error_description": "",
+			"status": 7
+		},
+		{
+			"id": 98,
+			"name": "McAfee Port Blocking",
+			"start_date": "2015-04-20T15:57:44.442Z",
+			"end_date": "2015-04-20T16:03:23.725Z",
+			"affected_hosts": ["WIN8-X86"],
+			"affected_groups": [""],
+			"affected_users": [
+				"AUTO\\Administrator",
+				"WIN8-X86\\DWM-1"
+			],
+			"total_actions": 47,
+			"remediation_actions": [
+				{
+					"details": "Quarantine 1 files in directory \"c:\\windows\".",
+					"id": 2214,
+					"name": "Quarantine Files In Directory"
+				},
+				{
+					"details": "Quarantine \"c:\\windows\\system32\\z5eqa8h9.exe\" with passphrase:None.",
+					"id": 2213,
+					"name": "Quarantine A File"
+				},
+				{
+					"details": "Quarantine \"c:\\users\\administrator\\eq58r9.exe\" with passphrase:None.",
+					"id": 2212,
+					"name": "Quarantine A File"
+				},
+				{
+					"details": "Terminate(kill) process name:\"z5eQA8h9.exe\" pid:2632.",
+					"id": 2211,
+					"name": "Kill Process"
+				},
+				{
+					"details": "Terminate(kill) process name:\"eQ58r9.exe\" pid:1080.",
+					"id": 2210,
+					"name": "Kill Process"
+				},
+				{
+					"details": "Release \"c:\\users\\administrator\\eq58r9.exe\" from process name:\"eQ58r9.exe\" pid:1080.",
+					"id": 2207,
+					"name": "Release File Handle"
+				},
+				{
+					"details": "Release \"c:\\windows\\system32\\z5eqa8h9.exe\" from process name:\"z5eQA8h9.exe\" pid:2632.",
+					"id": 2206,
+					"name": "Release File Handle"
+				},
+				{
+					"details": "Quarantine \"c:\\users\\administrator\\eq58r9.exe\" with passphrase:None.",
+					"id": 2203,
+					"name": "Quarantine A File"
+				},
+				{
+					"details": "Quarantine \"c:\\windows\\system32\\z5eqa8h9.exe\" with passphrase:None.",
+					"id": 2202,
+					"name": "Quarantine A File"
+				},
+				{
+					"details": "Quarantine 1 files in directory \"c:\\windows\\system32\".",
+					"id": 2195,
+					"name": "Quarantine Files In Directory"
+				},
+				{
+					"details": "Quarantine 1 files in directory \"c:\\users\\administrator\".",
+					"id": 2194,
+					"name": "Quarantine Files In Directory"
+				}
+			],
+			"pending_actions": [],
+			"failed_actions": [
+				{
+					"details": "Calculate hash values for 754 files.",
+					"id": 2217,
+					"name": "Get Files Hashes"
+				},
+				{
+					"details": "Release \"c:\\users\\administrator\\eq58r9.exe\" from process name:\"eQ58r9.exe\" pid:1080.",
+					"id": 2207,
+					"name": "Release File Handle"
+				},
+				{
+					"details": "Release \"c:\\windows\\system32\\z5eqa8h9.exe\" from process name:\"z5eQA8h9.exe\" pid:2632.",
+					"id": 2206,
+					"name": "Release File Handle"
+				},
+				{
+					"details": "Quarantine \"c:\\users\\administrator\\eq58r9.exe\" with passphrase:None.",
+					"id": 2203,
+					"name": "Quarantine A File"
+				},
+				{
+					"details": "Quarantine \"c:\\windows\\system32\\z5eqa8h9.exe\" with passphrase:None.",
+					"id": 2202,
+					"name": "Quarantine A File"
+				}
+			],
+			"last_action": {
+				"details": "Checks that file C:\\Windows\\System32\\drivers\\etc\\hosts status \"not_found\" requires quarantine.",
+				"is_remediation": false,
+				"id": 2226,
+				"name": "Decide On File Quarantine"
+			},
+			"important": false,
+			"detection_system": "e2e",
+			"error_description": "",
+			"status": 7
+		},
+		{
+			"id": 70,
+			"name": "Symantec Virus Found syslog",
+			"start_date": "2015-04-14T13:50:48.035Z",
+			"end_date": "2015-04-14T14:24:55.655Z",
+			"affected_hosts": ["WIN81-X64"],
+			"affected_groups": [""],
+			"affected_users": [],
+			"total_actions": 49,
+			"remediation_actions": [
+				{
+					"details": "Terminate(kill) process name:\"evil.exe\" pid:2032.",
+					"id": 1850,
+					"name": "Kill Process"
+				},
+				{
+					"details": "Release \"c:\\temp\\evil.exe\" from process name:\"evil.exe\" pid:2032.",
+					"id": 1848,
+					"name": "Release File Handle"
+				},
+				{
+					"details": "Quarantine \"c:\\temp\\1.exe\" with passphrase:None.",
+					"id": 1846,
+					"name": "Quarantine A File"
+				},
+				{
+					"details": "Quarantine \"c:\\temp\\evil.exe\" with passphrase:None.",
+					"id": 1845,
+					"name": "Quarantine A File"
+				},
+				{
+					"details": "Terminate(kill) process name:\"1.exe\" pid:3648.",
+					"id": 1844,
+					"name": "Kill Process"
+				},
+				{
+					"details": "Release \"c:\\temp\\1.exe\" from process name:\"1.exe\" pid:3648.",
+					"id": 1839,
+					"name": "Release File Handle"
+				},
+				{
+					"details": "Quarantine \"c:\\temp\\1.exe\" with passphrase:None.",
+					"id": 1837,
+					"name": "Quarantine A File"
+				},
+				{
+					"details": "Quarantine 1 files in directory \"c:\\temp\".",
+					"id": 1831,
+					"name": "Quarantine Files In Directory"
+				},
+				{
+					"details": "Quarantine \"C:\\temp\\file in space.exe\" with passphrase:None.",
+					"id": 1817,
+					"name": "Quarantine A File"
+				},
+				{
+					"details": "Terminate(kill) process name:\"file in space.exe\" pid:3100.",
+					"id": 1816,
+					"name": "Kill Process"
+				},
+				{
+					"details": "Release \"C:\\temp\\file in space.exe\" from process name:\"file in space.exe\" pid:3100.",
+					"id": 1814,
+					"name": "Release File Handle"
+				},
+				{
+					"details": "Quarantine \"C:\\temp\\file in space.exe\" with passphrase:None.",
+					"id": 1812,
+					"name": "Quarantine A File"
+				}
+			],
+			"pending_actions": [],
+			"failed_actions": [
+				{
+					"details": "Release \"c:\\temp\\evil.exe\" from process name:\"evil.exe\" pid:2032.",
+					"id": 1848,
+					"name": "Release File Handle"
+				},
+				{
+					"details": "Quarantine \"c:\\temp\\evil.exe\" with passphrase:None.",
+					"id": 1845,
+					"name": "Quarantine A File"
+				},
+				{
+					"details": "Release \"c:\\temp\\1.exe\" from process name:\"1.exe\" pid:3648.",
+					"id": 1839,
+					"name": "Release File Handle"
+				},
+				{
+					"details": "Quarantine \"c:\\temp\\1.exe\" with passphrase:None.",
+					"id": 1837,
+					"name": "Quarantine A File"
+				},
+				{
+					"details": "Release \"C:\\temp\\file in space.exe\" from process name:\"file in space.exe\" pid:3100.",
+					"id": 1814,
+					"name": "Release File Handle"
+				},
+				{
+					"details": "Quarantine \"C:\\temp\\file in space.exe\" with passphrase:None.",
+					"id": 1812,
+					"name": "Quarantine A File"
+				}
+			],
+			"last_action": {
+				"details": "Terminate(kill) process name:\"evil.exe\" pid:2032.",
+				"is_remediation": true,
+				"id": 1850,
+				"name": "Kill Process"
+			},
+			"important": false,
+			"detection_system": "e2e",
+			"error_description": "",
+			"status": 9
+		},
+		{
+			"id": 45,
+			"name": "McAfee Port Blocking",
+			"start_date": "2015-04-13T07:25:28.355Z",
+			"end_date": null,
+			"affected_hosts": ["win8-x86"],
+			"affected_groups": [""],
+			"affected_users": [
+				"AUTO\\Administrator",
+				"WIN8-X86\\DWM-1"
+			],
+			"total_actions": 10,
+			"remediation_actions": [],
+			"pending_actions": [],
+			"failed_actions": [
+				{
+					"details": "Lists all PEs in \"C:\\Users\\Administrator\\Downloads\".",
+					"id": 1141,
+					"name": "Find Files In Directory"
+				},
+				{
+					"details": "List all running processes on ()win8-x86@2.0.0.6.",
+					"id": 1140,
+					"name": "Get Process List"
+				},
+				{
+					"details": "Lists all PEs in \"C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\Outlook\".",
+					"id": 1139,
+					"name": "Find Files In Directory"
+				},
+				{
+					"details": "Get active connections list.",
+					"id": 1137,
+					"name": "Get All Active Connections"
+				}
+			],
+			"last_action": {
+				"details": "Get all executable files created in last 3600 seconds.",
+				"is_remediation": false,
+				"id": 1143,
+				"name": "Get Recently Created Files"
+			},
+			"important": false,
+			"detection_system": "e2e",
+			"error_description": "",
+			"status": 9
+		},
+		{
+			"id": 44,
+			"name": "McAfee Abnormal Host Behavior",
+			"start_date": "2015-04-13T06:58:30.775Z",
+			"end_date": "2015-04-13T07:06:22.590Z",
+			"affected_hosts": ["win8-x86"],
+			"affected_groups": [""],
+			"affected_users": ["AUTO\\Administrator"],
+			"total_actions": 38,
+			"remediation_actions": [
+				{
+					"details": "Quarantine 1 files in directory \"c:\\windows\\system32\".",
+					"id": 1121,
+					"name": "Quarantine Files In Directory"
+				},
+				{
+					"details": "Quarantine \"c:\\windows\\sus.exe\" with passphrase:None.",
+					"id": 1120,
+					"name": "Quarantine A File"
+				},
+				{
+					"details": "Terminate(kill) process name:\"sus.exe\" pid:1180.",
+					"id": 1119,
+					"name": "Kill Process"
+				},
+				{
+					"details": "Release \"c:\\windows\\sus.exe\" from process name:\"sus.exe\" pid:1180.",
+					"id": 1117,
+					"name": "Release File Handle"
+				},
+				{
+					"details": "Quarantine \"c:\\windows\\sus.exe\" with passphrase:None.",
+					"id": 1115,
+					"name": "Quarantine A File"
+				},
+				{
+					"details": "Quarantine 1 files in directory \"c:\\windows\".",
+					"id": 1111,
+					"name": "Quarantine Files In Directory"
+				}
+			],
+			"pending_actions": [],
+			"failed_actions": [
+				{
+					"details": "Calculate hash values for 762 files.",
+					"id": 1124,
+					"name": "Get Files Hashes"
+				},
+				{
+					"details": "Release \"c:\\windows\\sus.exe\" from process name:\"sus.exe\" pid:1180.",
+					"id": 1117,
+					"name": "Release File Handle"
+				},
+				{
+					"details": "Quarantine \"c:\\windows\\sus.exe\" with passphrase:None.",
+					"id": 1115,
+					"name": "Quarantine A File"
+				}
+			],
+			"last_action": {
+				"details": "Checks that file C:\\Windows\\System32\\drivers\\etc\\hosts status \"not_found\" requires quarantine.",
+				"is_remediation": false,
+				"id": 1133,
+				"name": "Decide On File Quarantine"
+			},
+			"important": false,
+			"detection_system": "e2e",
+			"error_description": "",
+			"status": 9
+		}
+	]
+}

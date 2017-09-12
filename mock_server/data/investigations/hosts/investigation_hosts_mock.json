@@ -1,0 +1,59 @@
+{
+	"count": 5,
+	"next": null,
+	"previous": null,
+	"results": [
+		{
+			"id": 59,
+			"name": "WIN7-ULT-X86.auto.lab",
+			"ip": null,
+			"group": 39,
+			"investigation": 17,
+			"os": {
+				"id": 8,
+				"name": "Windows 7 Ultimate",
+				"version": "6.1",
+				"service_pack": "Service Pack 1",
+				"architecture": null,
+				"family": 0
+			},
+			"protection_level_name": "Semi Automated - Require Approval",
+			"protection_level_type": 1,
+			"is_unmanaged": true,
+			"logged_in_users": ["yossi"],
+			"last_seen": null,
+			"status": 4,
+			"last_investigated": "2017-01-23T12:38:39.598Z",
+			"investigation_count": 2,
+			"ou": "CN=WIN7-ULT-X86,OU=Hexadite-PC,DC=Auto,DC=Lab",
+			"is_unprotected": false,
+			"allow_cancel": true
+		},
+		{
+			"id": 222,
+			"name": "BINGO.auto.lab",
+			"ip": null,
+			"group": 39,
+			"investigation": 17,
+			"os": {
+				"id": 8,
+				"name": "Windows 7 Ultimate",
+				"version": "6.1",
+				"service_pack": "Service Pack 1",
+				"architecture": null,
+				"family": 0
+			},
+			"protection_level_name": "Semi Automated - Require Approval",
+			"protection_level_type": 1,
+			"is_unmanaged": false,
+			"logged_in_users": ["yossi"],
+			"last_seen": null,
+			"status": 3,
+			"last_investigated": "2017-01-23T12:38:39.598Z",
+			"investigation_count": 2,
+			"ou": "CN=WIN7-ULT-X86,OU=Hexadite-PC,DC=Auto,DC=Lab",
+			"is_unprotected": false,
+			"allow_cancel": false
+		}
+	]
+}

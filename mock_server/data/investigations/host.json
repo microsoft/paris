@@ -1,0 +1,16 @@
+{
+	"group": "HR",
+	"id": 40,
+	"ip": "192.168.2.121",
+	"logged_in_users": [
+		"Administrator"
+	],
+	"name": "Computer_2_121",
+	"os": {
+		"architecture": "64 Bit",
+		"name": "Windows Server 2008 R2",
+		"service_pack": null
+	},
+	"protection_level_type": 2,
+	"protection_level_name": "Semi Psychedelic"
+}
