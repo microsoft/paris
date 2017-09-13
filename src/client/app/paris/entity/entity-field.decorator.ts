@@ -1,6 +1,6 @@
 import {DataEntityType} from "./data-entity.base";
 import {Field} from "./entity-field";
-import {entityFieldsService} from "../services/entity-fields.service";
+import {entitiesService} from "../services/entities.service";
 
 export function EntityField(fieldConfig:Field):PropertyDecorator {
 	return function (entityPrototype: DataEntityType, propertyKey: string | symbol) {
@@ -11,6 +11,6 @@ export function EntityField(fieldConfig:Field):PropertyDecorator {
 
 		fieldConfigCopy.type = propertyConstructor;
 
-		entityFieldsService.addEntityField(entityPrototype, fieldConfigCopy);
+		entitiesService.addEntityField(entityPrototype, fieldConfigCopy);
 	}
 }

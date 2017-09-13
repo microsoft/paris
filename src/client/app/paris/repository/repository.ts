@@ -1,9 +1,8 @@
-import {ModelEntityConfig} from "../entity/entity.config";
+import {ModelEntity} from "../entity/entity.config";
 import {DataEntityConstructor} from "../entity/data-entity.base";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
 import {Field} from "../entity/entity-field";
-import {entityFieldsService, FieldsIndex} from "../services/entity-fields.service";
 import {RepositoryManagerService} from "./repository-manager.service";
 import {IRepository} from "./repository.interface";
 import {DataSet} from "../data/dataset";
@@ -16,7 +15,7 @@ export class Repository<T extends IIdentifiable>{
 	private _allValues:Array<T>;
 	private _allValuesMap:Map<any, T>;
 
-	constructor(public readonly entityConfig:ModelEntityConfig,
+	constructor(public readonly entity:ModelEntity,
 				private entityConstructor:DataEntityConstructor<T>,
 				private dataStore:DataStoreService,
 				private repositoryManagerService:RepositoryManagerService){}
@@ -33,13 +32,10 @@ export class Repository<T extends IIdentifiable>{
 	 * @returns {Observable<ModelData>}
 	 */
 	private getModelData(itemData:any):Observable<ModelData>{
-		let entityFields:FieldsIndex = entityFieldsService.getDataEntityTypeFields(this.entityConstructor),
-			modelData:ModelData = { id: itemData.id },
+		let modelData:ModelData = { id: itemData.id },
 			subModels:Array<Observable<{ [key:string]:any }>> = [];
 
-		for(let entityFieldId in entityFields){
-			let entityField:Field = entityFields[entityFieldId];
-
+		this.entity.fields.forEach((entityField:Field) => {
 			let propertyValue:any = itemData[entityField.data || entityField.id];
 
 			if (propertyValue === undefined || propertyValue === null){
@@ -53,7 +49,7 @@ export class Repository<T extends IIdentifiable>{
 						let propertyEntityValue:Observable<any> = Object(propertyValue) === propertyValue ? propertyRepository.createItem(propertyValue) : propertyRepository.getItemById(propertyValue),
 							getPropertyEntityValue:Observable<{ [index:string]:any }> = propertyEntityValue.map((propertyEntityValue:any) => {
 								let data:{ [index:string]:any } = {};
-								data[entityFieldId] = propertyEntityValue;
+								data[entityField.id] = propertyEntityValue;
 								return data;
 							});
 
@@ -65,7 +61,7 @@ export class Repository<T extends IIdentifiable>{
 					}
 				}
 			}
-		}
+		});
 
 		if (subModels.length) {
 			return Observable.combineLatest.apply(this, subModels).map((propertyEntityValues: Array<{ [index: string]: any }>) => {
@@ -78,7 +74,7 @@ export class Repository<T extends IIdentifiable>{
 	}
 
 	getItemsDataSet(options?:any):Observable<DataSet<T>>{
-		return this.dataStore.get(this.entityConfig.endpoint + "/", options).flatMap((dataSet:DataSet<any>) => {
+		return this.dataStore.get(this.entity.endpoint + "/", options).flatMap((dataSet:DataSet<any>) => {
 			let itemCreators:Array<Observable<T>> = dataSet.results.map((itemData:any) => this.createItem(itemData));
 
 			return Observable.combineLatest.apply(this, itemCreators).map((items:Array<T>) => {
@@ -91,7 +87,7 @@ export class Repository<T extends IIdentifiable>{
 	}
 
 	getItemById(itemId:string|number):Observable<T>{
-		if (this.entityConfig.loadAll){
+		if (this.entity.loadAll){
 			if (!this._allValues){
 				return this.getItemsDataSet()
 					.do((dataSet:DataSet<T>) => {
@@ -105,7 +101,7 @@ export class Repository<T extends IIdentifiable>{
 				return Observable.of(this._allValuesMap.get(itemId));
 		}
 		else {
-			return this.dataStore.get(`${this.entityConfig.endpoint}/${itemId}`)
+			return this.dataStore.get(`${this.entity.endpoint}/${itemId}`)
 				.flatMap(data => this.createItem(data));
 		}
 	}

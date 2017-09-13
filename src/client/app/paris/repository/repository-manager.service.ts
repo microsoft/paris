@@ -1,7 +1,7 @@
 import {Injectable} from "@angular/core";
 import {Repository} from "./repository";
 import {IRepository} from "./repository.interface";
-import {ModelEntityConfig} from "../entity/entity.config";
+import {ModelEntity} from "../entity/entity.config";
 import {DataEntityConstructor, DataEntityType} from "../entity/data-entity.base";
 import {Subject} from "rxjs/Subject";
 import {entitiesService} from "../services/entities.service";
@@ -19,7 +19,7 @@ export class RepositoryManagerService{
 	getRepository<T extends IIdentifiable>(entityConstructor:DataEntityConstructor<T>):Repository<T> | null{
 		let repository:Repository<T> = <Repository<T>>this.repositories.get(entityConstructor);
 		if (!repository) {
-			let entityConfig:ModelEntityConfig = entitiesService.getEntityByType(entityConstructor);
+			let entityConfig:ModelEntity = entitiesService.getEntityByType(entityConstructor);
 			if (!entityConfig)
 				return null;
 

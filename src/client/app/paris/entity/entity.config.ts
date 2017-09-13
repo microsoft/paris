@@ -1,10 +1,10 @@
-import {Field} from "./entity-field";
+import {EntityFields} from "./entity-fields";
 
 export class ModelEntity{
 	singularName:string;
 	pluralName:string;
 	endpoint:string;
-	fields?:Array<Field> = [];
+	fields?:EntityFields;
 	loadAll?:boolean = false;
 
 	constructor(config:ModelEntityConfig){
