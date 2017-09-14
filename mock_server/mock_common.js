@@ -31,9 +31,9 @@ function getResponseCallback(res){
 	}
 }
 /**
- * Returns a function to handler requests with an ID, which all map to the same mock data file.
+ * Returns a function to handler requests with an ID, which all map to the same mock dataset file.
  * @param path {String} The path of the single JSON file to return for any ID
- * @param idProperty The ID property to add to the result JSON data (the value is the 'id' param in the URL)
+ * @param idProperty The ID property to add to the result JSON dataset (the value is the 'id' param in the URL)
  * @returns {Function}
  */
 function getIdentifiableItem(path, idProperty){

@@ -1,4 +1,4 @@
-import {Injectable} from "@angular/core";
+import {Inject, Injectable} from "@angular/core";
 import {Repository} from "./repository";
 import {IRepository} from "./repository.interface";
 import {ModelEntity} from "../entity/entity.config";
@@ -7,6 +7,7 @@ import {Subject} from "rxjs/Subject";
 import {entitiesService} from "../services/entities.service";
 import {DataStoreService} from "../services/data-store/data-store.service";
 import {IIdentifiable} from "../models/identifiable.model";
+import {ParisConfig} from "../config/paris-config";
 
 @Injectable()
 export class RepositoryManagerService{
@@ -14,7 +15,7 @@ export class RepositoryManagerService{
 
 	save$:Subject<RepositoryEvent> = new Subject();
 
-	constructor(private dataStore:DataStoreService){}
+	constructor(private dataStore:DataStoreService, @Inject('config') private config:ParisConfig){}
 
 	getRepository<T extends IIdentifiable>(entityConstructor:DataEntityConstructor<T>):Repository<T> | null{
 		let repository:Repository<T> = <Repository<T>>this.repositories.get(entityConstructor);
@@ -23,7 +24,7 @@ export class RepositoryManagerService{
 			if (!entityConfig)
 				return null;
 
-			repository = new Repository<T>(entityConfig, entityConstructor, this.dataStore, this);
+			repository = new Repository<T>(entityConfig, this.config, entityConstructor, this.dataStore, this);
 			this.repositories.set(entityConstructor, repository);
 
 			repository.save$.subscribe(savedItem => this.save$.next({ repository: repository, item: savedItem }));

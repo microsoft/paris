@@ -377,7 +377,7 @@ export class SeedConfig {
    */
   TEMPLATE_CONFIG = {
     /**
-     * Used to detect `data` property values to be HTML-escaped.
+     * Used to detect `dataset` property values to be HTML-escaped.
      *
      * @memberOf _.templateSettings
      * @type {RegExp}
@@ -393,7 +393,7 @@ export class SeedConfig {
     evaluate: /<%([\s\S]+?)%>/g,
 
     /**
-     * Used to detect `data` property values to inject.
+     * Used to detect `dataset` property values to inject.
      *
      * @memberOf _.templateSettings
      * @type {RegExp}
@@ -401,7 +401,7 @@ export class SeedConfig {
     interpolate: /<%=([\s\S]+?)%>/g,
 
     /**
-     * Used to reference the data object in the template text.
+     * Used to reference the dataset object in the template text.
      *
      * @memberOf _.templateSettings
      * @type {string}

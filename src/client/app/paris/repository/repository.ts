@@ -5,9 +5,11 @@ import {Subject} from "rxjs/Subject";
 import {Field} from "../entity/entity-field";
 import {RepositoryManagerService} from "./repository-manager.service";
 import {IRepository} from "./repository.interface";
-import {DataSet} from "../data/dataset";
 import {DataStoreService} from "../services/data-store/data-store.service";
 import {IIdentifiable} from "../models/identifiable.model";
+import {ParisConfig} from "../config/paris-config";
+import {DataSetOptions} from "../dataset/dataset-options";
+import {DataSet} from "../dataset/dataset";
 
 export class Repository<T extends IIdentifiable>{
 	save$:Subject<T> = new Subject<T>();
@@ -16,6 +18,7 @@ export class Repository<T extends IIdentifiable>{
 	private _allValuesMap:Map<any, T>;
 
 	constructor(public readonly entity:ModelEntity,
+				private config:ParisConfig,
 				private entityConstructor:DataEntityConstructor<T>,
 				private dataStore:DataStoreService,
 				private repositoryManagerService:RepositoryManagerService){}
@@ -26,7 +29,7 @@ export class Repository<T extends IIdentifiable>{
 	}
 
 	/**
-	 * Populates the item data with any sub @model. For example, if an ID is found for a property whose type is an entity,
+	 * Populates the item dataset with any sub @model. For example, if an ID is found for a property whose type is an entity,
 	 * the property's value will be an instance of that entity, for the ID, not the ID.
 	 * @param itemData
 	 * @returns {Observable<ModelData>}
@@ -73,17 +76,28 @@ export class Repository<T extends IIdentifiable>{
 			return Observable.of(modelData);
 	}
 
-	getItemsDataSet(options?:any):Observable<DataSet<T>>{
-		return this.dataStore.get(this.entity.endpoint + "/", options).flatMap((dataSet:DataSet<any>) => {
-			let itemCreators:Array<Observable<T>> = dataSet.results.map((itemData:any) => this.createItem(itemData));
+	getItemsDataSet(options?:DataSetOptions):Observable<DataSet<T>>{
+		return this.dataStore.get(this.entity.endpoint + "/", options)
+			.map((rawDataSet:any) => {
+				let rawItems:Array<any> = rawDataSet[this.config.allItemsProperty];
 
-			return Observable.combineLatest.apply(this, itemCreators).map((items:Array<T>) => {
+				if (!rawItems)
+					console.warn(`Property '${this.config.allItemsProperty}' wasn't found in DataSet for Entity '${this.entity.pluralName}'.`)
 				return {
-					count: dataSet.count,
-					results: items
-				};
+					count: rawDataSet.count,
+					items: rawItems
+				}
 			})
-		});
+			.flatMap((dataSet:DataSet<any>) => {
+				let itemCreators:Array<Observable<T>> = dataSet.items.map((itemData:any) => this.createItem(itemData));
+
+				return Observable.combineLatest.apply(this, itemCreators).map((items:Array<T>) => {
+					return {
+						count: dataSet.count,
+						items: items
+					};
+				})
+			});
 	}
 
 	getItemById(itemId:string|number):Observable<T>{
@@ -91,7 +105,7 @@ export class Repository<T extends IIdentifiable>{
 			if (!this._allValues){
 				return this.getItemsDataSet()
 					.do((dataSet:DataSet<T>) => {
-						this._allValues = dataSet.results;
+						this._allValues = dataSet.items;
 						this._allValuesMap = new Map();
 						this._allValues.forEach((value:T) => this._allValuesMap.set(value.id, value));
 					})
@@ -107,6 +121,8 @@ export class Repository<T extends IIdentifiable>{
 	}
 
 	save(item:T):void{
+		// TODO: Get the backend data
+
 		console.log("SAVE: ", item);
 		this.save$.next(item);
 	}

@@ -4,7 +4,7 @@ import {RepositoryManagerService} from "./paris/repository/repository-manager.se
 import {AlertModel} from "./@model/alert.model";
 import {MachineModel} from "./@model/machine.model";
 import {Repository} from "./paris/repository/repository";
-import {DataSet} from "./paris/data/dataset";
+import {DataSet} from "./paris/dataset/dataset";
 
 /**
  * This class represents the main application component.
@@ -28,9 +28,9 @@ export class AppComponent {
 				this.alert = alert;
 			}, error => console.error("ERROR", error));
 
-		alertsRepo.getItemsDataSet().subscribe((alerts:DataSet<AlertModel>) => {
+		alertsRepo.getItemsDataSet({ page: 1, pageSize: 15 }).subscribe((alerts:DataSet<AlertModel>) => {
 			console.log("Alerts: ", alerts);
-			this.alerts = alerts.results;
+			this.alerts = alerts.items;
 		});
 
 		let machinesRepo:Repository<MachineModel> = repositoriesManagerService.getRepository(MachineModel);
