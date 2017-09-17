@@ -10,6 +10,7 @@ import {IIdentifiable} from "../models/identifiable.model";
 import {ParisConfig} from "../config/paris-config";
 import {DataSetOptions} from "../dataset/dataset-options";
 import {DataSet} from "../dataset/dataset";
+import {Index} from "../models/index";
 
 export class Repository<T extends IIdentifiable>{
 	save$:Subject<T> = new Subject<T>();
@@ -34,7 +35,7 @@ export class Repository<T extends IIdentifiable>{
 	 * @param itemData
 	 * @returns {Observable<ModelData>}
 	 */
-	private getModelData(itemData:any):Observable<ModelData>{
+	private getModelData(itemData:Index):Observable<ModelData>{
 		let modelData:ModelData = { id: itemData.id },
 			subModels:Array<Observable<{ [key:string]:any }>> = [];
 
@@ -45,23 +46,21 @@ export class Repository<T extends IIdentifiable>{
 				modelData[entityField.id] = entityField.defaultValue || null;
 			}
 			else {
-				if (entityField.type){
-					let propertyRepository:IRepository = this.repositoryManagerService.getRepository(entityField.type);
+				let propertyRepository:IRepository = this.repositoryManagerService.getRepository(entityField.type);
 
-					if (propertyRepository){
-						let propertyEntityValue:Observable<any> = Object(propertyValue) === propertyValue ? propertyRepository.createItem(propertyValue) : propertyRepository.getItemById(propertyValue),
-							getPropertyEntityValue:Observable<{ [index:string]:any }> = propertyEntityValue.map((propertyEntityValue:any) => {
-								let data:{ [index:string]:any } = {};
-								data[entityField.id] = propertyEntityValue;
-								return data;
-							});
+				if (propertyRepository){
+					let propertyEntityValue:Observable<any> = Object(propertyValue) === propertyValue ? propertyRepository.createItem(propertyValue) : propertyRepository.getItemById(propertyValue),
+						getPropertyEntityValue:Observable<{ [index:string]:any }> = propertyEntityValue.map((propertyEntityValue:any) => {
+							let data:{ [index:string]:any } = {};
+							data[entityField.id] = propertyEntityValue;
+							return data;
+						});
 
 
-						subModels.push(getPropertyEntityValue);
-					}
-					else {
-						modelData[entityField.id] = propertyValue;
-					}
+					subModels.push(getPropertyEntityValue);
+				}
+				else {
+					modelData[entityField.id] = propertyValue;
 				}
 			}
 		});
@@ -82,7 +81,7 @@ export class Repository<T extends IIdentifiable>{
 				let rawItems:Array<any> = rawDataSet[this.config.allItemsProperty];
 
 				if (!rawItems)
-					console.warn(`Property '${this.config.allItemsProperty}' wasn't found in DataSet for Entity '${this.entity.pluralName}'.`)
+					console.warn(`Property '${this.config.allItemsProperty}' wasn't found in DataSet for Entity '${this.entity.pluralName}'.`);
 				return {
 					count: rawDataSet.count,
 					items: rawItems
@@ -120,14 +119,39 @@ export class Repository<T extends IIdentifiable>{
 		}
 	}
 
-	save(item:T):void{
-		// TODO: Get the backend data
+	save(item:T):Observable<T>{
+		let saveData:Index = this.getItemSaveData(item);
+		console.log(`Saving ${this.entity.singularName}:`, saveData);
 
-		console.log("SAVE: ", item);
-		this.save$.next(item);
+		return this.dataStore.post(`${this.entity.endpoint}/${item.id || ''}`, saveData)
+			.flatMap((savedItemData:Index) => this.createItem(savedItemData))
+			.do((item:T) => this.save$.next(item));
+	}
+
+	getItemSaveData(item:T):Index{
+		let modelData:Index = {};
+
+		for (let propertyId in item){
+			let modelValue:any;
+
+			let propertyValue:any = item[propertyId],
+				entityField:Field = this.entity.fields.get(propertyId);
+
+			if (entityField) {
+				let propertyRepository: IRepository = this.repositoryManagerService.getRepository(entityField.type);
+
+				if (propertyRepository)
+					modelValue = (<IIdentifiable>propertyValue).id;
+				else
+					modelValue = propertyValue instanceof Date ? propertyValue.valueOf() : propertyValue;
+
+				modelData[entityField.id] = modelValue;
+			}
+		}
+
+		return modelData;
 	}
 }
 
-interface ModelData extends IIdentifiable{
-	[index:string]:any
+interface ModelData extends IIdentifiable, Index{
 }

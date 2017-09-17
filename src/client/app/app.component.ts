@@ -26,6 +26,9 @@ export class AppComponent {
 			.subscribe((alert:AlertModel) => {
 				console.log("alert: ", alert);
 				this.alert = alert;
+
+				this.alert.name = "Updated Alert!";
+				alertsRepo.save(this.alert).subscribe((savedAlert:AlertModel) => console.log("SAVED", savedAlert))
 			}, error => console.error("ERROR", error));
 
 		alertsRepo.getItemsDataSet({ page: 1, pageSize: 15 }).subscribe((alerts:DataSet<AlertModel>) => {
