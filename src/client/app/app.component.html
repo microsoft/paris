@@ -14,6 +14,7 @@
 			<td>{{alert.machine.domain}}\{{alert.machine.name}}</td>
 		</tr>
 	</table>
+	<button (click)="loadAlert()">Refresh Alert</button>
 </div>
 <hr />
 <div *ngIf="alerts">
@@ -36,4 +37,5 @@
 			</tr>
 		</tbody>
 	</table>
+	<button (click)="loadAlerts()">Refresh Alert</button>
 </div>

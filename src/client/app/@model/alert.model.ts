@@ -30,4 +30,15 @@ export class AlertModel extends Identifiable<string> {
 		name: "Host"
 	})
 	host?:MachineModel;
+
+	@EntityField({
+		name: "Date"
+	})
+	date:Date;
+
+	@EntityField({
+		name: "Tags",
+		genericType: String
+	})
+	tags:Array<string>;
 }

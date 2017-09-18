@@ -11,6 +11,7 @@ import {ParisConfig} from "../config/paris-config";
 import {DataSetOptions} from "../dataset/dataset-options";
 import {DataSet} from "../dataset/dataset";
 import {Index} from "../models/index";
+import {DataTransformersService} from "../services/data-transformers.service";
 
 export class Repository<T extends IIdentifiable>{
 	save$:Subject<T> = new Subject<T>();
@@ -48,6 +49,8 @@ export class Repository<T extends IIdentifiable>{
 			else {
 				let propertyRepository:IRepository = this.repositoryManagerService.getRepository(entityField.type);
 
+				// TODO: Use isArray and set array data, as well as property data.
+
 				if (propertyRepository){
 					let propertyEntityValue:Observable<any> = Object(propertyValue) === propertyValue ? propertyRepository.createItem(propertyValue) : propertyRepository.getItemById(propertyValue),
 						getPropertyEntityValue:Observable<{ [index:string]:any }> = propertyEntityValue.map((propertyEntityValue:any) => {
@@ -60,7 +63,7 @@ export class Repository<T extends IIdentifiable>{
 					subModels.push(getPropertyEntityValue);
 				}
 				else {
-					modelData[entityField.id] = propertyValue;
+					modelData[entityField.id] = DataTransformersService.parse(entityField.type, propertyValue);
 				}
 			}
 		});
@@ -121,7 +124,6 @@ export class Repository<T extends IIdentifiable>{
 
 	save(item:T):Observable<T>{
 		let saveData:Index = this.getItemSaveData(item);
-		console.log(`Saving ${this.entity.singularName}:`, saveData);
 
 		return this.dataStore.post(`${this.entity.endpoint}/${item.id || ''}`, saveData)
 			.flatMap((savedItemData:Index) => this.createItem(savedItemData))
@@ -143,7 +145,7 @@ export class Repository<T extends IIdentifiable>{
 				if (propertyRepository)
 					modelValue = (<IIdentifiable>propertyValue).id;
 				else
-					modelValue = propertyValue instanceof Date ? propertyValue.valueOf() : propertyValue;
+					modelValue = DataTransformersService.serialize(entityField.type, propertyValue);
 
 				modelData[entityField.id] = modelValue;
 			}

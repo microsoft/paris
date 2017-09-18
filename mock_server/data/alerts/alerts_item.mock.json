@@ -2,6 +2,7 @@
 	"id": "123",
 	"title": "Something bad happened",
 	"status": 1,
+	"date": 1505710515089,
 	"machine": "yossi-pc",
 	"host": {
 		"id": "yossi_comp",

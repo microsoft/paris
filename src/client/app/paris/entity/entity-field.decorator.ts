@@ -5,12 +5,15 @@ import {entitiesService} from "../services/entities.service";
 export function EntityField(fieldConfig:Field):PropertyDecorator {
 	return function (entityPrototype: DataEntityType, propertyKey: string | symbol) {
 		let propertyConstructor:DataEntityType = Reflect.getMetadata("design:type", entityPrototype, propertyKey);
+		if (propertyKey === "tags")
+			debugger;
+
 		let fieldConfigCopy:Field = Object.assign({}, fieldConfig);
 		if (!fieldConfigCopy.id)
 			fieldConfigCopy.id = String(propertyKey);
 
-		fieldConfigCopy.type = propertyConstructor;
-
+		fieldConfigCopy.type = fieldConfig.genericType || propertyConstructor;
+		fieldConfigCopy.isArray = propertyConstructor === Array;
 		entitiesService.addEntityField(entityPrototype, fieldConfigCopy);
 	}
 }
