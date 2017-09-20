@@ -8,5 +8,7 @@
 		"id": "yossi_comp",
 		"name": "Yossi's comp",
 		"domain": "HEXADITE"
-	}
+	},
+	"host_name": "const\\yossi-pc",
+	"tags": ["Cyber", "Automation"]
 }

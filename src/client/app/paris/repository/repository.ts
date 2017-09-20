@@ -49,21 +49,24 @@ export class Repository<T extends IIdentifiable>{
 			else {
 				let propertyRepository:IRepository = this.repositoryManagerService.getRepository(entityField.type);
 
-				// TODO: Use isArray and set array data, as well as property data.
-
 				if (propertyRepository){
-					let propertyEntityValue:Observable<any> = Object(propertyValue) === propertyValue ? propertyRepository.createItem(propertyValue) : propertyRepository.getItemById(propertyValue),
-						getPropertyEntityValue:Observable<{ [index:string]:any }> = propertyEntityValue.map((propertyEntityValue:any) => {
-							let data:{ [index:string]:any } = {};
-							data[entityField.id] = propertyEntityValue;
-							return data;
-						});
+					let getPropertyEntityValue$:Observable<Index>;
+					let mapValueToEntityFieldIndex:(value:any) => Index = Repository.mapToEntityFieldIndex.bind(this, entityField.id);
 
+					if (entityField.isArray){
+						let propertyMembers$:Array<Observable<T>> = propertyValue.map((memberData:any) => this.getEntityItem(propertyRepository, memberData));
+						getPropertyEntityValue$ = Observable.combineLatest.apply(this, propertyMembers$).map(mapValueToEntityFieldIndex);
+					}
+					else{
+						getPropertyEntityValue$ = this.getEntityItem(propertyRepository, propertyValue).map(mapValueToEntityFieldIndex);
+					}
 
-					subModels.push(getPropertyEntityValue);
+					subModels.push(getPropertyEntityValue$);
 				}
 				else {
-					modelData[entityField.id] = DataTransformersService.parse(entityField.type, propertyValue);
+					modelData[entityField.id] = entityField.isArray
+						? propertyValue.map((elementValue:any) => DataTransformersService.parse(entityField.type, elementValue))
+						: DataTransformersService.parse(entityField.type, propertyValue);
 				}
 			}
 		});
@@ -76,6 +79,16 @@ export class Repository<T extends IIdentifiable>{
 		}
 		else
 			return Observable.of(modelData);
+	}
+
+	private static mapToEntityFieldIndex(entityFieldId:string, value:any):Index{
+		let data:Index = {};
+		data[entityFieldId] = value;
+		return data;
+	}
+
+	private getEntityItem(repository:IRepository, itemData:any):Observable<T>{
+		return Object(itemData) === itemData ? repository.createItem(itemData) : repository.getItemById(itemData);
 	}
 
 	getItemsDataSet(options?:DataSetOptions):Observable<DataSet<T>>{
@@ -134,20 +147,22 @@ export class Repository<T extends IIdentifiable>{
 		let modelData:Index = {};
 
 		for (let propertyId in item){
-			let modelValue:any;
+			if (item.hasOwnProperty(propertyId)) {
+				let modelValue: any;
 
-			let propertyValue:any = item[propertyId],
-				entityField:Field = this.entity.fields.get(propertyId);
+				let propertyValue: any = item[propertyId],
+					entityField: Field = this.entity.fields.get(propertyId);
 
-			if (entityField) {
-				let propertyRepository: IRepository = this.repositoryManagerService.getRepository(entityField.type);
+				if (entityField) {
+					let propertyRepository: IRepository = this.repositoryManagerService.getRepository(entityField.type);
 
-				if (propertyRepository)
-					modelValue = (<IIdentifiable>propertyValue).id;
-				else
-					modelValue = DataTransformersService.serialize(entityField.type, propertyValue);
+					if (propertyRepository)
+						modelValue = (<IIdentifiable>propertyValue).id;
+					else
+						modelValue = DataTransformersService.serialize(entityField.type, propertyValue);
 
-				modelData[entityField.id] = modelValue;
+					modelData[entityField.id] = modelValue;
+				}
 			}
 		}
 

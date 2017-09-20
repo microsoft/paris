@@ -46,10 +46,12 @@ export class AppComponent {
 			.subscribe((alert:AlertModel) => {
 				console.log("alert: ", alert);
 				this.alert = alert;
-
-				this.alert.name = "Updated Alert!";
-				this.alertsRepo.save(this.alert).subscribe((savedAlert:AlertModel) => console.log("SAVED", savedAlert))
 			}, error => console.error("ERROR", error));
+	}
+
+	saveAlert(){
+		this.alert.name = "Updated Alert!";
+		this.alertsRepo.save(this.alert).subscribe((savedAlert:AlertModel) => console.log("SAVED", savedAlert))
 	}
 
 	loadAlerts(){

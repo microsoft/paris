@@ -5,8 +5,6 @@ import {entitiesService} from "../services/entities.service";
 export function EntityField(fieldConfig:Field):PropertyDecorator {
 	return function (entityPrototype: DataEntityType, propertyKey: string | symbol) {
 		let propertyConstructor:DataEntityType = Reflect.getMetadata("design:type", entityPrototype, propertyKey);
-		if (propertyKey === "tags")
-			debugger;
 
 		let fieldConfigCopy:Field = Object.assign({}, fieldConfig);
 		if (!fieldConfigCopy.id)

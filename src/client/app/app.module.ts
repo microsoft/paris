@@ -6,6 +6,7 @@ import {AppRoutingModule} from './app-routing.module';
 import {ParisModule} from "./paris/paris.module";
 import {HttpClientModule} from "@angular/common/http";
 import {ParisConfig} from "./paris/config/paris-config";
+import {TagComponent} from "./components/tag.component";
 
 const parisConfig:ParisConfig = {
 	apiRoot: "api",
@@ -19,7 +20,10 @@ const parisConfig:ParisConfig = {
 		AppRoutingModule,
 		ParisModule.forRoot(parisConfig)
 	],
-	declarations: [AppComponent],
+	declarations: [
+		AppComponent,
+		TagComponent
+	],
 	providers: [
 		{
 			provide: APP_BASE_HREF,

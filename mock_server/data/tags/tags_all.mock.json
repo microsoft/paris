@@ -1,0 +1,14 @@
+{
+	"results": [
+		{
+			"id": "Cyber",
+			"name": "Cyber",
+			"color": "#ffc107"
+		},
+		{
+			"id": "Automation",
+			"name": "Automation",
+			"color": "#00bcd4"
+		}
+	]
+}

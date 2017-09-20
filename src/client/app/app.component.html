@@ -6,12 +6,22 @@
 			<td>{{alert.name}}</td>
 		</tr>
 		<tr>
+			<th>Date</th>
+			<td>{{alert.date | date:"medium"}}</td>
+		</tr>
+		<tr>
 			<th>Status</th>
 			<td>{{alert.status.name}}</td>
 		</tr>
 		<tr>
 			<th>Machine</th>
 			<td>{{alert.machine.domain}}\{{alert.machine.name}}</td>
+		</tr>
+		<tr *ngIf="alert.tags">
+			<th>Tags</th>
+			<td>
+				<tag *ngFor="let tag of alert.tags" [tag]="tag"></tag>
+			</td>
 		</tr>
 	</table>
 	<button (click)="loadAlert()">Refresh Alert</button>

@@ -3,6 +3,7 @@ import {Identifiable} from "./base/identifiable.model";
 import {EntityField} from "../paris/entity/entity-field.decorator";
 import {MachineModel} from "./machine.model";
 import {AlertStatusModel} from "./alert-status.model";
+import {TagModel} from "./tag.model";
 
 @Entity({
 	singularName: "Alert",
@@ -38,7 +39,7 @@ export class AlertModel extends Identifiable<string> {
 
 	@EntityField({
 		name: "Tags",
-		genericType: String
+		genericType: TagModel
 	})
-	tags:Array<string>;
+	tags:Array<TagModel>;
 }
