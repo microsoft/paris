@@ -1,6 +1,6 @@
 import {Component} from '@angular/core';
 import './operators';
-import {RepositoryManagerService} from "./paris/repository/repository-manager.service";
+import {RepositoryEvent, RepositoryManagerService} from "./paris/repository/repository-manager.service";
 import {AlertModel} from "./@model/alert.model";
 import {MachineModel} from "./@model/machine.model";
 import {Repository} from "./paris/repository/repository";
@@ -24,6 +24,10 @@ export class AppComponent {
 
 	constructor(private repositoriesManagerService: RepositoryManagerService) {
 		this.alertsRepo = repositoriesManagerService.getRepository(AlertModel);
+
+		repositoriesManagerService.save$.subscribe((e:RepositoryEvent) => {
+			console.log(`Saved new ${e.repository.entity.singularName}`);
+		});
 
 		this.loadAll();
 	}

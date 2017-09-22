@@ -1,7 +1,5 @@
 const express = require('express');
-const fs = require("fs");
 const bodyParser = require('body-parser');
-const https = require("https");
 
 var routeModules = [
 	//require("./modules/investigations.routes"),
@@ -57,7 +55,7 @@ app.use(function (req, res) {
 				entityId = apiMatch[2];
 
 			// If the URL ends with '/', we expect all the data in the folder, which is mocked by the 'all.json' file inside it:
-			mockDataFileUrl = common.MOCK_DATA_FOLDER + entity + "/" + entity.replace(/\//g, "_") + (entityId ? "_item" : "_all") + ".mock";
+			mockDataFileUrl = common.MOCK_DATA_FOLDER + entity + "/" + entity.replace(/\//g, "_") + (entityId || req.method === "POST" ? "_item" : "_all") + ".mock";
 		}
 
 		if (req.method === "POST") {
@@ -70,7 +68,8 @@ app.use(function (req, res) {
 					}, 1000);
 				}
 				else {
-					common.getResponseCallback(res)(null, data);
+					var itemId = +new Date;
+					common.getResponseCallback(res)(null, Object.assign(data, req.body, { id: itemId }));
 				}
 			});
 		}

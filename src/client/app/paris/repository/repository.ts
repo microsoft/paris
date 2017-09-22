@@ -14,13 +14,24 @@ import {Index} from "../models/index";
 import {DataTransformersService} from "../services/data-transformers.service";
 import {Immutability} from "../services/immutability";
 import {DataCache, DataCacheSettings} from "../services/cache";
+import {BehaviorSubject} from "rxjs/BehaviorSubject";
 
-export class Repository<T extends IIdentifiable>{
-	save$:Subject<T> = new Subject<T>();
+export class Repository<T extends IIdentifiable> implements IRepository{
+	save$:Observable<T>;
+	private _allItems$:Observable<Array<T>>;
 
 	private _allValues:Array<T>;
 	private _allValuesMap:Map<any, T>;
 	private _cache:DataCache<T>;
+	private _allItemsSubject$:Subject<Array<T>>;
+	private _saveSubject$:Subject<T>;
+
+	get allItems$():Observable<Array<T>>{
+		if (this._allValues)
+			return Observable.merge(Observable.of(this._allValues), this._allItemsSubject$.asObservable());
+
+		return this._allItems$;
+	}
 
 	private get cache():DataCache<T>{
 		if (!this._cache) {
@@ -38,11 +49,23 @@ export class Repository<T extends IIdentifiable>{
 				private config:ParisConfig,
 				private entityConstructor:DataEntityConstructor<T>,
 				private dataStore:DataStoreService,
-				private repositoryManagerService:RepositoryManagerService){}
+				private repositoryManagerService:RepositoryManagerService){
+		let getAllItems$:Observable<Array<T>> = this.getItemsDataSet().map(dataSet => dataSet.items);
 
-	createItem(itemData:any):Observable<T>{
+		this._allItemsSubject$ = new Subject<Array<T>>();
+		this._allItems$ = Observable.merge(getAllItems$, this._allItemsSubject$.asObservable());
+
+		this._saveSubject$ = new Subject();
+		this.save$ = this._saveSubject$.asObservable();
+	}
+
+	createItem(itemData:any):Observable<Readonly<T>>{
 		return this.getModelData(itemData)
 			.map((modelData:ModelData) => Immutability.freeze(new this.entityConstructor(modelData)));
+	}
+
+	createNewItem():T{
+		return new this.entityConstructor();
 	}
 
 	/**
@@ -158,7 +181,14 @@ export class Repository<T extends IIdentifiable>{
 
 		return this.dataStore.post(`${this.entity.endpoint}/${item.id || ''}`, saveData)
 			.flatMap((savedItemData:Index) => this.createItem(savedItemData))
-			.do((item:T) => this.save$.next(item));
+			.do((item:T) => {
+				if (this._allValues){
+					this._allValues = this._allValues.concat([item]);
+					this._allItemsSubject$.next(this._allValues);
+				}
+
+				this._saveSubject$.next(item);
+			});
 	}
 
 	getItemSaveData(item:T):Index{

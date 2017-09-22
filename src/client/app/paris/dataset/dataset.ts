@@ -1,4 +1,4 @@
 export interface DataSet<T>{
 	count:number,
-	items:Array<T>
+	items:Array<Readonly<T>>
 }

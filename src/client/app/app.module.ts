@@ -11,6 +11,7 @@ import {EntitiesNavComponent} from "./components/entities-nav.component";
 import {EntityComponent} from "./components/entity.component";
 import {RouterModule} from "@angular/router";
 import {EntityResolver} from "./entity-resolver";
+import {FormsModule} from "@angular/forms";
 
 const parisConfig:ParisConfig = {
 	apiRoot: "api",
@@ -23,7 +24,8 @@ const parisConfig:ParisConfig = {
 		HttpClientModule,
 		AppRoutingModule,
 		ParisModule.forRoot(parisConfig),
-		RouterModule
+		RouterModule,
+		FormsModule
 	],
 	declarations: [
 		AppComponent,

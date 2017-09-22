@@ -6,7 +6,6 @@ import {RepositoryManagerService} from "../paris/repository/repository-manager.s
 import {DataSet} from "../paris/dataset/dataset";
 import {Index} from "../paris/models/index";
 import {Field} from "../paris/entity/entity-field";
-import {HttpErrorResponse} from "@angular/common/http";
 
 @Component({
 	selector: "entity",
@@ -14,45 +13,47 @@ import {HttpErrorResponse} from "@angular/common/http";
 		<h1>{{entity.entityConfig.pluralName}}</h1>
 		<strong class="error" *ngIf="error; else items" style="color: Red">{{error.message}}</strong>
 		<ng-template #items>
-			<table *ngIf="allItems">
+			<table *ngIf="repo">
 				<thead>
 					<tr>
 						<th *ngFor="let field of entity.entityConfig.fieldsArray">{{field.name}}</th>
 					</tr>
 				</thead>
 				<tbody>
-					<tr *ngFor="let item of allItems.items">
+					<tr *ngFor="let item of (repo.allItems$ | async)">
 						<td *ngFor="let field of entity.entityConfig.fieldsArray">{{getFieldDisplay(item, field)}}</td>
 					</tr>
 				</tbody>
 			</table>
 		</ng-template>
+		
+		<hr />
+		<input [(ngModel)]="newItemName" 
+			   [attr.placeholder]="'The name of the new ' + entity.entityConfig.singularName">
+		<button (click)="addNew()">Save</button>
 	`
 })
 export class EntityComponent{
 	entity:DataEntityType;
-	allItems:DataSet<any>;
 	error:any;
 
-	private repo:IRepository;
+	repo:IRepository;
+
+	newItemName:string;
 
 	constructor(route: ActivatedRoute, private repositoriesManagerService: RepositoryManagerService){
 		route.params.subscribe(() => {
 			if (this.entity = route.snapshot.data['entity']) {
 				this.repo = repositoriesManagerService.getRepository(this.entity);
-				this.updateAll();
+				this.newItemName = `New ${this.entity.entityConfig.singularName}`;
 			}
 		});
 	}
 
-	private updateAll(){
-		this.repo.getItemsDataSet({ page: 1, pageSize: 15 }).subscribe((allItemsDataSet:DataSet<any>) => {
-			this.allItems = allItemsDataSet;
-			this.error = null;
-		}, (error:HttpErrorResponse) => {
-			console.error(error);
-			this.error = error
-		});
+	addNew():void{
+		let item = this.repo.createNewItem();
+		item.name = this.newItemName;
+		this.repo.save(item).toPromise();
 	}
 
 	getFieldDisplay(item:Index, field:Field):string{
