@@ -6,6 +6,8 @@
 			"title": "Something bad happened",
 			"status": 1,
 			"machine": "yossi-pc",
+			"date": 1505710515089,
+			"tags": ["Cyber", "Automation"],
 			"host": {
 				"id": "yossi_comp",
 				"name": "Yossi's comp",

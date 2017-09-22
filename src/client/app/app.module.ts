@@ -7,6 +7,10 @@ import {ParisModule} from "./paris/paris.module";
 import {HttpClientModule} from "@angular/common/http";
 import {ParisConfig} from "./paris/config/paris-config";
 import {TagComponent} from "./components/tag.component";
+import {EntitiesNavComponent} from "./components/entities-nav.component";
+import {EntityComponent} from "./components/entity.component";
+import {RouterModule} from "@angular/router";
+import {EntityResolver} from "./entity-resolver";
 
 const parisConfig:ParisConfig = {
 	apiRoot: "api",
@@ -18,17 +22,21 @@ const parisConfig:ParisConfig = {
 		BrowserModule,
 		HttpClientModule,
 		AppRoutingModule,
-		ParisModule.forRoot(parisConfig)
+		ParisModule.forRoot(parisConfig),
+		RouterModule
 	],
 	declarations: [
 		AppComponent,
-		TagComponent
+		TagComponent,
+		EntitiesNavComponent,
+		EntityComponent
 	],
 	providers: [
 		{
 			provide: APP_BASE_HREF,
 			useValue: '<%= APP_BASE %>'
-		}
+		},
+		EntityResolver
 	],
 	bootstrap: [AppComponent]
 

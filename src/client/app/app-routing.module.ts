@@ -1,12 +1,18 @@
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import {EntityComponent} from "./components/entity.component";
+import {EntityResolver} from "./entity-resolver";
 
 @NgModule({
   imports: [
     RouterModule.forRoot([
-      /* define app module routes here, e.g., to lazily load a module
-         (do not place feature module routes here, use an own -routing.module.ts in the feature instead)
-       */
+		{
+			path: 'entity/:entityPluralName',
+			component: EntityComponent,
+			resolve: {
+				entity: EntityResolver
+			}
+		}
     ])
   ],
   exports: [RouterModule]

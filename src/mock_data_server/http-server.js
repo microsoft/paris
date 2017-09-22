@@ -3,7 +3,6 @@ const fs = require("fs");
 const bodyParser = require('body-parser');
 const https = require("https");
 
-
 var routeModules = [
 	//require("./modules/investigations.routes"),
 	//require("./modules/alerts.routes"),

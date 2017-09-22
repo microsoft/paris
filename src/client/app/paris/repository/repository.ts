@@ -12,12 +12,27 @@ import {DataSetOptions} from "../dataset/dataset-options";
 import {DataSet} from "../dataset/dataset";
 import {Index} from "../models/index";
 import {DataTransformersService} from "../services/data-transformers.service";
+import {Immutability} from "../services/immutability";
+import {DataCache, DataCacheSettings} from "../services/cache";
 
 export class Repository<T extends IIdentifiable>{
 	save$:Subject<T> = new Subject<T>();
 
 	private _allValues:Array<T>;
 	private _allValuesMap:Map<any, T>;
+	private _cache:DataCache<T>;
+
+	private get cache():DataCache<T>{
+		if (!this._cache) {
+			let cacheSettings:DataCacheSettings<T> = Object.assign({
+				getter: (itemId:string | number) => this.getItemById(itemId, false)
+			}, this.entity.cache);
+
+			this._cache = new DataCache<T>(cacheSettings);
+		}
+
+		return this._cache;
+	}
 
 	constructor(public readonly entity:ModelEntity,
 				private config:ParisConfig,
@@ -27,7 +42,7 @@ export class Repository<T extends IIdentifiable>{
 
 	createItem(itemData:any):Observable<T>{
 		return this.getModelData(itemData)
-			.map((modelData:ModelData) => new this.entityConstructor(modelData));
+			.map((modelData:ModelData) => Immutability.freeze(new this.entityConstructor(modelData)));
 	}
 
 	/**
@@ -107,15 +122,18 @@ export class Repository<T extends IIdentifiable>{
 				let itemCreators:Array<Observable<T>> = dataSet.items.map((itemData:any) => this.createItem(itemData));
 
 				return Observable.combineLatest.apply(this, itemCreators).map((items:Array<T>) => {
-					return {
+					return Object.freeze({
 						count: dataSet.count,
-						items: items
-					};
+						items: Object.freeze(items)
+					});
 				})
 			});
 	}
 
-	getItemById(itemId:string|number):Observable<T>{
+	getItemById(itemId:string|number, allowCache:boolean = true):Observable<T>{
+		if (allowCache !== false && this.entity.cache)
+			return this.cache.get(itemId);
+
 		if (this.entity.loadAll){
 			if (!this._allValues){
 				return this.getItemsDataSet()

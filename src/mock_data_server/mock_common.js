@@ -1,6 +1,6 @@
 fs = require("fs");
 
-var MOCK_DATA_FOLDER = "./data/";
+var MOCK_DATA_FOLDER = "./mock_data/";
 
 var exports = module.exports = {
 	getFileData: getFileData,

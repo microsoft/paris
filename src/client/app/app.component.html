@@ -1,3 +1,6 @@
+<entities-nav></entities-nav>
+<router-outlet></router-outlet>
+<hr />
 <div *ngIf="alert">
 	<h2>Alert</h2>
 	<table>
@@ -24,28 +27,6 @@
 			</td>
 		</tr>
 	</table>
-	<button (click)="loadAlert()">Refresh Alert</button>
-</div>
-<hr />
-<div *ngIf="alerts">
-	<h2>Alerts DataSet</h2>
-	<table>
-		<thead>
-			<tr>
-				<th>ID</th>
-				<th>Name</th>
-				<th>Status</th>
-				<th>Machine</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr *ngFor="let alert of alerts">
-				<td>{{alert.id}}</td>
-				<td>{{alert.name}}</td>
-				<td>{{alert.status.name}}</td>
-				<td>{{alert.machine.name}} ({{alert.machine.domain || 'No Domain'}})</td>
-			</tr>
-		</tbody>
-	</table>
-	<button (click)="loadAlerts()">Refresh Alert</button>
+	<button (click)="loadAlert()">Refresh</button>
+	<button (click)="saveAlert()">Update</button>
 </div>
