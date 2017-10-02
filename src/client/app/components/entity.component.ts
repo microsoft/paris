@@ -60,11 +60,21 @@ export class EntityComponent{
 		let itemFieldValue = item[field.id];
 		if (itemFieldValue !== undefined && itemFieldValue !== null) {
 			if (itemFieldValue instanceof Array)
-				return itemFieldValue.map(member => member && member.name || member).join(", ");
+				return itemFieldValue.map(member => this.getFieldDisplayValue(member)).join(", ");
 
-			return itemFieldValue.name || itemFieldValue;
+			return this.getFieldDisplayValue(itemFieldValue);
 		}
 
 		return itemFieldValue || "N/A";
+	}
+
+	private getFieldDisplayValue(value:any):string{
+		if (!value)
+			return "(N/A)";
+
+		if (typeof(value) === "object" && value.name)
+			return `[${value.name}]`;
+
+		return value instanceof Date ? value.toLocaleString() : value.toString();
 	}
 }

@@ -1,31 +1,23 @@
-import {EntityFields} from "./entity-fields";
-import {Field} from "./entity-field";
+import {EntityConfigBase, IEntityConfigBase} from "./entity-config.base";
 
-export class ModelEntity{
-	singularName:string;
-	pluralName:string;
+export class ModelEntity extends EntityConfigBase{
 	endpoint:string;
-	fields?:EntityFields;
 	loadAll?:boolean = false;
-	listOf?:any;
 	cache?:ModelEntityCacheConfig;
 
-	get fieldsArray():Array<Field>{
-		return this.fields ? Array.from(this.fields.values()) : [];
-	}
+	constructor(config:EntityConfig){
+		super(config);
 
-	constructor(config:ModelEntityConfig){
-		Object.assign(this, config);
+		this.endpoint = config.endpoint;
+		this.loadAll = config.loadAll === true;
+		this.cache = config.cache;
 	}
 }
 
-export interface ModelEntityConfig{
-	singularName:string,
-	pluralName:string,
+export interface EntityConfig extends IEntityConfigBase{
 	endpoint:string,
 	loadAll?:boolean,
-	listOf?:any,
-	cache?: ModelEntityCacheConfig
+	cache?:ModelEntityCacheConfig
 }
 
 interface ModelEntityCacheConfig{

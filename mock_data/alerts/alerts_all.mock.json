@@ -12,7 +12,8 @@
 				"id": "yossi_comp",
 				"name": "Yossi's comp",
 				"domain": "HEXADITE"
-			}
+			},
+			"food": 1
 		},
 		{
 			"id": "234",

@@ -4,7 +4,6 @@ import {RepositoryEvent, RepositoryManagerService} from "./paris/repository/repo
 import {AlertModel} from "./@model/alert.model";
 import {MachineModel} from "./@model/machine.model";
 import {Repository} from "./paris/repository/repository";
-import {DataSet} from "./paris/dataset/dataset";
 import {Immutability} from "./paris/services/immutability";
 
 /**

@@ -10,5 +10,6 @@
 		"domain": "HEXADITE"
 	},
 	"host_name": "const\\yossi-pc",
-	"tags": ["Cyber", "Automation"]
+	"tags": ["Cyber", "Automation"],
+	"food": 2
 }

@@ -15,6 +15,8 @@ import {DataTransformersService} from "../services/data-transformers.service";
 import {Immutability} from "../services/immutability";
 import {DataCache, DataCacheSettings} from "../services/cache";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {ModelObjectValue} from "../entity/object-value.config";
+import {objectValuesService} from "../services/object-values.service";
 
 export class Repository<T extends IIdentifiable> implements IRepository{
 	save$:Observable<T>;
@@ -102,9 +104,15 @@ export class Repository<T extends IIdentifiable> implements IRepository{
 					subModels.push(getPropertyEntityValue$);
 				}
 				else {
-					modelData[entityField.id] = entityField.isArray
-						? propertyValue.map((elementValue:any) => DataTransformersService.parse(entityField.type, elementValue))
-						: DataTransformersService.parse(entityField.type, propertyValue);
+					let objectValueType:ModelObjectValue = objectValuesService.getEntityByType(entityField.type);
+
+					if (objectValueType)
+						modelData[entityField.id] = objectValueType.getValueById(propertyValue) || propertyValue;
+					else {
+						modelData[entityField.id] = entityField.isArray
+							? propertyValue.map((elementValue: any) => DataTransformersService.parse(entityField.type, elementValue))
+							: DataTransformersService.parse(entityField.type, propertyValue);
+					}
 				}
 			}
 		});
