@@ -1,32 +1,13 @@
-<entities-nav></entities-nav>
-<router-outlet></router-outlet>
-<hr />
-<div *ngIf="alert">
-	<h2>Alert</h2>
-	<table>
-		<tr>
-			<th>Title</th>
-			<td>{{alert.name}}</td>
-		</tr>
-		<tr>
-			<th>Date</th>
-			<td>{{alert.date | date:"medium"}}</td>
-		</tr>
-		<tr>
-			<th>Status</th>
-			<td>{{alert.status.name}}</td>
-		</tr>
-		<tr>
-			<th>Machine</th>
-			<td>{{alert.machine.domain}}\{{alert.machine.name}}</td>
-		</tr>
-		<tr *ngIf="alert.tags">
-			<th>Tags</th>
-			<td>
-				<tag *ngFor="let tag of alert.tags" [tag]="tag"></tag>
-			</td>
-		</tr>
-	</table>
-	<button (click)="loadAlert()">Refresh</button>
-	<button (click)="saveAlert()">Update</button>
-</div>
+<ul>
+	<li *ngFor="let item of todoItems$ | async">
+		<input type="checkbox"
+			   [id]="'todo' + item.$key"
+			   [(ngModel)]="item.isDone"
+			   (change)="todoRepo.save(item)" />
+		<label [attr.for]="'todo' + item.$key">{{item.text}}</label>
+	</li>
+</ul>
+<form (submit)="addNewItem()">
+	<input [(ngModel)]="newItemText" name="newItem" placeholder="Add new item..." />
+	<button type="submit" [disabled]="!newItemText">Add</button>
+</form>

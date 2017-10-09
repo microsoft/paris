@@ -14,8 +14,7 @@ import {EntityResolver} from "./entity-resolver";
 import {FormsModule} from "@angular/forms";
 
 const parisConfig:ParisConfig = {
-	apiRoot: "api",
-	allItemsProperty: "results"
+	apiRoot: "api"
 };
 
 @NgModule({

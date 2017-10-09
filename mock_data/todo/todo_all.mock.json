@@ -1,0 +1,21 @@
+{
+	"items": [
+		{
+			"$key": "2",
+			"text": "Pay water bill",
+			"tags": ["payments"],
+			"created": 1507404535541,
+			"isDone": false,
+			"user": "yossik"
+		},
+		{
+			"$key": "1",
+			"text": "Get paid",
+			"tags": ["payments", "work"],
+			"doneTime": 1507404535541,
+			"created": 1507304111141,
+			"isDone": true,
+			"user": "yossik"
+		}
+	]
+}

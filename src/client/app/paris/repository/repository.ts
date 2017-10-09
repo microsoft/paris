@@ -61,9 +61,9 @@ export class Repository<T extends IIdentifiable> implements IRepository{
 		this.save$ = this._saveSubject$.asObservable();
 	}
 
-	createItem(itemData:any):Observable<Readonly<T>>{
+	createItem(itemData:any):Observable<T>{
 		return this.getModelData(itemData)
-			.map((modelData:ModelData) => Immutability.freeze(new this.entityConstructor(modelData)));
+			.map((modelData:ModelData) => new this.entityConstructor(modelData));
 	}
 
 	createNewItem():T{
@@ -77,7 +77,7 @@ export class Repository<T extends IIdentifiable> implements IRepository{
 	 * @returns {Observable<ModelData>}
 	 */
 	private getModelData(itemData:Index):Observable<ModelData>{
-		let modelData:ModelData = { id: itemData.id },
+		let modelData:ModelData = { $key: itemData[this.entity.idProperty || this.config.entityIdProperty] },
 			subModels:Array<Observable<{ [key:string]:any }>> = [];
 
 		this.entity.fields.forEach((entityField:Field) => {
@@ -155,7 +155,7 @@ export class Repository<T extends IIdentifiable> implements IRepository{
 				return Observable.combineLatest.apply(this, itemCreators).map((items:Array<T>) => {
 					return Object.freeze({
 						count: dataSet.count,
-						items: Object.freeze(items)
+						items: items
 					});
 				})
 			});
@@ -171,7 +171,7 @@ export class Repository<T extends IIdentifiable> implements IRepository{
 					.do((dataSet:DataSet<T>) => {
 						this._allValues = dataSet.items;
 						this._allValuesMap = new Map();
-						this._allValues.forEach((value:T) => this._allValuesMap.set(value.id, value));
+						this._allValues.forEach((value:T) => this._allValuesMap.set(value.$key, value));
 					})
 					.map((dataSet:DataSet<T>) => this._allValuesMap.get(itemId));
 			}
@@ -187,11 +187,11 @@ export class Repository<T extends IIdentifiable> implements IRepository{
 	save(item:T):Observable<T>{
 		let saveData:Index = this.getItemSaveData(item);
 
-		return this.dataStore.post(`${this.entity.endpoint}/${item.id || ''}`, saveData)
+		return this.dataStore.post(`${this.entity.endpoint}/${item.$key || ''}`, saveData)
 			.flatMap((savedItemData:Index) => this.createItem(savedItemData))
 			.do((item:T) => {
 				if (this._allValues){
-					this._allValues = this._allValues.concat([item]);
+					this._allValues = [...this._allValues, item];
 					this._allItemsSubject$.next(this._allValues);
 				}
 
@@ -213,7 +213,7 @@ export class Repository<T extends IIdentifiable> implements IRepository{
 					let propertyRepository: IRepository = this.repositoryManagerService.getRepository(entityField.type);
 
 					if (propertyRepository)
-						modelValue = (<IIdentifiable>propertyValue).id;
+						modelValue = (<IIdentifiable>propertyValue).$key;
 					else
 						modelValue = DataTransformersService.serialize(entityField.type, propertyValue);
 

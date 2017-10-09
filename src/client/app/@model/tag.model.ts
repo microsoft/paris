@@ -1,6 +1,6 @@
 import {Entity} from "../paris/entity/entity.decorator";
-import {Identifiable} from "./base/identifiable.model";
 import {EntityField} from "../paris/entity/entity-field.decorator";
+import {EntityBaseModel} from "./base/entity-base.model";
 
 @Entity({
 	singularName: "Tag",
@@ -8,7 +8,7 @@ import {EntityField} from "../paris/entity/entity-field.decorator";
 	endpoint: "tags",
 	loadAll: true
 })
-export class TagModel extends Identifiable<string> {
+export class TagModel extends EntityBaseModel {
 	@EntityField({
 		name: "Color"
 	})

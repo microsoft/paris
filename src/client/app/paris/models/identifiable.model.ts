@@ -1,4 +1,4 @@
 export interface IIdentifiable{
-	id:string | number,
+	$key:string,
 	name?:string
 }

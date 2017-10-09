@@ -5,6 +5,7 @@ export abstract class EntityConfigBase{
 	singularName:string;
 	pluralName:string;
 	fields?:EntityFields;
+	idProperty?:string;
 
 	get fieldsArray():Array<Field>{
 		return this.fields ? Array.from(this.fields.values()) : [];
@@ -18,5 +19,6 @@ export abstract class EntityConfigBase{
 export interface IEntityConfigBase{
 	singularName:string,
 	pluralName:string,
-	fields?:EntityFields
+	fields?:EntityFields,
+	idProperty?:string,
 }

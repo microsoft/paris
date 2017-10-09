@@ -8,5 +8,6 @@ export let dataStoreServiceFactory = (http: HttpClient, dataStoreOptions: ParisC
 
 const defaultDataStoreOptions:ParisConfig = {
 	apiRoot: "/",
-	allItemsProperty: "items"
+	allItemsProperty: "items",
+	entityIdProperty: "id"
 };

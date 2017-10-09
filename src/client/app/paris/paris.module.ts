@@ -1,9 +1,8 @@
 import {ModuleWithProviders, NgModule} from "@angular/core";
 import {RepositoryManagerService} from "./repository/repository-manager.service";
-import {HttpClient, HttpClientModule} from "@angular/common/http";
+import {HttpClientModule} from "@angular/common/http";
 import {DataStoreService} from "./services/data-store/data-store.service";
-import {dataStoreServiceFactory} from "./services/data-store/data-store.service.provider";
-import {ParisConfig} from "./config/paris-config";
+import {defaultConfig, ParisConfig} from "./config/paris-config";
 
 @NgModule({
 	imports: [ HttpClientModule ],
@@ -13,12 +12,12 @@ import {ParisConfig} from "./config/paris-config";
 	]
 })
 export class ParisModule {
-	static forRoot(dataStoreOptions: ParisConfig): ModuleWithProviders {
+	static forRoot(config: ParisConfig): ModuleWithProviders {
 		return {
 			ngModule: ParisModule,
 			providers: [
 				RepositoryManagerService,
-				{ provide: 'config', useValue: dataStoreOptions }
+				{ provide: 'config', useValue: Object.assign({}, defaultConfig, config) }
 			]
 		};
 	}

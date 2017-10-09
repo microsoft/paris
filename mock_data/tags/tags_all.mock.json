@@ -1,13 +1,13 @@
 {
-	"results": [
+	"items": [
 		{
-			"id": "Cyber",
-			"name": "Cyber",
+			"$key": "payments",
+			"name": "Payments",
 			"color": "#ffc107"
 		},
 		{
-			"id": "Automation",
-			"name": "Automation",
+			"$key": "work",
+			"name": "Work",
 			"color": "#00bcd4"
 		}
 	]

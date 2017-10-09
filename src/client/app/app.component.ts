@@ -1,62 +1,50 @@
-import {Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
 import './operators';
 import {RepositoryEvent, RepositoryManagerService} from "./paris/repository/repository-manager.service";
-import {AlertModel} from "./@model/alert.model";
-import {MachineModel} from "./@model/machine.model";
 import {Repository} from "./paris/repository/repository";
-import {Immutability} from "./paris/services/immutability";
+import {TodoItemModel} from "./@model/todo-item.model";
+import {Observable} from "rxjs/Observable";
+import {Subject} from "rxjs/Subject";
+import {BehaviorSubject} from "rxjs/BehaviorSubject";
 
 /**
  * This class represents the main application component.
  */
 @Component({
 	moduleId: module.id,
-	selector: 'sd-app',
+	selector: 'todo-app',
 	templateUrl: 'app.component.html',
 	styleUrls: ['app.component.css'],
+	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent {
-	alert:AlertModel;
-	alerts:Array<AlertModel>;
+	todoItems$:Observable<Array<TodoItemModel>>;
 
-	private alertsRepo:Repository<AlertModel>;
+	private todoRepo:Repository<TodoItemModel>;
+	private newTodoItems$:BehaviorSubject<Array<TodoItemModel>> = new BehaviorSubject([]);
+
+	newItemText:string;
 
 	constructor(private repositoriesManagerService: RepositoryManagerService) {
-		this.alertsRepo = repositoriesManagerService.getRepository(AlertModel);
+		this.todoRepo = repositoriesManagerService.getRepository(TodoItemModel);
 
-		repositoriesManagerService.save$.subscribe((e:RepositoryEvent) => {
-			console.log(`Saved new ${e.repository.entity.singularName}`);
+		const getAllItems:Observable<Array<TodoItemModel>> = this.todoRepo.allItems$.do(() => {
+			// When new data arrives from the repository, the local items should be cleared,
+			// since they already should exist in the data.
+			this.newTodoItems$.next([]);
 		});
 
-		this.loadAll();
+		this.todoItems$ = Observable.combineLatest(getAllItems, this.newTodoItems$.asObservable())
+			.map((items:Array<Array<TodoItemModel>>) => items[0].concat(items[1]));
 	}
 
-	loadAll(){
-		this.loadAlert();
-		this.loadMachine();
-	}
+	addNewItem(){
+		const newItem:TodoItemModel = new TodoItemModel();
+		newItem.text = this.newItemText;
 
-	loadMachine(){
-		let machinesRepo:Repository<MachineModel> = this.repositoriesManagerService.getRepository(MachineModel);
-
-		machinesRepo.getItemById("yossi-pc")
-			.subscribe((machine:MachineModel) => console.log("Machine: ", machine));
-	}
-
-	loadAlert(){
-		this.alertsRepo.getItemById("123")
-			.subscribe((alert:AlertModel) => {
-				console.log("alert: ", alert);
-				this.alert = alert;
-			}, error => console.error("ERROR", error));
-	}
-
-	saveAlert(){
-		let editedAlert:AlertModel = Immutability.unfreeze(this.alert);
-		editedAlert.name = "Updated Alert!";
-		this.alertsRepo.save(editedAlert).subscribe((savedAlert:AlertModel) => {
-			console.log("SAVED", savedAlert);
-			this.alert = savedAlert;
-		})
+		this.todoRepo.save(newItem).subscribe((newItem:TodoItemModel) => {
+			this.newItemText = "";
+			this.newTodoItems$.next([...this.newTodoItems$.value, newItem]);
+		});
 	}
 }
