@@ -1,5 +1,6 @@
+<h1>Paris To-Do Sample app</h1>
 <ul>
-	<li *ngFor="let item of todoItems$ | async">
+	<li *ngFor="let item of todoItems$ | async" [class.disabled]="item.isNew">
 		<input type="checkbox"
 			   [id]="'todo' + item.$key"
 			   [(ngModel)]="item.isDone"

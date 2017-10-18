@@ -11,7 +11,7 @@ export function EntityField(fieldConfig:Field):PropertyDecorator {
 		if (!fieldConfigCopy.id)
 			fieldConfigCopy.id = String(propertyKey);
 
-		fieldConfigCopy.type = fieldConfig.genericType || propertyConstructor;
+		fieldConfigCopy.type = fieldConfig.arrayOf || propertyConstructor;
 		fieldConfigCopy.isArray = propertyConstructor === Array;
 		entityFieldsService.addField(entityPrototype, fieldConfigCopy);
 	}

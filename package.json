@@ -24,7 +24,6 @@
     "karma": "karma",
     "karma.start": "karma start",
 	  "mock-data-server.start": "node ./src/mock_data_server/mock_data_server",
-	  "postinstall": "gulp check.versions && gulp build.bundle.rxjs && gulp webdriver && gulp print.banner",
     "reinstall": "npm cache clean && npm install",
     "serve.coverage": "gulp serve.coverage --color",
     "serve.dev": "gulp serve.dev --color --env-config dev",
@@ -45,7 +44,9 @@
     "webdriver-start": "node ./node_modules/protractor/bin/webdriver-manager start",
     "webdriver-update": "node ./node_modules/protractor/bin/webdriver-manager update",
     "compodoc": "./node_modules/.bin/compodoc -p src/client/tsconfig.json",
-    "serve.compodoc": "./node_modules/.bin/compodoc -s"
+    "serve.compodoc": "./node_modules/.bin/compodoc -s",
+	  "run": "ts-node ./src/core/paris.module",
+	  "prepublishOnly": "tsc -p ./ --outDir dist/"
   },
   "author": "Yossi Kolesnicov",
   "license": "MIT",

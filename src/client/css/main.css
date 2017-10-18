@@ -87,3 +87,7 @@ thead tr{
 tr + tr{
 	border-top: solid 1px #eaeaea;
 }
+
+.disabled{
+	opacity: .5;
+}

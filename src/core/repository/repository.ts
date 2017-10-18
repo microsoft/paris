@@ -110,7 +110,7 @@ export class Repository<T extends IIdentifiable> implements IRepository{
 						modelData[entityField.id] = objectValueType.getValueById(propertyValue) || propertyValue;
 					else {
 						modelData[entityField.id] = entityField.isArray
-							? propertyValue.map((elementValue: any) => DataTransformersService.parse(entityField.type, elementValue))
+							? propertyValue ? propertyValue.map((elementValue: any) => DataTransformersService.parse(entityField.type, elementValue)) : []
 							: DataTransformersService.parse(entityField.type, propertyValue);
 					}
 				}

@@ -17,7 +17,7 @@ export class TodoItemModel extends EntityBaseModel{
 
 	@EntityField({
 		name: "Tags",
-		genericType: TagModel
+		arrayOf: TagModel
 	})
 	tags:Array<TagModel>;
 

@@ -1,10 +1,9 @@
 import {ChangeDetectionStrategy, Component} from '@angular/core';
 import './operators';
-import {RepositoryEvent, RepositoryManagerService} from "./paris/repository/repository-manager.service";
+import {RepositoryManagerService} from "./paris/repository/repository-manager.service";
 import {Repository} from "./paris/repository/repository";
 import {TodoItemModel} from "./@model/todo-item.model";
 import {Observable} from "rxjs/Observable";
-import {Subject} from "rxjs/Subject";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 
 /**
@@ -40,11 +39,13 @@ export class AppComponent {
 
 	addNewItem(){
 		const newItem:TodoItemModel = new TodoItemModel();
-		newItem.text = this.newItemText;
 
-		this.todoRepo.save(newItem).subscribe((newItem:TodoItemModel) => {
-			this.newItemText = "";
-			this.newTodoItems$.next([...this.newTodoItems$.value, newItem]);
+		newItem.text = this.newItemText;
+		this.newItemText = "";
+		this.newTodoItems$.next([...this.newTodoItems$.value, newItem]);
+
+		this.todoRepo.save(newItem).subscribe((savedNewItem:TodoItemModel) => {
+			this.newTodoItems$.next([...this.newTodoItems$.value.slice(0, -1), savedNewItem]);
 		});
 	}
 }

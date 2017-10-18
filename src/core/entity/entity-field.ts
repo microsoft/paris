@@ -7,6 +7,6 @@ export interface Field{
 	entity?:DataEntityType,
 	type?:DataEntityType,
 	defaultValue?:any,
-	genericType?:DataEntityType,
+	arrayOf?:DataEntityType,
 	isArray?:boolean
 }

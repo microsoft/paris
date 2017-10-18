@@ -7,6 +7,10 @@ export abstract class EntityBaseModel implements IIdentifiable{
 	})
 	$key:string;
 
+	get isNew():boolean{
+		return this.$key === null || this.$key === undefined;
+	}
+
 	constructor(data?:EntityBaseData){
 		if (data)
 			Object.assign(this, data);
