@@ -1,3 +1,4 @@
+export { ParisConfig } from "./lib/config/paris-config";
 export { DataTransformersService, DataTransformer } from "./lib/services/data-transformers.service";
 export { ModelEntity, EntityConfig, ModelEntityCacheConfig } from "./lib/entity/entity.config";
 export { entityFieldsService } from "./lib/services/entity-fields.service";
