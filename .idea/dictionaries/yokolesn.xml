@@ -2,6 +2,7 @@
   <dictionary name="yokolesn">
     <words>
       <w>deps</w>
+      <w>tsconfig</w>
     </words>
   </dictionary>
 </component>

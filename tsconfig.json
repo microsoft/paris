@@ -1,47 +1,26 @@
 {
-  "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
-    "declaration": false,
-    "removeComments": true,
-    "noLib": false,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "lib": ["es2015"],
-    "sourceMap": true,
-    "pretty": true,
-    "allowUnreachableCode": false,
-    "allowUnusedLabels": false,
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
-    "noImplicitUseStrict": false,
-    "noFallthroughCasesInSwitch": true,
-    "typeRoots": [
-      "./node_modules/@types",
-      "./node_modules"
-    ],
-    "types": [
-      "node"
-    ]
-  },
-  "files": [
-    "gulpfile.ts",
-    "tools/manual_typings/seed/autoprefixer.d.ts",
-    "tools/manual_typings/seed/cssnano.d.ts",
-    "tools/manual_typings/seed/express-history-api-fallback.d.ts",
-    "tools/manual_typings/seed/istream.d.ts",
-    "tools/manual_typings/seed/karma.d.ts",
-    "tools/manual_typings/seed/merge-stream.d.ts",
-    "tools/manual_typings/seed/open.d.ts",
-    "tools/manual_typings/seed/operators.d.ts",
-    "tools/manual_typings/seed/slash.d.ts",
-    "tools/manual_typings/seed/systemjs-builder.d.ts",
-    "tools/manual_typings/seed/tildify.d.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "src"
-  ],
-  "compileOnSave": false
+	"compilerOptions": {
+		"lib": ["es2016", "dom"], // we target Node.js(v6)
+		"module": "commonjs", // export compatibility
+		"target": "es5", // we target Node.js(v6)
+		"moduleResolution": "node", // we target Node.js(v6)
+		"declaration": true, // generate TypeScript definitions
+		"rootDir": ".",
+		"outDir": "dist", // transpile JS in this directory
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
+		"noImplicitAny": true,
+		"noImplicitReturns": true,
+		"noImplicitUseStrict": false,
+		"noFallthroughCasesInSwitch": true,
+		"typeRoots": [
+			"./node_modules/@types",
+			"./node_modules"
+		],
+		"types" : ["node"] // only use needed types
+	},
+	"include": [
+		"paris.umd.ts",
+		"lib/**/*"
+	]
 }
