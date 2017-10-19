@@ -5,13 +5,14 @@
   "repository": {
     "url": "https://github.com/microsoft/paris.ts"
   },
-	"main": "dist/index.js",
+	"main": "dist/paris.umd.js",
 	"typings": "definitions/index",
 	"typescript": {
 		"definition": "definitions/index"
 	},
   "scripts": {
-	  "release": "standard-version"
+	  "release": "standard-version",
+	  "postinstall": "gulp build"
   },
   "author": "Yossi Kolesnicov",
   "license": "MIT",
