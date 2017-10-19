@@ -6,7 +6,7 @@
 		"moduleResolution": "node", // we target Node.js(v6)
 		"declaration": true, // generate TypeScript definitions
 		"rootDir": ".",
-		"outDir": "dist", // transpile JS in this directory
+		"outDir": "bundle", // transpile JS in this directory
 		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true,
 		"noImplicitAny": true,
