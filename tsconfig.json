@@ -20,7 +20,7 @@
 		"types" : ["node"] // only use needed types
 	},
 	"include": [
-		"paris.umd.ts",
+		"index.ts",
 		"lib/**/*"
 	]
 }

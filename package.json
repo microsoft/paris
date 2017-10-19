@@ -1,15 +1,12 @@
 {
-  "name": "Paris",
+  "name": "paris",
   "version": "0.1.0",
   "description": "Library for the implementation of Domain Driven Design in Angular/TypeScript apps",
   "repository": {
     "url": "https://github.com/microsoft/paris.ts"
   },
-	"main": "dist/paris.umd.js",
-	"typings": "definitions/index",
-	"typescript": {
-		"definition": "definitions/index"
-	},
+	"main": "bundle/index.js",
+	"typings": "definitions/index.d.ts",
   "scripts": {
 	  "release": "standard-version"
   },
