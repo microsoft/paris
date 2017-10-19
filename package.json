@@ -11,8 +11,7 @@
 		"definition": "definitions/index"
 	},
   "scripts": {
-	  "release": "standard-version",
-	  "postinstall": "gulp build"
+	  "release": "standard-version"
   },
   "author": "Yossi Kolesnicov",
   "license": "MIT",
