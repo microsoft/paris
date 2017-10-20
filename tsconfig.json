@@ -1,12 +1,12 @@
 {
 	"compilerOptions": {
 		"lib": ["es2016", "dom"], // we target Node.js(v6)
-		"module": "commonjs", // export compatibility
 		"target": "es5", // we target Node.js(v6)
+		"module": "commonjs",
 		"moduleResolution": "node", // we target Node.js(v6)
 		"declaration": true, // generate TypeScript definitions
 		"rootDir": ".",
-		"outDir": "bundle", // transpile JS in this directory
+		"outDir": "./bundle",
 		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true,
 		"noImplicitAny": true,
@@ -20,7 +20,6 @@
 		"types" : ["node"] // only use needed types
 	},
 	"include": [
-		"index.ts",
 		"lib/**/*"
 	]
 }

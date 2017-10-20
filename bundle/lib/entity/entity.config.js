@@ -11,7 +11,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var entity_config_base_1 = require("./entity-config.base");
-var ModelEntity = (function (_super) {
+var ModelEntity = /** @class */ (function (_super) {
     __extends(ModelEntity, _super);
     function ModelEntity(config) {
         var _this = _super.call(this, config) || this;

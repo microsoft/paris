@@ -11,7 +11,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var entities_service_base_1 = require("./entities.service.base");
-var EntitiesService = (function (_super) {
+var EntitiesService = /** @class */ (function (_super) {
     __extends(EntitiesService, _super);
     function EntitiesService() {
         return _super !== null && _super.apply(this, arguments) || this;

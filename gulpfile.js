@@ -2,8 +2,9 @@ const gulp = require('gulp');
 const ts = require('gulp-typescript');
 const clean = require('gulp-clean');
 const runSequence = require('run-sequence');
+const concat = require('gulp-concat');
 
-gulp.task('build', function() {
+gulp.task('build', ["clean"], function() {
 	const merge = require('merge2');
 	const tsProject = ts.createProject('tsconfig.json');
 
@@ -11,13 +12,15 @@ gulp.task('build', function() {
 		.pipe(tsProject());
 
 	return merge([
-		tsResult.dts.pipe(gulp.dest('./definitions')),
-		tsResult.js.pipe(gulp.dest(tsProject.config.compilerOptions.outDir))
+		tsResult.dts
+			.pipe(gulp.dest(tsProject.config.compilerOptions.outDir)),
+		tsResult.js
+			.pipe(gulp.dest(tsProject.config.compilerOptions.outDir))
 	]);
 });
 
 gulp.task('clean', function () {
-	return gulp.src('dist', { read: false })
+	return gulp.src('bundle', { read: false })
 		.pipe(clean());
 });
 

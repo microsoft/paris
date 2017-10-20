@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var EntityFieldsService = (function () {
+var EntityFieldsService = /** @class */ (function () {
     function EntityFieldsService() {
         this.fields = new Map;
     }

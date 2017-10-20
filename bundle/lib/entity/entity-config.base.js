@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var EntityConfigBase = (function () {
+var EntityConfigBase = /** @class */ (function () {
     function EntityConfigBase(config) {
         Object.assign(this, config);
     }

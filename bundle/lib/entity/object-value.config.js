@@ -12,7 +12,7 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var entity_config_base_1 = require("./entity-config.base");
 var immutability_1 = require("../services/immutability");
-var ModelObjectValue = (function (_super) {
+var ModelObjectValue = /** @class */ (function (_super) {
     __extends(ModelObjectValue, _super);
     function ModelObjectValue(config) {
         var _this = _super.call(this, config) || this;

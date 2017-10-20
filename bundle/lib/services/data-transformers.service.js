@@ -9,7 +9,7 @@ var transformers = [
 ];
 var transformersMap = new Map;
 transformers.forEach(function (transformer) { return transformersMap.set(transformer.type, transformer); });
-var DataTransformersService = (function () {
+var DataTransformersService = /** @class */ (function () {
     function DataTransformersService() {
     }
     DataTransformersService.parse = function (type, value) {

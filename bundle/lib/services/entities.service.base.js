@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var entity_fields_service_1 = require("./entity-fields.service");
-var EntitiesServiceBase = (function () {
+var EntitiesServiceBase = /** @class */ (function () {
     function EntitiesServiceBase() {
         this._allEntities = new Map;
     }

@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var Observable_1 = require("rxjs/Observable");
-var DataCache = (function () {
+var DataCache = /** @class */ (function () {
     function DataCache(settings) {
         DataCache.validateSettings(settings);
         this.time = settings.time || null; // milliseconds

@@ -17,7 +17,7 @@ var repository_1 = require("./repository");
 var Subject_1 = require("rxjs/Subject");
 var entities_service_1 = require("../services/entities.service");
 var data_store_service_1 = require("../services/data-store/data-store.service");
-var RepositoryManagerService = (function () {
+var RepositoryManagerService = /** @class */ (function () {
     function RepositoryManagerService(dataStore, config) {
         this.dataStore = dataStore;
         this.config = config;

@@ -6,13 +6,13 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-require("operators");
+require("./operators");
 var core_1 = require("@angular/core");
 var repository_manager_service_1 = require("./repository/repository-manager.service");
 var http_1 = require("@angular/common/http");
 var data_store_service_1 = require("./services/data-store/data-store.service");
 var paris_config_1 = require("./config/paris-config");
-var ParisModule = (function () {
+var ParisModule = /** @class */ (function () {
     function ParisModule() {
     }
     ParisModule_1 = ParisModule;

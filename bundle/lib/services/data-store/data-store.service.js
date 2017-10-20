@@ -14,7 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = require("@angular/core");
 var http_1 = require("@angular/common/http");
-var DataStoreService = (function () {
+var DataStoreService = /** @class */ (function () {
     function DataStoreService(http, config) {
         this.http = http;
         this.config = config;

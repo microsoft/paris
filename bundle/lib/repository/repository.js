@@ -5,7 +5,7 @@ var Subject_1 = require("rxjs/Subject");
 var data_transformers_service_1 = require("../services/data-transformers.service");
 var cache_1 = require("../services/cache");
 var object_values_service_1 = require("../services/object-values.service");
-var Repository = (function () {
+var Repository = /** @class */ (function () {
     function Repository(entity, config, entityConstructor, dataStore, repositoryManagerService) {
         this.entity = entity;
         this.config = config;

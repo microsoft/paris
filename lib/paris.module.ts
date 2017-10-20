@@ -1,4 +1,4 @@
-import "operators";
+import "./operators";
 import {ModuleWithProviders, NgModule} from "@angular/core";
 import {RepositoryManagerService} from "./repository/repository-manager.service";
 import {HttpClientModule} from "@angular/common/http";

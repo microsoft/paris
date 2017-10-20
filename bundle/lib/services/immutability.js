@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var Immutability = (function () {
+var Immutability = /** @class */ (function () {
     function Immutability() {
     }
     Immutability.freeze = function (obj) {
