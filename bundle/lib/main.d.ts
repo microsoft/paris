@@ -1,0 +1,14 @@
+export { Repository } from "./repository/repository";
+export * from "./repository/repository-manager.service";
+export { IRepository } from "./repository/repository.interface";
+export { IIdentifiable } from "./models/identifiable.model";
+export { ParisConfig } from "./config/paris-config";
+export { DataTransformersService, DataTransformer } from "./services/data-transformers.service";
+export { ModelEntity, EntityConfig, ModelEntityCacheConfig } from "./entity/entity.config";
+export { entityFieldsService } from "./services/entity-fields.service";
+export { entitiesService } from "./services/entities.service";
+export { ModelObjectValue } from "./entity/object-value.config";
+export { EntityField } from "./entity/entity-field.decorator";
+export { ObjectValue } from "./entity/object-value.decorator";
+export { Entity } from "./entity/entity.decorator";
+export { ParisModule } from "./paris.module";

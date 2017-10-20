@@ -1,1 +1,1 @@
-export * from "./paris.umd";
+export * from "./lib/main";
