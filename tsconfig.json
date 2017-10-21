@@ -17,9 +17,16 @@
 			"./node_modules/@types",
 			"./node_modules"
 		],
-		"types" : ["node"] // only use needed types
+		"types" : ["node"], // only use needed types
+		"baseUrl": "/",
+		"paths": {
+			"@angular/*": [
+				"../node_modules/@angular/*"
+			]
+		}
 	},
 	"include": [
+		"index.ts",
 		"lib/**/*"
 	]
 }

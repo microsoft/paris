@@ -1,14 +1,1 @@
-export { Repository } from "./bundle/lib/repository/repository";
-export * from "./bundle/lib/repository/repository-manager.service";
-export { IRepository } from "./bundle/lib/repository/repository.interface";
-export { IIdentifiable } from "./bundle/lib/models/identifiable.model";
-export { ParisConfig } from "./bundle/lib/config/paris-config";
-export { DataTransformersService, DataTransformer } from "./bundle/lib/services/data-transformers.service";
-export { ModelEntity, EntityConfig, ModelEntityCacheConfig } from "./bundle/lib/entity/entity.config";
-export { entityFieldsService } from "./bundle/lib/services/entity-fields.service";
-export { entitiesService } from "./bundle/lib/services/entities.service";
-export { ModelObjectValue } from "./bundle/lib/entity/object-value.config";
-export { EntityField } from "./bundle/lib/entity/entity-field.decorator";
-export { ObjectValue } from "./bundle/lib/entity/object-value.decorator";
-export { Entity } from "./bundle/lib/entity/entity.decorator";
-export { ParisModule } from "./bundle/lib/paris.module";
+export * from "./bundle/lib/main";

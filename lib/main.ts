@@ -1,5 +1,5 @@
 export {Repository} from "./repository/repository";
-export * from "./repository/repository-manager.service";
+export {RepositoryManagerService} from "./repository/repository-manager.service";
 export {IRepository} from "./repository/repository.interface";
 export {IIdentifiable} from "./models/identifiable.model";
 export {ParisConfig} from "./config/paris-config";

@@ -13,7 +13,7 @@ import {defaultConfig, ParisConfig} from "./config/paris-config";
 	]
 })
 export class ParisModule {
-	static forRoot(config: ParisConfig): ModuleWithProviders {
+	static forRoot(config?: ParisConfig): ModuleWithProviders {
 		return {
 			ngModule: ParisModule,
 			providers: [

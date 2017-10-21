@@ -1,6 +1,24 @@
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
+import typescript from 'rollup-plugin-typescript';
 import pkg from './package.json';
+
+// found this online, it does seem to correctly rewrite the rxjs paths
+// but is it helping or hurting?
+class RollupRx {
+
+	constructor( options ){
+		this.options = options;
+	}
+
+	resolveId( id ){
+		if(id.startsWith('rxjs/')){
+			return `${__dirname}/node_modules/rxjs-es/${id.replace('rxjs/', '')}.js`;
+		}
+	}
+}
+
+const rollupRx = config => new RollupRx( config );
 
 export default [
 	// browser-friendly UMD build
@@ -12,8 +30,13 @@ export default [
 		plugins: [
 			resolve(), // so Rollup can find `ms`
 			commonjs() // so Rollup can convert `ms` to an ES module
-		]
-	},
+		],
+		external: id => {
+			return /^rxjs/.test(id) || /^@angular/.test(id);
+		}
+	}
+	/*
+	,
 
 	// CommonJS (for Node) and ES module (for bundlers) build.
 	// (We could have three entries in the configuration array
@@ -28,4 +51,5 @@ export default [
 			{ dest: pkg.module, format: 'es' }
 		]
 	}
+	*/
 ];

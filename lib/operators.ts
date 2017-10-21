@@ -11,5 +11,3 @@ import 'rxjs/add/operator/share';
 import 'rxjs/add/operator/finally';
 import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/observable/merge';
-
-import "reflect-metadata";

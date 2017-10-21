@@ -2,11 +2,11 @@ const gulp = require('gulp');
 const ts = require('gulp-typescript');
 const clean = require('gulp-clean');
 const runSequence = require('run-sequence');
-const concat = require('gulp-concat');
 
 gulp.task('build', ["clean"], function() {
-	const merge = require('merge2');
 	const tsProject = ts.createProject('tsconfig.json');
+
+	const merge = require('merge2');
 
 	var tsResult = tsProject.src()
 		.pipe(tsProject());
@@ -20,7 +20,9 @@ gulp.task('build', ["clean"], function() {
 });
 
 gulp.task('clean', function () {
-	return gulp.src('bundle', { read: false })
+	const tsProject = ts.createProject('tsconfig.json');
+
+	return gulp.src(tsProject.config.compilerOptions.outDir, { read: false })
 		.pipe(clean());
 });
 
