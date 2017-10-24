@@ -1,7 +1,7 @@
 {
 	"items": [
 		{
-			"$key": "2",
+			"id": "2",
 			"text": "Pay water bill",
 			"tags": ["payments"],
 			"created": 1507404535541,
@@ -9,7 +9,7 @@
 			"user": "yossik"
 		},
 		{
-			"$key": "1",
+			"id": "1",
 			"text": "Get paid",
 			"tags": ["payments", "work"],
 			"doneTime": 1507404535541,

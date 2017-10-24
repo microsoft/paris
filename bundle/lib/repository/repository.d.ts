@@ -24,6 +24,7 @@ export declare class Repository<T extends IIdentifiable> implements IRepository 
     private _saveSubject$;
     readonly allItems$: Observable<Array<T>>;
     private readonly cache;
+    private readonly baseUrl;
     constructor(entity: ModelEntity, config: ParisConfig, entityConstructor: DataEntityConstructor<T>, dataStore: DataStoreService, repositoryManagerService: RepositoryManagerService);
     createItem(itemData: any): Observable<T>;
     createNewItem(): T;
@@ -38,6 +39,7 @@ export declare class Repository<T extends IIdentifiable> implements IRepository 
     private getEntityItem(repository, itemData);
     getItemsDataSet(options?: DataSetOptions): Observable<DataSet<T>>;
     getItemById(itemId: string | number, allowCache?: boolean): Observable<T>;
+    private setAllItems();
     save(item: T): Observable<T>;
     getItemSaveData(item: T): Index;
 }

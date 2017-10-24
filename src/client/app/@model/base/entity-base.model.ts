@@ -5,10 +5,10 @@ export abstract class EntityBaseModel implements IIdentifiable{
 	@EntityField({
 		name: "ID"
 	})
-	$key:string;
+	id:string;
 
 	get isNew():boolean{
-		return this.$key === null || this.$key === undefined;
+		return this.id === null || this.id === undefined;
 	}
 
 	constructor(data?:EntityBaseData){

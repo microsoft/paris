@@ -2,7 +2,7 @@ import {DataEntityType} from "./data-entity.base";
 
 export interface Field{
 	id?:string,
-	name:string,
+	name?:string,
 	data?:string,
 	entity?:DataEntityType,
 	type?:DataEntityType,

@@ -6,9 +6,9 @@ export declare class DataStoreService {
     private config;
     private activeRequests;
     constructor(http: HttpClient, config: ParisConfig);
-    get(endpoint: string, data?: RequestData): Observable<any>;
-    post(endpoint: string, data?: RequestData): Observable<any>;
-    private getEndpointUrl(endpoint);
+    get(endpoint: string, data?: RequestData, baseUrl?: string): Observable<any>;
+    post(endpoint: string, data?: RequestData, baseUrl?: string): Observable<any>;
+    private getEndpointUrl(endpoint, baseUrl?);
     private setActiveRequest(obs, verb, endpoint, data?);
     private getActiveRequestId(verb, endpoint, data?);
 }

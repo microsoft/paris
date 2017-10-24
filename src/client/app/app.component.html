@@ -2,10 +2,10 @@
 <ul>
 	<li *ngFor="let item of todoItems$ | async" [class.disabled]="item.isNew">
 		<input type="checkbox"
-			   [id]="'todo' + item.$key"
+			   [id]="'todo' + item.id"
 			   [(ngModel)]="item.isDone"
 			   (change)="todoRepo.save(item)" />
-		<label [attr.for]="'todo' + item.$key">{{item.text}}</label>
+		<label [attr.for]="'todo' + item.id">{{item.text}}</label>
 	</li>
 </ul>
 <form (submit)="addNewItem()">

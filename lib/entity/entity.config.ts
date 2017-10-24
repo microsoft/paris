@@ -1,26 +1,33 @@
 import {EntityConfigBase, IEntityConfigBase} from "./entity-config.base";
+import {ParisConfig} from "../config/paris-config";
 
 export class ModelEntity extends EntityConfigBase{
-	endpoint:string;
+	endpoint:EntityConfigFunctionOrValue;
 	loadAll?:boolean = false;
 	cache?:ModelEntityCacheConfig;
+	baseUrl?:EntityConfigFunctionOrValue;
+	allItemsProperty?:string;
+	allItemsEndpoint?:string;
 
 	constructor(config:EntityConfig){
 		super(config);
 
-		this.endpoint = config.endpoint;
 		this.loadAll = config.loadAll === true;
-		this.cache = config.cache;
 	}
 }
 
 export interface EntityConfig extends IEntityConfigBase{
-	endpoint:string,
+	endpoint:EntityConfigFunctionOrValue,
 	loadAll?:boolean,
-	cache?:ModelEntityCacheConfig
+	cache?:ModelEntityCacheConfig,
+	baseUrl?:EntityConfigFunctionOrValue,
+	allItemsProperty?:string,
+	allItemsEndpoint?:string
 }
 
 export interface ModelEntityCacheConfig{
 	time?: number,
 	max?: number
 }
+
+export type EntityConfigFunctionOrValue = ((config?:ParisConfig) => string) | string;

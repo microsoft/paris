@@ -20,14 +20,14 @@ var DataStoreService = /** @class */ (function () {
         this.config = config;
         this.activeRequests = new Map();
     }
-    DataStoreService.prototype.get = function (endpoint, data) {
-        return this.setActiveRequest(this.http.get(this.getEndpointUrl(endpoint), data), HttpVerb.get, endpoint, data);
+    DataStoreService.prototype.get = function (endpoint, data, baseUrl) {
+        return this.setActiveRequest(this.http.get(this.getEndpointUrl(endpoint, baseUrl), data), HttpVerb.get, endpoint, data);
     };
-    DataStoreService.prototype.post = function (endpoint, data) {
-        return this.http.post(this.getEndpointUrl(endpoint), data);
+    DataStoreService.prototype.post = function (endpoint, data, baseUrl) {
+        return this.http.post(this.getEndpointUrl(endpoint, baseUrl), data);
     };
-    DataStoreService.prototype.getEndpointUrl = function (endpoint) {
-        return this.config.apiRoot + "/" + endpoint;
+    DataStoreService.prototype.getEndpointUrl = function (endpoint, baseUrl) {
+        return (baseUrl || this.config.apiRoot) + "/" + endpoint;
     };
     DataStoreService.prototype.setActiveRequest = function (obs, verb, endpoint, data) {
         var _this = this;

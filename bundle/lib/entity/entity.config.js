@@ -16,9 +16,7 @@ var ModelEntity = /** @class */ (function (_super) {
     function ModelEntity(config) {
         var _this = _super.call(this, config) || this;
         _this.loadAll = false;
-        _this.endpoint = config.endpoint;
         _this.loadAll = config.loadAll === true;
-        _this.cache = config.cache;
         return _this;
     }
     return ModelEntity;

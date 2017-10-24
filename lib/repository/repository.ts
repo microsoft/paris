@@ -17,6 +17,7 @@ import {DataCache, DataCacheSettings} from "../services/cache";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {ModelObjectValue} from "../entity/object-value.config";
 import {objectValuesService} from "../services/object-values.service";
+import * as _ from "lodash";
 
 export class Repository<T extends IIdentifiable> implements IRepository{
 	save$:Observable<T>;
@@ -32,6 +33,9 @@ export class Repository<T extends IIdentifiable> implements IRepository{
 		if (this._allValues)
 			return Observable.merge(Observable.of(this._allValues), this._allItemsSubject$.asObservable());
 
+		if (this.entity.loadAll)
+			return this.setAllItems();
+
 		return this._allItems$;
 	}
 
@@ -45,6 +49,13 @@ export class Repository<T extends IIdentifiable> implements IRepository{
 		}
 
 		return this._cache;
+	}
+
+	private get baseUrl():string{
+		if (!this.entity.baseUrl)
+			return null;
+
+		return this.entity.baseUrl instanceof Function ? this.entity.baseUrl(this.config) : this.entity.baseUrl;
 	}
 
 	constructor(public readonly entity:ModelEntity,
@@ -77,11 +88,11 @@ export class Repository<T extends IIdentifiable> implements IRepository{
 	 * @returns {Observable<ModelData>}
 	 */
 	private getModelData(itemData:Index):Observable<ModelData>{
-		let modelData:ModelData = { $key: itemData[this.entity.idProperty || this.config.entityIdProperty] },
+		let modelData:ModelData = { id: itemData[this.entity.idProperty || this.config.entityIdProperty] },
 			subModels:Array<Observable<{ [key:string]:any }>> = [];
 
 		this.entity.fields.forEach((entityField:Field) => {
-			let propertyValue:any = itemData[entityField.data || entityField.id];
+			let propertyValue:any = entityField.data ? _.get(itemData, entityField.data) : itemData[entityField.id];
 
 			if (propertyValue === undefined || propertyValue === null){
 				modelData[entityField.id] = entityField.defaultValue || null;
@@ -110,7 +121,9 @@ export class Repository<T extends IIdentifiable> implements IRepository{
 						modelData[entityField.id] = objectValueType.getValueById(propertyValue) || propertyValue;
 					else {
 						modelData[entityField.id] = entityField.isArray
-							? propertyValue ? propertyValue.map((elementValue: any) => DataTransformersService.parse(entityField.type, elementValue)) : []
+							? propertyValue
+								? propertyValue.map((elementValue: any) => DataTransformersService.parse(entityField.type, elementValue))
+								: []
 							: DataTransformersService.parse(entityField.type, propertyValue);
 					}
 				}
@@ -138,9 +151,11 @@ export class Repository<T extends IIdentifiable> implements IRepository{
 	}
 
 	getItemsDataSet(options?:DataSetOptions):Observable<DataSet<T>>{
-		return this.dataStore.get(this.entity.endpoint + "/", options)
+		return this.dataStore.get(`${this.entity.endpoint}/${this.entity.allItemsEndpoint || ''}`, options, this.baseUrl)
 			.map((rawDataSet:any) => {
-				let rawItems:Array<any> = rawDataSet[this.config.allItemsProperty];
+				const allItemsProperty = this.entity.allItemsProperty || this.config.allItemsProperty;
+
+				let rawItems:Array<any> = rawDataSet instanceof Array ? rawDataSet : rawDataSet[allItemsProperty];
 
 				if (!rawItems)
 					console.warn(`Property '${this.config.allItemsProperty}' wasn't found in DataSet for Entity '${this.entity.pluralName}'.`);
@@ -165,29 +180,29 @@ export class Repository<T extends IIdentifiable> implements IRepository{
 		if (allowCache !== false && this.entity.cache)
 			return this.cache.get(itemId);
 
-		if (this.entity.loadAll){
-			if (!this._allValues){
-				return this.getItemsDataSet()
-					.do((dataSet:DataSet<T>) => {
-						this._allValues = dataSet.items;
-						this._allValuesMap = new Map();
-						this._allValues.forEach((value:T) => this._allValuesMap.set(value.$key, value));
-					})
-					.map((dataSet:DataSet<T>) => this._allValuesMap.get(itemId));
-			}
-			else
-				return Observable.of(this._allValuesMap.get(itemId));
-		}
+		if (this.entity.loadAll)
+			return this.setAllItems().map(() => this._allValuesMap.get(itemId));
 		else {
 			return this.dataStore.get(`${this.entity.endpoint}/${itemId}`)
 				.flatMap(data => this.createItem(data));
 		}
 	}
 
+	private setAllItems():Observable<Array<T>>{
+		if (this._allValues)
+			return Observable.of(this._allValues);
+
+		return this.getItemsDataSet().do((dataSet:DataSet<T>) => {
+			this._allValues = dataSet.items;
+			this._allValuesMap = new Map();
+			this._allValues.forEach((value:T) => this._allValuesMap.set(value.id, value));
+		}).map(dataSet => dataSet.items);
+	}
+
 	save(item:T):Observable<T>{
 		let saveData:Index = this.getItemSaveData(item);
 
-		return this.dataStore.post(`${this.entity.endpoint}/${item.$key || ''}`, saveData)
+		return this.dataStore.post(`${this.entity.endpoint}/${item.id || ''}`, saveData)
 			.flatMap((savedItemData:Index) => this.createItem(savedItemData))
 			.do((item:T) => {
 				if (this._allValues){
@@ -213,7 +228,7 @@ export class Repository<T extends IIdentifiable> implements IRepository{
 					let propertyRepository: IRepository = this.repositoryManagerService.getRepository(entityField.type);
 
 					if (propertyRepository)
-						modelValue = (<IIdentifiable>propertyValue).$key;
+						modelValue = (<IIdentifiable>propertyValue).id;
 					else
 						modelValue = DataTransformersService.serialize(entityField.type, propertyValue);
 

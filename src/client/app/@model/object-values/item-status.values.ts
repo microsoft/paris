@@ -2,15 +2,15 @@ import {ItemStatusModel} from "./item-status.model";
 
 export const itemStatusValues:Array<ItemStatusModel> = [
 	{
-		$key: "chores",
+		id: "chores",
 		name: "Chores"
 	},
 	{
-		$key: "work",
+		id: "work",
 		name: "Work"
 	},
 	{
-		$key: "payments",
+		id: "payments",
 		name: "Payments"
 	}
 ];

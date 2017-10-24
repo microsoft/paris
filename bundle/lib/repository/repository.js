@@ -5,6 +5,7 @@ var Subject_1 = require("rxjs/Subject");
 var data_transformers_service_1 = require("../services/data-transformers.service");
 var cache_1 = require("../services/cache");
 var object_values_service_1 = require("../services/object-values.service");
+var _ = require("lodash");
 var Repository = /** @class */ (function () {
     function Repository(entity, config, entityConstructor, dataStore, repositoryManagerService) {
         this.entity = entity;
@@ -22,6 +23,8 @@ var Repository = /** @class */ (function () {
         get: function () {
             if (this._allValues)
                 return Observable_1.Observable.merge(Observable_1.Observable.of(this._allValues), this._allItemsSubject$.asObservable());
+            if (this.entity.loadAll)
+                return this.setAllItems();
             return this._allItems$;
         },
         enumerable: true,
@@ -37,6 +40,15 @@ var Repository = /** @class */ (function () {
                 this._cache = new cache_1.DataCache(cacheSettings);
             }
             return this._cache;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Repository.prototype, "baseUrl", {
+        get: function () {
+            if (!this.entity.baseUrl)
+                return null;
+            return this.entity.baseUrl instanceof Function ? this.entity.baseUrl(this.config) : this.entity.baseUrl;
         },
         enumerable: true,
         configurable: true
@@ -57,9 +69,9 @@ var Repository = /** @class */ (function () {
      */
     Repository.prototype.getModelData = function (itemData) {
         var _this = this;
-        var modelData = { $key: itemData[this.entity.idProperty || this.config.entityIdProperty] }, subModels = [];
+        var modelData = { id: itemData[this.entity.idProperty || this.config.entityIdProperty] }, subModels = [];
         this.entity.fields.forEach(function (entityField) {
-            var propertyValue = itemData[entityField.data || entityField.id];
+            var propertyValue = entityField.data ? _.get(itemData, entityField.data) : itemData[entityField.id];
             if (propertyValue === undefined || propertyValue === null) {
                 modelData[entityField.id] = entityField.defaultValue || null;
             }
@@ -83,7 +95,9 @@ var Repository = /** @class */ (function () {
                         modelData[entityField.id] = objectValueType.getValueById(propertyValue) || propertyValue;
                     else {
                         modelData[entityField.id] = entityField.isArray
-                            ? propertyValue ? propertyValue.map(function (elementValue) { return data_transformers_service_1.DataTransformersService.parse(entityField.type, elementValue); }) : []
+                            ? propertyValue
+                                ? propertyValue.map(function (elementValue) { return data_transformers_service_1.DataTransformersService.parse(entityField.type, elementValue); })
+                                : []
                             : data_transformers_service_1.DataTransformersService.parse(entityField.type, propertyValue);
                     }
                 }
@@ -108,9 +122,10 @@ var Repository = /** @class */ (function () {
     };
     Repository.prototype.getItemsDataSet = function (options) {
         var _this = this;
-        return this.dataStore.get(this.entity.endpoint + "/", options)
+        return this.dataStore.get(this.entity.endpoint + "/" + (this.entity.allItemsEndpoint || ''), options, this.baseUrl)
             .map(function (rawDataSet) {
-            var rawItems = rawDataSet[_this.config.allItemsProperty];
+            var allItemsProperty = _this.entity.allItemsProperty || _this.config.allItemsProperty;
+            var rawItems = rawDataSet instanceof Array ? rawDataSet : rawDataSet[allItemsProperty];
             if (!rawItems)
                 console.warn("Property '" + _this.config.allItemsProperty + "' wasn't found in DataSet for Entity '" + _this.entity.pluralName + "'.");
             return {
@@ -133,28 +148,27 @@ var Repository = /** @class */ (function () {
         if (allowCache === void 0) { allowCache = true; }
         if (allowCache !== false && this.entity.cache)
             return this.cache.get(itemId);
-        if (this.entity.loadAll) {
-            if (!this._allValues) {
-                return this.getItemsDataSet()
-                    .do(function (dataSet) {
-                    _this._allValues = dataSet.items;
-                    _this._allValuesMap = new Map();
-                    _this._allValues.forEach(function (value) { return _this._allValuesMap.set(value.$key, value); });
-                })
-                    .map(function (dataSet) { return _this._allValuesMap.get(itemId); });
-            }
-            else
-                return Observable_1.Observable.of(this._allValuesMap.get(itemId));
-        }
+        if (this.entity.loadAll)
+            return this.setAllItems().map(function () { return _this._allValuesMap.get(itemId); });
         else {
             return this.dataStore.get(this.entity.endpoint + "/" + itemId)
                 .flatMap(function (data) { return _this.createItem(data); });
         }
     };
+    Repository.prototype.setAllItems = function () {
+        var _this = this;
+        if (this._allValues)
+            return Observable_1.Observable.of(this._allValues);
+        return this.getItemsDataSet().do(function (dataSet) {
+            _this._allValues = dataSet.items;
+            _this._allValuesMap = new Map();
+            _this._allValues.forEach(function (value) { return _this._allValuesMap.set(value.id, value); });
+        }).map(function (dataSet) { return dataSet.items; });
+    };
     Repository.prototype.save = function (item) {
         var _this = this;
         var saveData = this.getItemSaveData(item);
-        return this.dataStore.post(this.entity.endpoint + "/" + (item.$key || ''), saveData)
+        return this.dataStore.post(this.entity.endpoint + "/" + (item.id || ''), saveData)
             .flatMap(function (savedItemData) { return _this.createItem(savedItemData); })
             .do(function (item) {
             if (_this._allValues) {
@@ -173,7 +187,7 @@ var Repository = /** @class */ (function () {
                 if (entityField) {
                     var propertyRepository = this.repositoryManagerService.getRepository(entityField.type);
                     if (propertyRepository)
-                        modelValue = propertyValue.$key;
+                        modelValue = propertyValue.id;
                     else
                         modelValue = data_transformers_service_1.DataTransformersService.serialize(entityField.type, propertyValue);
                     modelData[entityField.id] = modelValue;

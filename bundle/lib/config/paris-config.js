@@ -2,5 +2,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.defaultConfig = {
     allItemsProperty: "items",
-    entityIdProperty: "$key"
+    entityIdProperty: "id"
 };

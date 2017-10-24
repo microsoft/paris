@@ -1,12 +1,12 @@
 {
 	"items": [
 		{
-			"$key": "payments",
+			"id": "payments",
 			"name": "Payments",
 			"color": "#ffc107"
 		},
 		{
-			"$key": "work",
+			"id": "work",
 			"name": "Work",
 			"color": "#00bcd4"
 		}

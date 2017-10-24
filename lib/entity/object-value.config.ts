@@ -21,7 +21,7 @@ export class ModelObjectValue extends EntityConfigBase{
 
 		if (!this._valuesMap) {
 			this._valuesMap = new Map;
-			this.values.forEach(value => this._valuesMap.set(value.$key, value));
+			this.values.forEach(value => this._valuesMap.set(value.id, value));
 		}
 		return this._valuesMap ? this._valuesMap.get(valueId) : null;
 	}

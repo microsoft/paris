@@ -27,7 +27,7 @@ var ModelObjectValue = /** @class */ (function (_super) {
             return null;
         if (!this._valuesMap) {
             this._valuesMap = new Map;
-            this.values.forEach(function (value) { return _this._valuesMap.set(value.$key, value); });
+            this.values.forEach(function (value) { return _this._valuesMap.set(value.id, value); });
         }
         return this._valuesMap ? this._valuesMap.get(valueId) : null;
     };

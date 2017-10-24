@@ -1,7 +1,7 @@
 {
 	"items": [
 		{
-			"$key": "yossik",
+			"id": "yossik",
 			"name": "Yossi Kolesnicov"
 		}
 	]

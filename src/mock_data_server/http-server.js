@@ -63,13 +63,13 @@ app.use(function (req, res) {
 				if (error) {
 					setTimeout(function () {
 						var obj = req.body;
-						obj.$key = Math.round(Math.random() * Math.pow(10, 10));
+						obj.id = Math.round(Math.random() * Math.pow(10, 10));
 						res.status(200).json(obj);
 					}, 1000);
 				}
 				else {
 					var itemId = +new Date;
-					common.getResponseCallback(res)(null, Object.assign(data, req.body, { $key: itemId }));
+					common.getResponseCallback(res)(null, Object.assign(data, req.body, { id: itemId }));
 				}
 			});
 		}

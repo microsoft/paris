@@ -4,6 +4,7 @@ var entity_fields_service_1 = require("../services/entity-fields.service");
 function EntityField(fieldConfig) {
     return function (entityPrototype, propertyKey) {
         var propertyConstructor = window['Reflect'].getMetadata("design:type", entityPrototype, propertyKey);
+        fieldConfig = fieldConfig || {};
         var fieldConfigCopy = Object.assign({}, fieldConfig);
         if (!fieldConfigCopy.id)
             fieldConfigCopy.id = String(propertyKey);

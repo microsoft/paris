@@ -19,10 +19,7 @@ var ParisModule = /** @class */ (function () {
     ParisModule.forRoot = function (config) {
         return {
             ngModule: ParisModule_1,
-            providers: [
-                repository_manager_service_1.RepositoryManagerService,
-                { provide: 'config', useValue: Object.assign({}, paris_config_1.defaultConfig, config) }
-            ]
+            providers: [{ provide: 'config', useValue: Object.assign({}, paris_config_1.defaultConfig, config) }]
         };
     };
     ParisModule = ParisModule_1 = __decorate([

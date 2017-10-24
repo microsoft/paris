@@ -11,16 +11,16 @@ export class DataStoreService{
 
 	}
 
-	get(endpoint:string, data?:RequestData):Observable<any>{
-		return this.setActiveRequest(this.http.get(this.getEndpointUrl(endpoint), data), HttpVerb.get, endpoint, data);
+	get(endpoint:string, data?:RequestData, baseUrl?:string, ):Observable<any>{
+		return this.setActiveRequest(this.http.get(this.getEndpointUrl(endpoint, baseUrl), data), HttpVerb.get, endpoint, data);
 	}
 
-	post(endpoint:string, data?:RequestData):Observable<any>{
-		return this.http.post(this.getEndpointUrl(endpoint), data);
+	post(endpoint:string, data?:RequestData, baseUrl?:string):Observable<any>{
+		return this.http.post(this.getEndpointUrl(endpoint, baseUrl), data);
 	}
 
-	private getEndpointUrl(endpoint:string):string{
-		return `${this.config.apiRoot}/${endpoint}`;
+	private getEndpointUrl(endpoint:string, baseUrl?:string):string{
+		return `${baseUrl || this.config.apiRoot}/${endpoint}`;
 	}
 
 	private setActiveRequest(obs:Observable<any>, verb:HttpVerb, endpoint:string, data?:RequestData):Observable<any>{
