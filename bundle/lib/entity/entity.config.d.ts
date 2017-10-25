@@ -1,5 +1,6 @@
 import { EntityConfigBase, IEntityConfigBase } from "./entity-config.base";
 import { ParisConfig } from "../config/paris-config";
+import { DataEntityConstructor } from "./data-entity.base";
 export declare class ModelEntity extends EntityConfigBase {
     endpoint: EntityConfigFunctionOrValue;
     loadAll?: boolean;
@@ -7,10 +8,10 @@ export declare class ModelEntity extends EntityConfigBase {
     baseUrl?: EntityConfigFunctionOrValue;
     allItemsProperty?: string;
     allItemsEndpoint?: string;
-    constructor(config: EntityConfig);
+    constructor(config: EntityConfig, entityConstructor: DataEntityConstructor<any>);
 }
 export interface EntityConfig extends IEntityConfigBase {
-    endpoint: EntityConfigFunctionOrValue;
+    endpoint?: EntityConfigFunctionOrValue;
     loadAll?: boolean;
     cache?: ModelEntityCacheConfig;
     baseUrl?: EntityConfigFunctionOrValue;

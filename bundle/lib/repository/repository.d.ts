@@ -34,9 +34,10 @@ export declare class Repository<T extends IIdentifiable> implements IRepository 
      * @param itemData
      * @returns {Observable<ModelData>}
      */
-    private getModelData(itemData);
+    private static getModelData(itemData, entity, config, repositoryManagerService, entityConstructor);
     private static mapToEntityFieldIndex(entityFieldId, value);
-    private getEntityItem(repository, itemData);
+    private static getEntityItem(repository, itemData);
+    private static getValueObjectItem(valueObjectType, data, repositoryManagerService, config?);
     getItemsDataSet(options?: DataSetOptions): Observable<DataSet<T>>;
     getItemById(itemId: string | number, allowCache?: boolean): Observable<T>;
     private setAllItems();

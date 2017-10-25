@@ -7,8 +7,7 @@ export {DataTransformersService, DataTransformer} from "./services/data-transfor
 export {ModelEntity, EntityConfig, ModelEntityCacheConfig} from "./entity/entity.config";
 export {entityFieldsService} from "./services/entity-fields.service";
 export {entitiesService} from "./services/entities.service";
-export {ModelObjectValue} from "./entity/object-value.config";
 export {EntityField} from "./entity/entity-field.decorator";
-export {ObjectValue} from "./entity/object-value.decorator";
+export {ValueObject} from "./entity/value-object.decorator";
 export {Entity} from "./entity/entity.decorator";
 export {ParisModule} from "./paris.module";

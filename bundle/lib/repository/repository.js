@@ -1,10 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var entity_config_1 = require("../entity/entity.config");
 var Observable_1 = require("rxjs/Observable");
 var Subject_1 = require("rxjs/Subject");
 var data_transformers_service_1 = require("../services/data-transformers.service");
 var cache_1 = require("../services/cache");
-var object_values_service_1 = require("../services/object-values.service");
+var value_objects_service_1 = require("../services/value-objects.service");
 var _ = require("lodash");
 var Repository = /** @class */ (function () {
     function Repository(entity, config, entityConstructor, dataStore, repositoryManagerService) {
@@ -55,7 +56,7 @@ var Repository = /** @class */ (function () {
     });
     Repository.prototype.createItem = function (itemData) {
         var _this = this;
-        return this.getModelData(itemData)
+        return Repository.getModelData(itemData, this.entity, this.config, this.repositoryManagerService, this.entityConstructor)
             .map(function (modelData) { return new _this.entityConstructor(modelData); });
     };
     Repository.prototype.createNewItem = function () {
@@ -67,32 +68,41 @@ var Repository = /** @class */ (function () {
      * @param itemData
      * @returns {Observable<ModelData>}
      */
-    Repository.prototype.getModelData = function (itemData) {
-        var _this = this;
-        var modelData = { id: itemData[this.entity.idProperty || this.config.entityIdProperty] }, subModels = [];
-        this.entity.fields.forEach(function (entityField) {
+    Repository.getModelData = function (itemData, entity, config, repositoryManagerService, entityConstructor) {
+        var modelData = entity instanceof entity_config_1.ModelEntity ? { id: itemData[entity.idProperty || config.entityIdProperty] } : {}, subModels = [];
+        entity.fields.forEach(function (entityField) {
             var propertyValue = entityField.data ? _.get(itemData, entityField.data) : itemData[entityField.id];
             if (propertyValue === undefined || propertyValue === null) {
-                modelData[entityField.id] = entityField.defaultValue || null;
+                modelData[entityField.id] = entityField.isArray ? [] : entityField.defaultValue || null;
             }
             else {
-                var propertyRepository_1 = _this.repositoryManagerService.getRepository(entityField.type);
+                var propertyRepository_1 = repositoryManagerService.getRepository(entityField.type);
                 if (propertyRepository_1) {
                     var getPropertyEntityValue$ = void 0;
-                    var mapValueToEntityFieldIndex = Repository.mapToEntityFieldIndex.bind(_this, entityField.id);
+                    var mapValueToEntityFieldIndex = Repository.mapToEntityFieldIndex.bind(null, entityField.id);
                     if (entityField.isArray) {
-                        var propertyMembers$ = propertyValue.map(function (memberData) { return _this.getEntityItem(propertyRepository_1, memberData); });
-                        getPropertyEntityValue$ = Observable_1.Observable.combineLatest.apply(_this, propertyMembers$).map(mapValueToEntityFieldIndex);
+                        var propertyMembers$ = propertyValue.map(function (memberData) { return Repository.getEntityItem(propertyRepository_1, memberData); });
+                        getPropertyEntityValue$ = Observable_1.Observable.combineLatest.apply(Observable_1.Observable, propertyMembers$).map(mapValueToEntityFieldIndex);
                     }
                     else {
-                        getPropertyEntityValue$ = _this.getEntityItem(propertyRepository_1, propertyValue).map(mapValueToEntityFieldIndex);
+                        getPropertyEntityValue$ = Repository.getEntityItem(propertyRepository_1, propertyValue).map(mapValueToEntityFieldIndex);
                     }
                     subModels.push(getPropertyEntityValue$);
                 }
                 else {
-                    var objectValueType = object_values_service_1.objectValuesService.getEntityByType(entityField.type);
-                    if (objectValueType)
-                        modelData[entityField.id] = objectValueType.getValueById(propertyValue) || propertyValue;
+                    var valueObjectType_1 = value_objects_service_1.valueObjectsService.getEntityByType(entityField.type);
+                    if (valueObjectType_1) {
+                        var getPropertyEntityValue$ = void 0;
+                        var mapValueToEntityFieldIndex = Repository.mapToEntityFieldIndex.bind(null, entityField.id);
+                        if (entityField.isArray) {
+                            var propertyMembers$ = propertyValue.map(function (memberData) { return Repository.getValueObjectItem(valueObjectType_1, memberData, repositoryManagerService, config); });
+                            getPropertyEntityValue$ = Observable_1.Observable.combineLatest.apply(Observable_1.Observable, propertyMembers$).map(mapValueToEntityFieldIndex);
+                        }
+                        else {
+                            getPropertyEntityValue$ = Repository.getEntityItem(propertyRepository_1, propertyValue).map(mapValueToEntityFieldIndex);
+                        }
+                        subModels.push(getPropertyEntityValue$);
+                    }
                     else {
                         modelData[entityField.id] = entityField.isArray
                             ? propertyValue
@@ -104,9 +114,9 @@ var Repository = /** @class */ (function () {
             }
         });
         if (subModels.length) {
-            return Observable_1.Observable.combineLatest.apply(this, subModels).map(function (propertyEntityValues) {
+            return Observable_1.Observable.combineLatest.apply(Observable_1.Observable, subModels).map(function (propertyEntityValues) {
                 propertyEntityValues.forEach(function (propertyEntityValue) { return Object.assign(modelData, propertyEntityValue); });
-                return new _this.entityConstructor(modelData);
+                return new entityConstructor(modelData);
             });
         }
         else
@@ -117,8 +127,15 @@ var Repository = /** @class */ (function () {
         data[entityFieldId] = value;
         return data;
     };
-    Repository.prototype.getEntityItem = function (repository, itemData) {
+    Repository.getEntityItem = function (repository, itemData) {
         return Object(itemData) === itemData ? repository.createItem(itemData) : repository.getItemById(itemData);
+    };
+    Repository.getValueObjectItem = function (valueObjectType, data, repositoryManagerService, config) {
+        // If the value object is one of a list of values, just set it to the model
+        if (valueObjectType.hasValue(data))
+            return Observable_1.Observable.of(valueObjectType.getValueById(data));
+        return Repository.getModelData(data, valueObjectType, config, repositoryManagerService, valueObjectType.entityConstructor)
+            .map(function (modelData) { return new valueObjectType.entityConstructor(modelData); });
     };
     Repository.prototype.getItemsDataSet = function (options) {
         var _this = this;

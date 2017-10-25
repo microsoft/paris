@@ -12,12 +12,10 @@ import {DataSetOptions} from "../dataset/dataset-options";
 import {DataSet} from "../dataset/dataset";
 import {Index} from "../models/index";
 import {DataTransformersService} from "../services/data-transformers.service";
-import {Immutability} from "../services/immutability";
 import {DataCache, DataCacheSettings} from "../services/cache";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
-import {ModelObjectValue} from "../entity/object-value.config";
-import {objectValuesService} from "../services/object-values.service";
+import {valueObjectsService} from "../services/value-objects.service";
 import * as _ from "lodash";
+import {EntityConfigBase} from "../entity/entity-config.base";
 
 export class Repository<T extends IIdentifiable> implements IRepository{
 	save$:Observable<T>;
@@ -73,7 +71,7 @@ export class Repository<T extends IIdentifiable> implements IRepository{
 	}
 
 	createItem(itemData:any):Observable<T>{
-		return this.getModelData(itemData)
+		return Repository.getModelData(itemData, this.entity, this.config, this.repositoryManagerService, this.entityConstructor)
 			.map((modelData:ModelData) => new this.entityConstructor(modelData));
 	}
 
@@ -87,38 +85,50 @@ export class Repository<T extends IIdentifiable> implements IRepository{
 	 * @param itemData
 	 * @returns {Observable<ModelData>}
 	 */
-	private getModelData(itemData:Index):Observable<ModelData>{
-		let modelData:ModelData = { id: itemData[this.entity.idProperty || this.config.entityIdProperty] },
-			subModels:Array<Observable<{ [key:string]:any }>> = [];
+	private static getModelData(itemData:Index, entity:EntityConfigBase, config:ParisConfig, repositoryManagerService:RepositoryManagerService, entityConstructor:DataEntityConstructor<Index>):Observable<Index>{
+		let modelData:Index = entity instanceof ModelEntity ? { id: itemData[entity.idProperty || config.entityIdProperty] } : {},
+			subModels:Array<Observable<Index>> = [];
 
-		this.entity.fields.forEach((entityField:Field) => {
+		entity.fields.forEach((entityField:Field) => {
 			let propertyValue:any = entityField.data ? _.get(itemData, entityField.data) : itemData[entityField.id];
 
 			if (propertyValue === undefined || propertyValue === null){
-				modelData[entityField.id] = entityField.defaultValue || null;
+				modelData[entityField.id] = entityField.isArray ? [] : entityField.defaultValue || null;
 			}
 			else {
-				let propertyRepository:IRepository = this.repositoryManagerService.getRepository(entityField.type);
+				let propertyRepository:IRepository = repositoryManagerService.getRepository(entityField.type);
 
 				if (propertyRepository){
 					let getPropertyEntityValue$:Observable<Index>;
-					let mapValueToEntityFieldIndex:(value:any) => Index = Repository.mapToEntityFieldIndex.bind(this, entityField.id);
+					let mapValueToEntityFieldIndex:(value:any) => Index = Repository.mapToEntityFieldIndex.bind(null, entityField.id);
 
 					if (entityField.isArray){
-						let propertyMembers$:Array<Observable<T>> = propertyValue.map((memberData:any) => this.getEntityItem(propertyRepository, memberData));
-						getPropertyEntityValue$ = Observable.combineLatest.apply(this, propertyMembers$).map(mapValueToEntityFieldIndex);
+						let propertyMembers$:Array<Observable<any>> = propertyValue.map((memberData:any) => Repository.getEntityItem(propertyRepository, memberData));
+						getPropertyEntityValue$ = Observable.combineLatest.apply(Observable, propertyMembers$).map(mapValueToEntityFieldIndex);
 					}
 					else{
-						getPropertyEntityValue$ = this.getEntityItem(propertyRepository, propertyValue).map(mapValueToEntityFieldIndex);
+						getPropertyEntityValue$ = Repository.getEntityItem(propertyRepository, propertyValue).map(mapValueToEntityFieldIndex);
 					}
 
 					subModels.push(getPropertyEntityValue$);
 				}
 				else {
-					let objectValueType:ModelObjectValue = objectValuesService.getEntityByType(entityField.type);
+					let valueObjectType:EntityConfigBase = valueObjectsService.getEntityByType(entityField.type);
 
-					if (objectValueType)
-						modelData[entityField.id] = objectValueType.getValueById(propertyValue) || propertyValue;
+					if (valueObjectType) {
+						let getPropertyEntityValue$:Observable<Index>;
+						let mapValueToEntityFieldIndex:(value:any) => Index = Repository.mapToEntityFieldIndex.bind(null, entityField.id);
+
+						if (entityField.isArray){
+							let propertyMembers$:Array<Observable<any>> = propertyValue.map((memberData:any) => Repository.getValueObjectItem(valueObjectType, memberData, repositoryManagerService, config));
+							getPropertyEntityValue$ = Observable.combineLatest.apply(Observable, propertyMembers$).map(mapValueToEntityFieldIndex);
+						}
+						else{
+							getPropertyEntityValue$ = Repository.getEntityItem(propertyRepository, propertyValue).map(mapValueToEntityFieldIndex);
+						}
+
+						subModels.push(getPropertyEntityValue$);
+					}
 					else {
 						modelData[entityField.id] = entityField.isArray
 							? propertyValue
@@ -131,9 +141,9 @@ export class Repository<T extends IIdentifiable> implements IRepository{
 		});
 
 		if (subModels.length) {
-			return Observable.combineLatest.apply(this, subModels).map((propertyEntityValues: Array<{ [index: string]: any }>) => {
+			return Observable.combineLatest.apply(Observable, subModels).map((propertyEntityValues: Array<{ [index: string]: any }>) => {
 				propertyEntityValues.forEach((propertyEntityValue: { [index: string]: any }) => Object.assign(modelData, propertyEntityValue));
-				return new this.entityConstructor(modelData);
+				return new entityConstructor(modelData);
 			});
 		}
 		else
@@ -146,8 +156,17 @@ export class Repository<T extends IIdentifiable> implements IRepository{
 		return data;
 	}
 
-	private getEntityItem(repository:IRepository, itemData:any):Observable<T>{
+	private static getEntityItem(repository:IRepository, itemData:any):Observable<Index>{
 		return Object(itemData) === itemData ? repository.createItem(itemData) : repository.getItemById(itemData);
+	}
+
+	private static getValueObjectItem(valueObjectType:EntityConfigBase, data:any, repositoryManagerService:RepositoryManagerService, config?:ParisConfig):Observable<Index>{
+		// If the value object is one of a list of values, just set it to the model
+		if (valueObjectType.hasValue(data))
+			return Observable.of(valueObjectType.getValueById(data));
+
+		return Repository.getModelData(data, valueObjectType, config, repositoryManagerService, valueObjectType.entityConstructor)
+			.map((modelData:ModelData) => new valueObjectType.entityConstructor(modelData));
 	}
 
 	getItemsDataSet(options?:DataSetOptions):Observable<DataSet<T>>{

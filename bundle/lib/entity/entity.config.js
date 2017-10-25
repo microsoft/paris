@@ -13,8 +13,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var entity_config_base_1 = require("./entity-config.base");
 var ModelEntity = /** @class */ (function (_super) {
     __extends(ModelEntity, _super);
-    function ModelEntity(config) {
-        var _this = _super.call(this, config) || this;
+    function ModelEntity(config, entityConstructor) {
+        var _this = _super.call(this, config, entityConstructor) || this;
         _this.loadAll = false;
         _this.loadAll = config.loadAll === true;
         return _this;

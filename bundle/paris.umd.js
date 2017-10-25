@@ -33,6 +33,114 @@ function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
+var immutability = createCommonjsModule(function (module, exports) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var Immutability = /** @class */ (function () {
+    function Immutability() {
+    }
+    Immutability.freeze = function (obj) {
+        if (!Object.isFrozen(obj))
+            Object.freeze(obj);
+        if (Object(obj) === obj)
+            Object.getOwnPropertyNames(obj).forEach(function (prop) { return Immutability.freeze(obj[prop]); });
+        return obj;
+    };
+    Immutability.unfreeze = function (obj) {
+        if (Object(obj) !== obj || obj instanceof Date || obj instanceof RegExp || obj instanceof Function)
+            return obj;
+        var unfrozenObj = Object.create(obj.constructor.prototype);
+        Object.assign(unfrozenObj, obj);
+        Object.getOwnPropertyNames(obj).forEach(function (prop) {
+            unfrozenObj[prop] = Immutability.unfreeze(unfrozenObj[prop]);
+        });
+        return unfrozenObj;
+    };
+    return Immutability;
+}());
+exports.Immutability = Immutability;
+});
+
+unwrapExports(immutability);
+
+var entityConfig_base = createCommonjsModule(function (module, exports) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+
+var EntityConfigBase = /** @class */ (function () {
+    function EntityConfigBase(config, entityConstructor) {
+        this.entityConstructor = entityConstructor;
+        if (config.values) {
+            config.values = config.values.map(function (valueConfig) { return new entityConstructor(valueConfig); });
+            immutability.Immutability.freeze(config.values);
+        }
+        Object.assign(this, config);
+    }
+    Object.defineProperty(EntityConfigBase.prototype, "fieldsArray", {
+        get: function () {
+            return this.fields ? Array.from(this.fields.values()) : [];
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(EntityConfigBase.prototype, "valuesMap", {
+        get: function () {
+            var _this = this;
+            if (this._valuesMap === undefined) {
+                if (!this.values)
+                    this._valuesMap = null;
+                else {
+                    this._valuesMap = new Map;
+                    this.values.forEach(function (value) { return _this._valuesMap.set(value.id, value); });
+                }
+            }
+            return this._valuesMap;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    EntityConfigBase.prototype.getValueById = function (valueId) {
+        return this.valuesMap ? this.valuesMap.get(valueId) : null;
+    };
+    EntityConfigBase.prototype.hasValue = function (valueId) {
+        return this.valuesMap ? this.valuesMap.has(valueId) : false;
+    };
+    return EntityConfigBase;
+}());
+exports.EntityConfigBase = EntityConfigBase;
+});
+
+unwrapExports(entityConfig_base);
+
+var entity_config = createCommonjsModule(function (module, exports) {
+"use strict";
+var __extends = (commonjsGlobal && commonjsGlobal.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+
+var ModelEntity = /** @class */ (function (_super) {
+    __extends(ModelEntity, _super);
+    function ModelEntity(config, entityConstructor) {
+        var _this = _super.call(this, config, entityConstructor) || this;
+        _this.loadAll = false;
+        _this.loadAll = config.loadAll === true;
+        return _this;
+    }
+    return ModelEntity;
+}(entityConfig_base.EntityConfigBase));
+exports.ModelEntity = ModelEntity;
+});
+
+unwrapExports(entity_config);
+
 var dataTransformers_service = createCommonjsModule(function (module, exports) {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -249,7 +357,7 @@ exports.EntitiesServiceBase = EntitiesServiceBase;
 
 unwrapExports(entities_service_base);
 
-var objectValues_service = createCommonjsModule(function (module, exports) {
+var valueObjects_service = createCommonjsModule(function (module, exports) {
 "use strict";
 var __extends = (commonjsGlobal && commonjsGlobal.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
@@ -263,18 +371,18 @@ var __extends = (commonjsGlobal && commonjsGlobal.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 
-var ObjectValuesService = /** @class */ (function (_super) {
-    __extends(ObjectValuesService, _super);
-    function ObjectValuesService() {
+var ValueObjectsService = /** @class */ (function (_super) {
+    __extends(ValueObjectsService, _super);
+    function ValueObjectsService() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    return ObjectValuesService;
+    return ValueObjectsService;
 }(entities_service_base.EntitiesServiceBase));
-exports.ObjectValuesService = ObjectValuesService;
-exports.objectValuesService = new ObjectValuesService;
+exports.ValueObjectsService = ValueObjectsService;
+exports.valueObjectsService = new ValueObjectsService;
 });
 
-unwrapExports(objectValues_service);
+unwrapExports(valueObjects_service);
 
 var lodash = createCommonjsModule(function (module, exports) {
 /**
@@ -17370,6 +17478,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 
 
+
 var Repository = /** @class */ (function () {
     function Repository(entity, config, entityConstructor, dataStore, repositoryManagerService) {
         this.entity = entity;
@@ -17419,7 +17528,7 @@ var Repository = /** @class */ (function () {
     });
     Repository.prototype.createItem = function (itemData) {
         var _this = this;
-        return this.getModelData(itemData)
+        return Repository.getModelData(itemData, this.entity, this.config, this.repositoryManagerService, this.entityConstructor)
             .map(function (modelData) { return new _this.entityConstructor(modelData); });
     };
     Repository.prototype.createNewItem = function () {
@@ -17431,32 +17540,41 @@ var Repository = /** @class */ (function () {
      * @param itemData
      * @returns {Observable<ModelData>}
      */
-    Repository.prototype.getModelData = function (itemData) {
-        var _this = this;
-        var modelData = { id: itemData[this.entity.idProperty || this.config.entityIdProperty] }, subModels = [];
-        this.entity.fields.forEach(function (entityField) {
+    Repository.getModelData = function (itemData, entity, config, repositoryManagerService, entityConstructor) {
+        var modelData = entity instanceof entity_config.ModelEntity ? { id: itemData[entity.idProperty || config.entityIdProperty] } : {}, subModels = [];
+        entity.fields.forEach(function (entityField) {
             var propertyValue = entityField.data ? lodash.get(itemData, entityField.data) : itemData[entityField.id];
             if (propertyValue === undefined || propertyValue === null) {
-                modelData[entityField.id] = entityField.defaultValue || null;
+                modelData[entityField.id] = entityField.isArray ? [] : entityField.defaultValue || null;
             }
             else {
-                var propertyRepository_1 = _this.repositoryManagerService.getRepository(entityField.type);
+                var propertyRepository_1 = repositoryManagerService.getRepository(entityField.type);
                 if (propertyRepository_1) {
                     var getPropertyEntityValue$ = void 0;
-                    var mapValueToEntityFieldIndex = Repository.mapToEntityFieldIndex.bind(_this, entityField.id);
+                    var mapValueToEntityFieldIndex = Repository.mapToEntityFieldIndex.bind(null, entityField.id);
                     if (entityField.isArray) {
-                        var propertyMembers$ = propertyValue.map(function (memberData) { return _this.getEntityItem(propertyRepository_1, memberData); });
-                        getPropertyEntityValue$ = Observable.Observable.combineLatest.apply(_this, propertyMembers$).map(mapValueToEntityFieldIndex);
+                        var propertyMembers$ = propertyValue.map(function (memberData) { return Repository.getEntityItem(propertyRepository_1, memberData); });
+                        getPropertyEntityValue$ = Observable.Observable.combineLatest.apply(Observable.Observable, propertyMembers$).map(mapValueToEntityFieldIndex);
                     }
                     else {
-                        getPropertyEntityValue$ = _this.getEntityItem(propertyRepository_1, propertyValue).map(mapValueToEntityFieldIndex);
+                        getPropertyEntityValue$ = Repository.getEntityItem(propertyRepository_1, propertyValue).map(mapValueToEntityFieldIndex);
                     }
                     subModels.push(getPropertyEntityValue$);
                 }
                 else {
-                    var objectValueType = objectValues_service.objectValuesService.getEntityByType(entityField.type);
-                    if (objectValueType)
-                        modelData[entityField.id] = objectValueType.getValueById(propertyValue) || propertyValue;
+                    var valueObjectType_1 = valueObjects_service.valueObjectsService.getEntityByType(entityField.type);
+                    if (valueObjectType_1) {
+                        var getPropertyEntityValue$ = void 0;
+                        var mapValueToEntityFieldIndex = Repository.mapToEntityFieldIndex.bind(null, entityField.id);
+                        if (entityField.isArray) {
+                            var propertyMembers$ = propertyValue.map(function (memberData) { return Repository.getValueObjectItem(valueObjectType_1, memberData, repositoryManagerService, config); });
+                            getPropertyEntityValue$ = Observable.Observable.combineLatest.apply(Observable.Observable, propertyMembers$).map(mapValueToEntityFieldIndex);
+                        }
+                        else {
+                            getPropertyEntityValue$ = Repository.getEntityItem(propertyRepository_1, propertyValue).map(mapValueToEntityFieldIndex);
+                        }
+                        subModels.push(getPropertyEntityValue$);
+                    }
                     else {
                         modelData[entityField.id] = entityField.isArray
                             ? propertyValue
@@ -17468,9 +17586,9 @@ var Repository = /** @class */ (function () {
             }
         });
         if (subModels.length) {
-            return Observable.Observable.combineLatest.apply(this, subModels).map(function (propertyEntityValues) {
+            return Observable.Observable.combineLatest.apply(Observable.Observable, subModels).map(function (propertyEntityValues) {
                 propertyEntityValues.forEach(function (propertyEntityValue) { return Object.assign(modelData, propertyEntityValue); });
-                return new _this.entityConstructor(modelData);
+                return new entityConstructor(modelData);
             });
         }
         else
@@ -17481,8 +17599,15 @@ var Repository = /** @class */ (function () {
         data[entityFieldId] = value;
         return data;
     };
-    Repository.prototype.getEntityItem = function (repository, itemData) {
+    Repository.getEntityItem = function (repository, itemData) {
         return Object(itemData) === itemData ? repository.createItem(itemData) : repository.getItemById(itemData);
+    };
+    Repository.getValueObjectItem = function (valueObjectType, data, repositoryManagerService, config) {
+        // If the value object is one of a list of values, just set it to the model
+        if (valueObjectType.hasValue(data))
+            return Observable.Observable.of(valueObjectType.getValueById(data));
+        return Repository.getModelData(data, valueObjectType, config, repositoryManagerService, valueObjectType.entityConstructor)
+            .map(function (modelData) { return new valueObjectType.entityConstructor(modelData); });
     };
     Repository.prototype.getItemsDataSet = function (options) {
         var _this = this;
@@ -17710,127 +17835,6 @@ exports.RepositoryManagerService = RepositoryManagerService;
 
 unwrapExports(repositoryManager_service);
 
-var entityConfig_base = createCommonjsModule(function (module, exports) {
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var EntityConfigBase = /** @class */ (function () {
-    function EntityConfigBase(config) {
-        Object.assign(this, config);
-    }
-    Object.defineProperty(EntityConfigBase.prototype, "fieldsArray", {
-        get: function () {
-            return this.fields ? Array.from(this.fields.values()) : [];
-        },
-        enumerable: true,
-        configurable: true
-    });
-    return EntityConfigBase;
-}());
-exports.EntityConfigBase = EntityConfigBase;
-});
-
-unwrapExports(entityConfig_base);
-
-var entity_config = createCommonjsModule(function (module, exports) {
-"use strict";
-var __extends = (commonjsGlobal && commonjsGlobal.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-
-var ModelEntity = /** @class */ (function (_super) {
-    __extends(ModelEntity, _super);
-    function ModelEntity(config) {
-        var _this = _super.call(this, config) || this;
-        _this.loadAll = false;
-        _this.loadAll = config.loadAll === true;
-        return _this;
-    }
-    return ModelEntity;
-}(entityConfig_base.EntityConfigBase));
-exports.ModelEntity = ModelEntity;
-});
-
-unwrapExports(entity_config);
-
-var immutability = createCommonjsModule(function (module, exports) {
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var Immutability = /** @class */ (function () {
-    function Immutability() {
-    }
-    Immutability.freeze = function (obj) {
-        if (!Object.isFrozen(obj))
-            Object.freeze(obj);
-        if (Object(obj) === obj)
-            Object.getOwnPropertyNames(obj).forEach(function (prop) { return Immutability.freeze(obj[prop]); });
-        return obj;
-    };
-    Immutability.unfreeze = function (obj) {
-        if (Object(obj) !== obj || obj instanceof Date || obj instanceof RegExp || obj instanceof Function)
-            return obj;
-        var unfrozenObj = Object.create(obj.constructor.prototype);
-        Object.assign(unfrozenObj, obj);
-        Object.getOwnPropertyNames(obj).forEach(function (prop) {
-            unfrozenObj[prop] = Immutability.unfreeze(unfrozenObj[prop]);
-        });
-        return unfrozenObj;
-    };
-    return Immutability;
-}());
-exports.Immutability = Immutability;
-});
-
-unwrapExports(immutability);
-
-var objectValue_config = createCommonjsModule(function (module, exports) {
-"use strict";
-var __extends = (commonjsGlobal && commonjsGlobal.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-
-
-var ModelObjectValue = /** @class */ (function (_super) {
-    __extends(ModelObjectValue, _super);
-    function ModelObjectValue(config) {
-        var _this = _super.call(this, config) || this;
-        if (config.values) {
-            immutability.Immutability.freeze(_this.values);
-        }
-        return _this;
-    }
-    ModelObjectValue.prototype.getValueById = function (valueId) {
-        var _this = this;
-        if (!this.values)
-            return null;
-        if (!this._valuesMap) {
-            this._valuesMap = new Map;
-            this.values.forEach(function (value) { return _this._valuesMap.set(value.id, value); });
-        }
-        return this._valuesMap ? this._valuesMap.get(valueId) : null;
-    };
-    return ModelObjectValue;
-}(entityConfig_base.EntityConfigBase));
-exports.ModelObjectValue = ModelObjectValue;
-});
-
-unwrapExports(objectValue_config);
-
 var entityField_decorator = createCommonjsModule(function (module, exports) {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -17852,24 +17856,22 @@ exports.EntityField = EntityField;
 
 unwrapExports(entityField_decorator);
 
-var objectValue_decorator = createCommonjsModule(function (module, exports) {
+var valueObject_decorator = createCommonjsModule(function (module, exports) {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 
 
-function ObjectValue(config) {
+function ValueObject(config) {
     return function (target) {
-        if (config.values)
-            config.values = config.values.map(function (valueConfig) { return new target.prototype.constructor(valueConfig); });
-        var objectValueConfig = new objectValue_config.ModelObjectValue(config);
-        target.objectValueConfig = objectValueConfig;
-        objectValues_service.objectValuesService.addEntity(target, objectValueConfig);
+        var valueObjectConfig = new entityConfig_base.EntityConfigBase(config, target.prototype.constructor);
+        target.valueObjectConfig = valueObjectConfig;
+        valueObjects_service.valueObjectsService.addEntity(target, valueObjectConfig);
     };
 }
-exports.ObjectValue = ObjectValue;
+exports.ValueObject = ValueObject;
 });
 
-unwrapExports(objectValue_decorator);
+unwrapExports(valueObject_decorator);
 
 var entity_decorator = createCommonjsModule(function (module, exports) {
 "use strict";
@@ -17878,7 +17880,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 function Entity(config) {
     return function (target) {
-        var entity = new entity_config.ModelEntity(config);
+        var entity = new entity_config.ModelEntity(config, target.prototype.constructor);
         target.entityConfig = entity;
         entities_service.entitiesService.addEntity(target, entity);
     };
@@ -17965,11 +17967,9 @@ exports.entityFieldsService = entityFields_service.entityFieldsService;
 
 exports.entitiesService = entities_service.entitiesService;
 
-exports.ModelObjectValue = objectValue_config.ModelObjectValue;
-
 exports.EntityField = entityField_decorator.EntityField;
 
-exports.ObjectValue = objectValue_decorator.ObjectValue;
+exports.ValueObject = valueObject_decorator.ValueObject;
 
 exports.Entity = entity_decorator.Entity;
 
@@ -17983,11 +17983,10 @@ var main_3 = main.DataTransformersService;
 var main_4 = main.ModelEntity;
 var main_5 = main.entityFieldsService;
 var main_6 = main.entitiesService;
-var main_7 = main.ModelObjectValue;
-var main_8 = main.EntityField;
-var main_9 = main.ObjectValue;
-var main_10 = main.Entity;
-var main_11 = main.ParisModule;
+var main_7 = main.EntityField;
+var main_8 = main.ValueObject;
+var main_9 = main.Entity;
+var main_10 = main.ParisModule;
 
 exports['default'] = main$1;
 exports.Repository = main_1;
@@ -17996,11 +17995,10 @@ exports.DataTransformersService = main_3;
 exports.ModelEntity = main_4;
 exports.entityFieldsService = main_5;
 exports.entitiesService = main_6;
-exports.ModelObjectValue = main_7;
-exports.EntityField = main_8;
-exports.ObjectValue = main_9;
-exports.Entity = main_10;
-exports.ParisModule = main_11;
+exports.EntityField = main_7;
+exports.ValueObject = main_8;
+exports.Entity = main_9;
+exports.ParisModule = main_10;
 
 Object.defineProperty(exports, '__esModule', { value: true });
 

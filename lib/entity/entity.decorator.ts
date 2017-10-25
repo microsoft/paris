@@ -4,7 +4,7 @@ import {entitiesService} from "../services/entities.service";
 
 export function Entity(config:EntityConfig){
 	return (target:DataEntityType) => {
-		let entity:ModelEntity = new ModelEntity(config);
+		let entity:ModelEntity = new ModelEntity(config, target.prototype.constructor);
 		target.entityConfig = entity;
 		entitiesService.addEntity(target, entity);
 	}
