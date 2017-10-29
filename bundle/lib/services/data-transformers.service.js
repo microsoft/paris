@@ -5,6 +5,11 @@ var transformers = [
         type: Date,
         parse: function (dateValue) { return new Date(dateValue); },
         serialize: function (date) { return date.valueOf(); }
+    },
+    {
+        type: RegExp,
+        parse: function (pattern) { return new RegExp(pattern); },
+        serialize: function (regExp) { return regExp ? regExp.toString().match(/^\/(.*)\/$/)[1] : null; }
     }
 ];
 var transformersMap = new Map;

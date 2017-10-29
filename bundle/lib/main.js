@@ -1,5 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var entity_model_base_1 = require("./models/entity-model.base");
+exports.EntityModelBase = entity_model_base_1.EntityModelBase;
+var model_base_1 = require("./models/model.base");
+exports.ModelBase = model_base_1.ModelBase;
 var repository_1 = require("./repository/repository");
 exports.Repository = repository_1.Repository;
 var repository_manager_service_1 = require("./repository/repository-manager.service");

@@ -4,6 +4,7 @@ var immutability_1 = require("../services/immutability");
 var EntityConfigBase = /** @class */ (function () {
     function EntityConfigBase(config, entityConstructor) {
         this.entityConstructor = entityConstructor;
+        this.readonly = false;
         if (config.values) {
             config.values = config.values.map(function (valueConfig) { return new entityConstructor(valueConfig); });
             immutability_1.Immutability.freeze(config.values);
@@ -25,7 +26,7 @@ var EntityConfigBase = /** @class */ (function () {
                     this._valuesMap = null;
                 else {
                     this._valuesMap = new Map;
-                    this.values.forEach(function (value) { return _this._valuesMap.set(value.id, value); });
+                    this.values.forEach(function (value) { return _this._valuesMap.set(value.id, Object.freeze(value)); });
                 }
             }
             return this._valuesMap;

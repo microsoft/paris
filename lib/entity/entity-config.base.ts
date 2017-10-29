@@ -1,6 +1,6 @@
 import {EntityFields} from "./entity-fields";
 import {Field} from "./entity-field";
-import {IIdentifiable} from "../models/identifiable.model";
+import {EntityModelConfigBase} from "../models/entity-config-base.interface";
 import {Immutability} from "../services/immutability";
 import {DataEntityConstructor} from "./data-entity.base";
 
@@ -9,21 +9,22 @@ export class EntityConfigBase{
 	pluralName:string;
 	fields?:EntityFields;
 	idProperty?:string;
+	readonly:boolean = false;
 
 	get fieldsArray():Array<Field>{
 		return this.fields ? Array.from(this.fields.values()) : [];
 	}
 
-	values:ReadonlyArray<IIdentifiable>;
+	values:ReadonlyArray<any>;
 
-	private _valuesMap:Map<string|number, IIdentifiable>;
-	private get valuesMap():Map<string|number, IIdentifiable> {
+	private _valuesMap:Map<string|number, any>;
+	private get valuesMap():Map<string|number, any> {
 		if (this._valuesMap === undefined) {
 			if (!this.values)
 				this._valuesMap = null;
 			else {
 				this._valuesMap = new Map;
-				this.values.forEach(value => this._valuesMap.set(value.id, value));
+				this.values.forEach(value => this._valuesMap.set(value.id, Object.freeze(value)));
 			}
 		}
 
@@ -39,7 +40,7 @@ export class EntityConfigBase{
 		Object.assign(this, config);
 	}
 
-	getValueById(valueId:string|number):IIdentifiable{
+	getValueById<T>(valueId:string|number):T{
 		return this.valuesMap ? this.valuesMap.get(valueId) : null;
 	}
 
@@ -53,5 +54,6 @@ export interface IEntityConfigBase{
 	pluralName:string,
 	fields?:EntityFields,
 	idProperty?:string,
-	values?:Array<IIdentifiable>
+	readonly?:boolean,
+	values?:Array<EntityModelConfigBase>
 }

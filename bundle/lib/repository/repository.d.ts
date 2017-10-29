@@ -4,12 +4,12 @@ import { Observable } from "rxjs/Observable";
 import { RepositoryManagerService } from "./repository-manager.service";
 import { IRepository } from "./repository.interface";
 import { DataStoreService } from "../services/data-store/data-store.service";
-import { IIdentifiable } from "../models/identifiable.model";
 import { ParisConfig } from "../config/paris-config";
 import { DataSetOptions } from "../dataset/dataset-options";
 import { DataSet } from "../dataset/dataset";
 import { Index } from "../models/index";
-export declare class Repository<T extends IIdentifiable> implements IRepository {
+import { EntityModelBase } from "../models/entity-model.base";
+export declare class Repository<T extends EntityModelBase> implements IRepository {
     readonly entity: ModelEntity;
     private config;
     private entityConstructor;
@@ -31,13 +31,17 @@ export declare class Repository<T extends IIdentifiable> implements IRepository 
     /**
      * Populates the item dataset with any sub @model. For example, if an ID is found for a property whose type is an entity,
      * the property's value will be an instance of that entity, for the ID, not the ID.
-     * @param itemData
-     * @returns {Observable<ModelData>}
+     * @param {Index} itemData
+     * @param {EntityConfigBase} entity
+     * @param {ParisConfig} config
+     * @param {RepositoryManagerService} repositoryManagerService
+     * @param {DataEntityConstructor<T extends EntityModelBase>} entityConstructor
+     * @returns {Observable<T extends EntityModelBase>}
      */
-    private static getModelData(itemData, entity, config, repositoryManagerService, entityConstructor);
+    private static getModelData<T>(itemData, entity, config, repositoryManagerService, entityConstructor);
     private static mapToEntityFieldIndex(entityFieldId, value);
-    private static getEntityItem(repository, itemData);
-    private static getValueObjectItem(valueObjectType, data, repositoryManagerService, config?);
+    private static getEntityItem<U>(repository, itemData);
+    private static getValueObjectItem<U>(valueObjectType, data, repositoryManagerService, config?);
     getItemsDataSet(options?: DataSetOptions): Observable<DataSet<T>>;
     getItemById(itemId: string | number, allowCache?: boolean): Observable<T>;
     private setAllItems();

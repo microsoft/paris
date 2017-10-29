@@ -1,7 +1,9 @@
+export { EntityModelBase } from "./models/entity-model.base";
+export { ModelBase } from "./models/model.base";
 export { Repository } from "./repository/repository";
 export { RepositoryManagerService } from "./repository/repository-manager.service";
 export { IRepository } from "./repository/repository.interface";
-export { IIdentifiable } from "./models/identifiable.model";
+export { EntityModelConfigBase } from "./models/entity-config-base.interface";
 export { ParisConfig } from "./config/paris-config";
 export { DataTransformersService, DataTransformer } from "./services/data-transformers.service";
 export { ModelEntity, EntityConfig, ModelEntityCacheConfig } from "./entity/entity.config";

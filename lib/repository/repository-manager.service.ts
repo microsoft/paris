@@ -6,8 +6,8 @@ import {DataEntityConstructor, DataEntityType} from "../entity/data-entity.base"
 import {Subject} from "rxjs/Subject";
 import {entitiesService} from "../services/entities.service";
 import {DataStoreService} from "../services/data-store/data-store.service";
-import {IIdentifiable} from "../models/identifiable.model";
 import {ParisConfig} from "../config/paris-config";
+import {EntityModelBase} from "../models/entity-model.base";
 
 @Injectable()
 export class RepositoryManagerService{
@@ -17,7 +17,7 @@ export class RepositoryManagerService{
 
 	constructor(private dataStore:DataStoreService, @Inject('config') private config:ParisConfig){}
 
-	getRepository<T extends IIdentifiable>(entityConstructor:DataEntityConstructor<T>):Repository<T> | null{
+	getRepository<T extends EntityModelBase>(entityConstructor:DataEntityConstructor<T>):Repository<T> | null{
 		let repository:Repository<T> = <Repository<T>>this.repositories.get(entityConstructor);
 		if (!repository) {
 			let entityConfig:ModelEntity = entitiesService.getEntityByType(entityConstructor);

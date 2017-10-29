@@ -1,17 +1,17 @@
 import {Observable} from "rxjs/Observable";
-import {IIdentifiable} from "../models/identifiable.model";
 import {DataSetOptions} from "../dataset/dataset-options";
 import {DataSet} from "../dataset/dataset";
 import {ModelEntity} from "../entity/entity.config";
+import {EntityModelBase} from "../models/entity-model.base";
 
 export interface IRepository{
 	entity:ModelEntity,
 	createItem:(itemData:any) => Observable<Readonly<any>>,
-	createNewItem:() => IIdentifiable,
+	createNewItem:() => EntityModelBase,
 	getItemById:(id:any) => Observable<any>,
 	getItemsDataSet:(options?:DataSetOptions) => Observable<DataSet<any>>,
-	getItemSaveData:(item:IIdentifiable) => Object,
+	getItemSaveData:(item:EntityModelBase) => Object,
 	allItems$:Observable<Array<any>>,
-	save:(item:IIdentifiable) => Observable<IIdentifiable>,
+	save:(item:EntityModelBase) => Observable<EntityModelBase>,
 	save$:Observable<any>
 }

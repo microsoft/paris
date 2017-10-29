@@ -1,6 +1,6 @@
 import { EntityFields } from "./entity-fields";
 import { Field } from "./entity-field";
-import { IIdentifiable } from "../models/identifiable.model";
+import { EntityModelConfigBase } from "../models/entity-config-base.interface";
 import { DataEntityConstructor } from "./data-entity.base";
 export declare class EntityConfigBase {
     entityConstructor: DataEntityConstructor<any>;
@@ -8,12 +8,13 @@ export declare class EntityConfigBase {
     pluralName: string;
     fields?: EntityFields;
     idProperty?: string;
+    readonly: boolean;
     readonly fieldsArray: Array<Field>;
-    values: ReadonlyArray<IIdentifiable>;
+    values: ReadonlyArray<any>;
     private _valuesMap;
     private readonly valuesMap;
     constructor(config: IEntityConfigBase, entityConstructor: DataEntityConstructor<any>);
-    getValueById(valueId: string | number): IIdentifiable;
+    getValueById<T>(valueId: string | number): T;
     hasValue(valueId: string | number): boolean;
 }
 export interface IEntityConfigBase {
@@ -21,5 +22,6 @@ export interface IEntityConfigBase {
     pluralName: string;
     fields?: EntityFields;
     idProperty?: string;
-    values?: Array<IIdentifiable>;
+    readonly?: boolean;
+    values?: Array<EntityModelConfigBase>;
 }

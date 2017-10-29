@@ -5,6 +5,11 @@ const transformers:Array<DataTransformer> = [
 		type: Date,
 		parse: (dateValue:string) => new Date(dateValue),
 		serialize: (date:Date) => date.valueOf()
+	},
+	{
+		type: RegExp,
+		parse: (pattern:string) => new RegExp(pattern),
+		serialize: (regExp:RegExp) => regExp ? regExp.toString().match(/^\/(.*)\/$/)[1] : null
 	}
 ];
 

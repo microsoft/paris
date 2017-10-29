@@ -33,6 +33,113 @@ function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
+var model_base = createCommonjsModule(function (module, exports) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var ModelBase = /** @class */ (function () {
+    function ModelBase(data) {
+        if (data)
+            Object.assign(this, data);
+    }
+    return ModelBase;
+}());
+exports.ModelBase = ModelBase;
+});
+
+unwrapExports(model_base);
+
+var entityFields_service = createCommonjsModule(function (module, exports) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var EntityFieldsService = /** @class */ (function () {
+    function EntityFieldsService() {
+        this.fields = new Map;
+    }
+    EntityFieldsService.prototype.addField = function (dataEntityType, field) {
+        var dataTypeFields = this.getDataTypeFields(dataEntityType);
+        if (!dataTypeFields)
+            this.fields.set(dataEntityType, dataTypeFields = new Map);
+        dataTypeFields.set(field.id, field);
+    };
+    EntityFieldsService.prototype.getDataTypeFields = function (dataEntityType) {
+        return this.fields.get(dataEntityType) || this.fields.get(dataEntityType.prototype);
+    };
+    return EntityFieldsService;
+}());
+exports.EntityFieldsService = EntityFieldsService;
+exports.entityFieldsService = new EntityFieldsService;
+});
+
+unwrapExports(entityFields_service);
+
+var entityField_decorator = createCommonjsModule(function (module, exports) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+
+function EntityField(fieldConfig) {
+    return function (entityPrototype, propertyKey) {
+        var propertyConstructor = window['Reflect'].getMetadata("design:type", entityPrototype, propertyKey);
+        fieldConfig = fieldConfig || {};
+        var fieldConfigCopy = Object.assign({}, fieldConfig);
+        if (!fieldConfigCopy.id)
+            fieldConfigCopy.id = String(propertyKey);
+        fieldConfigCopy.type = fieldConfig.arrayOf || propertyConstructor;
+        fieldConfigCopy.isArray = propertyConstructor === Array;
+        entityFields_service.entityFieldsService.addField(entityPrototype, fieldConfigCopy);
+    };
+}
+exports.EntityField = EntityField;
+});
+
+unwrapExports(entityField_decorator);
+
+var entityModel_base = createCommonjsModule(function (module, exports) {
+"use strict";
+var __extends = (commonjsGlobal && commonjsGlobal.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __decorate = (commonjsGlobal && commonjsGlobal.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (commonjsGlobal && commonjsGlobal.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+
+
+var EntityModelBase = /** @class */ (function (_super) {
+    __extends(EntityModelBase, _super);
+    function EntityModelBase(data) {
+        return _super.call(this, data) || this;
+    }
+    Object.defineProperty(EntityModelBase.prototype, "isNew", {
+        get: function () {
+            return this.id === null || this.id === undefined;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    __decorate([
+        entityField_decorator.EntityField(),
+        __metadata("design:type", String)
+    ], EntityModelBase.prototype, "id", void 0);
+    return EntityModelBase;
+}(model_base.ModelBase));
+exports.EntityModelBase = EntityModelBase;
+});
+
+unwrapExports(entityModel_base);
+
 var immutability = createCommonjsModule(function (module, exports) {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -70,6 +177,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var EntityConfigBase = /** @class */ (function () {
     function EntityConfigBase(config, entityConstructor) {
         this.entityConstructor = entityConstructor;
+        this.readonly = false;
         if (config.values) {
             config.values = config.values.map(function (valueConfig) { return new entityConstructor(valueConfig); });
             immutability.Immutability.freeze(config.values);
@@ -91,7 +199,7 @@ var EntityConfigBase = /** @class */ (function () {
                     this._valuesMap = null;
                 else {
                     this._valuesMap = new Map;
-                    this.values.forEach(function (value) { return _this._valuesMap.set(value.id, value); });
+                    this.values.forEach(function (value) { return _this._valuesMap.set(value.id, Object.freeze(value)); });
                 }
             }
             return this._valuesMap;
@@ -149,6 +257,11 @@ var transformers = [
         type: Date,
         parse: function (dateValue) { return new Date(dateValue); },
         serialize: function (date) { return date.valueOf(); }
+    },
+    {
+        type: RegExp,
+        parse: function (pattern) { return new RegExp(pattern); },
+        serialize: function (regExp) { return regExp ? regExp.toString().match(/^\/(.*)\/$/)[1] : null; }
     }
 ];
 var transformersMap = new Map;
@@ -279,30 +392,6 @@ exports.DataCache = DataCache;
 });
 
 unwrapExports(cache);
-
-var entityFields_service = createCommonjsModule(function (module, exports) {
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var EntityFieldsService = /** @class */ (function () {
-    function EntityFieldsService() {
-        this.fields = new Map;
-    }
-    EntityFieldsService.prototype.addField = function (dataEntityType, field) {
-        var dataTypeFields = this.getDataTypeFields(dataEntityType);
-        if (!dataTypeFields)
-            this.fields.set(dataEntityType, dataTypeFields = new Map);
-        dataTypeFields.set(field.id, field);
-    };
-    EntityFieldsService.prototype.getDataTypeFields = function (dataEntityType) {
-        return this.fields.get(dataEntityType) || this.fields.get(dataEntityType.prototype);
-    };
-    return EntityFieldsService;
-}());
-exports.EntityFieldsService = EntityFieldsService;
-exports.entityFieldsService = new EntityFieldsService;
-});
-
-unwrapExports(entityFields_service);
 
 var entities_service_base = createCommonjsModule(function (module, exports) {
 "use strict";
@@ -17527,9 +17616,7 @@ var Repository = /** @class */ (function () {
         configurable: true
     });
     Repository.prototype.createItem = function (itemData) {
-        var _this = this;
-        return Repository.getModelData(itemData, this.entity, this.config, this.repositoryManagerService, this.entityConstructor)
-            .map(function (modelData) { return new _this.entityConstructor(modelData); });
+        return Repository.getModelData(itemData, this.entity, this.config, this.repositoryManagerService, this.entityConstructor);
     };
     Repository.prototype.createNewItem = function () {
         return new this.entityConstructor();
@@ -17537,11 +17624,15 @@ var Repository = /** @class */ (function () {
     /**
      * Populates the item dataset with any sub @model. For example, if an ID is found for a property whose type is an entity,
      * the property's value will be an instance of that entity, for the ID, not the ID.
-     * @param itemData
-     * @returns {Observable<ModelData>}
+     * @param {Index} itemData
+     * @param {EntityConfigBase} entity
+     * @param {ParisConfig} config
+     * @param {RepositoryManagerService} repositoryManagerService
+     * @param {DataEntityConstructor<T extends EntityModelBase>} entityConstructor
+     * @returns {Observable<T extends EntityModelBase>}
      */
     Repository.getModelData = function (itemData, entity, config, repositoryManagerService, entityConstructor) {
-        var modelData = entity instanceof entity_config.ModelEntity ? { id: itemData[entity.idProperty || config.entityIdProperty] } : {}, subModels = [];
+        var entityIdProperty = entity.idProperty || config.entityIdProperty, modelData = entity instanceof entity_config.ModelEntity ? { id: itemData[entityIdProperty] } : {}, subModels = [];
         entity.fields.forEach(function (entityField) {
             var propertyValue = entityField.data ? lodash.get(itemData, entityField.data) : itemData[entityField.id];
             if (propertyValue === undefined || propertyValue === null) {
@@ -17556,9 +17647,8 @@ var Repository = /** @class */ (function () {
                         var propertyMembers$ = propertyValue.map(function (memberData) { return Repository.getEntityItem(propertyRepository_1, memberData); });
                         getPropertyEntityValue$ = Observable.Observable.combineLatest.apply(Observable.Observable, propertyMembers$).map(mapValueToEntityFieldIndex);
                     }
-                    else {
+                    else
                         getPropertyEntityValue$ = Repository.getEntityItem(propertyRepository_1, propertyValue).map(mapValueToEntityFieldIndex);
-                    }
                     subModels.push(getPropertyEntityValue$);
                 }
                 else {
@@ -17567,11 +17657,15 @@ var Repository = /** @class */ (function () {
                         var getPropertyEntityValue$ = void 0;
                         var mapValueToEntityFieldIndex = Repository.mapToEntityFieldIndex.bind(null, entityField.id);
                         if (entityField.isArray) {
-                            var propertyMembers$ = propertyValue.map(function (memberData) { return Repository.getValueObjectItem(valueObjectType_1, memberData, repositoryManagerService, config); });
-                            getPropertyEntityValue$ = Observable.Observable.combineLatest.apply(Observable.Observable, propertyMembers$).map(mapValueToEntityFieldIndex);
+                            if (propertyValue.length) {
+                                var propertyMembers$ = propertyValue.map(function (memberData) { return Repository.getValueObjectItem(valueObjectType_1, memberData, repositoryManagerService, config); });
+                                getPropertyEntityValue$ = Observable.Observable.combineLatest.apply(Observable.Observable, propertyMembers$).map(mapValueToEntityFieldIndex);
+                            }
+                            else
+                                getPropertyEntityValue$ = Observable.Observable.of([]).map(mapValueToEntityFieldIndex);
                         }
                         else {
-                            getPropertyEntityValue$ = Repository.getEntityItem(propertyRepository_1, propertyValue).map(mapValueToEntityFieldIndex);
+                            getPropertyEntityValue$ = Repository.getValueObjectItem(valueObjectType_1, propertyValue, repositoryManagerService, config).map(mapValueToEntityFieldIndex);
                         }
                         subModels.push(getPropertyEntityValue$);
                     }
@@ -17588,11 +17682,30 @@ var Repository = /** @class */ (function () {
         if (subModels.length) {
             return Observable.Observable.combineLatest.apply(Observable.Observable, subModels).map(function (propertyEntityValues) {
                 propertyEntityValues.forEach(function (propertyEntityValue) { return Object.assign(modelData, propertyEntityValue); });
-                return new entityConstructor(modelData);
+                var model = new entityConstructor(modelData);
+                propertyEntityValues.forEach(function (modelPropertyValue) {
+                    for (var p in modelPropertyValue) {
+                        var modelValue = modelPropertyValue[p];
+                        if (modelValue instanceof Array)
+                            modelValue.forEach(function (modelValueItem) {
+                                if (!Object.isFrozen(modelValueItem))
+                                    modelValueItem.parent = model;
+                            });
+                        else if (!Object.isFrozen(modelValue))
+                            modelValue.parent = model;
+                    }
+                });
+                if (entity.readonly)
+                    Object.freeze(model);
+                return model;
             });
         }
-        else
-            return Observable.Observable.of(modelData);
+        else {
+            var model = new entityConstructor(modelData);
+            if (entity.readonly)
+                Object.freeze(model);
+            return Observable.Observable.of(model);
+        }
     };
     Repository.mapToEntityFieldIndex = function (entityFieldId, value) {
         var data = {};
@@ -17638,7 +17751,7 @@ var Repository = /** @class */ (function () {
         if (allowCache !== false && this.entity.cache)
             return this.cache.get(itemId);
         if (this.entity.loadAll)
-            return this.setAllItems().map(function () { return _this._allValuesMap.get(itemId); });
+            return this.setAllItems().map(function () { return _this._allValuesMap.get(String(itemId)); });
         else {
             return this.dataStore.get(this.entity.endpoint + "/" + itemId)
                 .flatMap(function (data) { return _this.createItem(data); });
@@ -17651,7 +17764,7 @@ var Repository = /** @class */ (function () {
         return this.getItemsDataSet().do(function (dataSet) {
             _this._allValues = dataSet.items;
             _this._allValuesMap = new Map();
-            _this._allValues.forEach(function (value) { return _this._allValuesMap.set(value.id, value); });
+            _this._allValues.forEach(function (value) { return _this._allValuesMap.set(String(value.id), value); });
         }).map(function (dataSet) { return dataSet.items; });
     };
     Repository.prototype.save = function (item) {
@@ -17835,27 +17948,6 @@ exports.RepositoryManagerService = RepositoryManagerService;
 
 unwrapExports(repositoryManager_service);
 
-var entityField_decorator = createCommonjsModule(function (module, exports) {
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-
-function EntityField(fieldConfig) {
-    return function (entityPrototype, propertyKey) {
-        var propertyConstructor = window['Reflect'].getMetadata("design:type", entityPrototype, propertyKey);
-        fieldConfig = fieldConfig || {};
-        var fieldConfigCopy = Object.assign({}, fieldConfig);
-        if (!fieldConfigCopy.id)
-            fieldConfigCopy.id = String(propertyKey);
-        fieldConfigCopy.type = fieldConfig.arrayOf || propertyConstructor;
-        fieldConfigCopy.isArray = propertyConstructor === Array;
-        entityFields_service.entityFieldsService.addField(entityPrototype, fieldConfigCopy);
-    };
-}
-exports.EntityField = EntityField;
-});
-
-unwrapExports(entityField_decorator);
-
 var valueObject_decorator = createCommonjsModule(function (module, exports) {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -17955,6 +18047,10 @@ var main = createCommonjsModule(function (module, exports) {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 
+exports.EntityModelBase = entityModel_base.EntityModelBase;
+
+exports.ModelBase = model_base.ModelBase;
+
 exports.Repository = repository.Repository;
 
 exports.RepositoryManagerService = repositoryManager_service.RepositoryManagerService;
@@ -17977,28 +18073,32 @@ exports.ParisModule = paris_module.ParisModule;
 });
 
 var main$1 = unwrapExports(main);
-var main_1 = main.Repository;
-var main_2 = main.RepositoryManagerService;
-var main_3 = main.DataTransformersService;
-var main_4 = main.ModelEntity;
-var main_5 = main.entityFieldsService;
-var main_6 = main.entitiesService;
-var main_7 = main.EntityField;
-var main_8 = main.ValueObject;
-var main_9 = main.Entity;
-var main_10 = main.ParisModule;
+var main_1 = main.EntityModelBase;
+var main_2 = main.ModelBase;
+var main_3 = main.Repository;
+var main_4 = main.RepositoryManagerService;
+var main_5 = main.DataTransformersService;
+var main_6 = main.ModelEntity;
+var main_7 = main.entityFieldsService;
+var main_8 = main.entitiesService;
+var main_9 = main.EntityField;
+var main_10 = main.ValueObject;
+var main_11 = main.Entity;
+var main_12 = main.ParisModule;
 
 exports['default'] = main$1;
-exports.Repository = main_1;
-exports.RepositoryManagerService = main_2;
-exports.DataTransformersService = main_3;
-exports.ModelEntity = main_4;
-exports.entityFieldsService = main_5;
-exports.entitiesService = main_6;
-exports.EntityField = main_7;
-exports.ValueObject = main_8;
-exports.Entity = main_9;
-exports.ParisModule = main_10;
+exports.EntityModelBase = main_1;
+exports.ModelBase = main_2;
+exports.Repository = main_3;
+exports.RepositoryManagerService = main_4;
+exports.DataTransformersService = main_5;
+exports.ModelEntity = main_6;
+exports.entityFieldsService = main_7;
+exports.entitiesService = main_8;
+exports.EntityField = main_9;
+exports.ValueObject = main_10;
+exports.Entity = main_11;
+exports.ParisModule = main_12;
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
