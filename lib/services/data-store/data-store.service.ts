@@ -11,7 +11,7 @@ export class DataStoreService{
 
 	}
 
-	get(endpoint:string, data?:RequestData, baseUrl?:string, ):Observable<any>{
+	get(endpoint:string, data?:RequestData, baseUrl?:string):Observable<any>{
 		return this.setActiveRequest(this.http.get(this.getEndpointUrl(endpoint, baseUrl), data), HttpVerb.get, endpoint, data);
 	}
 

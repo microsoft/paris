@@ -1,3 +1,3 @@
 export interface EntityModelConfigBase{
-	id:string
+	id:string|number
 }

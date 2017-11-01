@@ -1,8 +1,7 @@
-import {EntityBaseModel} from "./base/entity-base.model";
 import {TagModel} from "./tag.model";
-import {EntityField} from "../paris/entity/entity-field.decorator";
 import {UserModel} from "./user.model";
-import {Entity} from "../paris/entity/entity.decorator";
+import {Entity} from "../../../../lib/entity/entity.decorator";
+import {EntityField} from "../../../../lib/entity/entity-field.decorator";
 
 @Entity({
 	singularName: "Todo Item",

@@ -1,11 +1,11 @@
 import {Inject, Injectable} from "@angular/core";
-import {Repository} from "./repository";
-import {IRepository} from "./repository.interface";
+import {Repository} from "../repository/repository";
+import {IRepository} from "../repository/repository.interface";
 import {ModelEntity} from "../entity/entity.config";
 import {DataEntityConstructor, DataEntityType} from "../entity/data-entity.base";
 import {Subject} from "rxjs/Subject";
-import {entitiesService} from "../services/entities.service";
-import {DataStoreService} from "../services/data-store/data-store.service";
+import {entitiesService} from "./entities.service";
+import {DataStoreService} from "./data-store/data-store.service";
 import {ParisConfig} from "../config/paris-config";
 import {EntityModelBase} from "../models/entity-model.base";
 

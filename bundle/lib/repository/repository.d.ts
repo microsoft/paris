@@ -1,7 +1,7 @@
 import { ModelEntity } from "../entity/entity.config";
 import { DataEntityConstructor } from "../entity/data-entity.base";
 import { Observable } from "rxjs/Observable";
-import { RepositoryManagerService } from "./repository-manager.service";
+import { RepositoryManagerService } from "../services/repository-manager.service";
 import { IRepository } from "./repository.interface";
 import { DataStoreService } from "../services/data-store/data-store.service";
 import { ParisConfig } from "../config/paris-config";
@@ -9,6 +9,7 @@ import { DataSetOptions } from "../dataset/dataset-options";
 import { DataSet } from "../dataset/dataset";
 import { Index } from "../models/index";
 import { EntityModelBase } from "../models/entity-model.base";
+import { DataOptions } from "../dataset/data.options";
 export declare class Repository<T extends EntityModelBase> implements IRepository {
     readonly entity: ModelEntity;
     private config;
@@ -26,7 +27,7 @@ export declare class Repository<T extends EntityModelBase> implements IRepositor
     private readonly cache;
     private readonly baseUrl;
     constructor(entity: ModelEntity, config: ParisConfig, entityConstructor: DataEntityConstructor<T>, dataStore: DataStoreService, repositoryManagerService: RepositoryManagerService);
-    createItem(itemData: any): Observable<T>;
+    createItem(itemData: any, options?: DataOptions): Observable<T>;
     createNewItem(): T;
     /**
      * Populates the item dataset with any sub @model. For example, if an ID is found for a property whose type is an entity,
@@ -35,15 +36,15 @@ export declare class Repository<T extends EntityModelBase> implements IRepositor
      * @param {EntityConfigBase} entity
      * @param {ParisConfig} config
      * @param {RepositoryManagerService} repositoryManagerService
-     * @param {DataEntityConstructor<T extends EntityModelBase>} entityConstructor
+     * @param {DataOptions} options
      * @returns {Observable<T extends EntityModelBase>}
      */
-    private static getModelData<T>(itemData, entity, config, repositoryManagerService, entityConstructor);
+    private static getModelData<T>(itemData, entity, config, repositoryManagerService, options?);
     private static mapToEntityFieldIndex(entityFieldId, value);
-    private static getEntityItem<U>(repository, itemData);
-    private static getValueObjectItem<U>(valueObjectType, data, repositoryManagerService, config?);
-    getItemsDataSet(options?: DataSetOptions): Observable<DataSet<T>>;
-    getItemById(itemId: string | number, allowCache?: boolean): Observable<T>;
+    private static getEntityItem<U>(repository, itemData, options?);
+    private static getValueObjectItem<U>(valueObjectType, data, repositoryManagerService, config?, options?);
+    getItemsDataSet(options?: DataSetOptions, dataOptions?: DataOptions): Observable<DataSet<T>>;
+    getItemById(itemId: string | number, options?: DataOptions): Observable<T>;
     private setAllItems();
     save(item: T): Observable<T>;
     getItemSaveData(item: T): Index;

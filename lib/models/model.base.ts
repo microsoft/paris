@@ -1,8 +1,9 @@
 export class ModelBase{
-	parent:ModelBase;
+	$parent?:ModelBase;
 
 	constructor(data?:any){
-		if (data)
+		if (data) {
 			Object.assign(this, data);
+		}
 	}
 }

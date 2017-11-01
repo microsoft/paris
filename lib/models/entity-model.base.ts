@@ -4,7 +4,7 @@ import {EntityModelConfigBase} from "./entity-config-base.interface";
 
 export class EntityModelBase extends ModelBase{
 	@EntityField()
-	id:string;
+	id:string|number;
 
 	get isNew():boolean{
 		return this.id === null || this.id === undefined;

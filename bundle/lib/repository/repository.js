@@ -7,6 +7,7 @@ var data_transformers_service_1 = require("../services/data-transformers.service
 var cache_1 = require("../services/cache");
 var value_objects_service_1 = require("../services/value-objects.service");
 var _ = require("lodash");
+var data_options_1 = require("../dataset/data.options");
 var Repository = /** @class */ (function () {
     function Repository(entity, config, entityConstructor, dataStore, repositoryManagerService) {
         this.entity = entity;
@@ -36,7 +37,7 @@ var Repository = /** @class */ (function () {
             var _this = this;
             if (!this._cache) {
                 var cacheSettings = Object.assign({
-                    getter: function (itemId) { return _this.getItemById(itemId, false); }
+                    getter: function (itemId) { return _this.getItemById(itemId, { allowCache: false }); }
                 }, this.entity.cache);
                 this._cache = new cache_1.DataCache(cacheSettings);
             }
@@ -54,8 +55,9 @@ var Repository = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    Repository.prototype.createItem = function (itemData) {
-        return Repository.getModelData(itemData, this.entity, this.config, this.repositoryManagerService, this.entityConstructor);
+    Repository.prototype.createItem = function (itemData, options) {
+        if (options === void 0) { options = data_options_1.defaultDataOptions; }
+        return Repository.getModelData(itemData, this.entity, this.config, this.repositoryManagerService);
     };
     Repository.prototype.createNewItem = function () {
         return new this.entityConstructor();
@@ -67,10 +69,11 @@ var Repository = /** @class */ (function () {
      * @param {EntityConfigBase} entity
      * @param {ParisConfig} config
      * @param {RepositoryManagerService} repositoryManagerService
-     * @param {DataEntityConstructor<T extends EntityModelBase>} entityConstructor
+     * @param {DataOptions} options
      * @returns {Observable<T extends EntityModelBase>}
      */
-    Repository.getModelData = function (itemData, entity, config, repositoryManagerService, entityConstructor) {
+    Repository.getModelData = function (itemData, entity, config, repositoryManagerService, options) {
+        if (options === void 0) { options = data_options_1.defaultDataOptions; }
         var entityIdProperty = entity.idProperty || config.entityIdProperty, modelData = entity instanceof entity_config_1.ModelEntity ? { id: itemData[entityIdProperty] } : {}, subModels = [];
         entity.fields.forEach(function (entityField) {
             var propertyValue = entityField.data ? _.get(itemData, entityField.data) : itemData[entityField.id];
@@ -83,11 +86,11 @@ var Repository = /** @class */ (function () {
                     var getPropertyEntityValue$ = void 0;
                     var mapValueToEntityFieldIndex = Repository.mapToEntityFieldIndex.bind(null, entityField.id);
                     if (entityField.isArray) {
-                        var propertyMembers$ = propertyValue.map(function (memberData) { return Repository.getEntityItem(propertyRepository_1, memberData); });
+                        var propertyMembers$ = propertyValue.map(function (memberData) { return Repository.getEntityItem(propertyRepository_1, memberData, options); });
                         getPropertyEntityValue$ = Observable_1.Observable.combineLatest.apply(Observable_1.Observable, propertyMembers$).map(mapValueToEntityFieldIndex);
                     }
                     else
-                        getPropertyEntityValue$ = Repository.getEntityItem(propertyRepository_1, propertyValue).map(mapValueToEntityFieldIndex);
+                        getPropertyEntityValue$ = Repository.getEntityItem(propertyRepository_1, propertyValue, options).map(mapValueToEntityFieldIndex);
                     subModels.push(getPropertyEntityValue$);
                 }
                 else {
@@ -97,14 +100,14 @@ var Repository = /** @class */ (function () {
                         var mapValueToEntityFieldIndex = Repository.mapToEntityFieldIndex.bind(null, entityField.id);
                         if (entityField.isArray) {
                             if (propertyValue.length) {
-                                var propertyMembers$ = propertyValue.map(function (memberData) { return Repository.getValueObjectItem(valueObjectType_1, memberData, repositoryManagerService, config); });
+                                var propertyMembers$ = propertyValue.map(function (memberData) { return Repository.getValueObjectItem(valueObjectType_1, memberData, repositoryManagerService, config, options); });
                                 getPropertyEntityValue$ = Observable_1.Observable.combineLatest.apply(Observable_1.Observable, propertyMembers$).map(mapValueToEntityFieldIndex);
                             }
                             else
                                 getPropertyEntityValue$ = Observable_1.Observable.of([]).map(mapValueToEntityFieldIndex);
                         }
                         else {
-                            getPropertyEntityValue$ = Repository.getValueObjectItem(valueObjectType_1, propertyValue, repositoryManagerService, config).map(mapValueToEntityFieldIndex);
+                            getPropertyEntityValue$ = Repository.getValueObjectItem(valueObjectType_1, propertyValue, repositoryManagerService, config, options).map(mapValueToEntityFieldIndex);
                         }
                         subModels.push(getPropertyEntityValue$);
                     }
@@ -121,17 +124,23 @@ var Repository = /** @class */ (function () {
         if (subModels.length) {
             return Observable_1.Observable.combineLatest.apply(Observable_1.Observable, subModels).map(function (propertyEntityValues) {
                 propertyEntityValues.forEach(function (propertyEntityValue) { return Object.assign(modelData, propertyEntityValue); });
-                var model = new entityConstructor(modelData);
+                var model;
+                try {
+                    model = new entity.entityConstructor(modelData);
+                }
+                catch (e) {
+                    console.error("Couldn't create " + entity.singularName + ".", e);
+                }
                 propertyEntityValues.forEach(function (modelPropertyValue) {
                     for (var p in modelPropertyValue) {
                         var modelValue = modelPropertyValue[p];
                         if (modelValue instanceof Array)
                             modelValue.forEach(function (modelValueItem) {
                                 if (!Object.isFrozen(modelValueItem))
-                                    modelValueItem.parent = model;
+                                    modelValueItem.$parent = model;
                             });
                         else if (!Object.isFrozen(modelValue))
-                            modelValue.parent = model;
+                            modelValue.$parent = model;
                     }
                 });
                 if (entity.readonly)
@@ -140,7 +149,13 @@ var Repository = /** @class */ (function () {
             });
         }
         else {
-            var model = new entityConstructor(modelData);
+            var model = void 0;
+            try {
+                model = new entity.entityConstructor(modelData);
+            }
+            catch (e) {
+                console.error("Couldn't create " + entity.singularName + ".", e);
+            }
             if (entity.readonly)
                 Object.freeze(model);
             return Observable_1.Observable.of(model);
@@ -151,18 +166,20 @@ var Repository = /** @class */ (function () {
         data[entityFieldId] = value;
         return data;
     };
-    Repository.getEntityItem = function (repository, itemData) {
-        return Object(itemData) === itemData ? repository.createItem(itemData) : repository.getItemById(itemData);
+    Repository.getEntityItem = function (repository, itemData, options) {
+        if (options === void 0) { options = data_options_1.defaultDataOptions; }
+        return Object(itemData) === itemData ? repository.createItem(itemData, options) : repository.getItemById(itemData, options);
     };
-    Repository.getValueObjectItem = function (valueObjectType, data, repositoryManagerService, config) {
+    Repository.getValueObjectItem = function (valueObjectType, data, repositoryManagerService, config, options) {
+        if (options === void 0) { options = data_options_1.defaultDataOptions; }
         // If the value object is one of a list of values, just set it to the model
         if (valueObjectType.hasValue(data))
             return Observable_1.Observable.of(valueObjectType.getValueById(data));
-        return Repository.getModelData(data, valueObjectType, config, repositoryManagerService, valueObjectType.entityConstructor)
-            .map(function (modelData) { return new valueObjectType.entityConstructor(modelData); });
+        return Repository.getModelData(data, valueObjectType, config, repositoryManagerService, options);
     };
-    Repository.prototype.getItemsDataSet = function (options) {
+    Repository.prototype.getItemsDataSet = function (options, dataOptions) {
         var _this = this;
+        if (dataOptions === void 0) { dataOptions = data_options_1.defaultDataOptions; }
         return this.dataStore.get(this.entity.endpoint + "/" + (this.entity.allItemsEndpoint || ''), options, this.baseUrl)
             .map(function (rawDataSet) {
             var allItemsProperty = _this.entity.allItemsProperty || _this.config.allItemsProperty;
@@ -175,7 +192,7 @@ var Repository = /** @class */ (function () {
             };
         })
             .flatMap(function (dataSet) {
-            var itemCreators = dataSet.items.map(function (itemData) { return _this.createItem(itemData); });
+            var itemCreators = dataSet.items.map(function (itemData) { return _this.createItem(itemData, dataOptions); });
             return Observable_1.Observable.combineLatest.apply(_this, itemCreators).map(function (items) {
                 return Object.freeze({
                     count: dataSet.count,
@@ -184,16 +201,21 @@ var Repository = /** @class */ (function () {
             });
         });
     };
-    Repository.prototype.getItemById = function (itemId, allowCache) {
+    Repository.prototype.getItemById = function (itemId, options) {
         var _this = this;
-        if (allowCache === void 0) { allowCache = true; }
-        if (allowCache !== false && this.entity.cache)
+        if (options === void 0) { options = data_options_1.defaultDataOptions; }
+        if (this.entity.values) {
+            var entityValue = this.entity.getValueById(itemId);
+            if (entityValue)
+                return Observable_1.Observable.of(entityValue);
+        }
+        if (options.allowCache !== false && this.entity.cache)
             return this.cache.get(itemId);
         if (this.entity.loadAll)
             return this.setAllItems().map(function () { return _this._allValuesMap.get(String(itemId)); });
         else {
             return this.dataStore.get(this.entity.endpoint + "/" + itemId)
-                .flatMap(function (data) { return _this.createItem(data); });
+                .flatMap(function (data) { return _this.createItem(data, options); });
         }
     };
     Repository.prototype.setAllItems = function () {
