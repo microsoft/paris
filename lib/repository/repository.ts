@@ -3,9 +3,8 @@ import {DataEntityConstructor} from "../entity/data-entity.base";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
 import {Field} from "../entity/entity-field";
-import {RepositoryManagerService} from "../services/repository-manager.service";
 import {IRepository} from "./repository.interface";
-import {DataStoreService} from "../services/data-store/data-store.service";
+import {DataStoreService} from "../services/data-store.service";
 import {ParisConfig} from "../config/paris-config";
 import {DataSetOptions} from "../dataset/dataset-options";
 import {DataSet} from "../dataset/dataset";
@@ -18,6 +17,7 @@ import {EntityConfigBase} from "../entity/entity-config.base";
 import {ModelBase} from "../models/model.base";
 import {EntityModelBase} from "../models/entity-model.base";
 import {DataOptions, defaultDataOptions} from "../dataset/data.options";
+import {Paris} from "../services/paris";
 
 export class Repository<T extends EntityModelBase> implements IRepository {
 	save$: Observable<T>;
@@ -62,7 +62,7 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 				private config: ParisConfig,
 				private entityConstructor: DataEntityConstructor<T>,
 				private dataStore: DataStoreService,
-				private repositoryManagerService: RepositoryManagerService) {
+				private paris: Paris) {
 		let getAllItems$: Observable<Array<T>> = this.getItemsDataSet().map(dataSet => dataSet.items);
 
 		this._allItemsSubject$ = new Subject<Array<T>>();
@@ -73,7 +73,7 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 	}
 
 	createItem(itemData: any, options:DataOptions = defaultDataOptions): Observable<T> {
-		return Repository.getModelData(itemData, this.entity, this.config, this.repositoryManagerService);
+		return Repository.getModelData(itemData, this.entity, this.config, this.paris);
 	}
 
 	createNewItem(): T {
@@ -86,11 +86,11 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 	 * @param {Index} itemData
 	 * @param {EntityConfigBase} entity
 	 * @param {ParisConfig} config
-	 * @param {RepositoryManagerService} repositoryManagerService
+	 * @param {Paris} paris
 	 * @param {DataOptions} options
 	 * @returns {Observable<T extends EntityModelBase>}
 	 */
-	private static getModelData<T extends ModelBase>(itemData: Index, entity: EntityConfigBase, config: ParisConfig, repositoryManagerService: RepositoryManagerService, options:DataOptions = defaultDataOptions): Observable<T> {
+	private static getModelData<T extends ModelBase>(itemData: Index, entity: EntityConfigBase, config: ParisConfig, paris: Paris, options:DataOptions = defaultDataOptions): Observable<T> {
 		let entityIdProperty: string = entity.idProperty || config.entityIdProperty,
 			modelData: Index = entity instanceof ModelEntity ? {id: itemData[entityIdProperty]} : {},
 			subModels: Array<Observable<{ [index: string]: ModelBase | Array<ModelBase> }>> = [];
@@ -102,7 +102,7 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 				modelData[entityField.id] = entityField.isArray ? [] : entityField.defaultValue || null;
 			}
 			else {
-				let propertyRepository: Repository<EntityModelBase> = repositoryManagerService.getRepository(entityField.type);
+				let propertyRepository: Repository<EntityModelBase> = paris.getRepository(entityField.type);
 
 				if (propertyRepository) {
 					let getPropertyEntityValue$: Observable<Index>;
@@ -126,14 +126,14 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 
 						if (entityField.isArray) {
 							if (propertyValue.length) {
-								let propertyMembers$: Array<Observable<ModelPropertyValue>> = propertyValue.map((memberData: any) => Repository.getValueObjectItem(valueObjectType, memberData, repositoryManagerService, config, options));
+								let propertyMembers$: Array<Observable<ModelPropertyValue>> = propertyValue.map((memberData: any) => Repository.getValueObjectItem(valueObjectType, memberData, paris, config, options));
 								getPropertyEntityValue$ = Observable.combineLatest.apply(Observable, propertyMembers$).map(mapValueToEntityFieldIndex);
 							}
 							else
 								getPropertyEntityValue$ = Observable.of([]).map(mapValueToEntityFieldIndex);
 						}
 						else {
-							getPropertyEntityValue$ = Repository.getValueObjectItem(valueObjectType, propertyValue, repositoryManagerService, config, options).map(mapValueToEntityFieldIndex);
+							getPropertyEntityValue$ = Repository.getValueObjectItem(valueObjectType, propertyValue, paris, config, options).map(mapValueToEntityFieldIndex);
 						}
 
 						subModels.push(getPropertyEntityValue$);
@@ -207,12 +207,12 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 		return Object(itemData) === itemData ? repository.createItem(itemData, options) : repository.getItemById(itemData, options);
 	}
 
-	private static getValueObjectItem<U extends ModelBase>(valueObjectType: EntityConfigBase, data: any, repositoryManagerService: RepositoryManagerService, config?: ParisConfig, options:DataOptions = defaultDataOptions): Observable<U> {
+	private static getValueObjectItem<U extends ModelBase>(valueObjectType: EntityConfigBase, data: any, paris: Paris, config?: ParisConfig, options:DataOptions = defaultDataOptions): Observable<U> {
 		// If the value object is one of a list of values, just set it to the model
 		if (valueObjectType.hasValue(data))
 			return Observable.of(valueObjectType.getValueById(data));
 
-		return Repository.getModelData(data, valueObjectType, config, repositoryManagerService, options);
+		return Repository.getModelData(data, valueObjectType, config, paris, options);
 	}
 
 	getItemsDataSet(options?: DataSetOptions, dataOptions:DataOptions = defaultDataOptions): Observable<DataSet<T>> {
@@ -270,20 +270,20 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 		}).map(dataSet => dataSet.items);
 	}
 
-	save(item: T): Observable<T> {
-		let saveData: Index = this.getItemSaveData(item);
-
-		return this.dataStore.post(`${this.entity.endpoint}/${item.id || ''}`, saveData)
-			.flatMap((savedItemData: Index) => this.createItem(savedItemData))
-			.do((item: T) => {
-				if (this._allValues) {
-					this._allValues = [...this._allValues, item];
-					this._allItemsSubject$.next(this._allValues);
-				}
-
-				this._saveSubject$.next(item);
-			});
-	}
+	// save(item: T): Observable<T> {
+	// 	let saveData: Index = this.getItemSaveData(item);
+	//
+	// 	return this.dataStore.post(`${this.entity.endpoint}/${item.id || ''}`, saveData)
+	// 		.flatMap((savedItemData: Index) => this.createItem(savedItemData))
+	// 		.do((item: T) => {
+	// 			if (this._allValues) {
+	// 				this._allValues = [...this._allValues, item];
+	// 				this._allItemsSubject$.next(this._allValues);
+	// 			}
+	//
+	// 			this._saveSubject$.next(item);
+	// 		});
+	// }
 
 	getItemSaveData(item: T): Index {
 		let modelData: Index = {};
@@ -296,7 +296,7 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 					entityField: Field = this.entity.fields.get(propertyId);
 
 				if (entityField) {
-					let propertyRepository: IRepository = this.repositoryManagerService.getRepository(entityField.type);
+					let propertyRepository: IRepository = this.paris.getRepository(entityField.type);
 
 					if (propertyRepository)
 						modelValue = (<EntityModelBase>propertyValue).id;

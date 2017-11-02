@@ -3,5 +3,9 @@ export interface ParisConfig {
     allItemsProperty?: string;
     entityIdProperty?: string;
     data?: any;
+    http?: ParisHttpConfig;
 }
 export declare const defaultConfig: ParisConfig;
+export interface ParisHttpConfig {
+    headers?: any;
+}

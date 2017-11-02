@@ -1,6 +1,5 @@
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
-import typescript from 'rollup-plugin-typescript';
 import pkg from './package.json';
 
 // found this online, it does seem to correctly rewrite the rxjs paths
@@ -32,7 +31,7 @@ export default [
 			commonjs() // so Rollup can convert `ms` to an ES module
 		],
 		external: id => {
-			return /^rxjs/.test(id) || /^@angular/.test(id);
+			return /^(rxjs|lodash)/.test(id);
 		}
 	}
 	/*

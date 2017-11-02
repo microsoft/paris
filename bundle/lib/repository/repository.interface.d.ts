@@ -11,6 +11,4 @@ export interface IRepository {
     getItemsDataSet: (options?: DataSetOptions) => Observable<DataSet<any>>;
     getItemSaveData: (item: EntityModelBase) => Object;
     allItems$: Observable<Array<any>>;
-    save: (item: EntityModelBase) => Observable<EntityModelBase>;
-    save$: Observable<any>;
 }

@@ -13,3 +13,4 @@ require("rxjs/add/operator/share");
 require("rxjs/add/operator/finally");
 require("rxjs/add/operator/toPromise");
 require("rxjs/add/observable/merge");
+require("rxjs/add/observable/dom/ajax");
