@@ -2,7 +2,7 @@ import {ModelEntity} from "../entity/entity.config";
 import {DataEntityConstructor} from "../entity/data-entity.base";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
-import {Field} from "../entity/entity-field";
+import {Field, FIELD_DATA_SELF} from "../entity/entity-field";
 import {IRepository} from "./repository.interface";
 import {DataStoreService} from "../services/data-store.service";
 import {ParisConfig} from "../config/paris-config";
@@ -42,7 +42,7 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 	private get cache(): DataCache<T> {
 		if (!this._cache) {
 			let cacheSettings: DataCacheSettings<T> = Object.assign({
-				getter: (itemId: string | number) => this.getItemById(itemId, { allowCache: false })
+				getter: (itemId: string | number) => this.getItemById(itemId, {allowCache: false})
 			}, this.entity.cache);
 
 			this._cache = new DataCache<T>(cacheSettings);
@@ -72,7 +72,7 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 		this.save$ = this._saveSubject$.asObservable();
 	}
 
-	createItem(itemData: any, options:DataOptions = defaultDataOptions): Observable<T> {
+	createItem(itemData: any, options: DataOptions = defaultDataOptions): Observable<T> {
 		return Repository.getModelData(itemData, this.entity, this.config, this.paris);
 	}
 
@@ -83,22 +83,42 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 	/**
 	 * Populates the item dataset with any sub @model. For example, if an ID is found for a property whose type is an entity,
 	 * the property's value will be an instance of that entity, for the ID, not the ID.
-	 * @param {Index} itemData
+	 * @param {Index} rawData
 	 * @param {EntityConfigBase} entity
 	 * @param {ParisConfig} config
 	 * @param {Paris} paris
 	 * @param {DataOptions} options
 	 * @returns {Observable<T extends EntityModelBase>}
 	 */
-	private static getModelData<T extends ModelBase>(itemData: Index, entity: EntityConfigBase, config: ParisConfig, paris: Paris, options:DataOptions = defaultDataOptions): Observable<T> {
+	private static getModelData<T extends ModelBase>(rawData: Index, entity: EntityConfigBase, config: ParisConfig, paris: Paris, options: DataOptions = defaultDataOptions): Observable<T> {
 		let entityIdProperty: string = entity.idProperty || config.entityIdProperty,
-			modelData: Index = entity instanceof ModelEntity ? {id: itemData[entityIdProperty]} : {},
+			modelData: Index = entity instanceof ModelEntity ? {id: rawData[entityIdProperty]} : {},
 			subModels: Array<Observable<{ [index: string]: ModelBase | Array<ModelBase> }>> = [];
 
+		let getModelDataError:Error = new Error(`Failed to create ${entity.singularName}.`);
+
 		entity.fields.forEach((entityField: Field) => {
-			let propertyValue: any = entityField.data ? _.get(itemData, entityField.data) : itemData[entityField.id];
+			let propertyValue: any;
+			if (entityField.data) {
+				if (entityField.data instanceof Array) {
+					for (let i = 0, path:string; i < entityField.data.length && propertyValue === undefined; i++) {
+						path = entityField.data[i];
+						let value:any = path === FIELD_DATA_SELF ? rawData : _.get(rawData, path);
+						if (value !== undefined && value !== null)
+							propertyValue = value;
+					}
+				}
+				else
+					propertyValue = entityField.data === FIELD_DATA_SELF ? rawData : _.get(rawData, entityField.data);
+			}
+			else
+				propertyValue = rawData[entityField.id];
 
 			if (propertyValue === undefined || propertyValue === null) {
+				if (entityField.required) {
+					getModelDataError.message = getModelDataError.message + ` Field ${entityField.id} is required but it's ${propertyValue}.`;
+					throw getModelDataError;
+				}
 				modelData[entityField.id] = entityField.isArray ? [] : entityField.defaultValue || null;
 			}
 			else {
@@ -149,16 +169,19 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 			}
 		});
 
+		let model$:Observable<T>;
+
 		if (subModels.length) {
-			return Observable.combineLatest.apply(Observable, subModels).map((propertyEntityValues: Array<ModelPropertyValue>) => {
+			model$ = Observable.combineLatest.apply(Observable, subModels).map((propertyEntityValues: Array<ModelPropertyValue>) => {
 				propertyEntityValues.forEach((propertyEntityValue: { [index: string]: any }) => Object.assign(modelData, propertyEntityValue));
 
-				let model:T;
+				let model: T;
 
 				try {
-					model = new entity.entityConstructor(modelData);
-				} catch(e){
-					console.error(`Couldn't create ${entity.singularName}.`, e);
+					model = new entity.entityConstructor(modelData, rawData);
+				} catch (e) {
+					getModelDataError.message = getModelDataError.message + " Error: " + e.message;
+					throw getModelDataError;
 				}
 
 				propertyEntityValues.forEach((modelPropertyValue: ModelPropertyValue) => {
@@ -175,26 +198,23 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 					}
 				});
 
-				if (entity.readonly)
-					Object.freeze(model);
-
 				return model;
 			});
 		}
 		else {
-			let model:T;
+			let model: T;
 
 			try {
-				model = new entity.entityConstructor(modelData);
-			} catch(e){
-				console.error(`Couldn't create ${entity.singularName}.`, e);
+				model = new entity.entityConstructor(modelData, rawData);
+			} catch (e) {
+				getModelDataError.message = getModelDataError.message + " Error: " + e.message;
+				throw getModelDataError;
 			}
 
-				if (entity.readonly)
-				Object.freeze(model);
-
-			return Observable.of(model);
+			model$ = Observable.of(model);
 		}
+
+		return entity.readonly ? model$.map(model => Object.freeze(model)) : model$;
 	}
 
 	private static mapToEntityFieldIndex(entityFieldId: string, value: ModelBase | Array<ModelBase>): ModelPropertyValue {
@@ -203,11 +223,11 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 		return data;
 	}
 
-	private static getEntityItem<U extends EntityModelBase>(repository: Repository<U>, itemData: any, options:DataOptions = defaultDataOptions): Observable<U> {
+	private static getEntityItem<U extends EntityModelBase>(repository: Repository<U>, itemData: any, options: DataOptions = defaultDataOptions): Observable<U> {
 		return Object(itemData) === itemData ? repository.createItem(itemData, options) : repository.getItemById(itemData, options);
 	}
 
-	private static getValueObjectItem<U extends ModelBase>(valueObjectType: EntityConfigBase, data: any, paris: Paris, config?: ParisConfig, options:DataOptions = defaultDataOptions): Observable<U> {
+	private static getValueObjectItem<U extends ModelBase>(valueObjectType: EntityConfigBase, data: any, paris: Paris, config?: ParisConfig, options: DataOptions = defaultDataOptions): Observable<U> {
 		// If the value object is one of a list of values, just set it to the model
 		if (valueObjectType.hasValue(data))
 			return Observable.of(valueObjectType.getValueById(data));
@@ -215,7 +235,9 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 		return Repository.getModelData(data, valueObjectType, config, paris, options);
 	}
 
-	getItemsDataSet(options?: DataSetOptions, dataOptions:DataOptions = defaultDataOptions): Observable<DataSet<T>> {
+	getItemsDataSet(options?: DataSetOptions, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<T>> {
+		let getItemsDataSetError:Error = new Error(`Failed to get ${this.entity.pluralName}.`);
+
 		return this.dataStore.get(`${this.entity.endpoint}/${this.entity.allItemsEndpoint || ''}`, options, this.baseUrl)
 			.map((rawDataSet: any) => {
 				const allItemsProperty = this.entity.allItemsProperty || this.config.allItemsProperty;
@@ -237,13 +259,16 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 						count: dataSet.count,
 						items: items
 					});
-				})
+				}).catch((error:Error) => {
+					getItemsDataSetError.message = getItemsDataSetError.message + " Error: " + error.message;
+					throw getItemsDataSetError;
+				});
 			});
 	}
 
-	getItemById(itemId: string | number, options:DataOptions = defaultDataOptions): Observable<T> {
-		if (this.entity.values){
-			const entityValue:T = this.entity.getValueById(itemId);
+	getItemById(itemId: string | number, options: DataOptions = defaultDataOptions): Observable<T> {
+		if (this.entity.values) {
+			const entityValue: T = this.entity.getValueById(itemId);
 			if (entityValue)
 				return Observable.of(entityValue);
 		}

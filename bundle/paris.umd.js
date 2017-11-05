@@ -153,6 +153,14 @@ exports.ModelEntity = ModelEntity;
 
 unwrapExports(entity_config);
 
+var entityField = createCommonjsModule(function (module, exports) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.FIELD_DATA_SELF = "__self";
+});
+
+unwrapExports(entityField);
+
 var dataTransformers_service = createCommonjsModule(function (module, exports) {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -437,6 +445,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 
 
+
 var Repository = /** @class */ (function () {
     function Repository(entity, config, entityConstructor, dataStore, paris) {
         this.entity = entity;
@@ -494,27 +503,46 @@ var Repository = /** @class */ (function () {
     /**
      * Populates the item dataset with any sub @model. For example, if an ID is found for a property whose type is an entity,
      * the property's value will be an instance of that entity, for the ID, not the ID.
-     * @param {Index} itemData
+     * @param {Index} rawData
      * @param {EntityConfigBase} entity
      * @param {ParisConfig} config
      * @param {Paris} paris
      * @param {DataOptions} options
      * @returns {Observable<T extends EntityModelBase>}
      */
-    Repository.getModelData = function (itemData, entity, config, paris, options) {
+    Repository.getModelData = function (rawData, entity, config, paris, options) {
         if (options === void 0) { options = data_options.defaultDataOptions; }
-        var entityIdProperty = entity.idProperty || config.entityIdProperty, modelData = entity instanceof entity_config.ModelEntity ? { id: itemData[entityIdProperty] } : {}, subModels = [];
-        entity.fields.forEach(function (entityField) {
-            var propertyValue = entityField.data ? lodash.get(itemData, entityField.data) : itemData[entityField.id];
+        var entityIdProperty = entity.idProperty || config.entityIdProperty, modelData = entity instanceof entity_config.ModelEntity ? { id: rawData[entityIdProperty] } : {}, subModels = [];
+        var getModelDataError = new Error("Failed to create " + entity.singularName + ".");
+        entity.fields.forEach(function (entityField$$1) {
+            var propertyValue;
+            if (entityField$$1.data) {
+                if (entityField$$1.data instanceof Array) {
+                    for (var i = 0, path = void 0; i < entityField$$1.data.length && propertyValue === undefined; i++) {
+                        path = entityField$$1.data[i];
+                        var value = path === entityField.FIELD_DATA_SELF ? rawData : lodash.get(rawData, path);
+                        if (value !== undefined && value !== null)
+                            propertyValue = value;
+                    }
+                }
+                else
+                    propertyValue = entityField$$1.data === entityField.FIELD_DATA_SELF ? rawData : lodash.get(rawData, entityField$$1.data);
+            }
+            else
+                propertyValue = rawData[entityField$$1.id];
             if (propertyValue === undefined || propertyValue === null) {
-                modelData[entityField.id] = entityField.isArray ? [] : entityField.defaultValue || null;
+                if (entityField$$1.required) {
+                    getModelDataError.message = getModelDataError.message + (" Field " + entityField$$1.id + " is required but it's " + propertyValue + ".");
+                    throw getModelDataError;
+                }
+                modelData[entityField$$1.id] = entityField$$1.isArray ? [] : entityField$$1.defaultValue || null;
             }
             else {
-                var propertyRepository_1 = paris.getRepository(entityField.type);
+                var propertyRepository_1 = paris.getRepository(entityField$$1.type);
                 if (propertyRepository_1) {
                     var getPropertyEntityValue$ = void 0;
-                    var mapValueToEntityFieldIndex = Repository.mapToEntityFieldIndex.bind(null, entityField.id);
-                    if (entityField.isArray) {
+                    var mapValueToEntityFieldIndex = Repository.mapToEntityFieldIndex.bind(null, entityField$$1.id);
+                    if (entityField$$1.isArray) {
                         var propertyMembers$ = propertyValue.map(function (memberData) { return Repository.getEntityItem(propertyRepository_1, memberData, options); });
                         getPropertyEntityValue$ = Observable_1.Observable.combineLatest.apply(Observable_1.Observable, propertyMembers$).map(mapValueToEntityFieldIndex);
                     }
@@ -523,11 +551,11 @@ var Repository = /** @class */ (function () {
                     subModels.push(getPropertyEntityValue$);
                 }
                 else {
-                    var valueObjectType_1 = valueObjects_service.valueObjectsService.getEntityByType(entityField.type);
+                    var valueObjectType_1 = valueObjects_service.valueObjectsService.getEntityByType(entityField$$1.type);
                     if (valueObjectType_1) {
                         var getPropertyEntityValue$ = void 0;
-                        var mapValueToEntityFieldIndex = Repository.mapToEntityFieldIndex.bind(null, entityField.id);
-                        if (entityField.isArray) {
+                        var mapValueToEntityFieldIndex = Repository.mapToEntityFieldIndex.bind(null, entityField$$1.id);
+                        if (entityField$$1.isArray) {
                             if (propertyValue.length) {
                                 var propertyMembers$ = propertyValue.map(function (memberData) { return Repository.getValueObjectItem(valueObjectType_1, memberData, paris, config, options); });
                                 getPropertyEntityValue$ = Observable_1.Observable.combineLatest.apply(Observable_1.Observable, propertyMembers$).map(mapValueToEntityFieldIndex);
@@ -541,24 +569,26 @@ var Repository = /** @class */ (function () {
                         subModels.push(getPropertyEntityValue$);
                     }
                     else {
-                        modelData[entityField.id] = entityField.isArray
+                        modelData[entityField$$1.id] = entityField$$1.isArray
                             ? propertyValue
-                                ? propertyValue.map(function (elementValue) { return dataTransformers_service.DataTransformersService.parse(entityField.type, elementValue); })
+                                ? propertyValue.map(function (elementValue) { return dataTransformers_service.DataTransformersService.parse(entityField$$1.type, elementValue); })
                                 : []
-                            : dataTransformers_service.DataTransformersService.parse(entityField.type, propertyValue);
+                            : dataTransformers_service.DataTransformersService.parse(entityField$$1.type, propertyValue);
                     }
                 }
             }
         });
+        var model$;
         if (subModels.length) {
-            return Observable_1.Observable.combineLatest.apply(Observable_1.Observable, subModels).map(function (propertyEntityValues) {
+            model$ = Observable_1.Observable.combineLatest.apply(Observable_1.Observable, subModels).map(function (propertyEntityValues) {
                 propertyEntityValues.forEach(function (propertyEntityValue) { return Object.assign(modelData, propertyEntityValue); });
                 var model;
                 try {
-                    model = new entity.entityConstructor(modelData);
+                    model = new entity.entityConstructor(modelData, rawData);
                 }
                 catch (e) {
-                    console.error("Couldn't create " + entity.singularName + ".", e);
+                    getModelDataError.message = getModelDataError.message + " Error: " + e.message;
+                    throw getModelDataError;
                 }
                 propertyEntityValues.forEach(function (modelPropertyValue) {
                     for (var p in modelPropertyValue) {
@@ -572,23 +602,21 @@ var Repository = /** @class */ (function () {
                             modelValue.$parent = model;
                     }
                 });
-                if (entity.readonly)
-                    Object.freeze(model);
                 return model;
             });
         }
         else {
             var model = void 0;
             try {
-                model = new entity.entityConstructor(modelData);
+                model = new entity.entityConstructor(modelData, rawData);
             }
             catch (e) {
-                console.error("Couldn't create " + entity.singularName + ".", e);
+                getModelDataError.message = getModelDataError.message + " Error: " + e.message;
+                throw getModelDataError;
             }
-            if (entity.readonly)
-                Object.freeze(model);
-            return Observable_1.Observable.of(model);
+            model$ = Observable_1.Observable.of(model);
         }
+        return entity.readonly ? model$.map(function (model) { return Object.freeze(model); }) : model$;
     };
     Repository.mapToEntityFieldIndex = function (entityFieldId, value) {
         var data = {};
@@ -609,6 +637,7 @@ var Repository = /** @class */ (function () {
     Repository.prototype.getItemsDataSet = function (options, dataOptions) {
         var _this = this;
         if (dataOptions === void 0) { dataOptions = data_options.defaultDataOptions; }
+        var getItemsDataSetError = new Error("Failed to get " + this.entity.pluralName + ".");
         return this.dataStore.get(this.entity.endpoint + "/" + (this.entity.allItemsEndpoint || ''), options, this.baseUrl)
             .map(function (rawDataSet) {
             var allItemsProperty = _this.entity.allItemsProperty || _this.config.allItemsProperty;
@@ -627,6 +656,9 @@ var Repository = /** @class */ (function () {
                     count: dataSet.count,
                     items: items
                 });
+            }).catch(function (error) {
+                getItemsDataSetError.message = getItemsDataSetError.message + " Error: " + error.message;
+                throw getItemsDataSetError;
             });
         });
     };
@@ -676,14 +708,14 @@ var Repository = /** @class */ (function () {
         for (var propertyId in item) {
             if (item.hasOwnProperty(propertyId)) {
                 var modelValue = void 0;
-                var propertyValue = item[propertyId], entityField = this.entity.fields.get(propertyId);
-                if (entityField) {
-                    var propertyRepository = this.paris.getRepository(entityField.type);
+                var propertyValue = item[propertyId], entityField$$1 = this.entity.fields.get(propertyId);
+                if (entityField$$1) {
+                    var propertyRepository = this.paris.getRepository(entityField$$1.type);
                     if (propertyRepository)
                         modelValue = propertyValue.id;
                     else
-                        modelValue = dataTransformers_service.DataTransformersService.serialize(entityField.type, propertyValue);
-                    modelData[entityField.id] = modelValue;
+                        modelValue = dataTransformers_service.DataTransformersService.serialize(entityField$$1.type, propertyValue);
+                    modelData[entityField$$1.id] = modelValue;
                 }
             }
         }

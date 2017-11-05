@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var entity_config_1 = require("../entity/entity.config");
 var Observable_1 = require("rxjs/Observable");
 var Subject_1 = require("rxjs/Subject");
+var entity_field_1 = require("../entity/entity-field");
 var data_transformers_service_1 = require("../services/data-transformers.service");
 var cache_1 = require("../services/cache");
 var value_objects_service_1 = require("../services/value-objects.service");
@@ -65,19 +66,38 @@ var Repository = /** @class */ (function () {
     /**
      * Populates the item dataset with any sub @model. For example, if an ID is found for a property whose type is an entity,
      * the property's value will be an instance of that entity, for the ID, not the ID.
-     * @param {Index} itemData
+     * @param {Index} rawData
      * @param {EntityConfigBase} entity
      * @param {ParisConfig} config
      * @param {Paris} paris
      * @param {DataOptions} options
      * @returns {Observable<T extends EntityModelBase>}
      */
-    Repository.getModelData = function (itemData, entity, config, paris, options) {
+    Repository.getModelData = function (rawData, entity, config, paris, options) {
         if (options === void 0) { options = data_options_1.defaultDataOptions; }
-        var entityIdProperty = entity.idProperty || config.entityIdProperty, modelData = entity instanceof entity_config_1.ModelEntity ? { id: itemData[entityIdProperty] } : {}, subModels = [];
+        var entityIdProperty = entity.idProperty || config.entityIdProperty, modelData = entity instanceof entity_config_1.ModelEntity ? { id: rawData[entityIdProperty] } : {}, subModels = [];
+        var getModelDataError = new Error("Failed to create " + entity.singularName + ".");
         entity.fields.forEach(function (entityField) {
-            var propertyValue = entityField.data ? _.get(itemData, entityField.data) : itemData[entityField.id];
+            var propertyValue;
+            if (entityField.data) {
+                if (entityField.data instanceof Array) {
+                    for (var i = 0, path = void 0; i < entityField.data.length && propertyValue === undefined; i++) {
+                        path = entityField.data[i];
+                        var value = path === entity_field_1.FIELD_DATA_SELF ? rawData : _.get(rawData, path);
+                        if (value !== undefined && value !== null)
+                            propertyValue = value;
+                    }
+                }
+                else
+                    propertyValue = entityField.data === entity_field_1.FIELD_DATA_SELF ? rawData : _.get(rawData, entityField.data);
+            }
+            else
+                propertyValue = rawData[entityField.id];
             if (propertyValue === undefined || propertyValue === null) {
+                if (entityField.required) {
+                    getModelDataError.message = getModelDataError.message + (" Field " + entityField.id + " is required but it's " + propertyValue + ".");
+                    throw getModelDataError;
+                }
                 modelData[entityField.id] = entityField.isArray ? [] : entityField.defaultValue || null;
             }
             else {
@@ -121,15 +141,17 @@ var Repository = /** @class */ (function () {
                 }
             }
         });
+        var model$;
         if (subModels.length) {
-            return Observable_1.Observable.combineLatest.apply(Observable_1.Observable, subModels).map(function (propertyEntityValues) {
+            model$ = Observable_1.Observable.combineLatest.apply(Observable_1.Observable, subModels).map(function (propertyEntityValues) {
                 propertyEntityValues.forEach(function (propertyEntityValue) { return Object.assign(modelData, propertyEntityValue); });
                 var model;
                 try {
-                    model = new entity.entityConstructor(modelData);
+                    model = new entity.entityConstructor(modelData, rawData);
                 }
                 catch (e) {
-                    console.error("Couldn't create " + entity.singularName + ".", e);
+                    getModelDataError.message = getModelDataError.message + " Error: " + e.message;
+                    throw getModelDataError;
                 }
                 propertyEntityValues.forEach(function (modelPropertyValue) {
                     for (var p in modelPropertyValue) {
@@ -143,23 +165,21 @@ var Repository = /** @class */ (function () {
                             modelValue.$parent = model;
                     }
                 });
-                if (entity.readonly)
-                    Object.freeze(model);
                 return model;
             });
         }
         else {
             var model = void 0;
             try {
-                model = new entity.entityConstructor(modelData);
+                model = new entity.entityConstructor(modelData, rawData);
             }
             catch (e) {
-                console.error("Couldn't create " + entity.singularName + ".", e);
+                getModelDataError.message = getModelDataError.message + " Error: " + e.message;
+                throw getModelDataError;
             }
-            if (entity.readonly)
-                Object.freeze(model);
-            return Observable_1.Observable.of(model);
+            model$ = Observable_1.Observable.of(model);
         }
+        return entity.readonly ? model$.map(function (model) { return Object.freeze(model); }) : model$;
     };
     Repository.mapToEntityFieldIndex = function (entityFieldId, value) {
         var data = {};
@@ -180,6 +200,7 @@ var Repository = /** @class */ (function () {
     Repository.prototype.getItemsDataSet = function (options, dataOptions) {
         var _this = this;
         if (dataOptions === void 0) { dataOptions = data_options_1.defaultDataOptions; }
+        var getItemsDataSetError = new Error("Failed to get " + this.entity.pluralName + ".");
         return this.dataStore.get(this.entity.endpoint + "/" + (this.entity.allItemsEndpoint || ''), options, this.baseUrl)
             .map(function (rawDataSet) {
             var allItemsProperty = _this.entity.allItemsProperty || _this.config.allItemsProperty;
@@ -198,6 +219,9 @@ var Repository = /** @class */ (function () {
                     count: dataSet.count,
                     items: items
                 });
+            }).catch(function (error) {
+                getItemsDataSetError.message = getItemsDataSetError.message + " Error: " + error.message;
+                throw getItemsDataSetError;
             });
         });
     };

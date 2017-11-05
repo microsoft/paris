@@ -32,14 +32,14 @@ export declare class Repository<T extends EntityModelBase> implements IRepositor
     /**
      * Populates the item dataset with any sub @model. For example, if an ID is found for a property whose type is an entity,
      * the property's value will be an instance of that entity, for the ID, not the ID.
-     * @param {Index} itemData
+     * @param {Index} rawData
      * @param {EntityConfigBase} entity
      * @param {ParisConfig} config
      * @param {Paris} paris
      * @param {DataOptions} options
      * @returns {Observable<T extends EntityModelBase>}
      */
-    private static getModelData<T>(itemData, entity, config, paris, options?);
+    private static getModelData<T>(rawData, entity, config, paris, options?);
     private static mapToEntityFieldIndex(entityFieldId, value);
     private static getEntityItem<U>(repository, itemData, options?);
     private static getValueObjectItem<U>(valueObjectType, data, paris, config?, options?);

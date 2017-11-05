@@ -1,6 +1,5 @@
 import {DataEntityType} from "./data-entity.base";
 import {Field} from "./entity-field";
-import {entitiesService} from "../services/entities.service";
 import {entityFieldsService} from "../services/entity-fields.service";
 
 export function EntityField(fieldConfig?:Field):PropertyDecorator {
