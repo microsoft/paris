@@ -1,5 +1,5 @@
 import {ParisConfig} from "../config/paris-config";
-import {Http, UrlParams} from "./http.service";
+import {Http, HttpOptions} from "./http.service";
 import {Observable} from "rxjs/Observable";
 
 export class DataStoreService{
@@ -7,7 +7,7 @@ export class DataStoreService{
 
 	constructor(private config:ParisConfig){}
 
-	get(endpoint:string, data?:UrlParams, baseUrl?:string):Observable<any>{
+	get(endpoint:string, data?:HttpOptions, baseUrl?:string):Observable<any>{
 		return this.setActiveRequest(Observable.from(Http.get(this.getEndpointUrl(endpoint, baseUrl), data, this.config.http)), HttpVerb.get, endpoint, data);
 	}
 
@@ -16,7 +16,7 @@ export class DataStoreService{
 	// }
 
 	private getEndpointUrl(endpoint:string, baseUrl?:string):string{
-		return `${baseUrl || this.config.apiRoot}/${endpoint}`;
+		return `${baseUrl || this.config.apiRoot || ""}/${endpoint}`;
 	}
 
 	private setActiveRequest(obs:Observable<any>, verb:HttpVerb, endpoint:string, data?:RequestData):Observable<any>{

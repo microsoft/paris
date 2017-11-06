@@ -2,8 +2,8 @@ import {ParisHttpConfig} from "../config/paris-config";
 import {Observable} from "rxjs/Observable";
 
 export class Http{
-	static get(url:string, options:HttpOptions, httpConfig?:ParisHttpConfig):Observable<any>{
-		let fullUrl:string = Http.addParamsToUrl(url),
+	static get(url:string, options?:HttpOptions, httpConfig?:ParisHttpConfig):Observable<any>{
+		let fullUrl:string = options && options.params ? Http.addParamsToUrl(url, options.params) : url,
 			tmpError:Error = new Error(`Failed to GET from ${url}.`);
 
 		return Observable.ajax(Object.assign({

@@ -9,6 +9,7 @@ var cache_1 = require("../services/cache");
 var value_objects_service_1 = require("../services/value-objects.service");
 var _ = require("lodash");
 var data_options_1 = require("../dataset/data.options");
+var dataset_service_1 = require("../services/dataset.service");
 var Repository = /** @class */ (function () {
     function Repository(entity, config, entityConstructor, dataStore, paris) {
         this.entity = entity;
@@ -58,7 +59,7 @@ var Repository = /** @class */ (function () {
     });
     Repository.prototype.createItem = function (itemData, options) {
         if (options === void 0) { options = data_options_1.defaultDataOptions; }
-        return Repository.getModelData(itemData, this.entity, this.config, this.paris);
+        return Repository.getModelData(itemData, this.entity, this.config, this.paris, options);
     };
     Repository.prototype.createNewItem = function () {
         return new this.entityConstructor();
@@ -101,43 +102,15 @@ var Repository = /** @class */ (function () {
                 modelData[entityField.id] = entityField.isArray ? [] : entityField.defaultValue || null;
             }
             else {
-                var propertyRepository_1 = paris.getRepository(entityField.type);
-                if (propertyRepository_1) {
-                    var getPropertyEntityValue$ = void 0;
-                    var mapValueToEntityFieldIndex = Repository.mapToEntityFieldIndex.bind(null, entityField.id);
-                    if (entityField.isArray) {
-                        var propertyMembers$ = propertyValue.map(function (memberData) { return Repository.getEntityItem(propertyRepository_1, memberData, options); });
-                        getPropertyEntityValue$ = Observable_1.Observable.combineLatest.apply(Observable_1.Observable, propertyMembers$).map(mapValueToEntityFieldIndex);
-                    }
-                    else
-                        getPropertyEntityValue$ = Repository.getEntityItem(propertyRepository_1, propertyValue, options).map(mapValueToEntityFieldIndex);
+                var getPropertyEntityValue$ = Repository.getSubModel(entityField, propertyValue, paris, config, options);
+                if (getPropertyEntityValue$)
                     subModels.push(getPropertyEntityValue$);
-                }
                 else {
-                    var valueObjectType_1 = value_objects_service_1.valueObjectsService.getEntityByType(entityField.type);
-                    if (valueObjectType_1) {
-                        var getPropertyEntityValue$ = void 0;
-                        var mapValueToEntityFieldIndex = Repository.mapToEntityFieldIndex.bind(null, entityField.id);
-                        if (entityField.isArray) {
-                            if (propertyValue.length) {
-                                var propertyMembers$ = propertyValue.map(function (memberData) { return Repository.getValueObjectItem(valueObjectType_1, memberData, paris, config, options); });
-                                getPropertyEntityValue$ = Observable_1.Observable.combineLatest.apply(Observable_1.Observable, propertyMembers$).map(mapValueToEntityFieldIndex);
-                            }
-                            else
-                                getPropertyEntityValue$ = Observable_1.Observable.of([]).map(mapValueToEntityFieldIndex);
-                        }
-                        else {
-                            getPropertyEntityValue$ = Repository.getValueObjectItem(valueObjectType_1, propertyValue, paris, config, options).map(mapValueToEntityFieldIndex);
-                        }
-                        subModels.push(getPropertyEntityValue$);
-                    }
-                    else {
-                        modelData[entityField.id] = entityField.isArray
-                            ? propertyValue
-                                ? propertyValue.map(function (elementValue) { return data_transformers_service_1.DataTransformersService.parse(entityField.type, elementValue); })
-                                : []
-                            : data_transformers_service_1.DataTransformersService.parse(entityField.type, propertyValue);
-                    }
+                    modelData[entityField.id] = entityField.isArray
+                        ? propertyValue
+                            ? propertyValue.map(function (elementValue) { return data_transformers_service_1.DataTransformersService.parse(entityField.type, elementValue); })
+                            : []
+                        : data_transformers_service_1.DataTransformersService.parse(entityField.type, propertyValue);
                 }
             }
         });
@@ -181,16 +154,37 @@ var Repository = /** @class */ (function () {
         }
         return entity.readonly ? model$.map(function (model) { return Object.freeze(model); }) : model$;
     };
+    Repository.getSubModel = function (entityField, value, paris, config, options) {
+        if (options === void 0) { options = data_options_1.defaultDataOptions; }
+        var getPropertyEntityValue$;
+        var mapValueToEntityFieldIndex = Repository.mapToEntityFieldIndex.bind(null, entityField.id);
+        var repository = paris.getRepository(entityField.type);
+        var valueObjectType = !repository && value_objects_service_1.valueObjectsService.getEntityByType(entityField.type);
+        if (!repository && !valueObjectType)
+            return null;
+        var getItem = repository ? Repository.getEntityItem.bind(null, repository) : Repository.getValueObjectItem.bind(null, valueObjectType);
+        if (entityField.isArray) {
+            if (value.length) {
+                var propertyMembers$ = value.map(function (memberData) { return getItem(memberData, options, paris, config); });
+                getPropertyEntityValue$ = Observable_1.Observable.combineLatest.apply(Observable_1.Observable, propertyMembers$).map(mapValueToEntityFieldIndex);
+            }
+            else
+                getPropertyEntityValue$ = Observable_1.Observable.of([]).map(mapValueToEntityFieldIndex);
+        }
+        else
+            getPropertyEntityValue$ = getItem(value, options, paris, config).map(mapValueToEntityFieldIndex);
+        return getPropertyEntityValue$;
+    };
     Repository.mapToEntityFieldIndex = function (entityFieldId, value) {
         var data = {};
         data[entityFieldId] = value;
         return data;
     };
-    Repository.getEntityItem = function (repository, itemData, options) {
+    Repository.getEntityItem = function (repository, data, options) {
         if (options === void 0) { options = data_options_1.defaultDataOptions; }
-        return Object(itemData) === itemData ? repository.createItem(itemData, options) : repository.getItemById(itemData, options);
+        return Object(data) === data ? repository.createItem(data, options) : repository.getItemById(data, options);
     };
-    Repository.getValueObjectItem = function (valueObjectType, data, paris, config, options) {
+    Repository.getValueObjectItem = function (valueObjectType, data, options, paris, config) {
         if (options === void 0) { options = data_options_1.defaultDataOptions; }
         // If the value object is one of a list of values, just set it to the model
         if (valueObjectType.hasValue(data))
@@ -201,7 +195,8 @@ var Repository = /** @class */ (function () {
         var _this = this;
         if (dataOptions === void 0) { dataOptions = data_options_1.defaultDataOptions; }
         var getItemsDataSetError = new Error("Failed to get " + this.entity.pluralName + ".");
-        return this.dataStore.get(this.entity.endpoint + "/" + (this.entity.allItemsEndpoint || ''), options, this.baseUrl)
+        var httpOptions = dataset_service_1.DatasetService.dataSetOptionsToHttpOptions(options);
+        return this.dataStore.get(this.entity.endpoint + "/" + (this.entity.allItemsEndpoint || ''), httpOptions, this.baseUrl)
             .map(function (rawDataSet) {
             var allItemsProperty = _this.entity.allItemsProperty || _this.config.allItemsProperty;
             var rawItems = rawDataSet instanceof Array ? rawDataSet : rawDataSet[allItemsProperty];

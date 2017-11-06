@@ -31,3 +31,5 @@ var value_object_decorator_1 = require("./entity/value-object.decorator");
 exports.ValueObject = value_object_decorator_1.ValueObject;
 var entity_decorator_1 = require("./entity/entity.decorator");
 exports.Entity = entity_decorator_1.Entity;
+var dataset_options_sort_1 = require("./dataset/dataset-options-sort");
+exports.DataSetOptionsSortDirection = dataset_options_sort_1.DataSetOptionsSortDirection;

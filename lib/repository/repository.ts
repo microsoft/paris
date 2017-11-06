@@ -1,5 +1,5 @@
 import {ModelEntity} from "../entity/entity.config";
-import {DataEntityConstructor} from "../entity/data-entity.base";
+import {DataEntityConstructor, DataEntityType} from "../entity/data-entity.base";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
 import {Field, FIELD_DATA_SELF} from "../entity/entity-field";
@@ -18,6 +18,8 @@ import {ModelBase} from "../models/model.base";
 import {EntityModelBase} from "../models/entity-model.base";
 import {DataOptions, defaultDataOptions} from "../dataset/data.options";
 import {Paris} from "../services/paris";
+import {DatasetService} from "../services/dataset.service";
+import {HttpOptions} from "../services/http.service";
 
 export class Repository<T extends EntityModelBase> implements IRepository {
 	save$: Observable<T>;
@@ -73,7 +75,7 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 	}
 
 	createItem(itemData: any, options: DataOptions = defaultDataOptions): Observable<T> {
-		return Repository.getModelData(itemData, this.entity, this.config, this.paris);
+		return Repository.getModelData(itemData, this.entity, this.config, this.paris, options);
 	}
 
 	createNewItem(): T {
@@ -122,49 +124,15 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 				modelData[entityField.id] = entityField.isArray ? [] : entityField.defaultValue || null;
 			}
 			else {
-				let propertyRepository: Repository<EntityModelBase> = paris.getRepository(entityField.type);
-
-				if (propertyRepository) {
-					let getPropertyEntityValue$: Observable<Index>;
-					let mapValueToEntityFieldIndex: (value: ModelBase) => ModelPropertyValue = Repository.mapToEntityFieldIndex.bind(null, entityField.id);
-
-					if (entityField.isArray) {
-						let propertyMembers$: Array<Observable<any>> = propertyValue.map((memberData: any) => Repository.getEntityItem(propertyRepository, memberData, options));
-						getPropertyEntityValue$ = Observable.combineLatest.apply(Observable, propertyMembers$).map(mapValueToEntityFieldIndex);
-					}
-					else
-						getPropertyEntityValue$ = Repository.getEntityItem(propertyRepository, propertyValue, options).map(mapValueToEntityFieldIndex);
-
+				const getPropertyEntityValue$ = Repository.getSubModel(entityField, propertyValue, paris, config, options);
+				if (getPropertyEntityValue$)
 					subModels.push(getPropertyEntityValue$);
-				}
 				else {
-					let valueObjectType: EntityConfigBase = valueObjectsService.getEntityByType(entityField.type);
-
-					if (valueObjectType) {
-						let getPropertyEntityValue$: Observable<ModelPropertyValue>;
-						let mapValueToEntityFieldIndex: (value: ModelBase | Array<ModelBase>) => ModelPropertyValue = Repository.mapToEntityFieldIndex.bind(null, entityField.id);
-
-						if (entityField.isArray) {
-							if (propertyValue.length) {
-								let propertyMembers$: Array<Observable<ModelPropertyValue>> = propertyValue.map((memberData: any) => Repository.getValueObjectItem(valueObjectType, memberData, paris, config, options));
-								getPropertyEntityValue$ = Observable.combineLatest.apply(Observable, propertyMembers$).map(mapValueToEntityFieldIndex);
-							}
-							else
-								getPropertyEntityValue$ = Observable.of([]).map(mapValueToEntityFieldIndex);
-						}
-						else {
-							getPropertyEntityValue$ = Repository.getValueObjectItem(valueObjectType, propertyValue, paris, config, options).map(mapValueToEntityFieldIndex);
-						}
-
-						subModels.push(getPropertyEntityValue$);
-					}
-					else {
-						modelData[entityField.id] = entityField.isArray
-							? propertyValue
-								? propertyValue.map((elementValue: any) => DataTransformersService.parse(entityField.type, elementValue))
-								: []
-							: DataTransformersService.parse(entityField.type, propertyValue);
-					}
+					modelData[entityField.id] = entityField.isArray
+						? propertyValue
+							? propertyValue.map((elementValue: any) => DataTransformersService.parse(entityField.type, elementValue))
+							: []
+						: DataTransformersService.parse(entityField.type, propertyValue);
 				}
 			}
 		});
@@ -217,17 +185,43 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 		return entity.readonly ? model$.map(model => Object.freeze(model)) : model$;
 	}
 
+	private static getSubModel(entityField:Field, value:any, paris:Paris, config:ParisConfig, options: DataOptions = defaultDataOptions):Observable<ModelPropertyValue>{
+		let getPropertyEntityValue$: Observable<ModelPropertyValue>;
+		let mapValueToEntityFieldIndex: (value: ModelBase | Array<ModelBase>) => ModelPropertyValue = Repository.mapToEntityFieldIndex.bind(null, entityField.id);
+
+		let repository:Repository<EntityModelBase> = paris.getRepository(entityField.type);
+		let valueObjectType:EntityConfigBase = !repository && valueObjectsService.getEntityByType(entityField.type);
+
+		if (!repository && !valueObjectType)
+			return null;
+
+		const getItem = repository ? Repository.getEntityItem.bind(null, repository) : Repository.getValueObjectItem.bind(null, valueObjectType);
+
+		if (entityField.isArray) {
+			if (value.length) {
+				let propertyMembers$: Array<Observable<ModelPropertyValue>> = value.map((memberData: any) => getItem(memberData, options, paris, config));
+				getPropertyEntityValue$ = Observable.combineLatest.apply(Observable, propertyMembers$).map(mapValueToEntityFieldIndex);
+			}
+			else
+				getPropertyEntityValue$ = Observable.of([]).map(mapValueToEntityFieldIndex);
+		}
+		else
+			getPropertyEntityValue$ = getItem(value, options, paris, config).map(mapValueToEntityFieldIndex);
+
+		return getPropertyEntityValue$;
+	}
+
 	private static mapToEntityFieldIndex(entityFieldId: string, value: ModelBase | Array<ModelBase>): ModelPropertyValue {
 		let data: ModelPropertyValue = {};
 		data[entityFieldId] = value;
 		return data;
 	}
 
-	private static getEntityItem<U extends EntityModelBase>(repository: Repository<U>, itemData: any, options: DataOptions = defaultDataOptions): Observable<U> {
-		return Object(itemData) === itemData ? repository.createItem(itemData, options) : repository.getItemById(itemData, options);
+	private static getEntityItem<U extends EntityModelBase>(repository: Repository<U>, data: any, options: DataOptions = defaultDataOptions): Observable<U> {
+		return Object(data) === data ? repository.createItem(data, options) : repository.getItemById(data, options);
 	}
 
-	private static getValueObjectItem<U extends ModelBase>(valueObjectType: EntityConfigBase, data: any, paris: Paris, config?: ParisConfig, options: DataOptions = defaultDataOptions): Observable<U> {
+	private static getValueObjectItem<U extends ModelBase>(valueObjectType: EntityConfigBase, data: any, options: DataOptions = defaultDataOptions, paris: Paris, config?: ParisConfig): Observable<U> {
 		// If the value object is one of a list of values, just set it to the model
 		if (valueObjectType.hasValue(data))
 			return Observable.of(valueObjectType.getValueById(data));
@@ -237,8 +231,9 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 
 	getItemsDataSet(options?: DataSetOptions, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<T>> {
 		let getItemsDataSetError:Error = new Error(`Failed to get ${this.entity.pluralName}.`);
+		const httpOptions:HttpOptions = DatasetService.dataSetOptionsToHttpOptions(options);
 
-		return this.dataStore.get(`${this.entity.endpoint}/${this.entity.allItemsEndpoint || ''}`, options, this.baseUrl)
+		return this.dataStore.get(`${this.entity.endpoint}/${this.entity.allItemsEndpoint || ''}`, httpOptions, this.baseUrl)
 			.map((rawDataSet: any) => {
 				const allItemsProperty = this.entity.allItemsProperty || this.config.allItemsProperty;
 

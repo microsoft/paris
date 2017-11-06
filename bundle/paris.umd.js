@@ -434,9 +434,58 @@ exports.defaultDataOptions = {
 
 unwrapExports(data_options);
 
+var datasetOptionsSort = createCommonjsModule(function (module, exports) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var DataSetOptionsSortDirection;
+(function (DataSetOptionsSortDirection) {
+    DataSetOptionsSortDirection[DataSetOptionsSortDirection["ascending"] = 0] = "ascending";
+    DataSetOptionsSortDirection[DataSetOptionsSortDirection["descending"] = 1] = "descending";
+})(DataSetOptionsSortDirection = exports.DataSetOptionsSortDirection || (exports.DataSetOptionsSortDirection = {}));
+});
+
+unwrapExports(datasetOptionsSort);
+
+var dataset_service = createCommonjsModule(function (module, exports) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+
+var DatasetService = /** @class */ (function () {
+    function DatasetService() {
+    }
+    DatasetService.dataSetOptionsToHttpOptions = function (dataSetOptions) {
+        if (!dataSetOptions)
+            return null;
+        var httpOptions = {};
+        if (dataSetOptions.params) {
+            httpOptions.params = {};
+            if (dataSetOptions.params.pageSize && dataSetOptions.params.pageSize > 0)
+                httpOptions.params.pagesize = dataSetOptions.params.pageSize;
+            if (dataSetOptions.params.page && dataSetOptions.params.page > 1)
+                httpOptions.params.page = dataSetOptions.params.page;
+            if (dataSetOptions.params.sortBy) {
+                httpOptions.params.sortBy = dataSetOptions.params.sortBy.map(function (sortField) {
+                    return "" + (sortField.direction === datasetOptionsSort.DataSetOptionsSortDirection.descending ? '-' : '') + sortField.field;
+                }).join(",");
+            }
+            if (dataSetOptions.params.query)
+                Object.assign(httpOptions.params, dataSetOptions.params.query);
+        }
+        if (dataSetOptions.data)
+            httpOptions.data = dataSetOptions.data;
+        return httpOptions;
+    };
+    return DatasetService;
+}());
+exports.DatasetService = DatasetService;
+});
+
+unwrapExports(dataset_service);
+
 var repository = createCommonjsModule(function (module, exports) {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+
 
 
 
@@ -495,7 +544,7 @@ var Repository = /** @class */ (function () {
     });
     Repository.prototype.createItem = function (itemData, options) {
         if (options === void 0) { options = data_options.defaultDataOptions; }
-        return Repository.getModelData(itemData, this.entity, this.config, this.paris);
+        return Repository.getModelData(itemData, this.entity, this.config, this.paris, options);
     };
     Repository.prototype.createNewItem = function () {
         return new this.entityConstructor();
@@ -538,43 +587,15 @@ var Repository = /** @class */ (function () {
                 modelData[entityField$$1.id] = entityField$$1.isArray ? [] : entityField$$1.defaultValue || null;
             }
             else {
-                var propertyRepository_1 = paris.getRepository(entityField$$1.type);
-                if (propertyRepository_1) {
-                    var getPropertyEntityValue$ = void 0;
-                    var mapValueToEntityFieldIndex = Repository.mapToEntityFieldIndex.bind(null, entityField$$1.id);
-                    if (entityField$$1.isArray) {
-                        var propertyMembers$ = propertyValue.map(function (memberData) { return Repository.getEntityItem(propertyRepository_1, memberData, options); });
-                        getPropertyEntityValue$ = Observable_1.Observable.combineLatest.apply(Observable_1.Observable, propertyMembers$).map(mapValueToEntityFieldIndex);
-                    }
-                    else
-                        getPropertyEntityValue$ = Repository.getEntityItem(propertyRepository_1, propertyValue, options).map(mapValueToEntityFieldIndex);
+                var getPropertyEntityValue$ = Repository.getSubModel(entityField$$1, propertyValue, paris, config, options);
+                if (getPropertyEntityValue$)
                     subModels.push(getPropertyEntityValue$);
-                }
                 else {
-                    var valueObjectType_1 = valueObjects_service.valueObjectsService.getEntityByType(entityField$$1.type);
-                    if (valueObjectType_1) {
-                        var getPropertyEntityValue$ = void 0;
-                        var mapValueToEntityFieldIndex = Repository.mapToEntityFieldIndex.bind(null, entityField$$1.id);
-                        if (entityField$$1.isArray) {
-                            if (propertyValue.length) {
-                                var propertyMembers$ = propertyValue.map(function (memberData) { return Repository.getValueObjectItem(valueObjectType_1, memberData, paris, config, options); });
-                                getPropertyEntityValue$ = Observable_1.Observable.combineLatest.apply(Observable_1.Observable, propertyMembers$).map(mapValueToEntityFieldIndex);
-                            }
-                            else
-                                getPropertyEntityValue$ = Observable_1.Observable.of([]).map(mapValueToEntityFieldIndex);
-                        }
-                        else {
-                            getPropertyEntityValue$ = Repository.getValueObjectItem(valueObjectType_1, propertyValue, paris, config, options).map(mapValueToEntityFieldIndex);
-                        }
-                        subModels.push(getPropertyEntityValue$);
-                    }
-                    else {
-                        modelData[entityField$$1.id] = entityField$$1.isArray
-                            ? propertyValue
-                                ? propertyValue.map(function (elementValue) { return dataTransformers_service.DataTransformersService.parse(entityField$$1.type, elementValue); })
-                                : []
-                            : dataTransformers_service.DataTransformersService.parse(entityField$$1.type, propertyValue);
-                    }
+                    modelData[entityField$$1.id] = entityField$$1.isArray
+                        ? propertyValue
+                            ? propertyValue.map(function (elementValue) { return dataTransformers_service.DataTransformersService.parse(entityField$$1.type, elementValue); })
+                            : []
+                        : dataTransformers_service.DataTransformersService.parse(entityField$$1.type, propertyValue);
                 }
             }
         });
@@ -618,16 +639,37 @@ var Repository = /** @class */ (function () {
         }
         return entity.readonly ? model$.map(function (model) { return Object.freeze(model); }) : model$;
     };
+    Repository.getSubModel = function (entityField$$1, value, paris, config, options) {
+        if (options === void 0) { options = data_options.defaultDataOptions; }
+        var getPropertyEntityValue$;
+        var mapValueToEntityFieldIndex = Repository.mapToEntityFieldIndex.bind(null, entityField$$1.id);
+        var repository = paris.getRepository(entityField$$1.type);
+        var valueObjectType = !repository && valueObjects_service.valueObjectsService.getEntityByType(entityField$$1.type);
+        if (!repository && !valueObjectType)
+            return null;
+        var getItem = repository ? Repository.getEntityItem.bind(null, repository) : Repository.getValueObjectItem.bind(null, valueObjectType);
+        if (entityField$$1.isArray) {
+            if (value.length) {
+                var propertyMembers$ = value.map(function (memberData) { return getItem(memberData, options, paris, config); });
+                getPropertyEntityValue$ = Observable_1.Observable.combineLatest.apply(Observable_1.Observable, propertyMembers$).map(mapValueToEntityFieldIndex);
+            }
+            else
+                getPropertyEntityValue$ = Observable_1.Observable.of([]).map(mapValueToEntityFieldIndex);
+        }
+        else
+            getPropertyEntityValue$ = getItem(value, options, paris, config).map(mapValueToEntityFieldIndex);
+        return getPropertyEntityValue$;
+    };
     Repository.mapToEntityFieldIndex = function (entityFieldId, value) {
         var data = {};
         data[entityFieldId] = value;
         return data;
     };
-    Repository.getEntityItem = function (repository, itemData, options) {
+    Repository.getEntityItem = function (repository, data, options) {
         if (options === void 0) { options = data_options.defaultDataOptions; }
-        return Object(itemData) === itemData ? repository.createItem(itemData, options) : repository.getItemById(itemData, options);
+        return Object(data) === data ? repository.createItem(data, options) : repository.getItemById(data, options);
     };
-    Repository.getValueObjectItem = function (valueObjectType, data, paris, config, options) {
+    Repository.getValueObjectItem = function (valueObjectType, data, options, paris, config) {
         if (options === void 0) { options = data_options.defaultDataOptions; }
         // If the value object is one of a list of values, just set it to the model
         if (valueObjectType.hasValue(data))
@@ -638,7 +680,8 @@ var Repository = /** @class */ (function () {
         var _this = this;
         if (dataOptions === void 0) { dataOptions = data_options.defaultDataOptions; }
         var getItemsDataSetError = new Error("Failed to get " + this.entity.pluralName + ".");
-        return this.dataStore.get(this.entity.endpoint + "/" + (this.entity.allItemsEndpoint || ''), options, this.baseUrl)
+        var httpOptions = dataset_service.DatasetService.dataSetOptionsToHttpOptions(options);
+        return this.dataStore.get(this.entity.endpoint + "/" + (this.entity.allItemsEndpoint || ''), httpOptions, this.baseUrl)
             .map(function (rawDataSet) {
             var allItemsProperty = _this.entity.allItemsProperty || _this.config.allItemsProperty;
             var rawItems = rawDataSet instanceof Array ? rawDataSet : rawDataSet[allItemsProperty];
@@ -763,7 +806,7 @@ var Http = /** @class */ (function () {
     function Http() {
     }
     Http.get = function (url, options, httpConfig) {
-        var fullUrl = Http.addParamsToUrl(url), tmpError = new Error("Failed to GET from " + url + ".");
+        var fullUrl = options && options.params ? Http.addParamsToUrl(url, options.params) : url, tmpError = new Error("Failed to GET from " + url + ".");
         return Observable_1.Observable.ajax(Object.assign({
             url: fullUrl
         }, Http.httpOptionsToRequestInit(options, httpConfig)))
@@ -821,7 +864,7 @@ var DataStoreService = /** @class */ (function () {
     // 	return this.http.post(this.getEndpointUrl(endpoint, baseUrl), data);
     // }
     DataStoreService.prototype.getEndpointUrl = function (endpoint, baseUrl) {
-        return (baseUrl || this.config.apiRoot) + "/" + endpoint;
+        return (baseUrl || this.config.apiRoot || "") + "/" + endpoint;
     };
     DataStoreService.prototype.setActiveRequest = function (obs, verb, endpoint, data) {
         var _this = this;
@@ -1033,6 +1076,8 @@ exports.EntityField = entityField_decorator.EntityField;
 exports.ValueObject = valueObject_decorator.ValueObject;
 
 exports.Entity = entity_decorator.Entity;
+
+exports.DataSetOptionsSortDirection = datasetOptionsSort.DataSetOptionsSortDirection;
 });
 
 var main$1 = unwrapExports(main);
@@ -1045,6 +1090,7 @@ var main_6 = main.ModelEntity;
 var main_7 = main.EntityField;
 var main_8 = main.ValueObject;
 var main_9 = main.Entity;
+var main_10 = main.DataSetOptionsSortDirection;
 
 exports['default'] = main$1;
 exports.Paris = main_1;
@@ -1056,6 +1102,7 @@ exports.ModelEntity = main_6;
 exports.EntityField = main_7;
 exports.ValueObject = main_8;
 exports.Entity = main_9;
+exports.DataSetOptionsSortDirection = main_10;
 
 Object.defineProperty(exports, '__esModule', { value: true });
 

@@ -40,9 +40,10 @@ export declare class Repository<T extends EntityModelBase> implements IRepositor
      * @returns {Observable<T extends EntityModelBase>}
      */
     private static getModelData<T>(rawData, entity, config, paris, options?);
+    private static getSubModel(entityField, value, paris, config, options?);
     private static mapToEntityFieldIndex(entityFieldId, value);
-    private static getEntityItem<U>(repository, itemData, options?);
-    private static getValueObjectItem<U>(valueObjectType, data, paris, config?, options?);
+    private static getEntityItem<U>(repository, data, options?);
+    private static getValueObjectItem<U>(valueObjectType, data, options, paris, config?);
     getItemsDataSet(options?: DataSetOptions, dataOptions?: DataOptions): Observable<DataSet<T>>;
     getItemById(itemId: string | number, options?: DataOptions): Observable<T>;
     private setAllItems();
