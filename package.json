@@ -55,7 +55,8 @@
     "standard-version": "^3.0.0",
     "systemjs": ">=0.20.12",
     "typescript": "^2.4.2",
-    "zone.js": ">=0.8.7"
+    "zone.js": ">=0.8.7",
+	  "run-sequence": "^2.2.0"
   },
   "peerDependencies": {
     "core-js": ">=2.4.1",
