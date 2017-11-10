@@ -4,6 +4,8 @@ import {EntityModelConfigBase} from "../models/entity-config-base.interface";
 import {Immutability} from "../services/immutability";
 import {DataEntityConstructor} from "./data-entity.base";
 
+const DEFAULT_VALUE_ID = "__default";
+
 export class EntityConfigBase{
 	singularName:string;
 	pluralName:string;
@@ -24,7 +26,9 @@ export class EntityConfigBase{
 				this._valuesMap = null;
 			else {
 				this._valuesMap = new Map;
-				this.values.forEach(value => this._valuesMap.set(value.id, Object.freeze(value)));
+				this.values.forEach(value => {
+					this._valuesMap.set(value.id === undefined || value.id === null ? DEFAULT_VALUE_ID : value.id, Object.freeze(value));
+				});
 			}
 		}
 
@@ -42,6 +46,10 @@ export class EntityConfigBase{
 
 	getValueById<T>(valueId:string|number):T{
 		return this.valuesMap ? this.valuesMap.get(valueId) : null;
+	}
+
+	getDefaultValue<T>():T{
+		return this.getValueById(DEFAULT_VALUE_ID) || null;
 	}
 
 	hasValue(valueId:string|number):boolean{

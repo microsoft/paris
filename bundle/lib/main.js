@@ -33,3 +33,5 @@ var entity_decorator_1 = require("./entity/entity.decorator");
 exports.Entity = entity_decorator_1.Entity;
 var dataset_options_sort_1 = require("./dataset/dataset-options-sort");
 exports.DataSetOptionsSortDirection = dataset_options_sort_1.DataSetOptionsSortDirection;
+var data_availability_enum_1 = require("./dataset/data-availability.enum");
+exports.DataAvailability = data_availability_enum_1.DataAvailability;

@@ -15,6 +15,7 @@ export declare class EntityConfigBase {
     private readonly valuesMap;
     constructor(config: IEntityConfigBase, entityConstructor: DataEntityConstructor<any>);
     getValueById<T>(valueId: string | number): T;
+    getDefaultValue<T>(): T;
     hasValue(valueId: string | number): boolean;
 }
 export interface IEntityConfigBase {

@@ -10,6 +10,7 @@ var value_objects_service_1 = require("../services/value-objects.service");
 var _ = require("lodash");
 var data_options_1 = require("../dataset/data.options");
 var dataset_service_1 = require("../services/dataset.service");
+var data_availability_enum_1 = require("../dataset/data-availability.enum");
 var Repository = /** @class */ (function () {
     function Repository(entity, config, entityConstructor, dataStore, paris) {
         this.entity = entity;
@@ -58,7 +59,7 @@ var Repository = /** @class */ (function () {
         configurable: true
     });
     Repository.prototype.createItem = function (itemData, options) {
-        if (options === void 0) { options = data_options_1.defaultDataOptions; }
+        if (options === void 0) { options = { allowCache: true, availability: data_availability_enum_1.DataAvailability.available }; }
         return Repository.getModelData(itemData, this.entity, this.config, this.paris, options);
     };
     Repository.prototype.createNewItem = function () {
@@ -162,7 +163,9 @@ var Repository = /** @class */ (function () {
         var valueObjectType = !repository && value_objects_service_1.valueObjectsService.getEntityByType(entityField.type);
         if (!repository && !valueObjectType)
             return null;
-        var getItem = repository ? Repository.getEntityItem.bind(null, repository) : Repository.getValueObjectItem.bind(null, valueObjectType);
+        var getItem = repository
+            ? Repository.getEntityItem.bind(null, repository)
+            : Repository.getValueObjectItem.bind(null, valueObjectType);
         if (entityField.isArray) {
             if (value.length) {
                 var propertyMembers$ = value.map(function (memberData) { return getItem(memberData, options, paris, config); });
@@ -172,7 +175,8 @@ var Repository = /** @class */ (function () {
                 getPropertyEntityValue$ = Observable_1.Observable.of([]).map(mapValueToEntityFieldIndex);
         }
         else
-            getPropertyEntityValue$ = getItem(value, options, paris, config).map(mapValueToEntityFieldIndex);
+            getPropertyEntityValue$ = getItem(value, options, paris, config)
+                .map(mapValueToEntityFieldIndex);
         return getPropertyEntityValue$;
     };
     Repository.mapToEntityFieldIndex = function (entityFieldId, value) {
@@ -187,8 +191,8 @@ var Repository = /** @class */ (function () {
     Repository.getValueObjectItem = function (valueObjectType, data, options, paris, config) {
         if (options === void 0) { options = data_options_1.defaultDataOptions; }
         // If the value object is one of a list of values, just set it to the model
-        if (valueObjectType.hasValue(data))
-            return Observable_1.Observable.of(valueObjectType.getValueById(data));
+        if (valueObjectType.values)
+            return Observable_1.Observable.of(valueObjectType.getValueById(data) || valueObjectType.getDefaultValue() || null);
         return Repository.getModelData(data, valueObjectType, config, paris, options);
     };
     Repository.prototype.getItemsDataSet = function (options, dataOptions) {
@@ -225,8 +229,7 @@ var Repository = /** @class */ (function () {
         if (options === void 0) { options = data_options_1.defaultDataOptions; }
         if (this.entity.values) {
             var entityValue = this.entity.getValueById(itemId);
-            if (entityValue)
-                return Observable_1.Observable.of(entityValue);
+            return Observable_1.Observable.of(entityValue || this.entity.getDefaultValue());
         }
         if (options.allowCache !== false && this.entity.cache)
             return this.cache.get(itemId);

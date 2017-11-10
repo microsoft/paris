@@ -20,6 +20,7 @@ import {DataOptions, defaultDataOptions} from "../dataset/data.options";
 import {Paris} from "../services/paris";
 import {DatasetService} from "../services/dataset.service";
 import {HttpOptions} from "../services/http.service";
+import {DataAvailability} from "../dataset/data-availability.enum";
 
 export class Repository<T extends EntityModelBase> implements IRepository {
 	save$: Observable<T>;
@@ -74,7 +75,7 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 		this.save$ = this._saveSubject$.asObservable();
 	}
 
-	createItem(itemData: any, options: DataOptions = defaultDataOptions): Observable<T> {
+	createItem(itemData: any, options: DataOptions = { allowCache: true, availability: DataAvailability.available }): Observable<T> {
 		return Repository.getModelData(itemData, this.entity, this.config, this.paris, options);
 	}
 
@@ -195,7 +196,9 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 		if (!repository && !valueObjectType)
 			return null;
 
-		const getItem = repository ? Repository.getEntityItem.bind(null, repository) : Repository.getValueObjectItem.bind(null, valueObjectType);
+		const getItem = repository
+			? Repository.getEntityItem.bind(null, repository)
+			: Repository.getValueObjectItem.bind(null, valueObjectType);
 
 		if (entityField.isArray) {
 			if (value.length) {
@@ -206,7 +209,8 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 				getPropertyEntityValue$ = Observable.of([]).map(mapValueToEntityFieldIndex);
 		}
 		else
-			getPropertyEntityValue$ = getItem(value, options, paris, config).map(mapValueToEntityFieldIndex);
+			getPropertyEntityValue$ = getItem(value, options, paris, config)
+				.map(mapValueToEntityFieldIndex);
 
 		return getPropertyEntityValue$;
 	}
@@ -223,8 +227,8 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 
 	private static getValueObjectItem<U extends ModelBase>(valueObjectType: EntityConfigBase, data: any, options: DataOptions = defaultDataOptions, paris: Paris, config?: ParisConfig): Observable<U> {
 		// If the value object is one of a list of values, just set it to the model
-		if (valueObjectType.hasValue(data))
-			return Observable.of(valueObjectType.getValueById(data));
+		if (valueObjectType.values)
+			return Observable.of(valueObjectType.getValueById(data) || valueObjectType.getDefaultValue() || null);
 
 		return Repository.getModelData(data, valueObjectType, config, paris, options);
 	}
@@ -264,8 +268,7 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 	getItemById(itemId: string | number, options: DataOptions = defaultDataOptions): Observable<T> {
 		if (this.entity.values) {
 			const entityValue: T = this.entity.getValueById(itemId);
-			if (entityValue)
-				return Observable.of(entityValue);
+			return Observable.of(entityValue || this.entity.getDefaultValue());
 		}
 
 		if (options.allowCache !== false && this.entity.cache)

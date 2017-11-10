@@ -25,3 +25,4 @@ export { ValueObject } from "./entity/value-object.decorator";
 export { Entity } from "./entity/entity.decorator";
 export { DataSetOptionsSortDirection, DataSetOptionsSortField } from "./dataset/dataset-options-sort";
 export { HttpOptions } from "./services/http.service";
+export { DataAvailability } from "./dataset/data-availability.enum";
