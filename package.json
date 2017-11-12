@@ -59,11 +59,7 @@
 	  "run-sequence": "^2.2.0"
   },
   "peerDependencies": {
-    "core-js": ">=2.4.1",
-    "intl": "^1.2.5",
     "rxjs": ">=5.2.0",
-    "systemjs": ">=0.20.12",
-    "zone.js": ">=0.8.7",
     "lodash.get": ">=4.4.2"
   }
 }
