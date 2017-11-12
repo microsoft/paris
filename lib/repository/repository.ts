@@ -21,6 +21,7 @@ import {Paris} from "../services/paris";
 import {DatasetService} from "../services/dataset.service";
 import {HttpOptions} from "../services/http.service";
 import {DataAvailability} from "../dataset/data-availability.enum";
+import {ErrorsService} from "../services/errors.service";
 
 export class Repository<T extends EntityModelBase> implements IRepository {
 	save$: Observable<T>;
@@ -118,11 +119,18 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 				propertyValue = rawData[entityField.id];
 
 			if (propertyValue === undefined || propertyValue === null) {
-				if (entityField.required) {
+				let fieldRepository:Repository<EntityModelBase> = paris.getRepository(entityField.type);
+				let fieldValueObjectType:EntityConfigBase = !fieldRepository && valueObjectsService.getEntityByType(entityField.type);
+
+				let defaultValue:any = fieldRepository && fieldRepository.entity.getDefaultValue()
+					|| fieldValueObjectType && fieldValueObjectType.getDefaultValue()
+					|| (entityField.isArray ? [] : entityField.defaultValue || null);
+
+				if (!defaultValue && entityField.required) {
 					getModelDataError.message = getModelDataError.message + ` Field ${entityField.id} is required but it's ${propertyValue}.`;
 					throw getModelDataError;
 				}
-				modelData[entityField.id] = entityField.isArray ? [] : entityField.defaultValue || null;
+				modelData[entityField.id] = defaultValue;
 			}
 			else {
 				const getPropertyEntityValue$ = Repository.getSubModel(entityField, propertyValue, paris, config, options);
@@ -244,7 +252,7 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 				let rawItems: Array<any> = rawDataSet instanceof Array ? rawDataSet : rawDataSet[allItemsProperty];
 
 				if (!rawItems)
-					console.warn(`Property '${this.config.allItemsProperty}' wasn't found in DataSet for Entity '${this.entity.pluralName}'.`);
+					ErrorsService.warn(`Property '${this.config.allItemsProperty}' wasn't found in DataSet for Entity '${this.entity.pluralName}'.`);
 				return {
 					count: rawDataSet.count,
 					items: rawItems
@@ -267,7 +275,15 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 
 	getItemById(itemId: string | number, options: DataOptions = defaultDataOptions): Observable<T> {
 		if (this.entity.values) {
-			const entityValue: T = this.entity.getValueById(itemId);
+
+			let entityValue: T;
+			if (itemId !== null && itemId !== undefined){
+				if (this.entity.hasValue(itemId))
+					entityValue = this.entity.getValueById(itemId);
+				else
+					ErrorsService.warn(`Unknown value for ${this.entity.singularName}: `, itemId);
+			}
+
 			return Observable.of(entityValue || this.entity.getDefaultValue());
 		}
 

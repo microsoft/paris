@@ -11,6 +11,7 @@ var _ = require("lodash");
 var data_options_1 = require("../dataset/data.options");
 var dataset_service_1 = require("../services/dataset.service");
 var data_availability_enum_1 = require("../dataset/data-availability.enum");
+var errors_service_1 = require("../services/errors.service");
 var Repository = /** @class */ (function () {
     function Repository(entity, config, entityConstructor, dataStore, paris) {
         this.entity = entity;
@@ -96,11 +97,16 @@ var Repository = /** @class */ (function () {
             else
                 propertyValue = rawData[entityField.id];
             if (propertyValue === undefined || propertyValue === null) {
-                if (entityField.required) {
+                var fieldRepository = paris.getRepository(entityField.type);
+                var fieldValueObjectType = !fieldRepository && value_objects_service_1.valueObjectsService.getEntityByType(entityField.type);
+                var defaultValue = fieldRepository && fieldRepository.entity.getDefaultValue()
+                    || fieldValueObjectType && fieldValueObjectType.getDefaultValue()
+                    || (entityField.isArray ? [] : entityField.defaultValue || null);
+                if (!defaultValue && entityField.required) {
                     getModelDataError.message = getModelDataError.message + (" Field " + entityField.id + " is required but it's " + propertyValue + ".");
                     throw getModelDataError;
                 }
-                modelData[entityField.id] = entityField.isArray ? [] : entityField.defaultValue || null;
+                modelData[entityField.id] = defaultValue;
             }
             else {
                 var getPropertyEntityValue$ = Repository.getSubModel(entityField, propertyValue, paris, config, options);
@@ -205,7 +211,7 @@ var Repository = /** @class */ (function () {
             var allItemsProperty = _this.entity.allItemsProperty || _this.config.allItemsProperty;
             var rawItems = rawDataSet instanceof Array ? rawDataSet : rawDataSet[allItemsProperty];
             if (!rawItems)
-                console.warn("Property '" + _this.config.allItemsProperty + "' wasn't found in DataSet for Entity '" + _this.entity.pluralName + "'.");
+                errors_service_1.ErrorsService.warn("Property '" + _this.config.allItemsProperty + "' wasn't found in DataSet for Entity '" + _this.entity.pluralName + "'.");
             return {
                 count: rawDataSet.count,
                 items: rawItems
@@ -228,7 +234,13 @@ var Repository = /** @class */ (function () {
         var _this = this;
         if (options === void 0) { options = data_options_1.defaultDataOptions; }
         if (this.entity.values) {
-            var entityValue = this.entity.getValueById(itemId);
+            var entityValue = void 0;
+            if (itemId !== null && itemId !== undefined) {
+                if (this.entity.hasValue(itemId))
+                    entityValue = this.entity.getValueById(itemId);
+                else
+                    errors_service_1.ErrorsService.warn("Unknown value for " + this.entity.singularName + ": ", itemId);
+            }
             return Observable_1.Observable.of(entityValue || this.entity.getDefaultValue());
         }
         if (options.allowCache !== false && this.entity.cache)

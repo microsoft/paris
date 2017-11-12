@@ -488,9 +488,30 @@ exports.DatasetService = DatasetService;
 
 unwrapExports(dataset_service);
 
+var errors_service = createCommonjsModule(function (module, exports) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var ErrorsService = /** @class */ (function () {
+    function ErrorsService() {
+    }
+    ErrorsService.warn = function () {
+        var items = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            items[_i] = arguments[_i];
+        }
+        return console && console.warn.apply(console, ["Paris warning: "].concat(items, [new Error().stack]));
+    };
+    return ErrorsService;
+}());
+exports.ErrorsService = ErrorsService;
+});
+
+unwrapExports(errors_service);
+
 var repository = createCommonjsModule(function (module, exports) {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+
 
 
 
@@ -587,11 +608,16 @@ var Repository = /** @class */ (function () {
             else
                 propertyValue = rawData[entityField$$1.id];
             if (propertyValue === undefined || propertyValue === null) {
-                if (entityField$$1.required) {
+                var fieldRepository = paris.getRepository(entityField$$1.type);
+                var fieldValueObjectType = !fieldRepository && valueObjects_service.valueObjectsService.getEntityByType(entityField$$1.type);
+                var defaultValue = fieldRepository && fieldRepository.entity.getDefaultValue()
+                    || fieldValueObjectType && fieldValueObjectType.getDefaultValue()
+                    || (entityField$$1.isArray ? [] : entityField$$1.defaultValue || null);
+                if (!defaultValue && entityField$$1.required) {
                     getModelDataError.message = getModelDataError.message + (" Field " + entityField$$1.id + " is required but it's " + propertyValue + ".");
                     throw getModelDataError;
                 }
-                modelData[entityField$$1.id] = entityField$$1.isArray ? [] : entityField$$1.defaultValue || null;
+                modelData[entityField$$1.id] = defaultValue;
             }
             else {
                 var getPropertyEntityValue$ = Repository.getSubModel(entityField$$1, propertyValue, paris, config, options);
@@ -696,7 +722,7 @@ var Repository = /** @class */ (function () {
             var allItemsProperty = _this.entity.allItemsProperty || _this.config.allItemsProperty;
             var rawItems = rawDataSet instanceof Array ? rawDataSet : rawDataSet[allItemsProperty];
             if (!rawItems)
-                console.warn("Property '" + _this.config.allItemsProperty + "' wasn't found in DataSet for Entity '" + _this.entity.pluralName + "'.");
+                errors_service.ErrorsService.warn("Property '" + _this.config.allItemsProperty + "' wasn't found in DataSet for Entity '" + _this.entity.pluralName + "'.");
             return {
                 count: rawDataSet.count,
                 items: rawItems
@@ -719,7 +745,13 @@ var Repository = /** @class */ (function () {
         var _this = this;
         if (options === void 0) { options = data_options.defaultDataOptions; }
         if (this.entity.values) {
-            var entityValue = this.entity.getValueById(itemId);
+            var entityValue = void 0;
+            if (itemId !== null && itemId !== undefined) {
+                if (this.entity.hasValue(itemId))
+                    entityValue = this.entity.getValueById(itemId);
+                else
+                    errors_service.ErrorsService.warn("Unknown value for " + this.entity.singularName + ": ", itemId);
+            }
             return Observable_1.Observable.of(entityValue || this.entity.getDefaultValue());
         }
         if (options.allowCache !== false && this.entity.cache)
