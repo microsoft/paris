@@ -6,10 +6,6 @@ export class EntityModelBase extends ModelBase{
 	@EntityField()
 	id:string|number;
 
-	get isNew():boolean{
-		return this.id === null || this.id === undefined;
-	}
-
 	constructor(data:EntityModelConfigBase){
 		super(data);
 	}

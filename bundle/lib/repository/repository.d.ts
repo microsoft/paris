@@ -7,6 +7,8 @@ import { ParisConfig } from "../config/paris-config";
 import { DataSetOptions } from "../dataset/dataset-options";
 import { DataSet } from "../dataset/dataset";
 import { Index } from "../models/index";
+import { EntityConfigBase } from "../entity/entity-config.base";
+import { ModelBase } from "../models/model.base";
 import { EntityModelBase } from "../models/entity-model.base";
 import { DataOptions } from "../dataset/data.options";
 import { Paris } from "../services/paris";
@@ -39,7 +41,7 @@ export declare class Repository<T extends EntityModelBase> implements IRepositor
      * @param {DataOptions} options
      * @returns {Observable<T extends EntityModelBase>}
      */
-    private static getModelData<T>(rawData, entity, config, paris, options?);
+    static getModelData<T extends ModelBase>(rawData: Index, entity: EntityConfigBase, config: ParisConfig, paris: Paris, options?: DataOptions): Observable<T>;
     private static getSubModel(entityField, value, paris, config, options?);
     private static mapToEntityFieldIndex(entityFieldId, value);
     private static getEntityItem<U>(repository, data, options?);

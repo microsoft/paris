@@ -12,7 +12,9 @@ import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/observable/merge';
 import 'rxjs/add/observable/dom/ajax';
 
+export {DataEntityType} from "./entity/data-entity.base";
 export {Paris} from "./services/paris";
+export {DataStoreService} from "./services/data-store.service";
 export {EntityModelBase} from "./models/entity-model.base";
 export {ModelBase} from "./models/model.base";
 export {Repository} from "./repository/repository";

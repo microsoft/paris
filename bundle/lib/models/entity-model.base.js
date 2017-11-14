@@ -26,13 +26,6 @@ var EntityModelBase = /** @class */ (function (_super) {
     function EntityModelBase(data) {
         return _super.call(this, data) || this;
     }
-    Object.defineProperty(EntityModelBase.prototype, "isNew", {
-        get: function () {
-            return this.id === null || this.id === undefined;
-        },
-        enumerable: true,
-        configurable: true
-    });
     __decorate([
         entity_field_decorator_1.EntityField(),
         __metadata("design:type", Object)

@@ -15,6 +15,8 @@ require("rxjs/add/observable/merge");
 require("rxjs/add/observable/dom/ajax");
 var paris_1 = require("./services/paris");
 exports.Paris = paris_1.Paris;
+var data_store_service_1 = require("./services/data-store.service");
+exports.DataStoreService = data_store_service_1.DataStoreService;
 var entity_model_base_1 = require("./models/entity-model.base");
 exports.EntityModelBase = entity_model_base_1.EntityModelBase;
 var model_base_1 = require("./models/model.base");

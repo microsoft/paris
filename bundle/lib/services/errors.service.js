@@ -8,7 +8,7 @@ var ErrorsService = /** @class */ (function () {
         for (var _i = 0; _i < arguments.length; _i++) {
             items[_i] = arguments[_i];
         }
-        return console && console.warn.apply(console, ["Paris warning: "].concat(items, [new Error().stack]));
+        return console && console.warn.apply(console, ["Paris warning: "].concat(items));
     };
     return ErrorsService;
 }());

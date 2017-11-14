@@ -6,10 +6,11 @@ import {ModelEntity} from "../entity/entity.config";
 import {entitiesService} from "./entities.service";
 import {IRepository} from "../repository/repository.interface";
 import {DataStoreService} from "./data-store.service";
+import {EntityConfigBase} from "../entity/entity-config.base";
 
 export class Paris{
 	private repositories:Map<DataEntityType, IRepository> = new Map();
-	private dataStore:DataStoreService;
+	readonly dataStore:DataStoreService;
 	readonly config:ParisConfig;
 
 	constructor(config?:ParisConfig){
@@ -29,5 +30,9 @@ export class Paris{
 		}
 
 		return repository;
+	}
+
+	getModelBaseConfig(entityConstructor:DataEntityType):EntityConfigBase{
+		return entityConstructor.entityConfig || entityConstructor.valueObjectConfig;
 	}
 }

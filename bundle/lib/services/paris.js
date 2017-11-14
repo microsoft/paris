@@ -21,6 +21,9 @@ var Paris = /** @class */ (function () {
         }
         return repository;
     };
+    Paris.prototype.getModelBaseConfig = function (entityConstructor) {
+        return entityConstructor.entityConfig || entityConstructor.valueObjectConfig;
+    };
     return Paris;
 }());
 exports.Paris = Paris;

@@ -50,11 +50,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var Immutability = /** @class */ (function () {
     function Immutability() {
     }
-    Immutability.freeze = function (obj) {
+    /**
+     * Deep-freezes an object
+     * @param {T} obj The object to freeze
+     * @param {Set<any>} excluded For internal use, used to avoid infinite recursion, when a parent object is references in one of its children
+     * @returns {Readonly<T>}
+     */
+    Immutability.freeze = function (obj, excluded) {
+        if (excluded && excluded.has(obj))
+            return obj;
         if (!Object.isFrozen(obj))
             Object.freeze(obj);
-        if (Object(obj) === obj)
-            Object.getOwnPropertyNames(obj).forEach(function (prop) { return Immutability.freeze(obj[prop]); });
+        if (Object(obj) === "object") {
+            var childrenExcluded_1 = excluded ? new Set(excluded) : new Set;
+            Object.getOwnPropertyNames(obj).forEach(function (prop) { return Immutability.freeze(obj[prop], childrenExcluded_1); });
+        }
         return obj;
     };
     Immutability.unfreeze = function (obj) {
@@ -499,7 +509,7 @@ var ErrorsService = /** @class */ (function () {
         for (var _i = 0; _i < arguments.length; _i++) {
             items[_i] = arguments[_i];
         }
-        return console && console.warn.apply(console, ["Paris warning: "].concat(items, [new Error().stack]));
+        return console && console.warn.apply(console, ["Paris warning: "].concat(items));
     };
     return ErrorsService;
 }());
@@ -958,6 +968,9 @@ var Paris = /** @class */ (function () {
         }
         return repository$$1;
     };
+    Paris.prototype.getModelBaseConfig = function (entityConstructor) {
+        return entityConstructor.entityConfig || entityConstructor.valueObjectConfig;
+    };
     return Paris;
 }());
 exports.Paris = Paris;
@@ -1031,13 +1044,6 @@ var EntityModelBase = /** @class */ (function (_super) {
     function EntityModelBase(data) {
         return _super.call(this, data) || this;
     }
-    Object.defineProperty(EntityModelBase.prototype, "isNew", {
-        get: function () {
-            return this.id === null || this.id === undefined;
-        },
-        enumerable: true,
-        configurable: true
-    });
     __decorate([
         entityField_decorator.EntityField(),
         __metadata("design:type", Object)
@@ -1102,6 +1108,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 exports.Paris = paris.Paris;
 
+exports.DataStoreService = dataStore_service.DataStoreService;
+
 exports.EntityModelBase = entityModel_base.EntityModelBase;
 
 exports.ModelBase = model_base.ModelBase;
@@ -1125,29 +1133,31 @@ exports.DataAvailability = dataAvailability_enum.DataAvailability;
 
 var main$1 = unwrapExports(main);
 var main_1 = main.Paris;
-var main_2 = main.EntityModelBase;
-var main_3 = main.ModelBase;
-var main_4 = main.Repository;
-var main_5 = main.DataTransformersService;
-var main_6 = main.ModelEntity;
-var main_7 = main.EntityField;
-var main_8 = main.ValueObject;
-var main_9 = main.Entity;
-var main_10 = main.DataSetOptionsSortDirection;
-var main_11 = main.DataAvailability;
+var main_2 = main.DataStoreService;
+var main_3 = main.EntityModelBase;
+var main_4 = main.ModelBase;
+var main_5 = main.Repository;
+var main_6 = main.DataTransformersService;
+var main_7 = main.ModelEntity;
+var main_8 = main.EntityField;
+var main_9 = main.ValueObject;
+var main_10 = main.Entity;
+var main_11 = main.DataSetOptionsSortDirection;
+var main_12 = main.DataAvailability;
 
 exports['default'] = main$1;
 exports.Paris = main_1;
-exports.EntityModelBase = main_2;
-exports.ModelBase = main_3;
-exports.Repository = main_4;
-exports.DataTransformersService = main_5;
-exports.ModelEntity = main_6;
-exports.EntityField = main_7;
-exports.ValueObject = main_8;
-exports.Entity = main_9;
-exports.DataSetOptionsSortDirection = main_10;
-exports.DataAvailability = main_11;
+exports.DataStoreService = main_2;
+exports.EntityModelBase = main_3;
+exports.ModelBase = main_4;
+exports.Repository = main_5;
+exports.DataTransformersService = main_6;
+exports.ModelEntity = main_7;
+exports.EntityField = main_8;
+exports.ValueObject = main_9;
+exports.Entity = main_10;
+exports.DataSetOptionsSortDirection = main_11;
+exports.DataAvailability = main_12;
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
