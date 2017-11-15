@@ -28,6 +28,8 @@ export declare class Repository<T extends EntityModelBase> implements IRepositor
     readonly allItems$: Observable<Array<T>>;
     private readonly cache;
     private readonly baseUrl;
+    readonly endpointName: string;
+    readonly endpointUrl: string;
     constructor(entity: ModelEntity, config: ParisConfig, entityConstructor: DataEntityConstructor<T>, dataStore: DataStoreService, paris: Paris);
     createItem(itemData: any, options?: DataOptions): Observable<T>;
     createNewItem(): T;

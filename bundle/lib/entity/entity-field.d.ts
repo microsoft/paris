@@ -1,4 +1,5 @@
 import { DataEntityType } from "./data-entity.base";
+import { ParisConfig } from "../config/paris-config";
 export interface Field {
     id?: string;
     name?: string;
@@ -9,5 +10,7 @@ export interface Field {
     arrayOf?: DataEntityType;
     isArray?: boolean;
     required?: boolean;
+    if?: EntityFieldConfigFunctionOrValue;
 }
 export declare const FIELD_DATA_SELF = "__self";
+export declare type EntityFieldConfigFunctionOrValue = ((data: any, config?: ParisConfig) => string) | string;

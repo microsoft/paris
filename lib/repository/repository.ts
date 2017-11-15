@@ -62,6 +62,14 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 		return this.entity.baseUrl instanceof Function ? this.entity.baseUrl(this.config) : this.entity.baseUrl;
 	}
 
+	get endpointName():string{
+		return this.entity.endpoint instanceof Function ? this.entity.endpoint(this.config) : this.entity.endpoint;
+	}
+
+	get endpointUrl():string{
+		return `${this.baseUrl}/${this.endpointName}`;
+	}
+
 	constructor(public readonly entity: ModelEntity,
 				private config: ParisConfig,
 				private entityConstructor: DataEntityConstructor<T>,
@@ -102,6 +110,23 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 		let getModelDataError:Error = new Error(`Failed to create ${entity.singularName}.`);
 
 		entity.fields.forEach((entityField: Field) => {
+			if (entityField.if){
+				let failed:boolean = false;
+
+				if (entityField.if instanceof Function && !entityField.if(rawData, paris.config))
+					failed = true;
+				else if (typeof(entityField.if) === "string") {
+					let rawDataPropertyValue: any = rawData[entityField.if];
+					if (rawDataPropertyValue === undefined || rawDataPropertyValue === null)
+						failed = true;
+				}
+
+				if (failed){
+					modelData[entityField.id] = null;
+					return;
+				}
+			}
+
 			let propertyValue: any;
 			if (entityField.data) {
 				if (entityField.data instanceof Array) {
@@ -245,7 +270,7 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 		let getItemsDataSetError:Error = new Error(`Failed to get ${this.entity.pluralName}.`);
 		const httpOptions:HttpOptions = DatasetService.dataSetOptionsToHttpOptions(options);
 
-		return this.dataStore.get(`${this.entity.endpoint}/${this.entity.allItemsEndpoint || ''}`, httpOptions, this.baseUrl)
+		return this.dataStore.get(`${this.endpointName}/${this.entity.allItemsEndpoint || ''}`, httpOptions, this.baseUrl)
 			.map((rawDataSet: any) => {
 				const allItemsProperty = this.entity.allItemsProperty || this.config.allItemsProperty;
 
@@ -293,7 +318,7 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 		if (this.entity.loadAll)
 			return this.setAllItems().map(() => this._allValuesMap.get(String(itemId)));
 		else {
-			return this.dataStore.get(`${this.entity.endpoint}/${itemId}`)
+			return this.dataStore.get(`${this.endpointName}/${itemId}`)
 				.flatMap(data => this.createItem(data, options));
 		}
 	}
@@ -312,7 +337,7 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 	// save(item: T): Observable<T> {
 	// 	let saveData: Index = this.getItemSaveData(item);
 	//
-	// 	return this.dataStore.post(`${this.entity.endpoint}/${item.id || ''}`, saveData)
+	// 	return this.dataStore.post(`${this.endpoint}/${item.id || ''}`, saveData)
 	// 		.flatMap((savedItemData: Index) => this.createItem(savedItemData))
 	// 		.do((item: T) => {
 	// 			if (this._allValues) {

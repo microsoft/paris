@@ -580,6 +580,20 @@ var Repository = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(Repository.prototype, "endpointName", {
+        get: function () {
+            return this.entity.endpoint instanceof Function ? this.entity.endpoint(this.config) : this.entity.endpoint;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Repository.prototype, "endpointUrl", {
+        get: function () {
+            return this.baseUrl + "/" + this.endpointName;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Repository.prototype.createItem = function (itemData, options) {
         if (options === void 0) { options = { allowCache: true, availability: dataAvailability_enum.DataAvailability.available }; }
         return Repository.getModelData(itemData, this.entity, this.config, this.paris, options);
@@ -602,6 +616,20 @@ var Repository = /** @class */ (function () {
         var entityIdProperty = entity.idProperty || config.entityIdProperty, modelData = entity instanceof entity_config.ModelEntity ? { id: rawData[entityIdProperty] } : {}, subModels = [];
         var getModelDataError = new Error("Failed to create " + entity.singularName + ".");
         entity.fields.forEach(function (entityField$$1) {
+            if (entityField$$1.if) {
+                var failed = false;
+                if (entityField$$1.if instanceof Function && !entityField$$1.if(rawData, paris.config))
+                    failed = true;
+                else if (typeof (entityField$$1.if) === "string") {
+                    var rawDataPropertyValue = rawData[entityField$$1.if];
+                    if (rawDataPropertyValue === undefined || rawDataPropertyValue === null)
+                        failed = true;
+                }
+                if (failed) {
+                    modelData[entityField$$1.id] = null;
+                    return;
+                }
+            }
             var propertyValue;
             if (entityField$$1.data) {
                 if (entityField$$1.data instanceof Array) {
@@ -727,7 +755,7 @@ var Repository = /** @class */ (function () {
         if (dataOptions === void 0) { dataOptions = data_options.defaultDataOptions; }
         var getItemsDataSetError = new Error("Failed to get " + this.entity.pluralName + ".");
         var httpOptions = dataset_service.DatasetService.dataSetOptionsToHttpOptions(options);
-        return this.dataStore.get(this.entity.endpoint + "/" + (this.entity.allItemsEndpoint || ''), httpOptions, this.baseUrl)
+        return this.dataStore.get(this.endpointName + "/" + (this.entity.allItemsEndpoint || ''), httpOptions, this.baseUrl)
             .map(function (rawDataSet) {
             var allItemsProperty = _this.entity.allItemsProperty || _this.config.allItemsProperty;
             var rawItems = rawDataSet instanceof Array ? rawDataSet : rawDataSet[allItemsProperty];
@@ -769,7 +797,7 @@ var Repository = /** @class */ (function () {
         if (this.entity.loadAll)
             return this.setAllItems().map(function () { return _this._allValuesMap.get(String(itemId)); });
         else {
-            return this.dataStore.get(this.entity.endpoint + "/" + itemId)
+            return this.dataStore.get(this.endpointName + "/" + itemId)
                 .flatMap(function (data) { return _this.createItem(data, options); });
         }
     };
@@ -786,7 +814,7 @@ var Repository = /** @class */ (function () {
     // save(item: T): Observable<T> {
     // 	let saveData: Index = this.getItemSaveData(item);
     //
-    // 	return this.dataStore.post(`${this.entity.endpoint}/${item.id || ''}`, saveData)
+    // 	return this.dataStore.post(`${this.endpoint}/${item.id || ''}`, saveData)
     // 		.flatMap((savedItemData: Index) => this.createItem(savedItemData))
     // 		.do((item: T) => {
     // 			if (this._allValues) {
