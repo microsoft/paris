@@ -10,7 +10,7 @@ export interface Field {
     arrayOf?: DataEntityType;
     isArray?: boolean;
     required?: boolean;
-    if?: EntityFieldConfigFunctionOrValue;
+    require?: EntityFieldConfigFunctionOrValue;
 }
 export declare const FIELD_DATA_SELF = "__self";
 export declare type EntityFieldConfigFunctionOrValue = ((data: any, config?: ParisConfig) => string) | string;

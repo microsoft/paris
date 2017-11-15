@@ -95,12 +95,12 @@ var Repository = /** @class */ (function () {
         var entityIdProperty = entity.idProperty || config.entityIdProperty, modelData = entity instanceof entity_config_1.ModelEntity ? { id: rawData[entityIdProperty] } : {}, subModels = [];
         var getModelDataError = new Error("Failed to create " + entity.singularName + ".");
         entity.fields.forEach(function (entityField) {
-            if (entityField.if) {
+            if (entityField.require) {
                 var failed = false;
-                if (entityField.if instanceof Function && !entityField.if(rawData, paris.config))
+                if (entityField.require instanceof Function && !entityField.require(rawData, paris.config))
                     failed = true;
-                else if (typeof (entityField.if) === "string") {
-                    var rawDataPropertyValue = rawData[entityField.if];
+                else if (typeof (entityField.require) === "string") {
+                    var rawDataPropertyValue = rawData[entityField.require];
                     if (rawDataPropertyValue === undefined || rawDataPropertyValue === null)
                         failed = true;
                 }

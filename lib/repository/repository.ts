@@ -110,13 +110,13 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 		let getModelDataError:Error = new Error(`Failed to create ${entity.singularName}.`);
 
 		entity.fields.forEach((entityField: Field) => {
-			if (entityField.if){
+			if (entityField.require){
 				let failed:boolean = false;
 
-				if (entityField.if instanceof Function && !entityField.if(rawData, paris.config))
+				if (entityField.require instanceof Function && !entityField.require(rawData, paris.config))
 					failed = true;
-				else if (typeof(entityField.if) === "string") {
-					let rawDataPropertyValue: any = rawData[entityField.if];
+				else if (typeof(entityField.require) === "string") {
+					let rawDataPropertyValue: any = rawData[entityField.require];
 					if (rawDataPropertyValue === undefined || rawDataPropertyValue === null)
 						failed = true;
 				}

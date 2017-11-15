@@ -11,7 +11,7 @@ export interface Field{
 	arrayOf?:DataEntityType,
 	isArray?:boolean,
 	required?:boolean,
-	if?:EntityFieldConfigFunctionOrValue
+	require?:EntityFieldConfigFunctionOrValue
 }
 
 export const FIELD_DATA_SELF = "__self";

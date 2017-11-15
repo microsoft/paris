@@ -616,12 +616,12 @@ var Repository = /** @class */ (function () {
         var entityIdProperty = entity.idProperty || config.entityIdProperty, modelData = entity instanceof entity_config.ModelEntity ? { id: rawData[entityIdProperty] } : {}, subModels = [];
         var getModelDataError = new Error("Failed to create " + entity.singularName + ".");
         entity.fields.forEach(function (entityField$$1) {
-            if (entityField$$1.if) {
+            if (entityField$$1.require) {
                 var failed = false;
-                if (entityField$$1.if instanceof Function && !entityField$$1.if(rawData, paris.config))
+                if (entityField$$1.require instanceof Function && !entityField$$1.require(rawData, paris.config))
                     failed = true;
-                else if (typeof (entityField$$1.if) === "string") {
-                    var rawDataPropertyValue = rawData[entityField$$1.if];
+                else if (typeof (entityField$$1.require) === "string") {
+                    var rawDataPropertyValue = rawData[entityField$$1.require];
                     if (rawDataPropertyValue === undefined || rawDataPropertyValue === null)
                         failed = true;
                 }
