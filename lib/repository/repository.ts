@@ -143,6 +143,9 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 			else
 				propertyValue = rawData[entityField.id];
 
+			if (entityField.parse)
+				propertyValue = entityField.parse(propertyValue);
+
 			if (propertyValue === undefined || propertyValue === null) {
 				let fieldRepository:Repository<EntityModelBase> = paris.getRepository(entityField.type);
 				let fieldValueObjectType:EntityConfigBase = !fieldRepository && valueObjectsService.getEntityByType(entityField.type);
@@ -166,7 +169,7 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 						? propertyValue
 							? propertyValue.map((elementValue: any) => DataTransformersService.parse(entityField.type, elementValue))
 							: []
-						: DataTransformersService.parse(entityField.type, propertyValue);
+						:  DataTransformersService.parse(entityField.type, propertyValue);
 				}
 			}
 		});

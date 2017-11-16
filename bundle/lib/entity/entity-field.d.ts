@@ -11,6 +11,7 @@ export interface Field {
     isArray?: boolean;
     required?: boolean;
     require?: ((data: any, config?: ParisConfig) => any) | string;
+    parse?: Function;
 }
 export declare const FIELD_DATA_SELF = "__self";
 export declare type EntityFieldConfigFunctionOrValue = ((data: any, config?: ParisConfig) => string) | string;

@@ -11,7 +11,8 @@ export interface Field{
 	arrayOf?:DataEntityType,
 	isArray?:boolean,
 	required?:boolean,
-	require?:((data:any, config?:ParisConfig) => any) | string
+	require?:((data:any, config?:ParisConfig) => any) | string,
+	parse?:Function
 }
 
 export const FIELD_DATA_SELF = "__self";

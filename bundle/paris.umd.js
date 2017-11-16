@@ -645,6 +645,8 @@ var Repository = /** @class */ (function () {
             }
             else
                 propertyValue = rawData[entityField$$1.id];
+            if (entityField$$1.parse)
+                propertyValue = entityField$$1.parse(propertyValue);
             if (propertyValue === undefined || propertyValue === null) {
                 var fieldRepository = paris.getRepository(entityField$$1.type);
                 var fieldValueObjectType = !fieldRepository && valueObjects_service.valueObjectsService.getEntityByType(entityField$$1.type);
