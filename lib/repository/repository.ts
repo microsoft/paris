@@ -143,9 +143,15 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 			else
 				propertyValue = rawData[entityField.id];
 
-			if (entityField.parse)
-				propertyValue = entityField.parse(propertyValue);
-
+			if (entityField.parse) {
+				try {
+					propertyValue = entityField.parse(propertyValue);
+				}
+				catch(e){
+					getModelDataError.message = getModelDataError.message + ` Error parsing field ${entityField.id}: ` + e.message;
+					throw getModelDataError;
+				}
+			}
 			if (propertyValue === undefined || propertyValue === null) {
 				let fieldRepository:Repository<EntityModelBase> = paris.getRepository(entityField.type);
 				let fieldValueObjectType:EntityConfigBase = !fieldRepository && valueObjectsService.getEntityByType(entityField.type);

@@ -160,6 +160,8 @@ var ModelEntity = /** @class */ (function (_super) {
         var _this = _super.call(this, config, entityConstructor) || this;
         _this.loadAll = false;
         _this.loadAll = config.loadAll === true;
+        if (!_this.endpoint && !_this.values)
+            throw new Error("Can't create entity " + _this.entityConstructor.name + ", no endpoint or values defined.");
         return _this;
     }
     return ModelEntity;
@@ -645,8 +647,15 @@ var Repository = /** @class */ (function () {
             }
             else
                 propertyValue = rawData[entityField$$1.id];
-            if (entityField$$1.parse)
-                propertyValue = entityField$$1.parse(propertyValue);
+            if (entityField$$1.parse) {
+                try {
+                    propertyValue = entityField$$1.parse(propertyValue);
+                }
+                catch (e) {
+                    getModelDataError.message = getModelDataError.message + (" Error parsing field " + entityField$$1.id + ": ") + e.message;
+                    throw getModelDataError;
+                }
+            }
             if (propertyValue === undefined || propertyValue === null) {
                 var fieldRepository = paris.getRepository(entityField$$1.type);
                 var fieldValueObjectType = !fieldRepository && valueObjects_service.valueObjectsService.getEntityByType(entityField$$1.type);

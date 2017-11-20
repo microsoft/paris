@@ -17,6 +17,8 @@ var ModelEntity = /** @class */ (function (_super) {
         var _this = _super.call(this, config, entityConstructor) || this;
         _this.loadAll = false;
         _this.loadAll = config.loadAll === true;
+        if (!_this.endpoint && !_this.values)
+            throw new Error("Can't create entity " + _this.entityConstructor.name + ", no endpoint or values defined.");
         return _this;
     }
     return ModelEntity;
