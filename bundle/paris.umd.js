@@ -452,17 +452,17 @@ exports.defaultDataOptions = {
 
 unwrapExports(data_options);
 
-var datasetOptionsSort = createCommonjsModule(function (module, exports) {
+var dataQuerySort = createCommonjsModule(function (module, exports) {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var DataSetOptionsSortDirection;
-(function (DataSetOptionsSortDirection) {
-    DataSetOptionsSortDirection[DataSetOptionsSortDirection["ascending"] = 0] = "ascending";
-    DataSetOptionsSortDirection[DataSetOptionsSortDirection["descending"] = 1] = "descending";
-})(DataSetOptionsSortDirection = exports.DataSetOptionsSortDirection || (exports.DataSetOptionsSortDirection = {}));
+var DataQuerySortDirection;
+(function (DataQuerySortDirection) {
+    DataQuerySortDirection[DataQuerySortDirection["ascending"] = 0] = "ascending";
+    DataQuerySortDirection[DataQuerySortDirection["descending"] = 1] = "descending";
+})(DataQuerySortDirection = exports.DataQuerySortDirection || (exports.DataQuerySortDirection = {}));
 });
 
-unwrapExports(datasetOptionsSort);
+unwrapExports(dataQuerySort);
 
 var dataset_service = createCommonjsModule(function (module, exports) {
 "use strict";
@@ -471,26 +471,22 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var DatasetService = /** @class */ (function () {
     function DatasetService() {
     }
-    DatasetService.dataSetOptionsToHttpOptions = function (dataSetOptions) {
-        if (!dataSetOptions)
+    DatasetService.queryToHttpOptions = function (query) {
+        if (!query)
             return null;
         var httpOptions = {};
-        if (dataSetOptions.params) {
-            httpOptions.params = {};
-            if (dataSetOptions.params.pageSize && dataSetOptions.params.pageSize > 0)
-                httpOptions.params.pagesize = dataSetOptions.params.pageSize;
-            if (dataSetOptions.params.page && dataSetOptions.params.page > 1)
-                httpOptions.params.page = dataSetOptions.params.page;
-            if (dataSetOptions.params.sortBy) {
-                httpOptions.params.sortBy = dataSetOptions.params.sortBy.map(function (sortField) {
-                    return "" + (sortField.direction === datasetOptionsSort.DataSetOptionsSortDirection.descending ? '-' : '') + sortField.field;
-                }).join(",");
-            }
-            if (dataSetOptions.params.query)
-                Object.assign(httpOptions.params, dataSetOptions.params.query);
+        httpOptions.params = {};
+        if (query.pageSize && query.pageSize > 0)
+            httpOptions.params.pagesize = query.pageSize;
+        if (query.page && query.page > 1)
+            httpOptions.params.page = query.page;
+        if (query.sortBy) {
+            httpOptions.params.sortBy = query.sortBy.map(function (sortField) {
+                return "" + (sortField.direction === dataQuerySort.DataQuerySortDirection.descending ? '-' : '') + sortField.field;
+            }).join(",");
         }
-        if (dataSetOptions.data)
-            httpOptions.data = dataSetOptions.data;
+        if (query.where)
+            Object.assign(httpOptions.params, query.where);
         return httpOptions;
     };
     return DatasetService;
@@ -542,7 +538,7 @@ var Repository = /** @class */ (function () {
         this.entityConstructor = entityConstructor;
         this.dataStore = dataStore;
         this.paris = paris;
-        var getAllItems$ = this.getItemsDataSet().map(function (dataSet) { return dataSet.items; });
+        var getAllItems$ = this.query().map(function (dataSet) { return dataSet.items; });
         this._allItemsSubject$ = new Subject.Subject();
         this._allItems$ = Observable_1.Observable.merge(getAllItems$, this._allItemsSubject$.asObservable());
         this._saveSubject$ = new Subject.Subject();
@@ -761,11 +757,11 @@ var Repository = /** @class */ (function () {
             return Observable_1.Observable.of(valueObjectType.getValueById(data) || valueObjectType.getDefaultValue() || null);
         return Repository.getModelData(data, valueObjectType, config, paris, options);
     };
-    Repository.prototype.getItemsDataSet = function (options, dataOptions) {
+    Repository.prototype.query = function (query, dataOptions) {
         var _this = this;
         if (dataOptions === void 0) { dataOptions = data_options.defaultDataOptions; }
-        var getItemsDataSetError = new Error("Failed to get " + this.entity.pluralName + ".");
-        var httpOptions = dataset_service.DatasetService.dataSetOptionsToHttpOptions(options);
+        var queryError = new Error("Failed to get " + this.entity.pluralName + ".");
+        var httpOptions = dataset_service.DatasetService.queryToHttpOptions(query);
         return this.dataStore.get(this.endpointName + "/" + (this.entity.allItemsEndpoint || ''), httpOptions, this.baseUrl)
             .map(function (rawDataSet) {
             var allItemsProperty = _this.entity.allItemsProperty || _this.config.allItemsProperty;
@@ -785,8 +781,8 @@ var Repository = /** @class */ (function () {
                     items: items
                 });
             }).catch(function (error) {
-                getItemsDataSetError.message = getItemsDataSetError.message + " Error: " + error.message;
-                throw getItemsDataSetError;
+                queryError.message = queryError.message + " Error: " + error.message;
+                throw queryError;
             });
         });
     };
@@ -816,7 +812,7 @@ var Repository = /** @class */ (function () {
         var _this = this;
         if (this._allValues)
             return Observable_1.Observable.of(this._allValues);
-        return this.getItemsDataSet().do(function (dataSet) {
+        return this.query().do(function (dataSet) {
             _this._allValues = dataSet.items;
             _this._allValuesMap = new Map();
             _this._allValues.forEach(function (value) { return _this._allValuesMap.set(String(value.id), value); });
@@ -1165,7 +1161,7 @@ exports.ValueObject = valueObject_decorator.ValueObject;
 
 exports.Entity = entity_decorator.Entity;
 
-exports.DataSetOptionsSortDirection = datasetOptionsSort.DataSetOptionsSortDirection;
+exports.DataQuerySortDirection = dataQuerySort.DataQuerySortDirection;
 
 exports.DataAvailability = dataAvailability_enum.DataAvailability;
 });
@@ -1181,7 +1177,7 @@ var main_7 = main.ModelEntity;
 var main_8 = main.EntityField;
 var main_9 = main.ValueObject;
 var main_10 = main.Entity;
-var main_11 = main.DataSetOptionsSortDirection;
+var main_11 = main.DataQuerySortDirection;
 var main_12 = main.DataAvailability;
 
 exports['default'] = main$1;
@@ -1195,7 +1191,7 @@ exports.ModelEntity = main_7;
 exports.EntityField = main_8;
 exports.ValueObject = main_9;
 exports.Entity = main_10;
-exports.DataSetOptionsSortDirection = main_11;
+exports.DataQuerySortDirection = main_11;
 exports.DataAvailability = main_12;
 
 Object.defineProperty(exports, '__esModule', { value: true });

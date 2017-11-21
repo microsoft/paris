@@ -1,34 +1,29 @@
-import {DataSetOptions} from "../dataset/dataset-options";
+import {DataQuery} from "../dataset/data-query";
 import {HttpOptions} from "./http.service";
-import {DataSetOptionsSortDirection, DataSetOptionsSortField} from "../dataset/dataset-options-sort";
+import {DataQuerySortDirection, DataQuerySortField} from "../dataset/data-query-sort";
 
 export class DatasetService{
-	static dataSetOptionsToHttpOptions(dataSetOptions?:DataSetOptions):HttpOptions{
-		if (!dataSetOptions)
+	static queryToHttpOptions(query?:DataQuery):HttpOptions{
+		if (!query)
 			return null;
 
 		let httpOptions:HttpOptions = {};
 
-		if (dataSetOptions.params){
-			httpOptions.params = {};
-			if (dataSetOptions.params.pageSize && dataSetOptions.params.pageSize > 0)
-				httpOptions.params.pagesize = dataSetOptions.params.pageSize;
+		httpOptions.params = {};
+		if (query.pageSize && query.pageSize > 0)
+			httpOptions.params.pagesize = query.pageSize;
 
-			if (dataSetOptions.params.page && dataSetOptions.params.page > 1)
-				httpOptions.params.page = dataSetOptions.params.page;
+		if (query.page && query.page > 1)
+			httpOptions.params.page = query.page;
 
-			if (dataSetOptions.params.sortBy) {
-				httpOptions.params.sortBy = dataSetOptions.params.sortBy.map((sortField: DataSetOptionsSortField) => {
-					return `${sortField.direction === DataSetOptionsSortDirection.descending ? '-' : ''}${sortField.field}`;
-				}).join(",");
-			}
-
-			if (dataSetOptions.params.query)
-				Object.assign(httpOptions.params, dataSetOptions.params.query);
+		if (query.sortBy) {
+			httpOptions.params.sortBy = query.sortBy.map((sortField: DataQuerySortField) => {
+				return `${sortField.direction === DataQuerySortDirection.descending ? '-' : ''}${sortField.field}`;
+			}).join(",");
 		}
 
-		if (dataSetOptions.data)
-			httpOptions.data = dataSetOptions.data;
+		if (query.where)
+			Object.assign(httpOptions.params, query.where);
 
 		return httpOptions;
 	}

@@ -4,7 +4,7 @@ import { Observable } from "rxjs/Observable";
 import { IRepository } from "./repository.interface";
 import { DataStoreService } from "../services/data-store.service";
 import { ParisConfig } from "../config/paris-config";
-import { DataSetOptions } from "../dataset/dataset-options";
+import { DataQuery } from "../dataset/data-query";
 import { DataSet } from "../dataset/dataset";
 import { Index } from "../models/index";
 import { EntityConfigBase } from "../entity/entity-config.base";
@@ -48,7 +48,7 @@ export declare class Repository<T extends EntityModelBase> implements IRepositor
     private static mapToEntityFieldIndex(entityFieldId, value);
     private static getEntityItem<U>(repository, data, options?);
     private static getValueObjectItem<U>(valueObjectType, data, options, paris, config?);
-    getItemsDataSet(options?: DataSetOptions, dataOptions?: DataOptions): Observable<DataSet<T>>;
+    query(query?: DataQuery, dataOptions?: DataOptions): Observable<DataSet<T>>;
     getItemById(itemId: string | number, options?: DataOptions): Observable<T>;
     private setAllItems();
     getItemSaveData(item: T): Index;

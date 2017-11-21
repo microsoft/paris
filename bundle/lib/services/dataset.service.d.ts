@@ -1,5 +1,5 @@
-import { DataSetOptions } from "../dataset/dataset-options";
+import { DataQuery } from "../dataset/data-query";
 import { HttpOptions } from "./http.service";
 export declare class DatasetService {
-    static dataSetOptionsToHttpOptions(dataSetOptions?: DataSetOptions): HttpOptions;
+    static queryToHttpOptions(query?: DataQuery): HttpOptions;
 }

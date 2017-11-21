@@ -6,7 +6,7 @@ import {Field, FIELD_DATA_SELF} from "../entity/entity-field";
 import {IRepository} from "./repository.interface";
 import {DataStoreService} from "../services/data-store.service";
 import {ParisConfig} from "../config/paris-config";
-import {DataSetOptions} from "../dataset/dataset-options";
+import {DataQuery} from "../dataset/data-query";
 import {DataSet} from "../dataset/dataset";
 import {Index} from "../models/index";
 import {DataTransformersService} from "../services/data-transformers.service";
@@ -75,7 +75,7 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 				private entityConstructor: DataEntityConstructor<T>,
 				private dataStore: DataStoreService,
 				private paris: Paris) {
-		let getAllItems$: Observable<Array<T>> = this.getItemsDataSet().map(dataSet => dataSet.items);
+		let getAllItems$: Observable<Array<T>> = this.query().map(dataSet => dataSet.items);
 
 		this._allItemsSubject$ = new Subject<Array<T>>();
 		this._allItems$ = Observable.merge(getAllItems$, this._allItemsSubject$.asObservable());
@@ -275,9 +275,9 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 		return Repository.getModelData(data, valueObjectType, config, paris, options);
 	}
 
-	getItemsDataSet(options?: DataSetOptions, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<T>> {
-		let getItemsDataSetError:Error = new Error(`Failed to get ${this.entity.pluralName}.`);
-		const httpOptions:HttpOptions = DatasetService.dataSetOptionsToHttpOptions(options);
+	query(query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<T>> {
+		let queryError:Error = new Error(`Failed to get ${this.entity.pluralName}.`);
+		const httpOptions:HttpOptions = DatasetService.queryToHttpOptions(query);
 
 		return this.dataStore.get(`${this.endpointName}/${this.entity.allItemsEndpoint || ''}`, httpOptions, this.baseUrl)
 			.map((rawDataSet: any) => {
@@ -301,8 +301,8 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 						items: items
 					});
 				}).catch((error:Error) => {
-					getItemsDataSetError.message = getItemsDataSetError.message + " Error: " + error.message;
-					throw getItemsDataSetError;
+					queryError.message = queryError.message + " Error: " + error.message;
+					throw queryError;
 				});
 			});
 	}
@@ -336,7 +336,7 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 		if (this._allValues)
 			return Observable.of(this._allValues);
 
-		return this.getItemsDataSet().do((dataSet: DataSet<T>) => {
+		return this.query().do((dataSet: DataSet<T>) => {
 			this._allValues = dataSet.items;
 			this._allValuesMap = new Map();
 			this._allValues.forEach((value: T) => this._allValuesMap.set(String(value.id), value));

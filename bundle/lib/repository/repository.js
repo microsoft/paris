@@ -19,7 +19,7 @@ var Repository = /** @class */ (function () {
         this.entityConstructor = entityConstructor;
         this.dataStore = dataStore;
         this.paris = paris;
-        var getAllItems$ = this.getItemsDataSet().map(function (dataSet) { return dataSet.items; });
+        var getAllItems$ = this.query().map(function (dataSet) { return dataSet.items; });
         this._allItemsSubject$ = new Subject_1.Subject();
         this._allItems$ = Observable_1.Observable.merge(getAllItems$, this._allItemsSubject$.asObservable());
         this._saveSubject$ = new Subject_1.Subject();
@@ -238,11 +238,11 @@ var Repository = /** @class */ (function () {
             return Observable_1.Observable.of(valueObjectType.getValueById(data) || valueObjectType.getDefaultValue() || null);
         return Repository.getModelData(data, valueObjectType, config, paris, options);
     };
-    Repository.prototype.getItemsDataSet = function (options, dataOptions) {
+    Repository.prototype.query = function (query, dataOptions) {
         var _this = this;
         if (dataOptions === void 0) { dataOptions = data_options_1.defaultDataOptions; }
-        var getItemsDataSetError = new Error("Failed to get " + this.entity.pluralName + ".");
-        var httpOptions = dataset_service_1.DatasetService.dataSetOptionsToHttpOptions(options);
+        var queryError = new Error("Failed to get " + this.entity.pluralName + ".");
+        var httpOptions = dataset_service_1.DatasetService.queryToHttpOptions(query);
         return this.dataStore.get(this.endpointName + "/" + (this.entity.allItemsEndpoint || ''), httpOptions, this.baseUrl)
             .map(function (rawDataSet) {
             var allItemsProperty = _this.entity.allItemsProperty || _this.config.allItemsProperty;
@@ -262,8 +262,8 @@ var Repository = /** @class */ (function () {
                     items: items
                 });
             }).catch(function (error) {
-                getItemsDataSetError.message = getItemsDataSetError.message + " Error: " + error.message;
-                throw getItemsDataSetError;
+                queryError.message = queryError.message + " Error: " + error.message;
+                throw queryError;
             });
         });
     };
@@ -293,7 +293,7 @@ var Repository = /** @class */ (function () {
         var _this = this;
         if (this._allValues)
             return Observable_1.Observable.of(this._allValues);
-        return this.getItemsDataSet().do(function (dataSet) {
+        return this.query().do(function (dataSet) {
             _this._allValues = dataSet.items;
             _this._allValuesMap = new Map();
             _this._allValues.forEach(function (value) { return _this._allValuesMap.set(String(value.id), value); });

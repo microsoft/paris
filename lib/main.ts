@@ -26,6 +26,8 @@ export {ModelEntity, EntityConfig, ModelEntityCacheConfig} from "./entity/entity
 export {EntityField} from "./entity/entity-field.decorator";
 export {ValueObject} from "./entity/value-object.decorator";
 export {Entity} from "./entity/entity.decorator";
-export {DataSetOptionsSortDirection, DataSetOptionsSortField} from "./dataset/dataset-options-sort";
+export {DataQuery} from "./dataset/data-query";
+export {DataQuerySortDirection, DataQuerySortField} from "./dataset/data-query-sort";
 export {HttpOptions} from "./services/http.service";
 export {DataAvailability} from "./dataset/data-availability.enum";
+export {DataSet} from "./dataset/dataset";
