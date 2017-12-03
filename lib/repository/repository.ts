@@ -145,7 +145,7 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 
 			if (entityField.parse) {
 				try {
-					propertyValue = entityField.parse(propertyValue);
+					propertyValue = entityField.parse(propertyValue, rawData);
 				}
 				catch(e){
 					getModelDataError.message = getModelDataError.message + ` Error parsing field ${entityField.id}: ` + e.message;
@@ -279,7 +279,7 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 		let queryError:Error = new Error(`Failed to get ${this.entity.pluralName}.`);
 		const httpOptions:HttpOptions = DatasetService.queryToHttpOptions(query);
 
-		return this.dataStore.get(`${this.endpointName}/${this.entity.allItemsEndpoint || ''}`, httpOptions, this.baseUrl)
+		return this.dataStore.get(`${this.endpointName}${this.entity.allItemsEndpointTrailingSlash !== false && !this.entity.allItemsEndpoint ? '/' : ''}${this.entity.allItemsEndpoint || ''}`, httpOptions, this.baseUrl)
 			.map((rawDataSet: any) => {
 				const allItemsProperty = this.entity.allItemsProperty || this.config.allItemsProperty;
 

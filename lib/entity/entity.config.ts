@@ -9,6 +9,7 @@ export class ModelEntity extends EntityConfigBase{
 	baseUrl?:EntityConfigFunctionOrValue;
 	allItemsProperty?:string;
 	allItemsEndpoint?:string;
+	allItemsEndpointTrailingSlash?:boolean;
 
 	constructor(config:EntityConfig, entityConstructor:DataEntityConstructor<any>){
 		super(config, entityConstructor);
@@ -25,7 +26,8 @@ export interface EntityConfig extends IEntityConfigBase{
 	cache?:ModelEntityCacheConfig,
 	baseUrl?:EntityConfigFunctionOrValue,
 	allItemsProperty?:string,
-	allItemsEndpoint?:string
+	allItemsEndpoint?:string,
+	allItemsEndpointTrailingSlash?:boolean
 }
 
 export interface ModelEntityCacheConfig{

@@ -1,6 +1,6 @@
 {
   "name": "paris",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Library for the implementation of Domain Driven Design in Angular/TypeScript apps",
   "repository": {
     "type": "git",

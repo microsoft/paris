@@ -645,7 +645,7 @@ var Repository = /** @class */ (function () {
                 propertyValue = rawData[entityField$$1.id];
             if (entityField$$1.parse) {
                 try {
-                    propertyValue = entityField$$1.parse(propertyValue);
+                    propertyValue = entityField$$1.parse(propertyValue, rawData);
                 }
                 catch (e) {
                     getModelDataError.message = getModelDataError.message + (" Error parsing field " + entityField$$1.id + ": ") + e.message;
@@ -762,7 +762,7 @@ var Repository = /** @class */ (function () {
         if (dataOptions === void 0) { dataOptions = data_options.defaultDataOptions; }
         var queryError = new Error("Failed to get " + this.entity.pluralName + ".");
         var httpOptions = dataset_service.DatasetService.queryToHttpOptions(query);
-        return this.dataStore.get(this.endpointName + "/" + (this.entity.allItemsEndpoint || ''), httpOptions, this.baseUrl)
+        return this.dataStore.get("" + this.endpointName + (this.entity.allItemsEndpointTrailingSlash !== false && !this.entity.allItemsEndpoint ? '/' : '') + (this.entity.allItemsEndpoint || ''), httpOptions, this.baseUrl)
             .map(function (rawDataSet) {
             var allItemsProperty = _this.entity.allItemsProperty || _this.config.allItemsProperty;
             var rawItems = rawDataSet instanceof Array ? rawDataSet : rawDataSet[allItemsProperty];
