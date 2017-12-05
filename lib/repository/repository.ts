@@ -277,7 +277,7 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 
 	query(query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<T>> {
 		let queryError:Error = new Error(`Failed to get ${this.entity.pluralName}.`);
-		const httpOptions:HttpOptions = DatasetService.queryToHttpOptions(query);
+		const httpOptions:HttpOptions = this.entity.parseDataQuery ? { params: this.entity.parseDataQuery(query) } : DatasetService.queryToHttpOptions(query);
 
 		return this.dataStore.get(`${this.endpointName}${this.entity.allItemsEndpointTrailingSlash !== false && !this.entity.allItemsEndpoint ? '/' : ''}${this.entity.allItemsEndpoint || ''}`, httpOptions, this.baseUrl)
 			.map((rawDataSet: any) => {
