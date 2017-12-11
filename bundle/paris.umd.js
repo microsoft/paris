@@ -761,7 +761,7 @@ var Repository = /** @class */ (function () {
         var _this = this;
         if (dataOptions === void 0) { dataOptions = data_options.defaultDataOptions; }
         var queryError = new Error("Failed to get " + this.entity.pluralName + ".");
-        var httpOptions = dataset_service.DatasetService.queryToHttpOptions(query);
+        var httpOptions = this.entity.parseDataQuery ? { params: this.entity.parseDataQuery(query) } : dataset_service.DatasetService.queryToHttpOptions(query);
         return this.dataStore.get("" + this.endpointName + (this.entity.allItemsEndpointTrailingSlash !== false && !this.entity.allItemsEndpoint ? '/' : '') + (this.entity.allItemsEndpoint || ''), httpOptions, this.baseUrl)
             .map(function (rawDataSet) {
             var allItemsProperty = _this.entity.allItemsProperty || _this.config.allItemsProperty;
