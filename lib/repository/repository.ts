@@ -307,7 +307,7 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 			});
 	}
 
-	getItemById(itemId: string | number, options: DataOptions = defaultDataOptions): Observable<T> {
+	getItemById(itemId: string | number, options: DataOptions = defaultDataOptions, params?:{ [index:string]:any }): Observable<T> {
 		if (this.entity.values) {
 
 			let entityValue: T;
@@ -327,7 +327,7 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 		if (this.entity.loadAll)
 			return this.setAllItems().map(() => this._allValuesMap.get(String(itemId)));
 		else {
-			return this.dataStore.get(`${this.endpointName}/${itemId}`)
+			return this.dataStore.get(this.entity.parseItemQuery ? this.entity.parseItemQuery(itemId, this.entity, this.config) : `${this.endpointName}/${itemId}`, params && { params: params }, this.baseUrl)
 				.flatMap(data => this.createItem(data, options));
 		}
 	}
