@@ -267,7 +267,7 @@ var Repository = /** @class */ (function () {
             });
         });
     };
-    Repository.prototype.getItemById = function (itemId, options) {
+    Repository.prototype.getItemById = function (itemId, options, params) {
         var _this = this;
         if (options === void 0) { options = data_options_1.defaultDataOptions; }
         if (this.entity.values) {
@@ -285,7 +285,7 @@ var Repository = /** @class */ (function () {
         if (this.entity.loadAll)
             return this.setAllItems().map(function () { return _this._allValuesMap.get(String(itemId)); });
         else {
-            return this.dataStore.get(this.endpointName + "/" + itemId)
+            return this.dataStore.get(this.entity.parseItemQuery ? this.entity.parseItemQuery(itemId, this.entity, this.config) : this.endpointName + "/" + itemId, params && { params: params }, this.baseUrl)
                 .flatMap(function (data) { return _this.createItem(data, options); });
         }
     };

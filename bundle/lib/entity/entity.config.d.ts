@@ -13,6 +13,7 @@ export declare class ModelEntity extends EntityConfigBase {
     parseDataQuery?: (dataQuery: DataQuery) => {
         [index: string]: any;
     };
+    parseItemQuery?: (itemId: string | number, entity?: ModelEntity, config?: ParisConfig) => string;
     constructor(config: EntityConfig, entityConstructor: DataEntityConstructor<any>);
 }
 export interface EntityConfig extends IEntityConfigBase {
@@ -26,6 +27,7 @@ export interface EntityConfig extends IEntityConfigBase {
     parseDataQuery?: (dataQuery: DataQuery) => {
         [index: string]: any;
     };
+    parseItemQuery?: (itemId: string | number, entity?: ModelEntity, config?: ParisConfig) => string;
 }
 export interface ModelEntityCacheConfig {
     time?: number;

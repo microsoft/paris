@@ -49,7 +49,9 @@ export declare class Repository<T extends EntityModelBase> implements IRepositor
     private static getEntityItem<U>(repository, data, options?);
     private static getValueObjectItem<U>(valueObjectType, data, options, paris, config?);
     query(query?: DataQuery, dataOptions?: DataOptions): Observable<DataSet<T>>;
-    getItemById(itemId: string | number, options?: DataOptions): Observable<T>;
+    getItemById(itemId: string | number, options?: DataOptions, params?: {
+        [index: string]: any;
+    }): Observable<T>;
     private setAllItems();
     getItemSaveData(item: T): Index;
 }
