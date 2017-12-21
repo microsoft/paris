@@ -53,5 +53,29 @@ export declare class Repository<T extends EntityModelBase> implements IRepositor
         [index: string]: any;
     }): Observable<T>;
     private setAllItems();
-    getItemSaveData(item: T): Index;
+    /**
+     * Saves an entity to the server
+     * @param {T} item
+     * @returns {Observable<T extends EntityModelBase>}
+     */
+    save(item: T): Observable<T>;
+    /**
+     * Validates that the specified item is valid, according to the requirements of the entity (or value object) it belongs to.
+     * @param item
+     * @param {EntityConfigBase} entity
+     * @returns {boolean}
+     */
+    static validateItem(item: any, entity: EntityConfigBase): boolean;
+    /**
+     * Creates a JSON object that can be saved to server, with the reverse logic of getItemModelData
+     * @param {T} item
+     * @returns {Index}
+     */
+    serializeItem(item: T): Index;
+    /**
+     * Serializes an object value
+     * @param item
+     * @returns {Index}
+     */
+    static serializeItem(item: any, entity: EntityConfigBase, paris: Paris): Index;
 }

@@ -299,36 +299,78 @@ var Repository = /** @class */ (function () {
             _this._allValues.forEach(function (value) { return _this._allValuesMap.set(String(value.id), value); });
         }).map(function (dataSet) { return dataSet.items; });
     };
-    // save(item: T): Observable<T> {
-    // 	let saveData: Index = this.getItemSaveData(item);
-    //
-    // 	return this.dataStore.post(`${this.endpoint}/${item.id || ''}`, saveData)
-    // 		.flatMap((savedItemData: Index) => this.createItem(savedItemData))
-    // 		.do((item: T) => {
-    // 			if (this._allValues) {
-    // 				this._allValues = [...this._allValues, item];
-    // 				this._allItemsSubject$.next(this._allValues);
-    // 			}
-    //
-    // 			this._saveSubject$.next(item);
-    // 		});
-    // }
-    Repository.prototype.getItemSaveData = function (item) {
-        var modelData = {};
-        for (var propertyId in item) {
-            if (item.hasOwnProperty(propertyId)) {
-                var modelValue = void 0;
-                var propertyValue = item[propertyId], entityField = this.entity.fields.get(propertyId);
-                if (entityField) {
-                    var propertyRepository = this.paris.getRepository(entityField.type);
-                    if (propertyRepository)
-                        modelValue = propertyValue.id;
-                    else
-                        modelValue = data_transformers_service_1.DataTransformersService.serialize(entityField.type, propertyValue);
-                    modelData[entityField.id] = modelValue;
+    /**
+     * Saves an entity to the server
+     * @param {T} item
+     * @returns {Observable<T extends EntityModelBase>}
+     */
+    Repository.prototype.save = function (item) {
+        var _this = this;
+        if (!this.entity.endpoint)
+            throw new Error("Entity " + this.entity.entityConstructor.name + " can be saved - it doesn't specify an endpoint.");
+        try {
+            var saveData = this.serializeItem(item);
+            return this.dataStore.save(this.entity.endpoint + "/" + (item.id || ''), item.id === undefined ? "POST" : "PUT", { data: saveData })
+                .flatMap(function (savedItemData) { return _this.createItem(savedItemData); })
+                .do(function (item) {
+                if (_this._allValues) {
+                    _this._allValues = _this._allValues.concat([item]);
+                    _this._allItemsSubject$.next(_this._allValues);
                 }
-            }
+                _this._saveSubject$.next(item);
+            });
         }
+        catch (e) {
+            return Observable_1.Observable.throw(e);
+        }
+    };
+    /**
+     * Validates that the specified item is valid, according to the requirements of the entity (or value object) it belongs to.
+     * @param item
+     * @param {EntityConfigBase} entity
+     * @returns {boolean}
+     */
+    Repository.validateItem = function (item, entity) {
+        entity.fields.forEach(function (entityField) {
+            var itemFieldValue = item[entityField.id];
+            if (entityField.required && (itemFieldValue === undefined || itemFieldValue === null))
+                throw new Error("Missing value for field '" + entityField.id + "'");
+        });
+        return true;
+    };
+    /**
+     * Creates a JSON object that can be saved to server, with the reverse logic of getItemModelData
+     * @param {T} item
+     * @returns {Index}
+     */
+    Repository.prototype.serializeItem = function (item) {
+        Repository.validateItem(item, this.entity);
+        return Repository.serializeItem(item, this.entity, this.paris);
+    };
+    /**
+     * Serializes an object value
+     * @param item
+     * @returns {Index}
+     */
+    Repository.serializeItem = function (item, entity, paris) {
+        Repository.validateItem(item, entity);
+        var modelData = {};
+        entity.fields.forEach(function (entityField) {
+            var itemFieldValue = item[entityField.id], fieldRepository = paris.getRepository(entityField.type), fieldValueObjectType = !fieldRepository && value_objects_service_1.valueObjectsService.getEntityByType(entityField.type), isNilValue = itemFieldValue === undefined || itemFieldValue === null;
+            var modelValue;
+            if (entityField.isArray)
+                modelValue = itemFieldValue ? itemFieldValue.map(function (element) { return Repository.serializeItem(element, fieldRepository ? fieldRepository.entity : fieldValueObjectType, paris); }) : null;
+            else if (fieldRepository)
+                modelValue = isNilValue ? fieldRepository.entity.getDefaultValue() || null : itemFieldValue.id;
+            else if (fieldValueObjectType)
+                modelValue = isNilValue ? fieldValueObjectType.getDefaultValue() || null : Repository.serializeItem(itemFieldValue, fieldValueObjectType, paris);
+            else
+                modelValue = data_transformers_service_1.DataTransformersService.serialize(entityField.type, itemFieldValue);
+            var modelProperty = entityField.data
+                ? entityField.data instanceof Array ? entityField.data[0] : entityField.data
+                : entityField.id;
+            modelData[modelProperty] = modelValue;
+        });
         return modelData;
     };
     return Repository;

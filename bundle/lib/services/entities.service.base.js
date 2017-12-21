@@ -22,14 +22,6 @@ var EntitiesServiceBase = /** @class */ (function () {
         // TODO: Clear the fields once the entity is populated, without affecting inherited fields.
         return entity;
     };
-    EntitiesServiceBase.prototype.getEntityByPluralName = function (pluralName) {
-        var allEntities = Array.from(this._allEntities.keys()), pluralNameLowerCase = pluralName.toLowerCase();
-        for (var i = 0, entity = void 0; entity = allEntities[i]; i++) {
-            if (entity.entityConfig.pluralName.toLowerCase() === pluralNameLowerCase)
-                return entity;
-        }
-        return null;
-    };
     EntitiesServiceBase.prototype.getDataEntityTypeFields = function (dataEntityType) {
         if (!dataEntityType)
             return null;

@@ -12,7 +12,7 @@ export class DataStoreService{
 	}
 
 	save(endpoint:string, method:RequestMethod = "POST", data?:HttpOptions, baseUrl?:string):Observable<any>{
-		return Http.request(method, this.getEndpointUrl(endpoint, baseUrl), data);
+		return Http.request(method, this.getEndpointUrl(endpoint, baseUrl), data, this.config.http);
 	}
 
 	private getEndpointUrl(endpoint:string, baseUrl?:string):string{

@@ -186,7 +186,7 @@ var transformers = [
     {
         type: Date,
         parse: function (dateValue) { return new Date(dateValue); },
-        serialize: function (date) { return date.valueOf(); }
+        serialize: function (date) { return date ? date.valueOf() : null; }
     },
     {
         type: RegExp,
@@ -371,14 +371,6 @@ var EntitiesServiceBase = /** @class */ (function () {
         entity.fields = this.getDataEntityTypeFields(dataEntityType);
         // TODO: Clear the fields once the entity is populated, without affecting inherited fields.
         return entity;
-    };
-    EntitiesServiceBase.prototype.getEntityByPluralName = function (pluralName) {
-        var allEntities = Array.from(this._allEntities.keys()), pluralNameLowerCase = pluralName.toLowerCase();
-        for (var i = 0, entity = void 0; entity = allEntities[i]; i++) {
-            if (entity.entityConfig.pluralName.toLowerCase() === pluralNameLowerCase)
-                return entity;
-        }
-        return null;
     };
     EntitiesServiceBase.prototype.getDataEntityTypeFields = function (dataEntityType) {
         if (!dataEntityType)
@@ -818,36 +810,78 @@ var Repository = /** @class */ (function () {
             _this._allValues.forEach(function (value) { return _this._allValuesMap.set(String(value.id), value); });
         }).map(function (dataSet) { return dataSet.items; });
     };
-    // save(item: T): Observable<T> {
-    // 	let saveData: Index = this.getItemSaveData(item);
-    //
-    // 	return this.dataStore.post(`${this.endpoint}/${item.id || ''}`, saveData)
-    // 		.flatMap((savedItemData: Index) => this.createItem(savedItemData))
-    // 		.do((item: T) => {
-    // 			if (this._allValues) {
-    // 				this._allValues = [...this._allValues, item];
-    // 				this._allItemsSubject$.next(this._allValues);
-    // 			}
-    //
-    // 			this._saveSubject$.next(item);
-    // 		});
-    // }
-    Repository.prototype.getItemSaveData = function (item) {
-        var modelData = {};
-        for (var propertyId in item) {
-            if (item.hasOwnProperty(propertyId)) {
-                var modelValue = void 0;
-                var propertyValue = item[propertyId], entityField$$1 = this.entity.fields.get(propertyId);
-                if (entityField$$1) {
-                    var propertyRepository = this.paris.getRepository(entityField$$1.type);
-                    if (propertyRepository)
-                        modelValue = propertyValue.id;
-                    else
-                        modelValue = dataTransformers_service.DataTransformersService.serialize(entityField$$1.type, propertyValue);
-                    modelData[entityField$$1.id] = modelValue;
+    /**
+     * Saves an entity to the server
+     * @param {T} item
+     * @returns {Observable<T extends EntityModelBase>}
+     */
+    Repository.prototype.save = function (item) {
+        var _this = this;
+        if (!this.entity.endpoint)
+            throw new Error("Entity " + this.entity.entityConstructor.name + " can be saved - it doesn't specify an endpoint.");
+        try {
+            var saveData = this.serializeItem(item);
+            return this.dataStore.save(this.entity.endpoint + "/" + (item.id || ''), item.id === undefined ? "POST" : "PUT", { data: saveData })
+                .flatMap(function (savedItemData) { return _this.createItem(savedItemData); })
+                .do(function (item) {
+                if (_this._allValues) {
+                    _this._allValues = _this._allValues.concat([item]);
+                    _this._allItemsSubject$.next(_this._allValues);
                 }
-            }
+                _this._saveSubject$.next(item);
+            });
         }
+        catch (e) {
+            return Observable_1.Observable.throw(e);
+        }
+    };
+    /**
+     * Validates that the specified item is valid, according to the requirements of the entity (or value object) it belongs to.
+     * @param item
+     * @param {EntityConfigBase} entity
+     * @returns {boolean}
+     */
+    Repository.validateItem = function (item, entity) {
+        entity.fields.forEach(function (entityField$$1) {
+            var itemFieldValue = item[entityField$$1.id];
+            if (entityField$$1.required && (itemFieldValue === undefined || itemFieldValue === null))
+                throw new Error("Missing value for field '" + entityField$$1.id + "'");
+        });
+        return true;
+    };
+    /**
+     * Creates a JSON object that can be saved to server, with the reverse logic of getItemModelData
+     * @param {T} item
+     * @returns {Index}
+     */
+    Repository.prototype.serializeItem = function (item) {
+        Repository.validateItem(item, this.entity);
+        return Repository.serializeItem(item, this.entity, this.paris);
+    };
+    /**
+     * Serializes an object value
+     * @param item
+     * @returns {Index}
+     */
+    Repository.serializeItem = function (item, entity, paris) {
+        Repository.validateItem(item, entity);
+        var modelData = {};
+        entity.fields.forEach(function (entityField$$1) {
+            var itemFieldValue = item[entityField$$1.id], fieldRepository = paris.getRepository(entityField$$1.type), fieldValueObjectType = !fieldRepository && valueObjects_service.valueObjectsService.getEntityByType(entityField$$1.type), isNilValue = itemFieldValue === undefined || itemFieldValue === null;
+            var modelValue;
+            if (entityField$$1.isArray)
+                modelValue = itemFieldValue ? itemFieldValue.map(function (element) { return Repository.serializeItem(element, fieldRepository ? fieldRepository.entity : fieldValueObjectType, paris); }) : null;
+            else if (fieldRepository)
+                modelValue = isNilValue ? fieldRepository.entity.getDefaultValue() || null : itemFieldValue.id;
+            else if (fieldValueObjectType)
+                modelValue = isNilValue ? fieldValueObjectType.getDefaultValue() || null : Repository.serializeItem(itemFieldValue, fieldValueObjectType, paris);
+            else
+                modelValue = dataTransformers_service.DataTransformersService.serialize(entityField$$1.type, itemFieldValue);
+            var modelProperty = entityField$$1.data
+                ? entityField$$1.data instanceof Array ? entityField$$1.data[0] : entityField$$1.data
+                : entityField$$1.id;
+            modelData[modelProperty] = modelValue;
+        });
         return modelData;
     };
     return Repository;
@@ -892,9 +926,32 @@ var Http = /** @class */ (function () {
     function Http() {
     }
     Http.get = function (url, options, httpConfig) {
-        var fullUrl = options && options.params ? Http.addParamsToUrl(url, options.params) : url, tmpError = new Error("Failed to GET from " + url + ".");
+        return Http.request("GET", url, options, httpConfig);
+    };
+    Http.post = function (url, options, httpConfig) {
+        return Http.request("POST", url, options, httpConfig);
+    };
+    Http.put = function (url, options, httpConfig) {
+        return Http.request("PUT", url, options, httpConfig);
+    };
+    Http.delete = function (url, options, httpConfig) {
+        return Http.request("DELETE", url, options, httpConfig);
+    };
+    Http.patch = function (url, options, httpConfig) {
+        return Http.request("PATCH", url, options, httpConfig);
+    };
+    Http.request = function (method, url, options, httpConfig) {
+        var fullUrl = options && options.params ? Http.addParamsToUrl(url, options.params) : url, tmpError = new Error("Failed to " + method + " from " + url + ".");
+        if (options && options.data) {
+            httpConfig = httpConfig || {};
+            if (!httpConfig.headers)
+                httpConfig.headers = {};
+            httpConfig.headers["Content-Type"] = "application/json";
+        }
         return Observable_1.Observable.ajax(Object.assign({
-            url: fullUrl
+            method: method,
+            url: fullUrl,
+            body: options && options.data
         }, Http.httpOptionsToRequestInit(options, httpConfig)))
             .map(function (e) { return e.response; })
             .catch(function () { throw tmpError; });
@@ -944,17 +1001,18 @@ var DataStoreService = /** @class */ (function () {
         this.activeRequests = new Map();
     }
     DataStoreService.prototype.get = function (endpoint, data, baseUrl) {
-        return this.setActiveRequest(Observable_1.Observable.from(http_service.Http.get(this.getEndpointUrl(endpoint, baseUrl), data, this.config.http)), HttpVerb.get, endpoint, data);
+        return this.setActiveRequest(Observable_1.Observable.from(http_service.Http.get(this.getEndpointUrl(endpoint, baseUrl), data, this.config.http)), "GET", endpoint, data);
     };
-    // post(endpoint:string, data?:RequestData, baseUrl?:string):Observable<any>{
-    // 	return this.http.post(this.getEndpointUrl(endpoint, baseUrl), data);
-    // }
+    DataStoreService.prototype.save = function (endpoint, method, data, baseUrl) {
+        if (method === void 0) { method = "POST"; }
+        return http_service.Http.request(method, this.getEndpointUrl(endpoint, baseUrl), data, this.config.http);
+    };
     DataStoreService.prototype.getEndpointUrl = function (endpoint, baseUrl) {
         return (baseUrl || this.config.apiRoot || "") + "/" + endpoint;
     };
-    DataStoreService.prototype.setActiveRequest = function (obs, verb, endpoint, data) {
+    DataStoreService.prototype.setActiveRequest = function (obs, method, endpoint, data) {
         var _this = this;
-        var activeRequestId = DataStoreService.getActiveRequestId(verb, endpoint, data), existingActiveRequest = this.activeRequests.get(activeRequestId);
+        var activeRequestId = DataStoreService.getActiveRequestId(method, endpoint, data), existingActiveRequest = this.activeRequests.get(activeRequestId);
         if (existingActiveRequest)
             return existingActiveRequest;
         else {
@@ -964,17 +1022,12 @@ var DataStoreService = /** @class */ (function () {
             return warmObservable;
         }
     };
-    DataStoreService.getActiveRequestId = function (verb, endpoint, data) {
-        return verb + "__" + endpoint + "__" + (data ? JSON.stringify(data) : '|');
+    DataStoreService.getActiveRequestId = function (method, endpoint, data) {
+        return method + "__" + endpoint + "__" + (data ? JSON.stringify(data) : '|');
     };
     return DataStoreService;
 }());
 exports.DataStoreService = DataStoreService;
-var HttpVerb;
-(function (HttpVerb) {
-    HttpVerb["get"] = "GET";
-    HttpVerb["post"] = "POST";
-})(HttpVerb || (HttpVerb = {}));
 });
 
 unwrapExports(dataStore_service);

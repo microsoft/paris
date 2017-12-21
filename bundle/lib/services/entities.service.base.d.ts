@@ -5,6 +5,5 @@ export declare abstract class EntitiesServiceBase<T extends EntityConfigBase> {
     readonly allEntities: Array<T>;
     getEntityByType(dataEntityType: DataEntityType): T;
     addEntity(dataEntityType: DataEntityType, entity: T): T;
-    getEntityByPluralName(pluralName: string): DataEntityType;
     private getDataEntityTypeFields(dataEntityType);
 }
