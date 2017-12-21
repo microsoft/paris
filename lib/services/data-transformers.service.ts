@@ -4,7 +4,7 @@ const transformers:Array<DataTransformer> = [
 	{
 		type: Date,
 		parse: (dateValue:string) => new Date(dateValue),
-		serialize: (date:Date) => date.valueOf()
+		serialize: (date:Date) => date ? date.valueOf() : null
 	},
 	{
 		type: RegExp,

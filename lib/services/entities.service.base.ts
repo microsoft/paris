@@ -26,20 +26,6 @@ export abstract class EntitiesServiceBase<T extends EntityConfigBase>{
 		return entity;
 	}
 
-
-
-	getEntityByPluralName(pluralName:string):DataEntityType{
-		let allEntities:Array<DataEntityType> = Array.from(this._allEntities.keys()),
-			pluralNameLowerCase = pluralName.toLowerCase();
-
-		for(let i=0, entity:DataEntityType; entity = allEntities[i]; i++){
-			if (entity.entityConfig.pluralName.toLowerCase() === pluralNameLowerCase)
-				return entity;
-		}
-
-		return null;
-	}
-
 	private getDataEntityTypeFields(dataEntityType:DataEntityType):EntityFields{
 		if (!dataEntityType)
 			return null;

@@ -10,10 +10,10 @@ export interface IRepository{
 	createNewItem:() => EntityModelBase,
 	getItemById:(id:any) => Observable<any>,
 	query:(options?:DataQuery) => Observable<DataSet<any>>,
-	getItemSaveData:(item:EntityModelBase) => Object,
+	serializeItem:(item:EntityModelBase) => Object,
 	allItems$:Observable<Array<any>>,
 	endpointName:string,
 	endpointUrl:string,
-	//save:(item:EntityModelBase) => Observable<EntityModelBase>,
+	save:(item:EntityModelBase) => Observable<EntityModelBase>
 	//save$:Observable<any>
 }

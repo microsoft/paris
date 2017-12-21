@@ -343,43 +343,94 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 		}).map(dataSet => dataSet.items);
 	}
 
-	// save(item: T): Observable<T> {
-	// 	let saveData: Index = this.getItemSaveData(item);
-	//
-	// 	return this.dataStore.post(`${this.endpoint}/${item.id || ''}`, saveData)
-	// 		.flatMap((savedItemData: Index) => this.createItem(savedItemData))
-	// 		.do((item: T) => {
-	// 			if (this._allValues) {
-	// 				this._allValues = [...this._allValues, item];
-	// 				this._allItemsSubject$.next(this._allValues);
-	// 			}
-	//
-	// 			this._saveSubject$.next(item);
-	// 		});
-	// }
+	/**
+	 * Saves an entity to the server
+	 * @param {T} item
+	 * @returns {Observable<T extends EntityModelBase>}
+	 */
+	save(item: T): Observable<T> {
+		if (!this.entity.endpoint)
+			throw new Error(`Entity ${this.entity.entityConstructor.name} can be saved - it doesn't specify an endpoint.`);
 
-	getItemSaveData(item: T): Index {
+		try {
+			let saveData: Index = this.serializeItem(item);
+			return this.dataStore.save(`${this.entity.endpoint}/${item.id || ''}`, item.id === undefined ? "POST" : "PUT", { data: saveData })
+				.flatMap((savedItemData: Index) => this.createItem(savedItemData))
+				.do((item: T) => {
+					if (this._allValues) {
+						this._allValues = [...this._allValues, item];
+						this._allItemsSubject$.next(this._allValues);
+					}
+
+					this._saveSubject$.next(item);
+				});
+		}
+		catch(e){
+			return Observable.throw(e);
+		}
+	}
+
+	/**
+	 * Validates that the specified item is valid, according to the requirements of the entity (or value object) it belongs to.
+	 * @param item
+	 * @param {EntityConfigBase} entity
+	 * @returns {boolean}
+	 */
+	static validateItem(item:any, entity:EntityConfigBase):boolean{
+		entity.fields.forEach((entityField:Field) => {
+			let itemFieldValue: any = (<any>item)[entityField.id];
+
+			if (entityField.required && (itemFieldValue === undefined || itemFieldValue === null))
+				throw new Error(`Missing value for field '${entityField.id}'`);
+		});
+
+		return true;
+	}
+
+	/**
+	 * Creates a JSON object that can be saved to server, with the reverse logic of getItemModelData
+	 * @param {T} item
+	 * @returns {Index}
+	 */
+	serializeItem(item:T): Index {
+		Repository.validateItem(item, this.entity);
+
+		return Repository.serializeItem(item, this.entity, this.paris);
+	}
+
+	/**
+	 * Serializes an object value
+	 * @param item
+	 * @returns {Index}
+	 */
+	static serializeItem(item:any, entity:EntityConfigBase, paris:Paris):Index{
+		Repository.validateItem(item, entity);
+
 		let modelData: Index = {};
 
-		for (let propertyId in item) {
-			if (item.hasOwnProperty(propertyId)) {
-				let modelValue: any;
+		entity.fields.forEach((entityField:Field) => {
+			let itemFieldValue:any = (<any>item)[entityField.id],
+				fieldRepository = paris.getRepository(entityField.type),
+				fieldValueObjectType:EntityConfigBase = !fieldRepository && valueObjectsService.getEntityByType(entityField.type),
+				isNilValue = itemFieldValue === undefined || itemFieldValue === null;
 
-				let propertyValue: any = item[propertyId],
-					entityField: Field = this.entity.fields.get(propertyId);
+			let modelValue:any;
 
-				if (entityField) {
-					let propertyRepository: IRepository = this.paris.getRepository(entityField.type);
+			if (entityField.isArray)
+				modelValue =  itemFieldValue ? itemFieldValue.map((element:any) => Repository.serializeItem(element, fieldRepository ? fieldRepository.entity : fieldValueObjectType, paris)) : null;
+			else if (fieldRepository)
+				modelValue = isNilValue ? fieldRepository.entity.getDefaultValue() || null : itemFieldValue.id;
+			else if (fieldValueObjectType)
+				modelValue = isNilValue ? fieldValueObjectType.getDefaultValue() || null : Repository.serializeItem(itemFieldValue, fieldValueObjectType, paris);
+			else
+				modelValue = DataTransformersService.serialize(entityField.type, itemFieldValue);
 
-					if (propertyRepository)
-						modelValue = (<EntityModelBase>propertyValue).id;
-					else
-						modelValue = DataTransformersService.serialize(entityField.type, propertyValue);
+			let modelProperty:string = entityField.data
+				? entityField.data instanceof Array ? entityField.data[0] : entityField.data
+				: entityField.id;
 
-					modelData[entityField.id] = modelValue;
-				}
-			}
-		}
+			modelData[modelProperty] = modelValue;
+		});
 
 		return modelData;
 	}

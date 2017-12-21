@@ -1,5 +1,5 @@
 import {ParisConfig} from "../config/paris-config";
-import {Http, HttpOptions} from "./http.service";
+import {Http, HttpOptions, RequestMethod} from "./http.service";
 import {Observable} from "rxjs/Observable";
 
 export class DataStoreService{
@@ -8,19 +8,19 @@ export class DataStoreService{
 	constructor(private config:ParisConfig){}
 
 	get(endpoint:string, data?:HttpOptions, baseUrl?:string):Observable<any>{
-		return this.setActiveRequest(Observable.from(Http.get(this.getEndpointUrl(endpoint, baseUrl), data, this.config.http)), HttpVerb.get, endpoint, data);
+		return this.setActiveRequest(Observable.from(Http.get(this.getEndpointUrl(endpoint, baseUrl), data, this.config.http)), "GET", endpoint, data);
 	}
 
-	// post(endpoint:string, data?:RequestData, baseUrl?:string):Observable<any>{
-	// 	return this.http.post(this.getEndpointUrl(endpoint, baseUrl), data);
-	// }
+	save(endpoint:string, method:RequestMethod = "POST", data?:HttpOptions, baseUrl?:string):Observable<any>{
+		return Http.request(method, this.getEndpointUrl(endpoint, baseUrl), data);
+	}
 
 	private getEndpointUrl(endpoint:string, baseUrl?:string):string{
 		return `${baseUrl || this.config.apiRoot || ""}/${endpoint}`;
 	}
 
-	private setActiveRequest(obs:Observable<any>, verb:HttpVerb, endpoint:string, data?:RequestData):Observable<any>{
-		let activeRequestId:string = DataStoreService.getActiveRequestId(verb, endpoint, data),
+	private setActiveRequest(obs:Observable<any>, method:RequestMethod, endpoint:string, data?:RequestData):Observable<any>{
+		let activeRequestId:string = DataStoreService.getActiveRequestId(method, endpoint, data),
 			existingActiveRequest = this.activeRequests.get(activeRequestId);
 
 		if (existingActiveRequest)
@@ -34,16 +34,11 @@ export class DataStoreService{
 		}
 	}
 
-	private static getActiveRequestId(verb:HttpVerb, endpoint:string, data?:RequestData):string{
-		return `${verb}__${endpoint}__${data ? JSON.stringify(data) : '|'}`;
+	private static getActiveRequestId(method:RequestMethod, endpoint:string, data?:RequestData):string{
+		return `${method}__${endpoint}__${data ? JSON.stringify(data) : '|'}`;
 	}
 }
 
 export interface RequestData{
 	[index:string]:any
-}
-
-enum HttpVerb{
-	get = "GET",
-	post = "POST"
 }

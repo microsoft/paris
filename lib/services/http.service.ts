@@ -1,13 +1,45 @@
 import {ParisHttpConfig} from "../config/paris-config";
 import {Observable} from "rxjs/Observable";
 
+export type RequestMethod = "GET"|"POST"|"PUT"|"PATCH"|"DELETE";
+
 export class Http{
 	static get(url:string, options?:HttpOptions, httpConfig?:ParisHttpConfig):Observable<any>{
+		return Http.request("GET", url, options, httpConfig);
+	}
+
+	static post(url:string, options?:HttpOptions, httpConfig?:ParisHttpConfig):Observable<any>{
+		return Http.request("POST", url, options, httpConfig);
+	}
+
+	static put(url:string, options?:HttpOptions, httpConfig?:ParisHttpConfig):Observable<any>{
+		return Http.request("PUT", url, options, httpConfig);
+	}
+
+	static delete(url:string, options?:HttpOptions, httpConfig?:ParisHttpConfig):Observable<any>{
+		return Http.request("DELETE", url, options, httpConfig);
+	}
+
+	static patch(url:string, options?:HttpOptions, httpConfig?:ParisHttpConfig):Observable<any>{
+		return Http.request("PATCH", url, options, httpConfig);
+	}
+
+	static request(method:RequestMethod, url:string, options?:HttpOptions, httpConfig?:ParisHttpConfig):Observable<any> {
 		let fullUrl:string = options && options.params ? Http.addParamsToUrl(url, options.params) : url,
-			tmpError:Error = new Error(`Failed to GET from ${url}.`);
+			tmpError:Error = new Error(`Failed to ${method} from ${url}.`);
+
+		if (options && options.data) {
+			httpConfig = httpConfig || {};
+			if (!httpConfig.headers)
+				httpConfig.headers = {};
+
+			httpConfig.headers["Content-Type"] = "application/json";
+		}
 
 		return Observable.ajax(Object.assign({
-			url: fullUrl
+			method: method,
+			url: fullUrl,
+			body: options && options.data
 		}, Http.httpOptionsToRequestInit(options, httpConfig)))
 			.map(e => e.response)
 			.catch(() => { throw tmpError });
