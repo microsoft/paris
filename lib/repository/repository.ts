@@ -1,5 +1,5 @@
 import {ModelEntity} from "../entity/entity.config";
-import {DataEntityConstructor, DataEntityType} from "../entity/data-entity.base";
+import {DataEntityConstructor} from "../entity/data-entity.base";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
 import {Field, FIELD_DATA_SELF} from "../entity/entity-field";
@@ -25,6 +25,7 @@ import {ErrorsService} from "../services/errors.service";
 
 export class Repository<T extends EntityModelBase> implements IRepository {
 	save$: Observable<T>;
+	delete$: Observable<Array<T>>;
 	private _allItems$: Observable<Array<T>>;
 
 	private _allValues: Array<T>;
@@ -32,6 +33,7 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 	private _cache: DataCache<T>;
 	private _allItemsSubject$: Subject<Array<T>>;
 	private _saveSubject$: Subject<T>;
+	private _deleteSubject$: Subject<Array<T>>;
 
 	get allItems$(): Observable<Array<T>> {
 		if (this._allValues)
@@ -81,7 +83,9 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 		this._allItems$ = Observable.merge(getAllItems$, this._allItemsSubject$.asObservable());
 
 		this._saveSubject$ = new Subject();
+		this._deleteSubject$ = new Subject();
 		this.save$ = this._saveSubject$.asObservable();
+		this.delete$ = this._deleteSubject$.asObservable();
 	}
 
 	createItem(itemData: any, options: DataOptions = { allowCache: true, availability: DataAvailability.available }): Observable<T> {
@@ -289,7 +293,9 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 					ErrorsService.warn(`Property '${this.config.allItemsProperty}' wasn't found in DataSet for Entity '${this.entity.pluralName}'.`);
 				return {
 					count: rawDataSet.count,
-					items: rawItems
+					items: rawItems,
+					next: rawDataSet.next,
+					previous: rawDataSet.previous
 				}
 			})
 			.flatMap((dataSet: DataSet<any>) => {
@@ -298,7 +304,9 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 				return Observable.combineLatest.apply(this, itemCreators).map((items: Array<T>) => {
 					return Object.freeze({
 						count: dataSet.count,
-						items: items
+						items: items,
+						next: dataSet.next,
+						previous: dataSet.previous
 					});
 				}).catch((error:Error) => {
 					queryError.message = queryError.message + " Error: " + error.message;
@@ -350,11 +358,11 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 	 */
 	save(item: T): Observable<T> {
 		if (!this.entity.endpoint)
-			throw new Error(`Entity ${this.entity.entityConstructor.name} can be saved - it doesn't specify an endpoint.`);
+			throw new Error(`Entity ${this.entity.entityConstructor.name} can't be saved - it doesn't specify an endpoint.`);
 
 		try {
 			let saveData: Index = this.serializeItem(item);
-			return this.dataStore.save(`${this.entity.endpoint}/${item.id || ''}`, item.id === undefined ? "POST" : "PUT", { data: saveData })
+			return this.dataStore.save(`${this.endpointName}/${item.id || ''}`, item.id === undefined ? "POST" : "PUT", { data: saveData }, this.baseUrl)
 				.flatMap((savedItemData: Index) => this.createItem(savedItemData))
 				.do((item: T) => {
 					if (this._allValues) {
@@ -364,6 +372,40 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 
 					this._saveSubject$.next(item);
 				});
+		}
+		catch(e){
+			return Observable.throw(e);
+		}
+	}
+
+	remove(items:Array<T>):Observable<Array<T>>{
+		if (!items)
+			throw new Error(`No ${this.entity.pluralName.toLowerCase()} specified for removing.`);
+
+		if (!(items instanceof Array))
+			items = [items];
+
+		if (!items.length)
+			return Observable.of([]);
+
+		if (!this.entity.endpoint)
+			throw new Error(`Entity ${this.entity.entityConstructor.name} can't be deleted - it doesn't specify an endpoint.`);
+
+		try {
+			return this.dataStore.delete(this.endpointName, { data: { ids: items.map(item => item.id) } }, this.baseUrl)
+				.do(() => {
+					if (this._allValues) {
+						items.forEach((item:T) => {
+							let itemIndex:number = _.findIndex(this._allValues, (_item:T) => _item.id === item.id);
+							if (~itemIndex)
+								this._allValues.splice(itemIndex, 1);
+						});
+
+						this._allItemsSubject$.next(this._allValues);
+					}
+
+					this._deleteSubject$.next(items);
+				}).map(() => items);
 		}
 		catch(e){
 			return Observable.throw(e);

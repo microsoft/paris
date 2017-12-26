@@ -15,6 +15,10 @@ export class DataStoreService{
 		return Http.request(method, this.getEndpointUrl(endpoint, baseUrl), data, this.config.http);
 	}
 
+	delete(endpoint:string, data?:HttpOptions, baseUrl?:string):Observable<any>{
+		return Http.request("DELETE", this.getEndpointUrl(endpoint, baseUrl), data, this.config.http);
+	}
+
 	private getEndpointUrl(endpoint:string, baseUrl?:string):string{
 		return `${baseUrl || this.config.apiRoot || ""}/${endpoint}`;
 	}

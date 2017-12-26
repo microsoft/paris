@@ -19,12 +19,14 @@ export declare class Repository<T extends EntityModelBase> implements IRepositor
     private dataStore;
     private paris;
     save$: Observable<T>;
+    delete$: Observable<Array<T>>;
     private _allItems$;
     private _allValues;
     private _allValuesMap;
     private _cache;
     private _allItemsSubject$;
     private _saveSubject$;
+    private _deleteSubject$;
     readonly allItems$: Observable<Array<T>>;
     private readonly cache;
     private readonly baseUrl;
@@ -59,6 +61,7 @@ export declare class Repository<T extends EntityModelBase> implements IRepositor
      * @returns {Observable<T extends EntityModelBase>}
      */
     save(item: T): Observable<T>;
+    remove(items: Array<T>): Observable<Array<T>>;
     /**
      * Validates that the specified item is valid, according to the requirements of the entity (or value object) it belongs to.
      * @param item

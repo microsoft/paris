@@ -23,7 +23,9 @@ var Repository = /** @class */ (function () {
         this._allItemsSubject$ = new Subject_1.Subject();
         this._allItems$ = Observable_1.Observable.merge(getAllItems$, this._allItemsSubject$.asObservable());
         this._saveSubject$ = new Subject_1.Subject();
+        this._deleteSubject$ = new Subject_1.Subject();
         this.save$ = this._saveSubject$.asObservable();
+        this.delete$ = this._deleteSubject$.asObservable();
     }
     Object.defineProperty(Repository.prototype, "allItems$", {
         get: function () {
@@ -251,7 +253,9 @@ var Repository = /** @class */ (function () {
                 errors_service_1.ErrorsService.warn("Property '" + _this.config.allItemsProperty + "' wasn't found in DataSet for Entity '" + _this.entity.pluralName + "'.");
             return {
                 count: rawDataSet.count,
-                items: rawItems
+                items: rawItems,
+                next: rawDataSet.next,
+                previous: rawDataSet.previous
             };
         })
             .flatMap(function (dataSet) {
@@ -259,7 +263,9 @@ var Repository = /** @class */ (function () {
             return Observable_1.Observable.combineLatest.apply(_this, itemCreators).map(function (items) {
                 return Object.freeze({
                     count: dataSet.count,
-                    items: items
+                    items: items,
+                    next: dataSet.next,
+                    previous: dataSet.previous
                 });
             }).catch(function (error) {
                 queryError.message = queryError.message + " Error: " + error.message;
@@ -307,10 +313,10 @@ var Repository = /** @class */ (function () {
     Repository.prototype.save = function (item) {
         var _this = this;
         if (!this.entity.endpoint)
-            throw new Error("Entity " + this.entity.entityConstructor.name + " can be saved - it doesn't specify an endpoint.");
+            throw new Error("Entity " + this.entity.entityConstructor.name + " can't be saved - it doesn't specify an endpoint.");
         try {
             var saveData = this.serializeItem(item);
-            return this.dataStore.save(this.entity.endpoint + "/" + (item.id || ''), item.id === undefined ? "POST" : "PUT", { data: saveData })
+            return this.dataStore.save(this.endpointName + "/" + (item.id || ''), item.id === undefined ? "POST" : "PUT", { data: saveData }, this.baseUrl)
                 .flatMap(function (savedItemData) { return _this.createItem(savedItemData); })
                 .do(function (item) {
                 if (_this._allValues) {
@@ -319,6 +325,34 @@ var Repository = /** @class */ (function () {
                 }
                 _this._saveSubject$.next(item);
             });
+        }
+        catch (e) {
+            return Observable_1.Observable.throw(e);
+        }
+    };
+    Repository.prototype.remove = function (items) {
+        var _this = this;
+        if (!items)
+            throw new Error("No " + this.entity.pluralName.toLowerCase() + " specified for removing.");
+        if (!(items instanceof Array))
+            items = [items];
+        if (!items.length)
+            return Observable_1.Observable.of([]);
+        if (!this.entity.endpoint)
+            throw new Error("Entity " + this.entity.entityConstructor.name + " can't be deleted - it doesn't specify an endpoint.");
+        try {
+            return this.dataStore.delete(this.endpointName, { data: { ids: items.map(function (item) { return item.id; }) } }, this.baseUrl)
+                .do(function () {
+                if (_this._allValues) {
+                    items.forEach(function (item) {
+                        var itemIndex = _.findIndex(_this._allValues, function (_item) { return _item.id === item.id; });
+                        if (~itemIndex)
+                            _this._allValues.splice(itemIndex, 1);
+                    });
+                    _this._allItemsSubject$.next(_this._allValues);
+                }
+                _this._deleteSubject$.next(items);
+            }).map(function () { return items; });
         }
         catch (e) {
             return Observable_1.Observable.throw(e);

@@ -14,6 +14,9 @@ var DataStoreService = /** @class */ (function () {
         if (method === void 0) { method = "POST"; }
         return http_service_1.Http.request(method, this.getEndpointUrl(endpoint, baseUrl), data, this.config.http);
     };
+    DataStoreService.prototype.delete = function (endpoint, data, baseUrl) {
+        return http_service_1.Http.request("DELETE", this.getEndpointUrl(endpoint, baseUrl), data, this.config.http);
+    };
     DataStoreService.prototype.getEndpointUrl = function (endpoint, baseUrl) {
         return (baseUrl || this.config.apiRoot || "") + "/" + endpoint;
     };

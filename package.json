@@ -60,6 +60,7 @@
   },
   "peerDependencies": {
     "rxjs": ">=5.2.0",
-    "lodash.get": ">=4.4.2"
+    "lodash.get": ">=4.4.2",
+    "lodash.findIndex": ">=4.4.2"
   }
 }
