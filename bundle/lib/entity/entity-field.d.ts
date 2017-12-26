@@ -12,6 +12,7 @@ export interface Field {
     required?: boolean;
     require?: ((data: any, config?: ParisConfig) => any) | string;
     parse?: (fieldData?: any, itemData?: any) => any;
+    serialize?: (itemData: any) => any;
 }
 export declare const FIELD_DATA_SELF = "__self";
 export declare type EntityFieldConfigFunctionOrValue = ((data: any, config?: ParisConfig) => string) | string;

@@ -22,18 +22,20 @@ import {DatasetService} from "../services/dataset.service";
 import {HttpOptions} from "../services/http.service";
 import {DataAvailability} from "../dataset/data-availability.enum";
 import {ErrorsService} from "../services/errors.service";
+import {SaveEntityEvent} from "../events/save-entity.event";
+import {RemoveEntitiesEvent} from "../events/remove-entities.event";
 
 export class Repository<T extends EntityModelBase> implements IRepository {
-	save$: Observable<T>;
-	delete$: Observable<Array<T>>;
+	save$: Observable<SaveEntityEvent>;
+	remove$: Observable<RemoveEntitiesEvent>;
 	private _allItems$: Observable<Array<T>>;
 
 	private _allValues: Array<T>;
 	private _allValuesMap: Map<string, T>;
 	private _cache: DataCache<T>;
 	private _allItemsSubject$: Subject<Array<T>>;
-	private _saveSubject$: Subject<T>;
-	private _deleteSubject$: Subject<Array<T>>;
+	private _saveSubject$: Subject<SaveEntityEvent>;
+	private _removeSubject$: Subject<RemoveEntitiesEvent>;
 
 	get allItems$(): Observable<Array<T>> {
 		if (this._allValues)
@@ -83,9 +85,9 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 		this._allItems$ = Observable.merge(getAllItems$, this._allItemsSubject$.asObservable());
 
 		this._saveSubject$ = new Subject();
-		this._deleteSubject$ = new Subject();
+		this._removeSubject$ = new Subject();
 		this.save$ = this._saveSubject$.asObservable();
-		this.delete$ = this._deleteSubject$.asObservable();
+		this.remove$ = this._removeSubject$.asObservable();
 	}
 
 	createItem(itemData: any, options: DataOptions = { allowCache: true, availability: DataAvailability.available }): Observable<T> {
@@ -360,9 +362,11 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 		if (!this.entity.endpoint)
 			throw new Error(`Entity ${this.entity.entityConstructor.name} can't be saved - it doesn't specify an endpoint.`);
 
+		let isNewItem:boolean = item.id === undefined;
+
 		try {
 			let saveData: Index = this.serializeItem(item);
-			return this.dataStore.save(`${this.endpointName}/${item.id || ''}`, item.id === undefined ? "POST" : "PUT", { data: saveData }, this.baseUrl)
+			return this.dataStore.save(`${this.endpointName}/${item.id || ''}`, isNewItem ? "POST" : "PUT", { data: saveData }, this.baseUrl)
 				.flatMap((savedItemData: Index) => this.createItem(savedItemData))
 				.do((item: T) => {
 					if (this._allValues) {
@@ -370,7 +374,7 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 						this._allItemsSubject$.next(this._allValues);
 					}
 
-					this._saveSubject$.next(item);
+					this._saveSubject$.next({ entity: this.entityConstructor, newValue: item, isNew: isNewItem });
 				});
 		}
 		catch(e){
@@ -404,7 +408,7 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 						this._allItemsSubject$.next(this._allValues);
 					}
 
-					this._deleteSubject$.next(items);
+					this._removeSubject$.next({ entity: this.entityConstructor, items: items });
 				}).map(() => items);
 		}
 		catch(e){
@@ -458,7 +462,9 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 
 			let modelValue:any;
 
-			if (entityField.isArray)
+			if (entityField.serialize)
+				modelValue = entityField.serialize(itemFieldValue);
+			else if (entityField.isArray)
 				modelValue =  itemFieldValue ? itemFieldValue.map((element:any) => Repository.serializeItem(element, fieldRepository ? fieldRepository.entity : fieldValueObjectType, paris)) : null;
 			else if (fieldRepository)
 				modelValue = isNilValue ? fieldRepository.entity.getDefaultValue() || null : itemFieldValue.id;

@@ -534,9 +534,9 @@ var Repository = /** @class */ (function () {
         this._allItemsSubject$ = new Subject.Subject();
         this._allItems$ = Observable_1.Observable.merge(getAllItems$, this._allItemsSubject$.asObservable());
         this._saveSubject$ = new Subject.Subject();
-        this._deleteSubject$ = new Subject.Subject();
+        this._removeSubject$ = new Subject.Subject();
         this.save$ = this._saveSubject$.asObservable();
-        this.delete$ = this._deleteSubject$.asObservable();
+        this.remove$ = this._removeSubject$.asObservable();
     }
     Object.defineProperty(Repository.prototype, "allItems$", {
         get: function () {
@@ -825,16 +825,17 @@ var Repository = /** @class */ (function () {
         var _this = this;
         if (!this.entity.endpoint)
             throw new Error("Entity " + this.entity.entityConstructor.name + " can't be saved - it doesn't specify an endpoint.");
+        var isNewItem = item.id === undefined;
         try {
             var saveData = this.serializeItem(item);
-            return this.dataStore.save(this.endpointName + "/" + (item.id || ''), item.id === undefined ? "POST" : "PUT", { data: saveData }, this.baseUrl)
+            return this.dataStore.save(this.endpointName + "/" + (item.id || ''), isNewItem ? "POST" : "PUT", { data: saveData }, this.baseUrl)
                 .flatMap(function (savedItemData) { return _this.createItem(savedItemData); })
                 .do(function (item) {
                 if (_this._allValues) {
                     _this._allValues = _this._allValues.concat([item]);
                     _this._allItemsSubject$.next(_this._allValues);
                 }
-                _this._saveSubject$.next(item);
+                _this._saveSubject$.next({ entity: _this.entityConstructor, newValue: item, isNew: isNewItem });
             });
         }
         catch (e) {
@@ -862,7 +863,7 @@ var Repository = /** @class */ (function () {
                     });
                     _this._allItemsSubject$.next(_this._allValues);
                 }
-                _this._deleteSubject$.next(items);
+                _this._removeSubject$.next({ entity: _this.entityConstructor, items: items });
             }).map(function () { return items; });
         }
         catch (e) {
@@ -903,7 +904,9 @@ var Repository = /** @class */ (function () {
         entity.fields.forEach(function (entityField$$1) {
             var itemFieldValue = item[entityField$$1.id], fieldRepository = paris.getRepository(entityField$$1.type), fieldValueObjectType = !fieldRepository && valueObjects_service.valueObjectsService.getEntityByType(entityField$$1.type), isNilValue = itemFieldValue === undefined || itemFieldValue === null;
             var modelValue;
-            if (entityField$$1.isArray)
+            if (entityField$$1.serialize)
+                modelValue = entityField$$1.serialize(itemFieldValue);
+            else if (entityField$$1.isArray)
                 modelValue = itemFieldValue ? itemFieldValue.map(function (element) { return Repository.serializeItem(element, fieldRepository ? fieldRepository.entity : fieldValueObjectType, paris); }) : null;
             else if (fieldRepository)
                 modelValue = isNilValue ? fieldRepository.entity.getDefaultValue() || null : itemFieldValue.id;
@@ -1076,13 +1079,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 
 
+
 var Paris = /** @class */ (function () {
     function Paris(config) {
         this.repositories = new Map();
+        this._saveSubject$ = new Subject.Subject;
+        this._removeSubject$ = new Subject.Subject;
         this.config = Object.assign({}, parisConfig.defaultConfig, config);
         this.dataStore = new dataStore_service.DataStoreService(this.config);
+        this.save$ = this._saveSubject$.asObservable();
+        this.remove$ = this._removeSubject$.asObservable();
     }
     Paris.prototype.getRepository = function (entityConstructor) {
+        var _this = this;
         var repository$$1 = this.repositories.get(entityConstructor);
         if (!repository$$1) {
             var entityConfig = entities_service.entitiesService.getEntityByType(entityConstructor);
@@ -1090,6 +1099,11 @@ var Paris = /** @class */ (function () {
                 return null;
             repository$$1 = new repository.Repository(entityConfig, this.config, entityConstructor, this.dataStore, this);
             this.repositories.set(entityConstructor, repository$$1);
+            // If the entity has an endpoint, it means it connects to the backend, so subscribe to save/delete events to enable global events:
+            if (entityConfig.endpoint) {
+                repository$$1.save$.subscribe(function (saveEvent) { return _this._saveSubject$.next(saveEvent); });
+                repository$$1.remove$.subscribe(function (removeEvent) { return _this._removeSubject$.next(removeEvent); });
+            }
         }
         return repository$$1;
     };

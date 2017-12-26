@@ -23,9 +23,9 @@ var Repository = /** @class */ (function () {
         this._allItemsSubject$ = new Subject_1.Subject();
         this._allItems$ = Observable_1.Observable.merge(getAllItems$, this._allItemsSubject$.asObservable());
         this._saveSubject$ = new Subject_1.Subject();
-        this._deleteSubject$ = new Subject_1.Subject();
+        this._removeSubject$ = new Subject_1.Subject();
         this.save$ = this._saveSubject$.asObservable();
-        this.delete$ = this._deleteSubject$.asObservable();
+        this.remove$ = this._removeSubject$.asObservable();
     }
     Object.defineProperty(Repository.prototype, "allItems$", {
         get: function () {
@@ -314,16 +314,17 @@ var Repository = /** @class */ (function () {
         var _this = this;
         if (!this.entity.endpoint)
             throw new Error("Entity " + this.entity.entityConstructor.name + " can't be saved - it doesn't specify an endpoint.");
+        var isNewItem = item.id === undefined;
         try {
             var saveData = this.serializeItem(item);
-            return this.dataStore.save(this.endpointName + "/" + (item.id || ''), item.id === undefined ? "POST" : "PUT", { data: saveData }, this.baseUrl)
+            return this.dataStore.save(this.endpointName + "/" + (item.id || ''), isNewItem ? "POST" : "PUT", { data: saveData }, this.baseUrl)
                 .flatMap(function (savedItemData) { return _this.createItem(savedItemData); })
                 .do(function (item) {
                 if (_this._allValues) {
                     _this._allValues = _this._allValues.concat([item]);
                     _this._allItemsSubject$.next(_this._allValues);
                 }
-                _this._saveSubject$.next(item);
+                _this._saveSubject$.next({ entity: _this.entityConstructor, newValue: item, isNew: isNewItem });
             });
         }
         catch (e) {
@@ -351,7 +352,7 @@ var Repository = /** @class */ (function () {
                     });
                     _this._allItemsSubject$.next(_this._allValues);
                 }
-                _this._deleteSubject$.next(items);
+                _this._removeSubject$.next({ entity: _this.entityConstructor, items: items });
             }).map(function () { return items; });
         }
         catch (e) {
@@ -392,7 +393,9 @@ var Repository = /** @class */ (function () {
         entity.fields.forEach(function (entityField) {
             var itemFieldValue = item[entityField.id], fieldRepository = paris.getRepository(entityField.type), fieldValueObjectType = !fieldRepository && value_objects_service_1.valueObjectsService.getEntityByType(entityField.type), isNilValue = itemFieldValue === undefined || itemFieldValue === null;
             var modelValue;
-            if (entityField.isArray)
+            if (entityField.serialize)
+                modelValue = entityField.serialize(itemFieldValue);
+            else if (entityField.isArray)
                 modelValue = itemFieldValue ? itemFieldValue.map(function (element) { return Repository.serializeItem(element, fieldRepository ? fieldRepository.entity : fieldValueObjectType, paris); }) : null;
             else if (fieldRepository)
                 modelValue = isNilValue ? fieldRepository.entity.getDefaultValue() || null : itemFieldValue.id;

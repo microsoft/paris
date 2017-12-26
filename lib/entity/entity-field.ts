@@ -12,7 +12,8 @@ export interface Field{
 	isArray?:boolean,
 	required?:boolean,
 	require?:((data:any, config?:ParisConfig) => any) | string,
-	parse?:(fieldData?:any, itemData?:any) => any
+	parse?:(fieldData?:any, itemData?:any) => any,
+	serialize?:(itemData:any) => any
 }
 
 export const FIELD_DATA_SELF = "__self";
