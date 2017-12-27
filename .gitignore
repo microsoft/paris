@@ -58,7 +58,6 @@ typings/
 .env
 
 #Builds folder
-bundle
 
 #NPM package-lock
 package-lock.json
