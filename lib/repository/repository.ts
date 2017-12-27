@@ -95,7 +95,15 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 	}
 
 	createNewItem(): T {
-		return new this.entityConstructor();
+		let defaultData:{ [index:string]:any } = {};
+		this.entity.fieldsArray.forEach((field:Field) => {
+			if (field.defaultValue !== undefined)
+				defaultData[field.id] = field.defaultValue;
+			else if (field.isArray)
+				defaultData[field.id] = [];
+		});
+
+		return new this.entityConstructor(defaultData);
 	}
 
 	/**
