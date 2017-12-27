@@ -390,6 +390,43 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 		}
 	}
 
+	/**
+	 * Saves multiple items to the server, all at once
+	 * @param {Array<T extends EntityModelBase>} items
+	 * @returns {Observable<Array<T extends EntityModelBase>>}
+	 */
+	saveItems(items:Array<T>):Observable<Array<T>>{
+		if (!this.entity.endpoint)
+			throw new Error(`${this.entity.pluralName} can't be saved - it doesn't specify an endpoint.`);
+
+		let newItems:SaveItems = { method: "POST", items: [] },
+			existingItems:SaveItems = { method: "PUT", items: [] };
+
+		items.forEach((item:any) => {
+			(item.id === undefined ? newItems : existingItems).items.push(this.serializeItem(item));
+		});
+
+		let saveItemsArray:Array<Observable<Array<T>>> = [newItems, existingItems]
+			.filter((saveItems:SaveItems) => saveItems.items.length)
+			.map((saveItems:SaveItems) => this.doSaveItems(saveItems.items, saveItems.method));
+
+		return Observable.combineLatest.apply(this, saveItemsArray).map((savedItems:Array<Array<T>>) => _.flatMap(savedItems));
+	}
+
+	/**
+	 * Does the actual saving to server for a list of items.
+	 * @param {Array<any>} itemsData
+	 * @param {"PUT" | "POST"} method
+	 * @returns {Observable<Array<T extends EntityModelBase>>}
+	 */
+	private doSaveItems(itemsData:Array<any>, method:"PUT" | "POST"):Observable<Array<T>>{
+		return this.dataStore.save(`${this.endpointName}/`, method, { data: { items: itemsData } }, this.baseUrl)
+			.flatMap((savedItemsData: Array<any>) => {
+				let itemCreators:Array<Observable<T>> = savedItemsData.map(savedItemData => this.createItem(savedItemData));
+				return Observable.combineLatest.apply(this, itemCreators);
+			});
+	}
+
 	remove(items:Array<T>):Observable<Array<T>>{
 		if (!items)
 			throw new Error(`No ${this.entity.pluralName.toLowerCase()} specified for removing.`);
@@ -493,3 +530,8 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 }
 
 type ModelPropertyValue = { [property: string]: ModelBase | Array<ModelBase> };
+
+interface SaveItems{
+	method: "POST" | "PUT",
+	items:Array<any>
+}
