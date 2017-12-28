@@ -309,6 +309,9 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 				}
 			})
 			.flatMap((dataSet: DataSet<any>) => {
+				if (!dataSet.items.length)
+					return Observable.of({ count: 0, items: [] });
+
 				let itemCreators: Array<Observable<T>> = dataSet.items.map((itemData: any) => this.createItem(itemData, dataOptions));
 
 				return Observable.combineLatest.apply(this, itemCreators).map((items: Array<T>) => {
