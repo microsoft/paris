@@ -884,7 +884,7 @@ var Repository = /** @class */ (function () {
             return Observable_1.Observable.combineLatest.apply(_this, itemCreators);
         });
     };
-    Repository.prototype.remove = function (items) {
+    Repository.prototype.remove = function (items, options) {
         var _this = this;
         if (!items)
             throw new Error("No " + this.entity.pluralName.toLowerCase() + " specified for removing.");
@@ -895,7 +895,9 @@ var Repository = /** @class */ (function () {
         if (!this.entity.endpoint)
             throw new Error("Entity " + this.entity.entityConstructor.name + " can't be deleted - it doesn't specify an endpoint.");
         try {
-            return this.dataStore.delete(this.endpointName, { data: { ids: items.map(function (item) { return item.id; }) } }, this.baseUrl)
+            var httpOptions = options || { data: {} };
+            httpOptions.data.ids = items.map(function (item) { return item.id; });
+            return this.dataStore.delete(this.endpointName, httpOptions, this.baseUrl)
                 .do(function () {
                 if (_this._allValues) {
                     items.forEach(function (item) {
