@@ -877,7 +877,10 @@ var Repository = /** @class */ (function () {
         var _this = this;
         return this.dataStore.save(this.endpointName + "/", method, { data: { items: itemsData } }, this.baseUrl)
             .flatMap(function (savedItemsData) {
-            var itemCreators = savedItemsData.map(function (savedItemData) { return _this.createItem(savedItemData); });
+            if (!savedItemsData)
+                return Observable_1.Observable.of(null);
+            var itemsData = savedItemsData instanceof Array ? savedItemsData : savedItemsData.items;
+            var itemCreators = itemsData.map(function (savedItemData) { return _this.createItem(savedItemData); });
             return Observable_1.Observable.combineLatest.apply(_this, itemCreators);
         });
     };

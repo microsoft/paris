@@ -421,8 +421,12 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 	 */
 	private doSaveItems(itemsData:Array<any>, method:"PUT" | "POST"):Observable<Array<T>>{
 		return this.dataStore.save(`${this.endpointName}/`, method, { data: { items: itemsData } }, this.baseUrl)
-			.flatMap((savedItemsData: Array<any>) => {
-				let itemCreators:Array<Observable<T>> = savedItemsData.map(savedItemData => this.createItem(savedItemData));
+			.flatMap((savedItemsData?: Array<any> | {items:Array<any>}) => {
+				if (!savedItemsData)
+					return Observable.of(null);
+
+				let itemsData:Array<any> = savedItemsData instanceof Array ? savedItemsData : savedItemsData.items;
+				let itemCreators:Array<Observable<T>> = itemsData.map(savedItemData => this.createItem(savedItemData));
 				return Observable.combineLatest.apply(this, itemCreators);
 			});
 	}
