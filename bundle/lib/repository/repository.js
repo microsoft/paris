@@ -80,7 +80,14 @@ var Repository = /** @class */ (function () {
         return Repository.getModelData(itemData, this.entity, this.config, this.paris, options);
     };
     Repository.prototype.createNewItem = function () {
-        return new this.entityConstructor();
+        var defaultData = {};
+        this.entity.fieldsArray.forEach(function (field) {
+            if (field.defaultValue !== undefined)
+                defaultData[field.id] = field.defaultValue;
+            else if (field.isArray)
+                defaultData[field.id] = [];
+        });
+        return new this.entityConstructor(defaultData);
     };
     /**
      * Populates the item dataset with any sub @model. For example, if an ID is found for a property whose type is an entity,
@@ -331,7 +338,42 @@ var Repository = /** @class */ (function () {
             return Observable_1.Observable.throw(e);
         }
     };
-    Repository.prototype.remove = function (items) {
+    /**
+     * Saves multiple items to the server, all at once
+     * @param {Array<T extends EntityModelBase>} items
+     * @returns {Observable<Array<T extends EntityModelBase>>}
+     */
+    Repository.prototype.saveItems = function (items) {
+        var _this = this;
+        if (!this.entity.endpoint)
+            throw new Error(this.entity.pluralName + " can't be saved - it doesn't specify an endpoint.");
+        var newItems = { method: "POST", items: [] }, existingItems = { method: "PUT", items: [] };
+        items.forEach(function (item) {
+            (item.id === undefined ? newItems : existingItems).items.push(_this.serializeItem(item));
+        });
+        var saveItemsArray = [newItems, existingItems]
+            .filter(function (saveItems) { return saveItems.items.length; })
+            .map(function (saveItems) { return _this.doSaveItems(saveItems.items, saveItems.method); });
+        return Observable_1.Observable.combineLatest.apply(this, saveItemsArray).map(function (savedItems) { return _.flatMap(savedItems); });
+    };
+    /**
+     * Does the actual saving to server for a list of items.
+     * @param {Array<any>} itemsData
+     * @param {"PUT" | "POST"} method
+     * @returns {Observable<Array<T extends EntityModelBase>>}
+     */
+    Repository.prototype.doSaveItems = function (itemsData, method) {
+        var _this = this;
+        return this.dataStore.save(this.endpointName + "/", method, { data: { items: itemsData } }, this.baseUrl)
+            .flatMap(function (savedItemsData) {
+            if (!savedItemsData)
+                return Observable_1.Observable.of(null);
+            var itemsData = savedItemsData instanceof Array ? savedItemsData : savedItemsData.items;
+            var itemCreators = itemsData.map(function (savedItemData) { return _this.createItem(savedItemData); });
+            return Observable_1.Observable.combineLatest.apply(_this, itemCreators);
+        });
+    };
+    Repository.prototype.remove = function (items, options) {
         var _this = this;
         if (!items)
             throw new Error("No " + this.entity.pluralName.toLowerCase() + " specified for removing.");
@@ -342,7 +384,9 @@ var Repository = /** @class */ (function () {
         if (!this.entity.endpoint)
             throw new Error("Entity " + this.entity.entityConstructor.name + " can't be deleted - it doesn't specify an endpoint.");
         try {
-            return this.dataStore.delete(this.endpointName, { data: { ids: items.map(function (item) { return item.id; }) } }, this.baseUrl)
+            var httpOptions = options || { data: {} };
+            httpOptions.data.ids = items.map(function (item) { return item.id; });
+            return this.dataStore.delete(this.endpointName, httpOptions, this.baseUrl)
                 .do(function () {
                 if (_this._allValues) {
                     items.forEach(function (item) {

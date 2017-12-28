@@ -12,6 +12,7 @@ import { ModelBase } from "../models/model.base";
 import { EntityModelBase } from "../models/entity-model.base";
 import { DataOptions } from "../dataset/data.options";
 import { Paris } from "../services/paris";
+import { HttpOptions } from "../services/http.service";
 import { SaveEntityEvent } from "../events/save-entity.event";
 import { RemoveEntitiesEvent } from "../events/remove-entities.event";
 export declare class Repository<T extends EntityModelBase> implements IRepository {
@@ -63,7 +64,20 @@ export declare class Repository<T extends EntityModelBase> implements IRepositor
      * @returns {Observable<T extends EntityModelBase>}
      */
     save(item: T): Observable<T>;
-    remove(items: Array<T>): Observable<Array<T>>;
+    /**
+     * Saves multiple items to the server, all at once
+     * @param {Array<T extends EntityModelBase>} items
+     * @returns {Observable<Array<T extends EntityModelBase>>}
+     */
+    saveItems(items: Array<T>): Observable<Array<T>>;
+    /**
+     * Does the actual saving to server for a list of items.
+     * @param {Array<any>} itemsData
+     * @param {"PUT" | "POST"} method
+     * @returns {Observable<Array<T extends EntityModelBase>>}
+     */
+    private doSaveItems(itemsData, method);
+    remove(items: Array<T>, options?: HttpOptions): Observable<Array<T>>;
     /**
      * Validates that the specified item is valid, according to the requirements of the entity (or value object) it belongs to.
      * @param item

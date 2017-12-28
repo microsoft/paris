@@ -95,7 +95,15 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 	}
 
 	createNewItem(): T {
-		return new this.entityConstructor();
+		let defaultData:{ [index:string]:any } = {};
+		this.entity.fieldsArray.forEach((field:Field) => {
+			if (field.defaultValue !== undefined)
+				defaultData[field.id] = field.defaultValue;
+			else if (field.isArray)
+				defaultData[field.id] = [];
+		});
+
+		return new this.entityConstructor(defaultData);
 	}
 
 	/**
@@ -382,7 +390,48 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 		}
 	}
 
-	remove(items:Array<T>):Observable<Array<T>>{
+	/**
+	 * Saves multiple items to the server, all at once
+	 * @param {Array<T extends EntityModelBase>} items
+	 * @returns {Observable<Array<T extends EntityModelBase>>}
+	 */
+	saveItems(items:Array<T>):Observable<Array<T>>{
+		if (!this.entity.endpoint)
+			throw new Error(`${this.entity.pluralName} can't be saved - it doesn't specify an endpoint.`);
+
+		let newItems:SaveItems = { method: "POST", items: [] },
+			existingItems:SaveItems = { method: "PUT", items: [] };
+
+		items.forEach((item:any) => {
+			(item.id === undefined ? newItems : existingItems).items.push(this.serializeItem(item));
+		});
+
+		let saveItemsArray:Array<Observable<Array<T>>> = [newItems, existingItems]
+			.filter((saveItems:SaveItems) => saveItems.items.length)
+			.map((saveItems:SaveItems) => this.doSaveItems(saveItems.items, saveItems.method));
+
+		return Observable.combineLatest.apply(this, saveItemsArray).map((savedItems:Array<Array<T>>) => _.flatMap(savedItems));
+	}
+
+	/**
+	 * Does the actual saving to server for a list of items.
+	 * @param {Array<any>} itemsData
+	 * @param {"PUT" | "POST"} method
+	 * @returns {Observable<Array<T extends EntityModelBase>>}
+	 */
+	private doSaveItems(itemsData:Array<any>, method:"PUT" | "POST"):Observable<Array<T>>{
+		return this.dataStore.save(`${this.endpointName}/`, method, { data: { items: itemsData } }, this.baseUrl)
+			.flatMap((savedItemsData?: Array<any> | {items:Array<any>}) => {
+				if (!savedItemsData)
+					return Observable.of(null);
+
+				let itemsData:Array<any> = savedItemsData instanceof Array ? savedItemsData : savedItemsData.items;
+				let itemCreators:Array<Observable<T>> = itemsData.map(savedItemData => this.createItem(savedItemData));
+				return Observable.combineLatest.apply(this, itemCreators);
+			});
+	}
+
+	remove(items:Array<T>, options?:HttpOptions):Observable<Array<T>>{
 		if (!items)
 			throw new Error(`No ${this.entity.pluralName.toLowerCase()} specified for removing.`);
 
@@ -396,7 +445,10 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 			throw new Error(`Entity ${this.entity.entityConstructor.name} can't be deleted - it doesn't specify an endpoint.`);
 
 		try {
-			return this.dataStore.delete(this.endpointName, { data: { ids: items.map(item => item.id) } }, this.baseUrl)
+			let httpOptions:HttpOptions = options || { data: {}};
+			httpOptions.data.ids = items.map(item => item.id);
+
+			return this.dataStore.delete(this.endpointName, httpOptions, this.baseUrl)
 				.do(() => {
 					if (this._allValues) {
 						items.forEach((item:T) => {
@@ -485,3 +537,8 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 }
 
 type ModelPropertyValue = { [property: string]: ModelBase | Array<ModelBase> };
+
+interface SaveItems{
+	method: "POST" | "PUT",
+	items:Array<any>
+}
