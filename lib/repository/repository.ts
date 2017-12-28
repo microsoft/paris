@@ -431,7 +431,7 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 			});
 	}
 
-	remove(items:Array<T>):Observable<Array<T>>{
+	remove(items:Array<T>, options?:HttpOptions):Observable<Array<T>>{
 		if (!items)
 			throw new Error(`No ${this.entity.pluralName.toLowerCase()} specified for removing.`);
 
@@ -445,7 +445,10 @@ export class Repository<T extends EntityModelBase> implements IRepository {
 			throw new Error(`Entity ${this.entity.entityConstructor.name} can't be deleted - it doesn't specify an endpoint.`);
 
 		try {
-			return this.dataStore.delete(this.endpointName, { data: { ids: items.map(item => item.id) } }, this.baseUrl)
+			let httpOptions:HttpOptions = options || { data: {}};
+			httpOptions.data.ids = items.map(item => item.id);
+
+			return this.dataStore.delete(this.endpointName, httpOptions, this.baseUrl)
 				.do(() => {
 					if (this._allValues) {
 						items.forEach((item:T) => {
