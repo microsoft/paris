@@ -2,18 +2,22 @@ import {defaultConfig, ParisConfig} from "../config/paris-config";
 import {EntityModelBase} from "../models/entity-model.base";
 import {DataEntityConstructor, DataEntityType} from "../entity/data-entity.base";
 import {Repository} from "../repository/repository";
-import {ModelEntity} from "../entity/entity.config";
+import {EntityConfig, ModelEntity} from "../entity/entity.config";
 import {entitiesService} from "./entities.service";
 import {IRepository} from "../repository/repository.interface";
 import {DataStoreService} from "./data-store.service";
-import {EntityConfigBase} from "../entity/entity-config.base";
+import {EntityConfigBase, IEntityConfigBase} from "../entity/entity-config.base";
 import {Observable} from "rxjs/Observable";
 import {SaveEntityEvent} from "../events/save-entity.event";
 import {Subject} from "rxjs/Subject";
 import {RemoveEntitiesEvent} from "../events/remove-entities.event";
+import {IRelationshipRepository, RelationshipRepository} from "../repository/relationship-repository";
+import {ModelBase} from "../models/model.base";
+import {valueObjectsService} from "./value-objects.service";
 
 export class Paris{
-	private repositories:Map<DataEntityType, IRepository> = new Map();
+	private repositories:Map<DataEntityType, IRepository> = new Map;
+	private relationshipRepositories:Map<string, IRelationshipRepository> = new Map;
 	readonly dataStore:DataStoreService;
 	readonly config:ParisConfig;
 
@@ -31,10 +35,10 @@ export class Paris{
 		this.remove$ = this._removeSubject$.asObservable();
 	}
 
-	getRepository<T extends EntityModelBase>(entityConstructor:DataEntityConstructor<T>):Repository<T> | null{
+	getRepository<T extends ModelBase>(entityConstructor:DataEntityConstructor<T>):Repository<T> | null{
 		let repository:Repository<T> = <Repository<T>>this.repositories.get(entityConstructor);
 		if (!repository) {
-			let entityConfig:ModelEntity = entitiesService.getEntityByType(entityConstructor);
+			let entityConfig:EntityConfig = entitiesService.getEntityByType(entityConstructor) || valueObjectsService.getEntityByType(entityConstructor);
 			if (!entityConfig)
 				return null;
 
@@ -46,6 +50,18 @@ export class Paris{
 				repository.save$.subscribe((saveEvent:SaveEntityEvent) => this._saveSubject$.next(saveEvent));
 				repository.remove$.subscribe((removeEvent:RemoveEntitiesEvent) => this._removeSubject$.next(removeEvent));
 			}
+		}
+
+		return repository;
+	}
+
+	getRelationshipRepository<T extends ModelBase, U extends ModelBase>(sourceEntityConstructor:DataEntityConstructor<T>, targetEntityConstructor:DataEntityConstructor<U>):RelationshipRepository<T, U>{
+		let relationshipId:string = `${sourceEntityConstructor.name}_${targetEntityConstructor.name}`;
+
+		let repository:RelationshipRepository<T, U> = <RelationshipRepository<T, U>>this.relationshipRepositories.get(relationshipId);
+		if (!repository) {
+			repository = new RelationshipRepository<T, U>(sourceEntityConstructor, targetEntityConstructor, this.config, this.dataStore, this);
+			this.relationshipRepositories.set(relationshipId, repository);
 		}
 
 		return repository;

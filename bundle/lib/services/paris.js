@@ -5,9 +5,12 @@ var repository_1 = require("../repository/repository");
 var entities_service_1 = require("./entities.service");
 var data_store_service_1 = require("./data-store.service");
 var Subject_1 = require("rxjs/Subject");
+var relationship_repository_1 = require("../repository/relationship-repository");
+var value_objects_service_1 = require("./value-objects.service");
 var Paris = /** @class */ (function () {
     function Paris(config) {
-        this.repositories = new Map();
+        this.repositories = new Map;
+        this.relationshipRepositories = new Map;
         this._saveSubject$ = new Subject_1.Subject;
         this._removeSubject$ = new Subject_1.Subject;
         this.config = Object.assign({}, paris_config_1.defaultConfig, config);
@@ -19,7 +22,7 @@ var Paris = /** @class */ (function () {
         var _this = this;
         var repository = this.repositories.get(entityConstructor);
         if (!repository) {
-            var entityConfig = entities_service_1.entitiesService.getEntityByType(entityConstructor);
+            var entityConfig = entities_service_1.entitiesService.getEntityByType(entityConstructor) || value_objects_service_1.valueObjectsService.getEntityByType(entityConstructor);
             if (!entityConfig)
                 return null;
             repository = new repository_1.Repository(entityConfig, this.config, entityConstructor, this.dataStore, this);
@@ -29,6 +32,15 @@ var Paris = /** @class */ (function () {
                 repository.save$.subscribe(function (saveEvent) { return _this._saveSubject$.next(saveEvent); });
                 repository.remove$.subscribe(function (removeEvent) { return _this._removeSubject$.next(removeEvent); });
             }
+        }
+        return repository;
+    };
+    Paris.prototype.getRelationshipRepository = function (sourceEntityConstructor, targetEntityConstructor) {
+        var relationshipId = sourceEntityConstructor.name + "_" + targetEntityConstructor.name;
+        var repository = this.relationshipRepositories.get(relationshipId);
+        if (!repository) {
+            repository = new relationship_repository_1.RelationshipRepository(sourceEntityConstructor, targetEntityConstructor, this.config, this.dataStore, this);
+            this.relationshipRepositories.set(relationshipId, repository);
         }
         return repository;
     };

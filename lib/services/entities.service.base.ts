@@ -6,6 +6,7 @@ import {entityFieldsService} from "./entity-fields.service";
 
 export abstract class EntitiesServiceBase<T extends EntityConfigBase>{
 	protected _allEntities:Map<DataEntityType, T> = new Map;
+	protected _allEntitiesByName:Map<string, T> = new Map;
 
 	get allEntities():Array<T>{
 		return Array.from(this._allEntities.values());
@@ -15,9 +16,15 @@ export abstract class EntitiesServiceBase<T extends EntityConfigBase>{
 		return this._allEntities.get(dataEntityType) || this._allEntities.get(dataEntityType.prototype);
 	}
 
+	getEntityByName(entityName:string):T{
+		return this._allEntitiesByName.get(entityName);
+	}
+
 	addEntity(dataEntityType:DataEntityType, entity:T):T{
-		if (!this._allEntities.has(dataEntityType))
+		if (!this._allEntities.has(dataEntityType)) {
 			this._allEntities.set(dataEntityType, entity);
+			this._allEntitiesByName.set(dataEntityType.name, entity);
+		}
 
 		entity.fields = this.getDataEntityTypeFields(dataEntityType);
 

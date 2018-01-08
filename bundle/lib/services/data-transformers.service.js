@@ -4,7 +4,7 @@ var transformers = [
     {
         type: Date,
         parse: function (dateValue) { return new Date(dateValue); },
-        serialize: function (date) { return date ? date.valueOf() : null; }
+        serialize: function (date) { return date ? date.toISOString() : null; }
     },
     {
         type: RegExp,

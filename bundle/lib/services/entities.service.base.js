@@ -4,6 +4,7 @@ var entity_fields_service_1 = require("./entity-fields.service");
 var EntitiesServiceBase = /** @class */ (function () {
     function EntitiesServiceBase() {
         this._allEntities = new Map;
+        this._allEntitiesByName = new Map;
     }
     Object.defineProperty(EntitiesServiceBase.prototype, "allEntities", {
         get: function () {
@@ -15,9 +16,14 @@ var EntitiesServiceBase = /** @class */ (function () {
     EntitiesServiceBase.prototype.getEntityByType = function (dataEntityType) {
         return this._allEntities.get(dataEntityType) || this._allEntities.get(dataEntityType.prototype);
     };
+    EntitiesServiceBase.prototype.getEntityByName = function (entityName) {
+        return this._allEntitiesByName.get(entityName);
+    };
     EntitiesServiceBase.prototype.addEntity = function (dataEntityType, entity) {
-        if (!this._allEntities.has(dataEntityType))
+        if (!this._allEntities.has(dataEntityType)) {
             this._allEntities.set(dataEntityType, entity);
+            this._allEntitiesByName.set(dataEntityType.name, entity);
+        }
         entity.fields = this.getDataEntityTypeFields(dataEntityType);
         // TODO: Clear the fields once the entity is populated, without affecting inherited fields.
         return entity;

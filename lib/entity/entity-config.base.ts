@@ -2,22 +2,25 @@ import {EntityFields} from "./entity-fields";
 import {Field} from "./entity-field";
 import {EntityModelConfigBase} from "../models/entity-config-base.interface";
 import {Immutability} from "../services/immutability";
-import {DataEntityConstructor} from "./data-entity.base";
+import {DataEntityConstructor, DataEntityType} from "./data-entity.base";
+import {IEntityRelationship} from "./entity-relationship";
+import {ModelBase} from "../models/model.base";
 
 const DEFAULT_VALUE_ID = "__default";
 
-export class EntityConfigBase{
+export class EntityConfigBase implements IEntityConfigBase{
 	singularName:string;
 	pluralName:string;
 	fields?:EntityFields;
 	idProperty?:string;
 	readonly:boolean = false;
+	relationships?:Array<IEntityRelationship>;
 
 	get fieldsArray():Array<Field>{
 		return this.fields ? Array.from(this.fields.values()) : [];
 	}
 
-	values:ReadonlyArray<any>;
+	values:Array<any>;
 
 	private _valuesMap:Map<string|number, any>;
 	private get valuesMap():Map<string|number, any> {
@@ -33,6 +36,21 @@ export class EntityConfigBase{
 		}
 
 		return this._valuesMap;
+	}
+
+	private _relationshipsMap:Map<string, IEntityRelationship>;
+
+	get relationshipsMap():Map<string, IEntityRelationship>{
+		if (!this._relationshipsMap) {
+			this._relationshipsMap = new Map();
+			if (this.relationships){
+				this.relationships.forEach((relationship:IEntityRelationship) => {
+					this._relationshipsMap.set(relationship.entity, relationship);
+				});
+			}
+		}
+
+		return this._relationshipsMap;
 	}
 
 	constructor(config:IEntityConfigBase, public entityConstructor:DataEntityConstructor<any>){
@@ -63,5 +81,11 @@ export interface IEntityConfigBase{
 	fields?:EntityFields,
 	idProperty?:string,
 	readonly?:boolean,
-	values?:Array<EntityModelConfigBase>
+	values?:Array<any>,
+	relationships?:Array<IEntityRelationship>,
+	fieldsArray?:Array<Field>,
+	hasValue?: (valueId:string|number) => boolean,
+	getDefaultValue?: () => any,
+	getValueById?: (valueId:string|number) => any,
+	entityConstructor?:DataEntityConstructor<any>
 }
