@@ -1,19 +1,14 @@
-import {EntityConfig, ModelEntity} from "../entity/entity.config";
+import {EntityConfig} from "../entity/entity.config";
 import {DataEntityConstructor} from "../entity/data-entity.base";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
-import {Field, FIELD_DATA_SELF} from "../entity/entity-field";
 import {IRepository} from "./repository.interface";
 import {DataStoreService} from "../services/data-store.service";
 import {ParisConfig} from "../config/paris-config";
 import {Index} from "../models/index";
-import {DataTransformersService} from "../services/data-transformers.service";
-import {valueObjectsService} from "../services/value-objects.service";
 import * as _ from "lodash";
-import {EntityConfigBase, IEntityConfigBase} from "../entity/entity-config.base";
 import {ModelBase} from "../models/model.base";
 import {EntityModelBase} from "../models/entity-model.base";
-import {DataOptions, defaultDataOptions} from "../dataset/data.options";
 import {Paris} from "../services/paris";
 import {HttpOptions} from "../services/http.service";
 import {SaveEntityEvent} from "../events/save-entity.event";
@@ -58,10 +53,10 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 			let isNewItem:boolean = item.id === undefined;
 			let saveData: Index = this.serializeItem(item);
 			return this.dataStore.save(`${this.endpointName}/${item.id || ''}`, isNewItem ? "POST" : "PUT", { data: saveData }, this.baseUrl)
-				.flatMap((savedItemData: Index) => this.createItem(savedItemData))
-				.do((item: T) => {
-					if (this._allValues) {
-						this._allValues = [...this._allValues, item];
+				.flatMap((savedItemData: Index) => savedItemData ? this.createItem(savedItemData) : Observable.of(null))
+				.do((savedItem: T) => {
+					if (savedItem && this._allValues) {
+						this._allValues = [...this._allValues, savedItem];
 						this._allItemsSubject$.next(this._allValues);
 					}
 

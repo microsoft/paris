@@ -1026,10 +1026,10 @@ var Repository = /** @class */ (function (_super) {
             var isNewItem_1 = item.id === undefined;
             var saveData = this.serializeItem(item);
             return this.dataStore.save(this.endpointName + "/" + (item.id || ''), isNewItem_1 ? "POST" : "PUT", { data: saveData }, this.baseUrl)
-                .flatMap(function (savedItemData) { return _this.createItem(savedItemData); })
-                .do(function (item) {
-                if (_this._allValues) {
-                    _this._allValues = _this._allValues.concat([item]);
+                .flatMap(function (savedItemData) { return savedItemData ? _this.createItem(savedItemData) : Observable_1.Observable.of(null); })
+                .do(function (savedItem) {
+                if (savedItem && _this._allValues) {
+                    _this._allValues = _this._allValues.concat([savedItem]);
                     _this._allItemsSubject$.next(_this._allValues);
                 }
                 _this._saveSubject$.next({ entity: _this.entityConstructor, newValue: item, isNew: isNewItem_1 });
