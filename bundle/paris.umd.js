@@ -708,6 +708,13 @@ var ReadonlyRepository = /** @class */ (function () {
         if (dataOptions === void 0) { dataOptions = data_options.defaultDataOptions; }
         var queryError = new Error("Failed to get " + this.entity.pluralName + ".");
         var httpOptions = this.entityBackendConfig.parseDataQuery ? { params: this.entityBackendConfig.parseDataQuery(query) } : dataset_service.DatasetService.queryToHttpOptions(query);
+        if (this.entityBackendConfig.fixedData) {
+            if (!httpOptions)
+                httpOptions = {};
+            if (!httpOptions.params)
+                httpOptions.params = {};
+            Object.assign(httpOptions.params, this.entityBackendConfig.fixedData);
+        }
         return this.dataStore.get("" + this.endpointName + (this.entityBackendConfig.allItemsEndpointTrailingSlash !== false && !this.entityBackendConfig.allItemsEndpoint ? '/' : '') + (this.entityBackendConfig.allItemsEndpoint || ''), httpOptions, this.baseUrl)
             .map(function (rawDataSet) {
             var allItemsProperty = _this.entityBackendConfig.allItemsProperty || _this.config.allItemsProperty;
@@ -742,6 +749,13 @@ var ReadonlyRepository = /** @class */ (function () {
         var _this = this;
         if (dataOptions === void 0) { dataOptions = data_options.defaultDataOptions; }
         var httpOptions = this.entityBackendConfig.parseDataQuery ? { params: this.entityBackendConfig.parseDataQuery(query) } : dataset_service.DatasetService.queryToHttpOptions(query);
+        if (this.entityBackendConfig.fixedData) {
+            if (!httpOptions)
+                httpOptions = {};
+            if (!httpOptions.params)
+                httpOptions.params = {};
+            Object.assign(httpOptions.params, this.entityBackendConfig.fixedData);
+        }
         return this.dataStore.get("" + this.endpointName + (this.entityBackendConfig.allItemsEndpointTrailingSlash !== false && !this.entityBackendConfig.allItemsEndpoint ? '/' : '') + (this.entityBackendConfig.allItemsEndpoint || ''), httpOptions, this.baseUrl)
             .flatMap(function (data) { return _this.createItem(data, dataOptions); });
     };
@@ -1272,6 +1286,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 
 
+
 var RelationshipRepository = /** @class */ (function (_super) {
     __extends(RelationshipRepository, _super);
     function RelationshipRepository(sourceEntityType, dataEntityType, config, dataStore, paris) {
@@ -1292,27 +1307,32 @@ var RelationshipRepository = /** @class */ (function (_super) {
         _this.sourceRepository = paris.getRepository(sourceEntityType);
         return _this;
     }
-    RelationshipRepository.prototype.queryForItem = function (itemId, query, dataOptions) {
+    RelationshipRepository.prototype.queryForItem = function (item, query, dataOptions) {
         if (dataOptions === void 0) { dataOptions = data_options.defaultDataOptions; }
         var cloneQuery = Object.assign({}, query);
         if (!cloneQuery.where)
             cloneQuery.where = {};
-        var sourceItemWhereQuery = {};
-        sourceItemWhereQuery[this.relationship.foreignKey || this.sourceEntityType.name] = itemId;
-        Object.assign(cloneQuery.where, sourceItemWhereQuery);
+        Object.assign(cloneQuery.where, this.getRelationQueryWhere(item));
         return this.query(cloneQuery, dataOptions);
     };
-    RelationshipRepository.prototype.getRelatedItem = function (itemId, query, dataOptions) {
+    RelationshipRepository.prototype.getRelatedItem = function (item, query, dataOptions) {
         if (dataOptions === void 0) { dataOptions = data_options.defaultDataOptions; }
         var cloneQuery = Object.assign({}, query);
-        if (itemId) {
+        if (item) {
             if (!cloneQuery.where)
                 cloneQuery.where = {};
-            var sourceItemWhereQuery = {};
-            sourceItemWhereQuery[this.relationship.foreignKey || this.sourceEntityType.name] = itemId;
-            Object.assign(cloneQuery.where, sourceItemWhereQuery);
+            Object.assign(cloneQuery.where, this.getRelationQueryWhere(item));
         }
         return this.queryItem(cloneQuery, dataOptions);
+    };
+    RelationshipRepository.prototype.getRelationQueryWhere = function (item) {
+        var where = {};
+        var sourceItemWhereQuery = {};
+        if (item && this.relationship.foreignKey && item instanceof entityModel_base.EntityModelBase)
+            sourceItemWhereQuery[this.relationship.foreignKey || this.sourceEntityType.name] = item.id;
+        else if (this.relationship.getRelationshipData)
+            Object.assign(sourceItemWhereQuery, this.relationship.getRelationshipData(item));
+        return Object.assign(where, sourceItemWhereQuery);
     };
     return RelationshipRepository;
 }(readonlyRepository.ReadonlyRepository));

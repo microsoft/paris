@@ -44,34 +44,40 @@ export class RelationshipRepository<T extends ModelBase, U extends ModelBase> ex
 		this.sourceRepository = paris.getRepository<T>(sourceEntityType);
 	}
 
-	queryForItem(itemId:any, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<U>> {
+	queryForItem(item:ModelBase, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<U>> {
 		let cloneQuery:DataQuery = Object.assign({}, query);
 
 		if (!cloneQuery.where)
 			cloneQuery.where = {};
 
-		let sourceItemWhereQuery:{ [index:string]:any } = {};
-		sourceItemWhereQuery[this.relationship.foreignKey || this.sourceEntityType.name] = itemId;
-
-		Object.assign(cloneQuery.where, sourceItemWhereQuery);
+		Object.assign(cloneQuery.where, this.getRelationQueryWhere(item));
 
 		return this.query(cloneQuery, dataOptions);
 	}
 
-	getRelatedItem(itemId?:any, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions):Observable<U>{
+	getRelatedItem(item:ModelBase, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions):Observable<U>{
 		let cloneQuery:DataQuery = Object.assign({}, query);
 
-		if (itemId) {
+		if (item) {
 			if (!cloneQuery.where)
 				cloneQuery.where = {};
 
-			let sourceItemWhereQuery: { [index: string]: any } = {};
-			sourceItemWhereQuery[this.relationship.foreignKey || this.sourceEntityType.name] = itemId;
-
-			Object.assign(cloneQuery.where, sourceItemWhereQuery);
+			Object.assign(cloneQuery.where, this.getRelationQueryWhere(item));
 		}
 
 		return this.queryItem(cloneQuery, dataOptions);
+	}
+
+	private getRelationQueryWhere(item:ModelBase):{ [index:string]:any }{
+		let where:{ [index:string]:any } = {};
+
+		let sourceItemWhereQuery:{ [index:string]:any } = {};
+		if (item && this.relationship.foreignKey && item instanceof EntityModelBase)
+			sourceItemWhereQuery[this.relationship.foreignKey || this.sourceEntityType.name] = item.id;
+		else if (this.relationship.getRelationshipData)
+			Object.assign(sourceItemWhereQuery, this.relationship.getRelationshipData(item));
+
+		return Object.assign(where, sourceItemWhereQuery);
 	}
 }
 

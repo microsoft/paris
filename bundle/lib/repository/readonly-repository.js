@@ -98,6 +98,13 @@ var ReadonlyRepository = /** @class */ (function () {
         if (dataOptions === void 0) { dataOptions = data_options_1.defaultDataOptions; }
         var queryError = new Error("Failed to get " + this.entity.pluralName + ".");
         var httpOptions = this.entityBackendConfig.parseDataQuery ? { params: this.entityBackendConfig.parseDataQuery(query) } : dataset_service_1.DatasetService.queryToHttpOptions(query);
+        if (this.entityBackendConfig.fixedData) {
+            if (!httpOptions)
+                httpOptions = {};
+            if (!httpOptions.params)
+                httpOptions.params = {};
+            Object.assign(httpOptions.params, this.entityBackendConfig.fixedData);
+        }
         return this.dataStore.get("" + this.endpointName + (this.entityBackendConfig.allItemsEndpointTrailingSlash !== false && !this.entityBackendConfig.allItemsEndpoint ? '/' : '') + (this.entityBackendConfig.allItemsEndpoint || ''), httpOptions, this.baseUrl)
             .map(function (rawDataSet) {
             var allItemsProperty = _this.entityBackendConfig.allItemsProperty || _this.config.allItemsProperty;
@@ -132,6 +139,13 @@ var ReadonlyRepository = /** @class */ (function () {
         var _this = this;
         if (dataOptions === void 0) { dataOptions = data_options_1.defaultDataOptions; }
         var httpOptions = this.entityBackendConfig.parseDataQuery ? { params: this.entityBackendConfig.parseDataQuery(query) } : dataset_service_1.DatasetService.queryToHttpOptions(query);
+        if (this.entityBackendConfig.fixedData) {
+            if (!httpOptions)
+                httpOptions = {};
+            if (!httpOptions.params)
+                httpOptions.params = {};
+            Object.assign(httpOptions.params, this.entityBackendConfig.fixedData);
+        }
         return this.dataStore.get("" + this.endpointName + (this.entityBackendConfig.allItemsEndpointTrailingSlash !== false && !this.entityBackendConfig.allItemsEndpoint ? '/' : '') + (this.entityBackendConfig.allItemsEndpoint || ''), httpOptions, this.baseUrl)
             .flatMap(function (data) { return _this.createItem(data, dataOptions); });
     };

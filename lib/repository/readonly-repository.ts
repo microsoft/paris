@@ -102,7 +102,17 @@ export class ReadonlyRepository<T extends ModelBase>{
 
 	query(query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<T>> {
 		let queryError:Error = new Error(`Failed to get ${this.entity.pluralName}.`);
-		const httpOptions:HttpOptions = this.entityBackendConfig.parseDataQuery ? { params: this.entityBackendConfig.parseDataQuery(query) } : DatasetService.queryToHttpOptions(query);
+		let httpOptions:HttpOptions = this.entityBackendConfig.parseDataQuery ? { params: this.entityBackendConfig.parseDataQuery(query) } : DatasetService.queryToHttpOptions(query);
+
+		if (this.entityBackendConfig.fixedData){
+			if (!httpOptions)
+				httpOptions = {};
+
+			if (!httpOptions.params)
+				httpOptions.params = {};
+
+			Object.assign(httpOptions.params, this.entityBackendConfig.fixedData);
+		}
 
 		return this.dataStore.get(`${this.endpointName}${this.entityBackendConfig.allItemsEndpointTrailingSlash !== false && !this.entityBackendConfig.allItemsEndpoint ? '/' : ''}${this.entityBackendConfig.allItemsEndpoint || ''}`, httpOptions, this.baseUrl)
 			.map((rawDataSet: any) => {
@@ -140,7 +150,17 @@ export class ReadonlyRepository<T extends ModelBase>{
 	}
 
 	queryItem(query: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<T> {
-		const httpOptions:HttpOptions = this.entityBackendConfig.parseDataQuery ? { params: this.entityBackendConfig.parseDataQuery(query) } : DatasetService.queryToHttpOptions(query);
+		let httpOptions:HttpOptions = this.entityBackendConfig.parseDataQuery ? { params: this.entityBackendConfig.parseDataQuery(query) } : DatasetService.queryToHttpOptions(query);
+
+		if (this.entityBackendConfig.fixedData){
+			if (!httpOptions)
+				httpOptions = {};
+
+			if (!httpOptions.params)
+				httpOptions.params = {};
+
+			Object.assign(httpOptions.params, this.entityBackendConfig.fixedData);
+		}
 
 		return this.dataStore.get(`${this.endpointName}${this.entityBackendConfig.allItemsEndpointTrailingSlash !== false && !this.entityBackendConfig.allItemsEndpoint ? '/' : ''}${this.entityBackendConfig.allItemsEndpoint || ''}`, httpOptions, this.baseUrl)
 			.flatMap(data => this.createItem(data, dataOptions));

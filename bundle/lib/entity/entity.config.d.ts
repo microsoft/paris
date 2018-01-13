@@ -26,6 +26,9 @@ export interface EntityBackendConfig {
     allItemsProperty?: string;
     allItemsEndpoint?: string;
     allItemsEndpointTrailingSlash?: boolean;
+    fixedData?: {
+        [index: string]: any;
+    };
     parseDataQuery?: (dataQuery: DataQuery) => {
         [index: string]: any;
     };
