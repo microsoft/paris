@@ -30,7 +30,7 @@ export class RelationshipRepository<T extends ModelBase, U extends ModelBase> ex
 
 		let relationshipConfig:IEntityRelationship = (sourceEntityType.entityConfig || this.sourceEntityType.valueObjectConfig).relationshipsMap.get(dataEntityType.name);
 		if (!relationshipConfig)
-			throw new Error(`Can't create RelationshipRepository, since there's no defined relationship in ${sourceEntityType.name} for ${dataEntityType.name}.`);
+			throw new Error(`Can't create RelationshipRepository, since there's no defined relationship in ${sourceEntityType.entityConfig.singularName} for ${dataEntityType.entityConfig.singularName}.`);
 
 		this.relationship = Object.assign({}, relationshipConfig, {
 			entity: entitiesService.getEntityByName(relationshipConfig.entity) || valueObjectsService.getEntityByName(relationshipConfig.entity),
@@ -73,7 +73,7 @@ export class RelationshipRepository<T extends ModelBase, U extends ModelBase> ex
 
 		let sourceItemWhereQuery:{ [index:string]:any } = {};
 		if (item && this.relationship.foreignKey && item instanceof EntityModelBase)
-			sourceItemWhereQuery[this.relationship.foreignKey || this.sourceEntityType.name] = item.id;
+			sourceItemWhereQuery[this.relationship.foreignKey || this.sourceEntityType.entityConfig.singularName.replace(/\s/g, "")] = item.id;
 		else if (this.relationship.getRelationshipData)
 			Object.assign(sourceItemWhereQuery, this.relationship.getRelationshipData(item));
 

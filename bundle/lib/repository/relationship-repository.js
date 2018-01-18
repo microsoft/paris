@@ -10,6 +10,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
+var entity_model_base_1 = require("../models/entity-model.base");
 var data_options_1 = require("../dataset/data.options");
 var readonly_repository_1 = require("./readonly-repository");
 var entities_service_1 = require("../services/entities.service");
@@ -24,7 +25,7 @@ var RelationshipRepository = /** @class */ (function (_super) {
             throw new Error("RelationshipRepository doesn't support a single entity type.");
         var relationshipConfig = (sourceEntityType.entityConfig || _this.sourceEntityType.valueObjectConfig).relationshipsMap.get(dataEntityType.name);
         if (!relationshipConfig)
-            throw new Error("Can't create RelationshipRepository, since there's no defined relationship in " + sourceEntityType.name + " for " + dataEntityType.name + ".");
+            throw new Error("Can't create RelationshipRepository, since there's no defined relationship in " + sourceEntityType.entityConfig.singularName + " for " + dataEntityType.entityConfig.singularName + ".");
         _this.relationship = Object.assign({}, relationshipConfig, {
             entity: entities_service_1.entitiesService.getEntityByName(relationshipConfig.entity) || value_objects_service_1.valueObjectsService.getEntityByName(relationshipConfig.entity),
         });
@@ -34,27 +35,32 @@ var RelationshipRepository = /** @class */ (function (_super) {
         _this.sourceRepository = paris.getRepository(sourceEntityType);
         return _this;
     }
-    RelationshipRepository.prototype.queryForItem = function (itemId, query, dataOptions) {
+    RelationshipRepository.prototype.queryForItem = function (item, query, dataOptions) {
         if (dataOptions === void 0) { dataOptions = data_options_1.defaultDataOptions; }
         var cloneQuery = Object.assign({}, query);
         if (!cloneQuery.where)
             cloneQuery.where = {};
-        var sourceItemWhereQuery = {};
-        sourceItemWhereQuery[this.relationship.foreignKey || this.sourceEntityType.name] = itemId;
-        Object.assign(cloneQuery.where, sourceItemWhereQuery);
+        Object.assign(cloneQuery.where, this.getRelationQueryWhere(item));
         return this.query(cloneQuery, dataOptions);
     };
-    RelationshipRepository.prototype.getRelatedItem = function (itemId, query, dataOptions) {
+    RelationshipRepository.prototype.getRelatedItem = function (item, query, dataOptions) {
         if (dataOptions === void 0) { dataOptions = data_options_1.defaultDataOptions; }
         var cloneQuery = Object.assign({}, query);
-        if (itemId) {
+        if (item) {
             if (!cloneQuery.where)
                 cloneQuery.where = {};
-            var sourceItemWhereQuery = {};
-            sourceItemWhereQuery[this.relationship.foreignKey || this.sourceEntityType.name] = itemId;
-            Object.assign(cloneQuery.where, sourceItemWhereQuery);
+            Object.assign(cloneQuery.where, this.getRelationQueryWhere(item));
         }
         return this.queryItem(cloneQuery, dataOptions);
+    };
+    RelationshipRepository.prototype.getRelationQueryWhere = function (item) {
+        var where = {};
+        var sourceItemWhereQuery = {};
+        if (item && this.relationship.foreignKey && item instanceof entity_model_base_1.EntityModelBase)
+            sourceItemWhereQuery[this.relationship.foreignKey || this.sourceEntityType.entityConfig.singularName] = item.id;
+        else if (this.relationship.getRelationshipData)
+            Object.assign(sourceItemWhereQuery, this.relationship.getRelationshipData(item));
+        return Object.assign(where, sourceItemWhereQuery);
     };
     return RelationshipRepository;
 }(readonly_repository_1.ReadonlyRepository));

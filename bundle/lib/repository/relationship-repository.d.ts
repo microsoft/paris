@@ -16,8 +16,9 @@ export declare class RelationshipRepository<T extends ModelBase, U extends Model
     private sourceRepository;
     private relationship;
     constructor(sourceEntityType: DataEntityConstructor<T>, dataEntityType: DataEntityConstructor<U>, config: ParisConfig, dataStore: DataStoreService, paris: Paris);
-    queryForItem(itemId: any, query?: DataQuery, dataOptions?: DataOptions): Observable<DataSet<U>>;
-    getRelatedItem(itemId?: any, query?: DataQuery, dataOptions?: DataOptions): Observable<U>;
+    queryForItem(item: ModelBase, query?: DataQuery, dataOptions?: DataOptions): Observable<DataSet<U>>;
+    getRelatedItem(item: ModelBase, query?: DataQuery, dataOptions?: DataOptions): Observable<U>;
+    private getRelationQueryWhere(item);
 }
 export interface IRelationshipRepository extends IReadonlyRepository {
     queryForItem: (item: EntityModelBase, query?: DataQuery, dataOptions?: DataOptions) => Observable<DataSet<ModelBase>>;
