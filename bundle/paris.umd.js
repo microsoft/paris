@@ -1296,10 +1296,12 @@ var RelationshipRepository = /** @class */ (function (_super) {
         if (sourceEntityType === dataEntityType)
             throw new Error("RelationshipRepository doesn't support a single entity type.");
         var relationshipConfig = (sourceEntityType.entityConfig || _this.sourceEntityType.valueObjectConfig).relationshipsMap.get(dataEntityType.name);
-        if (!relationshipConfig)
-            throw new Error("Can't create RelationshipRepository, since there's no defined relationship in " + sourceEntityType.name + " for " + dataEntityType.name + ".");
+        if (!relationshipConfig) {
+            var sourceEntityName = (_this.sourceEntityType.entityConfig || _this.sourceEntityType.valueObjectConfig).singularName, dataEntityName = (_this.dataEntityType.entityConfig || _this.dataEntityType.valueObjectConfig).singularName;
+            throw new Error("Can't create RelationshipRepository, since there's no defined relationship in " + sourceEntityName + " for " + dataEntityName + ".");
+        }
         _this.relationship = Object.assign({}, relationshipConfig, {
-            entity: entities_service.entitiesService.getEntityByName(relationshipConfig.entity) || valueObjects_service.valueObjectsService.getEntityByName(relationshipConfig.entity),
+            entity: entities_service.entitiesService.getEntityByName(relationshipConfig.entity) || valueObjects_service.valueObjectsService.getEntityByName(relationshipConfig.entity)
         });
         if (!_this.relationship.entity)
             throw new Error("Can't create RelationshipRepository, couldn't find entity '" + relationshipConfig.entity + "'.");
@@ -1328,8 +1330,10 @@ var RelationshipRepository = /** @class */ (function (_super) {
     RelationshipRepository.prototype.getRelationQueryWhere = function (item) {
         var where = {};
         var sourceItemWhereQuery = {};
-        if (item && this.relationship.foreignKey && item instanceof entityModel_base.EntityModelBase)
-            sourceItemWhereQuery[this.relationship.foreignKey || this.sourceEntityType.name] = item.id;
+        if (item && this.relationship.foreignKey && item instanceof entityModel_base.EntityModelBase) {
+            var entityTypeName = (this.sourceEntityType.entityConfig || this.sourceEntityType.valueObjectConfig).singularName.replace(/\s/g, "");
+            sourceItemWhereQuery[this.relationship.foreignKey || entityTypeName] = item.id;
+        }
         else if (this.relationship.getRelationshipData)
             Object.assign(sourceItemWhereQuery, this.relationship.getRelationshipData(item));
         return Object.assign(where, sourceItemWhereQuery);
