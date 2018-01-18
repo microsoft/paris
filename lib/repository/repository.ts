@@ -47,7 +47,7 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 	 */
 	save(item: T): Observable<T> {
 		if (!this.entityBackendConfig.endpoint)
-			throw new Error(`Entity ${this.entityConstructor.name} can't be saved - it doesn't specify an endpoint.`);
+			throw new Error(`Entity ${this.entityConstructor.entityConfig.singularName || this.entityConstructor.name} can't be saved - it doesn't specify an endpoint.`);
 
 		try {
 			let isNewItem:boolean = item.id === undefined;
@@ -120,7 +120,7 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 			return Observable.of([]);
 
 		if (!this.entityBackendConfig.endpoint)
-			throw new Error(`Entity ${this.entityConstructor.name} can't be deleted - it doesn't specify an endpoint.`);
+			throw new Error(`Entity ${this.entity.singularName} can't be deleted - it doesn't specify an endpoint.`);
 
 		try {
 			let httpOptions:HttpOptions = options || { data: {}};

@@ -9,7 +9,7 @@ import {HttpOptions} from "../services/http.service";
 import {DataStoreService} from "../services/data-store.service";
 import {ParisConfig} from "../config/paris-config";
 import {EntityBackendConfig, ModelEntity} from "../entity/entity.config";
-import {DataEntityConstructor} from "../entity/data-entity.base";
+import {DataEntityConstructor, DataEntityType} from "../entity/data-entity.base";
 import {Paris} from "../services/paris";
 import {DataAvailability} from "../dataset/data-availability.enum";
 import {Field, FIELD_DATA_SELF} from "../entity/entity-field";
@@ -263,8 +263,8 @@ export class ReadonlyRepository<T extends ModelBase>{
 				}
 			}
 			if (propertyValue === undefined || propertyValue === null) {
-				let fieldRepository:ReadonlyRepository<EntityModelBase> = paris.getRepository(entityField.type);
-				let fieldValueObjectType:EntityConfigBase = !fieldRepository && valueObjectsService.getEntityByType(entityField.type);
+				let fieldRepository:ReadonlyRepository<EntityModelBase> = paris.getRepository(<DataEntityType>entityField.type);
+				let fieldValueObjectType:EntityConfigBase = !fieldRepository && valueObjectsService.getEntityByType(<DataEntityType>entityField.type);
 
 				let defaultValue:any = fieldRepository && fieldRepository.entity.getDefaultValue()
 					|| fieldValueObjectType && fieldValueObjectType.getDefaultValue()
@@ -342,8 +342,8 @@ export class ReadonlyRepository<T extends ModelBase>{
 		let getPropertyEntityValue$: Observable<ModelPropertyValue>;
 		let mapValueToEntityFieldIndex: (value: ModelBase | Array<ModelBase>) => ModelPropertyValue = ReadonlyRepository.mapToEntityFieldIndex.bind(null, entityField.id);
 
-		let repository:ReadonlyRepository<EntityModelBase> = paris.getRepository(entityField.type);
-		let valueObjectType:EntityConfigBase = !repository && valueObjectsService.getEntityByType(entityField.type);
+		let repository:ReadonlyRepository<EntityModelBase> = paris.getRepository(<DataEntityType>entityField.type);
+		let valueObjectType:EntityConfigBase = !repository && valueObjectsService.getEntityByType(<DataEntityType>entityField.type);
 
 		if (!repository && !valueObjectType)
 			return null;
@@ -414,8 +414,8 @@ export class ReadonlyRepository<T extends ModelBase>{
 
 		entity.fields.forEach((entityField:Field) => {
 			let itemFieldValue:any = (<any>item)[entityField.id],
-				fieldRepository = paris.getRepository(entityField.type),
-				fieldValueObjectType:EntityConfigBase = !fieldRepository && valueObjectsService.getEntityByType(entityField.type),
+				fieldRepository = paris.getRepository(<DataEntityType>entityField.type),
+				fieldValueObjectType:EntityConfigBase = !fieldRepository && valueObjectsService.getEntityByType(<DataEntityType>entityField.type),
 				isNilValue = itemFieldValue === undefined || itemFieldValue === null;
 
 			let modelValue:any;

@@ -5,7 +5,7 @@ export interface Field {
     name?: string;
     data?: "__self" | string | Array<string>;
     entity?: DataEntityType;
-    type?: DataEntityType;
+    type?: Function;
     defaultValue?: any;
     arrayOf?: DataEntityType;
     isArray?: boolean;

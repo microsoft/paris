@@ -19,6 +19,6 @@ export declare class Paris {
     private _removeSubject$;
     constructor(config?: ParisConfig);
     getRepository<T extends ModelBase>(entityConstructor: DataEntityConstructor<T>): Repository<T> | null;
-    getRelationshipRepository<T extends ModelBase, U extends ModelBase>(sourceEntityConstructor: DataEntityConstructor<T>, targetEntityConstructor: DataEntityConstructor<U>): RelationshipRepository<T, U>;
+    getRelationshipRepository<T extends ModelBase, U extends ModelBase>(relationshipConstructor: Function): RelationshipRepository<T, U>;
     getModelBaseConfig(entityConstructor: DataEntityType): EntityConfigBase;
 }

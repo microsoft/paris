@@ -14,6 +14,7 @@ import {RemoveEntitiesEvent} from "../events/remove-entities.event";
 import {IRelationshipRepository, RelationshipRepository} from "../repository/relationship-repository";
 import {ModelBase} from "../models/model.base";
 import {valueObjectsService} from "./value-objects.service";
+import {EntityRelationshipRepositoryType} from "../entity/entity-relationship-repository-type";
 
 export class Paris{
 	private repositories:Map<DataEntityType, IRepository> = new Map;
@@ -55,12 +56,17 @@ export class Paris{
 		return repository;
 	}
 
-	getRelationshipRepository<T extends ModelBase, U extends ModelBase>(sourceEntityConstructor:DataEntityConstructor<T>, targetEntityConstructor:DataEntityConstructor<U>):RelationshipRepository<T, U>{
-		let relationshipId:string = `${sourceEntityConstructor.name}_${targetEntityConstructor.name}`;
+	getRelationshipRepository<T extends ModelBase, U extends ModelBase>(relationshipConstructor:Function):RelationshipRepository<T, U>{
+		const relationship:EntityRelationshipRepositoryType<T, U> = <EntityRelationshipRepositoryType<T, U>>relationshipConstructor;
+
+		let sourceEntityName:string = relationship.sourceEntityType.singularName.replace(/\s/g, ""),
+			dataEntityName:string = relationship.dataEntityType.singularName.replace(/\s/g, "");
+
+		let relationshipId:string = `${sourceEntityName}_${dataEntityName}`;
 
 		let repository:RelationshipRepository<T, U> = <RelationshipRepository<T, U>>this.relationshipRepositories.get(relationshipId);
 		if (!repository) {
-			repository = new RelationshipRepository<T, U>(sourceEntityConstructor, targetEntityConstructor, this.config, this.dataStore, this);
+			repository = new RelationshipRepository<T, U>(relationship.sourceEntityType, relationship.dataEntityType, this.config, this.dataStore, this);
 			this.relationshipRepositories.set(relationshipId, repository);
 		}
 

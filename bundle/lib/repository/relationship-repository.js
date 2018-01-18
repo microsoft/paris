@@ -13,8 +13,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var entity_model_base_1 = require("../models/entity-model.base");
 var data_options_1 = require("../dataset/data.options");
 var readonly_repository_1 = require("./readonly-repository");
-var entities_service_1 = require("../services/entities.service");
-var value_objects_service_1 = require("../services/value-objects.service");
+var entity_relationships_service_1 = require("../services/entity-relationships.service");
 var RelationshipRepository = /** @class */ (function (_super) {
     __extends(RelationshipRepository, _super);
     function RelationshipRepository(sourceEntityType, dataEntityType, config, dataStore, paris) {
@@ -23,25 +22,33 @@ var RelationshipRepository = /** @class */ (function (_super) {
         _this.dataEntityType = dataEntityType;
         if (sourceEntityType === dataEntityType)
             throw new Error("RelationshipRepository doesn't support a single entity type.");
-        var relationshipConfig = (sourceEntityType.entityConfig || _this.sourceEntityType.valueObjectConfig).relationshipsMap.get(dataEntityType.name);
-        if (!relationshipConfig)
-            throw new Error("Can't create RelationshipRepository, since there's no defined relationship in " + sourceEntityType.entityConfig.singularName + " for " + dataEntityType.entityConfig.singularName + ".");
-        _this.relationship = Object.assign({}, relationshipConfig, {
-            entity: entities_service_1.entitiesService.getEntityByName(relationshipConfig.entity) || value_objects_service_1.valueObjectsService.getEntityByName(relationshipConfig.entity),
-        });
-        if (!_this.relationship.entity)
-            throw new Error("Can't create RelationshipRepository, couldn't find entity '" + relationshipConfig.entity + "'.");
-        _this.entityBackendConfig = Object.assign({}, _this.relationship.entity, _this.relationship);
+        var sourceEntityConfig = sourceEntityType.entityConfig || sourceEntityType.valueObjectConfig, sourceEntityName = sourceEntityConfig.singularName.replace(/\s/g, ""), dataEntityName = (dataEntityType.entityConfig || dataEntityType.valueObjectConfig).singularName.replace(/\s/g, "");
+        _this.relationshipConfig = entity_relationships_service_1.entityRelationshipsService.getRelationship(_this.sourceEntityType, _this.dataEntityType);
+        if (!_this.relationshipConfig)
+            throw new Error("Can't create RelationshipRepository, since there's no defined relationship in " + sourceEntityName + " for " + dataEntityName + ".");
+        _this.entityBackendConfig = Object.assign({}, dataEntityType.entityConfig, _this.relationshipConfig);
         _this.sourceRepository = paris.getRepository(sourceEntityType);
         return _this;
     }
+    RelationshipRepository.prototype.query = function (query, dataOptions) {
+        if (dataOptions === void 0) { dataOptions = data_options_1.defaultDataOptions; }
+        if (!this.sourceItem)
+            throw new Error("Can't query RelationshipRepository<" + this.sourceEntityType.singularName + ", " + this.dataEntityType.singularName + ">, since no source item was defined.");
+        return this.queryForItem(this.sourceItem, query, dataOptions);
+    };
+    RelationshipRepository.prototype.queryItem = function (query, dataOptions) {
+        if (dataOptions === void 0) { dataOptions = data_options_1.defaultDataOptions; }
+        if (!this.sourceItem)
+            throw new Error("Can't query RelationshipRepository<" + this.sourceEntityType.singularName + ", " + this.dataEntityType.singularName + ">, since no source item was defined.");
+        return this.getRelatedItem(this.sourceItem, query, dataOptions);
+    };
     RelationshipRepository.prototype.queryForItem = function (item, query, dataOptions) {
         if (dataOptions === void 0) { dataOptions = data_options_1.defaultDataOptions; }
         var cloneQuery = Object.assign({}, query);
         if (!cloneQuery.where)
             cloneQuery.where = {};
         Object.assign(cloneQuery.where, this.getRelationQueryWhere(item));
-        return this.query(cloneQuery, dataOptions);
+        return _super.prototype.query.call(this, cloneQuery, dataOptions);
     };
     RelationshipRepository.prototype.getRelatedItem = function (item, query, dataOptions) {
         if (dataOptions === void 0) { dataOptions = data_options_1.defaultDataOptions; }
@@ -51,15 +58,17 @@ var RelationshipRepository = /** @class */ (function (_super) {
                 cloneQuery.where = {};
             Object.assign(cloneQuery.where, this.getRelationQueryWhere(item));
         }
-        return this.queryItem(cloneQuery, dataOptions);
+        return _super.prototype.queryItem.call(this, cloneQuery, dataOptions);
     };
     RelationshipRepository.prototype.getRelationQueryWhere = function (item) {
         var where = {};
         var sourceItemWhereQuery = {};
-        if (item && this.relationship.foreignKey && item instanceof entity_model_base_1.EntityModelBase)
-            sourceItemWhereQuery[this.relationship.foreignKey || this.sourceEntityType.entityConfig.singularName] = item.id;
-        else if (this.relationship.getRelationshipData)
-            Object.assign(sourceItemWhereQuery, this.relationship.getRelationshipData(item));
+        if (item && this.relationshipConfig.foreignKey && item instanceof entity_model_base_1.EntityModelBase) {
+            var entityTypeName = this.sourceEntityType.singularName.replace(/\s/g, "");
+            sourceItemWhereQuery[this.relationshipConfig.foreignKey || entityTypeName] = item.id;
+        }
+        else if (this.relationshipConfig.getRelationshipData)
+            Object.assign(sourceItemWhereQuery, this.relationshipConfig.getRelationshipData(item));
         return Object.assign(where, sourceItemWhereQuery);
     };
     return RelationshipRepository;

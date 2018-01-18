@@ -16,13 +16,13 @@ var EntitiesServiceBase = /** @class */ (function () {
     EntitiesServiceBase.prototype.getEntityByType = function (dataEntityType) {
         return this._allEntities.get(dataEntityType) || this._allEntities.get(dataEntityType.prototype);
     };
-    EntitiesServiceBase.prototype.getEntityByName = function (entityName) {
-        return this._allEntitiesByName.get(entityName);
+    EntitiesServiceBase.prototype.getEntityByName = function (entitySingularName) {
+        return this._allEntitiesByName.get(entitySingularName.replace(/\s/g, ""));
     };
     EntitiesServiceBase.prototype.addEntity = function (dataEntityType, entity) {
         if (!this._allEntities.has(dataEntityType)) {
             this._allEntities.set(dataEntityType, entity);
-            this._allEntitiesByName.set(dataEntityType.name, entity);
+            this._allEntitiesByName.set(dataEntityType.singularName.replace(/\s/g, ""), entity);
         }
         entity.fields = this.getDataEntityTypeFields(dataEntityType);
         // TODO: Clear the fields once the entity is populated, without affecting inherited fields.

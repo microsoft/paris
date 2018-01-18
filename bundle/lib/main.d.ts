@@ -11,6 +11,8 @@ import 'rxjs/add/operator/finally';
 import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/observable/merge';
 import 'rxjs/add/observable/dom/ajax';
+export { EntityRelationshipRepositoryType } from "./entity/entity-relationship-repository-type";
+export { EntityRelationship } from "./entity/entity-relationship.decorator";
 export { DataEntityType } from "./entity/data-entity.base";
 export { Paris } from "./services/paris";
 export { DataStoreService } from "./services/data-store.service";

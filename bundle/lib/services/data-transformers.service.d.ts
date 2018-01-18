@@ -1,7 +1,6 @@
-import { DataEntityType } from "../entity/data-entity.base";
 export declare class DataTransformersService {
-    static parse(type: DataEntityType, value: any): any;
-    static serialize(type: DataEntityType, value: any): any;
+    static parse(type: Function, value: any): any;
+    static serialize(type: Function, value: any): any;
 }
 export interface DataTransformer {
     type: any;

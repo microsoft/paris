@@ -1,10 +1,7 @@
 import {EntityFields} from "./entity-fields";
 import {Field} from "./entity-field";
-import {EntityModelConfigBase} from "../models/entity-config-base.interface";
 import {Immutability} from "../services/immutability";
-import {DataEntityConstructor, DataEntityType} from "./data-entity.base";
-import {IEntityRelationship} from "./entity-relationship";
-import {ModelBase} from "../models/model.base";
+import {DataEntityConstructor} from "./data-entity.base";
 
 const DEFAULT_VALUE_ID = "__default";
 
@@ -14,7 +11,6 @@ export class EntityConfigBase implements IEntityConfigBase{
 	fields?:EntityFields;
 	idProperty?:string;
 	readonly:boolean = false;
-	relationships?:Array<IEntityRelationship>;
 
 	get fieldsArray():Array<Field>{
 		return this.fields ? Array.from(this.fields.values()) : [];
@@ -36,21 +32,6 @@ export class EntityConfigBase implements IEntityConfigBase{
 		}
 
 		return this._valuesMap;
-	}
-
-	private _relationshipsMap:Map<string, IEntityRelationship>;
-
-	get relationshipsMap():Map<string, IEntityRelationship>{
-		if (!this._relationshipsMap) {
-			this._relationshipsMap = new Map();
-			if (this.relationships){
-				this.relationships.forEach((relationship:IEntityRelationship) => {
-					this._relationshipsMap.set(relationship.entity, relationship);
-				});
-			}
-		}
-
-		return this._relationshipsMap;
 	}
 
 	constructor(config:IEntityConfigBase, public entityConstructor:DataEntityConstructor<any>){
@@ -82,7 +63,6 @@ export interface IEntityConfigBase{
 	idProperty?:string,
 	readonly?:boolean,
 	values?:Array<any>,
-	relationships?:Array<IEntityRelationship>,
 	fieldsArray?:Array<Field>,
 	hasValue?: (valueId:string|number) => boolean,
 	getDefaultValue?: () => any,

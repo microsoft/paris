@@ -6,6 +6,8 @@ function Entity(config) {
     return function (target) {
         var entity = new entity_config_1.ModelEntity(config, target.prototype.constructor);
         target.entityConfig = entity;
+        target.singularName = config.singularName;
+        target.pluralName = config.pluralName;
         entities_service_1.entitiesService.addEntity(target, entity);
     };
 }

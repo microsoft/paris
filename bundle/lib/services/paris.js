@@ -35,11 +35,13 @@ var Paris = /** @class */ (function () {
         }
         return repository;
     };
-    Paris.prototype.getRelationshipRepository = function (sourceEntityConstructor, targetEntityConstructor) {
-        var relationshipId = sourceEntityConstructor.name + "_" + targetEntityConstructor.name;
+    Paris.prototype.getRelationshipRepository = function (relationshipConstructor) {
+        var relationship = relationshipConstructor;
+        var sourceEntityName = relationship.sourceEntityType.singularName.replace(/\s/g, ""), dataEntityName = relationship.dataEntityType.singularName.replace(/\s/g, "");
+        var relationshipId = sourceEntityName + "_" + dataEntityName;
         var repository = this.relationshipRepositories.get(relationshipId);
         if (!repository) {
-            repository = new relationship_repository_1.RelationshipRepository(sourceEntityConstructor, targetEntityConstructor, this.config, this.dataStore, this);
+            repository = new relationship_repository_1.RelationshipRepository(relationship.sourceEntityType, relationship.dataEntityType, this.config, this.dataStore, this);
             this.relationshipRepositories.set(relationshipId, repository);
         }
         return repository;

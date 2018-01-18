@@ -37,22 +37,6 @@ var EntityConfigBase = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(EntityConfigBase.prototype, "relationshipsMap", {
-        get: function () {
-            var _this = this;
-            if (!this._relationshipsMap) {
-                this._relationshipsMap = new Map();
-                if (this.relationships) {
-                    this.relationships.forEach(function (relationship) {
-                        _this._relationshipsMap.set(relationship.entity, relationship);
-                    });
-                }
-            }
-            return this._relationshipsMap;
-        },
-        enumerable: true,
-        configurable: true
-    });
     EntityConfigBase.prototype.getValueById = function (valueId) {
         return this.valuesMap ? this.valuesMap.get(valueId) : null;
     };

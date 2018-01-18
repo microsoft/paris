@@ -1,4 +1,4 @@
-import {DataEntityConstructor} from "../entity/data-entity.base";
+import {DataEntityConstructor, DataEntityType} from "../entity/data-entity.base";
 import {EntityModelBase} from "../models/entity-model.base";
 import {DataSet} from "../dataset/dataset";
 import {DataQuery} from "../dataset/data-query";
@@ -7,16 +7,17 @@ import {Observable} from "rxjs/Observable";
 import {DataStoreService} from "../services/data-store.service";
 import {ParisConfig} from "../config/paris-config";
 import {Paris} from "../services/paris";
-import {EntityRelationship, IEntityRelationship} from "../entity/entity-relationship";
 import {ReadonlyRepository} from "./readonly-repository";
 import {IReadonlyRepository} from "./repository.interface";
-import {entitiesService} from "../services/entities.service";
 import {ModelBase} from "../models/model.base";
-import {valueObjectsService} from "../services/value-objects.service";
+import {entityRelationshipsService} from "../services/entity-relationships.service";
+import {EntityRelationshipConfig} from "../entity/entity-relationship";
 
 export class RelationshipRepository<T extends ModelBase, U extends ModelBase> extends ReadonlyRepository<U> implements IRelationshipRepository {
 	private sourceRepository: ReadonlyRepository<T>;
-	private relationship: EntityRelationship;
+	readonly relationshipConfig:EntityRelationshipConfig;
+
+	sourceItem:T;
 
 	constructor(public sourceEntityType: DataEntityConstructor<T>,
 				public dataEntityType: DataEntityConstructor<U>,
@@ -28,23 +29,32 @@ export class RelationshipRepository<T extends ModelBase, U extends ModelBase> ex
 		if (sourceEntityType === dataEntityType)
 			throw new Error("RelationshipRepository doesn't support a single entity type.");
 
-		let relationshipConfig:IEntityRelationship = (sourceEntityType.entityConfig || this.sourceEntityType.valueObjectConfig).relationshipsMap.get(dataEntityType.name);
-		if (!relationshipConfig) {
-			let sourceEntityName:string = (this.sourceEntityType.entityConfig || this.sourceEntityType.valueObjectConfig).singularName,
-				dataEntityName:string = (this.dataEntityType.entityConfig || this.dataEntityType.valueObjectConfig).singularName;
+		let sourceEntityConfig = sourceEntityType.entityConfig || sourceEntityType.valueObjectConfig,
+			sourceEntityName:string = sourceEntityConfig.singularName.replace(/\s/g, ""),
+			dataEntityName:string = (dataEntityType.entityConfig || dataEntityType.valueObjectConfig).singularName.replace(/\s/g, "")
 
+			this.relationshipConfig = entityRelationshipsService.getRelationship(this.sourceEntityType, this.dataEntityType);
+
+		if (!this.relationshipConfig)
 			throw new Error(`Can't create RelationshipRepository, since there's no defined relationship in ${sourceEntityName} for ${dataEntityName}.`);
-		}
-		this.relationship = Object.assign({}, relationshipConfig, {
-			entity: entitiesService.getEntityByName(relationshipConfig.entity) || valueObjectsService.getEntityByName(relationshipConfig.entity)
-		});
 
-		if (!this.relationship.entity)
-			throw new Error(`Can't create RelationshipRepository, couldn't find entity '${relationshipConfig.entity}'.`);
-
-		this.entityBackendConfig = Object.assign({}, this.relationship.entity, this.relationship);
-
+		this.entityBackendConfig = Object.assign({}, dataEntityType.entityConfig, this.relationshipConfig);
 		this.sourceRepository = paris.getRepository<T>(sourceEntityType);
+	}
+
+	query(query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<U>>{
+		if (!this.sourceItem)
+			throw new Error(`Can't query RelationshipRepository<${this.sourceEntityType.singularName}, ${this.dataEntityType.singularName}>, since no source item was defined.`);
+
+		return this.queryForItem(this.sourceItem, query, dataOptions);
+	}
+
+
+	queryItem(query?: DataQuery, dataOptions: DataOptions = defaultDataOptions):Observable<U>{
+		if (!this.sourceItem)
+			throw new Error(`Can't query RelationshipRepository<${this.sourceEntityType.singularName}, ${this.dataEntityType.singularName}>, since no source item was defined.`);
+
+		return this.getRelatedItem(this.sourceItem, query, dataOptions);
 	}
 
 	queryForItem(item:ModelBase, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<U>> {
@@ -55,7 +65,7 @@ export class RelationshipRepository<T extends ModelBase, U extends ModelBase> ex
 
 		Object.assign(cloneQuery.where, this.getRelationQueryWhere(item));
 
-		return this.query(cloneQuery, dataOptions);
+		return super.query(cloneQuery, dataOptions);
 	}
 
 	getRelatedItem(item:ModelBase, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions):Observable<U>{
@@ -68,25 +78,28 @@ export class RelationshipRepository<T extends ModelBase, U extends ModelBase> ex
 			Object.assign(cloneQuery.where, this.getRelationQueryWhere(item));
 		}
 
-		return this.queryItem(cloneQuery, dataOptions);
+		return super.queryItem(cloneQuery, dataOptions);
 	}
 
 	private getRelationQueryWhere(item:ModelBase):{ [index:string]:any }{
 		let where:{ [index:string]:any } = {};
 
 		let sourceItemWhereQuery:{ [index:string]:any } = {};
-		if (item && this.relationship.foreignKey && item instanceof EntityModelBase) {
-			let entityTypeName:string = (this.sourceEntityType.entityConfig || this.sourceEntityType.valueObjectConfig).singularName.replace(/\s/g, "")
-			sourceItemWhereQuery[this.relationship.foreignKey || entityTypeName] = item.id;
+		if (item && this.relationshipConfig.foreignKey && item instanceof EntityModelBase) {
+			let entityTypeName:string = this.sourceEntityType.singularName.replace(/\s/g, "");
+			sourceItemWhereQuery[this.relationshipConfig.foreignKey || entityTypeName] = item.id;
 		}
-		else if (this.relationship.getRelationshipData)
-			Object.assign(sourceItemWhereQuery, this.relationship.getRelationshipData(item));
+		else if (this.relationshipConfig.getRelationshipData)
+			Object.assign(sourceItemWhereQuery, this.relationshipConfig.getRelationshipData(item));
 
 		return Object.assign(where, sourceItemWhereQuery);
 	}
 }
 
 export interface IRelationshipRepository extends IReadonlyRepository{
+	sourceEntityType: DataEntityType,
+	dataEntityType: DataEntityType,
+	relationshipConfig:EntityRelationshipConfig,
 	queryForItem:(item:EntityModelBase, query?:DataQuery, dataOptions?:DataOptions) => Observable<DataSet<ModelBase>>,
 	getRelatedItem:(itemId?:any, query?: DataQuery, dataOptions?: DataOptions) => Observable<ModelBase>
 }

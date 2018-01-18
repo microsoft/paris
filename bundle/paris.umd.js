@@ -33,6 +33,55 @@ function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
+var entityRelationships_service = createCommonjsModule(function (module, exports) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var EntityRelationshipsService = /** @class */ (function () {
+    function EntityRelationshipsService() {
+        this.relationships = new Map;
+    }
+    EntityRelationshipsService.prototype.addRelationship = function (relationship) {
+        var sourceDataEntityType = relationship.sourceEntity, sourceRelationships = this.relationships.get(sourceDataEntityType);
+        if (!sourceRelationships) {
+            sourceRelationships = new Map;
+            this.relationships.set(sourceDataEntityType, sourceRelationships);
+        }
+        var mappedRelationship = sourceRelationships.get(relationship.dataEntity);
+        if (mappedRelationship)
+            throw new Error("Duplicate relationship: " + sourceDataEntityType.singularName + " -> " + relationship.dataEntity.singularName);
+        sourceRelationships.set(relationship.dataEntity, relationship);
+    };
+    EntityRelationshipsService.prototype.getRelationship = function (sourceDataType, dataType) {
+        var sourceRelationships = this.relationships.get(sourceDataType);
+        if (!sourceRelationships)
+            return null;
+        return sourceRelationships.get(dataType);
+    };
+    return EntityRelationshipsService;
+}());
+exports.EntityRelationshipsService = EntityRelationshipsService;
+exports.entityRelationshipsService = new EntityRelationshipsService;
+});
+
+unwrapExports(entityRelationships_service);
+
+var entityRelationship_decorator = createCommonjsModule(function (module, exports) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+
+function EntityRelationship(entityRelationshipConfig) {
+    return function (target) {
+        target.sourceEntityType = entityRelationshipConfig.sourceEntity;
+        target.dataEntityType = entityRelationshipConfig.dataEntity;
+        target.relationshipConfig = entityRelationshipConfig;
+        entityRelationships_service.entityRelationshipsService.addRelationship(entityRelationshipConfig);
+    };
+}
+exports.EntityRelationship = EntityRelationship;
+});
+
+unwrapExports(entityRelationship_decorator);
+
 var parisConfig = createCommonjsModule(function (module, exports) {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -314,22 +363,6 @@ var EntityConfigBase = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(EntityConfigBase.prototype, "relationshipsMap", {
-        get: function () {
-            var _this = this;
-            if (!this._relationshipsMap) {
-                this._relationshipsMap = new Map();
-                if (this.relationships) {
-                    this.relationships.forEach(function (relationship) {
-                        _this._relationshipsMap.set(relationship.entity, relationship);
-                    });
-                }
-            }
-            return this._relationshipsMap;
-        },
-        enumerable: true,
-        configurable: true
-    });
     EntityConfigBase.prototype.getValueById = function (valueId) {
         return this.valuesMap ? this.valuesMap.get(valueId) : null;
     };
@@ -367,7 +400,7 @@ var ModelEntity = /** @class */ (function (_super) {
         _this.loadAll = false;
         _this.loadAll = config.loadAll === true;
         if (!_this.endpoint && !_this.values)
-            throw new Error("Can't create entity " + _this.entityConstructor.name + ", no endpoint or values defined.");
+            throw new Error("Can't create entity " + (config.singularName || _this.entityConstructor.name) + ", no endpoint or values defined.");
         return _this;
     }
     return ModelEntity;
@@ -548,13 +581,13 @@ var EntitiesServiceBase = /** @class */ (function () {
     EntitiesServiceBase.prototype.getEntityByType = function (dataEntityType) {
         return this._allEntities.get(dataEntityType) || this._allEntities.get(dataEntityType.prototype);
     };
-    EntitiesServiceBase.prototype.getEntityByName = function (entityName) {
-        return this._allEntitiesByName.get(entityName);
+    EntitiesServiceBase.prototype.getEntityByName = function (entitySingularName) {
+        return this._allEntitiesByName.get(entitySingularName.replace(/\s/g, ""));
     };
     EntitiesServiceBase.prototype.addEntity = function (dataEntityType, entity) {
         if (!this._allEntities.has(dataEntityType)) {
             this._allEntities.set(dataEntityType, entity);
-            this._allEntitiesByName.set(dataEntityType.name, entity);
+            this._allEntitiesByName.set(dataEntityType.singularName.replace(/\s/g, ""), entity);
         }
         entity.fields = this.getDataEntityTypeFields(dataEntityType);
         // TODO: Clear the fields once the entity is populated, without affecting inherited fields.
@@ -1035,7 +1068,7 @@ var Repository = /** @class */ (function (_super) {
     Repository.prototype.save = function (item) {
         var _this = this;
         if (!this.entityBackendConfig.endpoint)
-            throw new Error("Entity " + this.entityConstructor.name + " can't be saved - it doesn't specify an endpoint.");
+            throw new Error("Entity " + (this.entityConstructor.entityConfig.singularName || this.entityConstructor.name) + " can't be saved - it doesn't specify an endpoint.");
         try {
             var isNewItem_1 = item.id === undefined;
             var saveData = this.serializeItem(item);
@@ -1097,7 +1130,7 @@ var Repository = /** @class */ (function (_super) {
         if (!items.length)
             return Observable_1.Observable.of([]);
         if (!this.entityBackendConfig.endpoint)
-            throw new Error("Entity " + this.entityConstructor.name + " can't be deleted - it doesn't specify an endpoint.");
+            throw new Error("Entity " + this.entity.singularName + " can't be deleted - it doesn't specify an endpoint.");
         try {
             var httpOptions = options || { data: {} };
             httpOptions.data.ids = items.map(function (item) { return item.id; });
@@ -1286,7 +1319,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 
 
-
 var RelationshipRepository = /** @class */ (function (_super) {
     __extends(RelationshipRepository, _super);
     function RelationshipRepository(sourceEntityType, dataEntityType, config, dataStore, paris) {
@@ -1295,27 +1327,33 @@ var RelationshipRepository = /** @class */ (function (_super) {
         _this.dataEntityType = dataEntityType;
         if (sourceEntityType === dataEntityType)
             throw new Error("RelationshipRepository doesn't support a single entity type.");
-        var relationshipConfig = (sourceEntityType.entityConfig || _this.sourceEntityType.valueObjectConfig).relationshipsMap.get(dataEntityType.name);
-        if (!relationshipConfig) {
-            var sourceEntityName = (_this.sourceEntityType.entityConfig || _this.sourceEntityType.valueObjectConfig).singularName, dataEntityName = (_this.dataEntityType.entityConfig || _this.dataEntityType.valueObjectConfig).singularName;
+        var sourceEntityConfig = sourceEntityType.entityConfig || sourceEntityType.valueObjectConfig, sourceEntityName = sourceEntityConfig.singularName.replace(/\s/g, ""), dataEntityName = (dataEntityType.entityConfig || dataEntityType.valueObjectConfig).singularName.replace(/\s/g, "");
+        _this.relationshipConfig = entityRelationships_service.entityRelationshipsService.getRelationship(_this.sourceEntityType, _this.dataEntityType);
+        if (!_this.relationshipConfig)
             throw new Error("Can't create RelationshipRepository, since there's no defined relationship in " + sourceEntityName + " for " + dataEntityName + ".");
-        }
-        _this.relationship = Object.assign({}, relationshipConfig, {
-            entity: entities_service.entitiesService.getEntityByName(relationshipConfig.entity) || valueObjects_service.valueObjectsService.getEntityByName(relationshipConfig.entity)
-        });
-        if (!_this.relationship.entity)
-            throw new Error("Can't create RelationshipRepository, couldn't find entity '" + relationshipConfig.entity + "'.");
-        _this.entityBackendConfig = Object.assign({}, _this.relationship.entity, _this.relationship);
+        _this.entityBackendConfig = Object.assign({}, dataEntityType.entityConfig, _this.relationshipConfig);
         _this.sourceRepository = paris.getRepository(sourceEntityType);
         return _this;
     }
+    RelationshipRepository.prototype.query = function (query, dataOptions) {
+        if (dataOptions === void 0) { dataOptions = data_options.defaultDataOptions; }
+        if (!this.sourceItem)
+            throw new Error("Can't query RelationshipRepository<" + this.sourceEntityType.singularName + ", " + this.dataEntityType.singularName + ">, since no source item was defined.");
+        return this.queryForItem(this.sourceItem, query, dataOptions);
+    };
+    RelationshipRepository.prototype.queryItem = function (query, dataOptions) {
+        if (dataOptions === void 0) { dataOptions = data_options.defaultDataOptions; }
+        if (!this.sourceItem)
+            throw new Error("Can't query RelationshipRepository<" + this.sourceEntityType.singularName + ", " + this.dataEntityType.singularName + ">, since no source item was defined.");
+        return this.getRelatedItem(this.sourceItem, query, dataOptions);
+    };
     RelationshipRepository.prototype.queryForItem = function (item, query, dataOptions) {
         if (dataOptions === void 0) { dataOptions = data_options.defaultDataOptions; }
         var cloneQuery = Object.assign({}, query);
         if (!cloneQuery.where)
             cloneQuery.where = {};
         Object.assign(cloneQuery.where, this.getRelationQueryWhere(item));
-        return this.query(cloneQuery, dataOptions);
+        return _super.prototype.query.call(this, cloneQuery, dataOptions);
     };
     RelationshipRepository.prototype.getRelatedItem = function (item, query, dataOptions) {
         if (dataOptions === void 0) { dataOptions = data_options.defaultDataOptions; }
@@ -1325,17 +1363,17 @@ var RelationshipRepository = /** @class */ (function (_super) {
                 cloneQuery.where = {};
             Object.assign(cloneQuery.where, this.getRelationQueryWhere(item));
         }
-        return this.queryItem(cloneQuery, dataOptions);
+        return _super.prototype.queryItem.call(this, cloneQuery, dataOptions);
     };
     RelationshipRepository.prototype.getRelationQueryWhere = function (item) {
         var where = {};
         var sourceItemWhereQuery = {};
-        if (item && this.relationship.foreignKey && item instanceof entityModel_base.EntityModelBase) {
-            var entityTypeName = (this.sourceEntityType.entityConfig || this.sourceEntityType.valueObjectConfig).singularName.replace(/\s/g, "");
-            sourceItemWhereQuery[this.relationship.foreignKey || entityTypeName] = item.id;
+        if (item && this.relationshipConfig.foreignKey && item instanceof entityModel_base.EntityModelBase) {
+            var entityTypeName = this.sourceEntityType.singularName.replace(/\s/g, "");
+            sourceItemWhereQuery[this.relationshipConfig.foreignKey || entityTypeName] = item.id;
         }
-        else if (this.relationship.getRelationshipData)
-            Object.assign(sourceItemWhereQuery, this.relationship.getRelationshipData(item));
+        else if (this.relationshipConfig.getRelationshipData)
+            Object.assign(sourceItemWhereQuery, this.relationshipConfig.getRelationshipData(item));
         return Object.assign(where, sourceItemWhereQuery);
     };
     return RelationshipRepository;
@@ -1383,11 +1421,13 @@ var Paris = /** @class */ (function () {
         }
         return repository$$1;
     };
-    Paris.prototype.getRelationshipRepository = function (sourceEntityConstructor, targetEntityConstructor) {
-        var relationshipId = sourceEntityConstructor.name + "_" + targetEntityConstructor.name;
+    Paris.prototype.getRelationshipRepository = function (relationshipConstructor) {
+        var relationship = relationshipConstructor;
+        var sourceEntityName = relationship.sourceEntityType.singularName.replace(/\s/g, ""), dataEntityName = relationship.dataEntityType.singularName.replace(/\s/g, "");
+        var relationshipId = sourceEntityName + "_" + dataEntityName;
         var repository$$1 = this.relationshipRepositories.get(relationshipId);
         if (!repository$$1) {
-            repository$$1 = new relationshipRepository.RelationshipRepository(sourceEntityConstructor, targetEntityConstructor, this.config, this.dataStore, this);
+            repository$$1 = new relationshipRepository.RelationshipRepository(relationship.sourceEntityType, relationship.dataEntityType, this.config, this.dataStore, this);
             this.relationshipRepositories.set(relationshipId, repository$$1);
         }
         return repository$$1;
@@ -1410,6 +1450,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 function ValueObject(config) {
     return function (target) {
         var valueObjectConfig = new entityConfig_base.EntityConfigBase(config, target.prototype.constructor);
+        target.singularName = valueObjectConfig.singularName;
+        target.pluralName = valueObjectConfig.pluralName;
         target.valueObjectConfig = valueObjectConfig;
         valueObjects_service.valueObjectsService.addEntity(target, valueObjectConfig);
     };
@@ -1428,6 +1470,8 @@ function Entity(config) {
     return function (target) {
         var entity = new entity_config.ModelEntity(config, target.prototype.constructor);
         target.entityConfig = entity;
+        target.singularName = config.singularName;
+        target.pluralName = config.pluralName;
         entities_service.entitiesService.addEntity(target, entity);
     };
 }
@@ -1452,6 +1496,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 
 
+
+exports.EntityRelationship = entityRelationship_decorator.EntityRelationship;
 
 exports.Paris = paris.Paris;
 
@@ -1481,34 +1527,36 @@ exports.DataAvailability = dataAvailability_enum.DataAvailability;
 });
 
 var main$1 = unwrapExports(main);
-var main_1 = main.Paris;
-var main_2 = main.DataStoreService;
-var main_3 = main.EntityModelBase;
-var main_4 = main.ModelBase;
-var main_5 = main.Repository;
-var main_6 = main.RelationshipRepository;
-var main_7 = main.DataTransformersService;
-var main_8 = main.ModelEntity;
-var main_9 = main.EntityField;
-var main_10 = main.ValueObject;
-var main_11 = main.Entity;
-var main_12 = main.DataQuerySortDirection;
-var main_13 = main.DataAvailability;
+var main_1 = main.EntityRelationship;
+var main_2 = main.Paris;
+var main_3 = main.DataStoreService;
+var main_4 = main.EntityModelBase;
+var main_5 = main.ModelBase;
+var main_6 = main.Repository;
+var main_7 = main.RelationshipRepository;
+var main_8 = main.DataTransformersService;
+var main_9 = main.ModelEntity;
+var main_10 = main.EntityField;
+var main_11 = main.ValueObject;
+var main_12 = main.Entity;
+var main_13 = main.DataQuerySortDirection;
+var main_14 = main.DataAvailability;
 
 exports['default'] = main$1;
-exports.Paris = main_1;
-exports.DataStoreService = main_2;
-exports.EntityModelBase = main_3;
-exports.ModelBase = main_4;
-exports.Repository = main_5;
-exports.RelationshipRepository = main_6;
-exports.DataTransformersService = main_7;
-exports.ModelEntity = main_8;
-exports.EntityField = main_9;
-exports.ValueObject = main_10;
-exports.Entity = main_11;
-exports.DataQuerySortDirection = main_12;
-exports.DataAvailability = main_13;
+exports.EntityRelationship = main_1;
+exports.Paris = main_2;
+exports.DataStoreService = main_3;
+exports.EntityModelBase = main_4;
+exports.ModelBase = main_5;
+exports.Repository = main_6;
+exports.RelationshipRepository = main_7;
+exports.DataTransformersService = main_8;
+exports.ModelEntity = main_9;
+exports.EntityField = main_10;
+exports.ValueObject = main_11;
+exports.Entity = main_12;
+exports.DataQuerySortDirection = main_13;
+exports.DataAvailability = main_14;
 
 Object.defineProperty(exports, '__esModule', { value: true });
 

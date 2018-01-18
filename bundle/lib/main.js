@@ -13,6 +13,8 @@ require("rxjs/add/operator/finally");
 require("rxjs/add/operator/toPromise");
 require("rxjs/add/observable/merge");
 require("rxjs/add/observable/dom/ajax");
+var entity_relationship_decorator_1 = require("./entity/entity-relationship.decorator");
+exports.EntityRelationship = entity_relationship_decorator_1.EntityRelationship;
 var paris_1 = require("./services/paris");
 exports.Paris = paris_1.Paris;
 var data_store_service_1 = require("./services/data-store.service");

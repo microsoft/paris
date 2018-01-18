@@ -1,4 +1,4 @@
-import { DataEntityConstructor } from "../entity/data-entity.base";
+import { DataEntityConstructor, DataEntityType } from "../entity/data-entity.base";
 import { EntityModelBase } from "../models/entity-model.base";
 import { DataSet } from "../dataset/dataset";
 import { DataQuery } from "../dataset/data-query";
@@ -10,17 +10,24 @@ import { Paris } from "../services/paris";
 import { ReadonlyRepository } from "./readonly-repository";
 import { IReadonlyRepository } from "./repository.interface";
 import { ModelBase } from "../models/model.base";
+import { EntityRelationshipConfig } from "../entity/entity-relationship";
 export declare class RelationshipRepository<T extends ModelBase, U extends ModelBase> extends ReadonlyRepository<U> implements IRelationshipRepository {
     sourceEntityType: DataEntityConstructor<T>;
     dataEntityType: DataEntityConstructor<U>;
     private sourceRepository;
-    private relationship;
+    readonly relationshipConfig: EntityRelationshipConfig;
+    sourceItem: T;
     constructor(sourceEntityType: DataEntityConstructor<T>, dataEntityType: DataEntityConstructor<U>, config: ParisConfig, dataStore: DataStoreService, paris: Paris);
+    query(query?: DataQuery, dataOptions?: DataOptions): Observable<DataSet<U>>;
+    queryItem(query?: DataQuery, dataOptions?: DataOptions): Observable<U>;
     queryForItem(item: ModelBase, query?: DataQuery, dataOptions?: DataOptions): Observable<DataSet<U>>;
     getRelatedItem(item: ModelBase, query?: DataQuery, dataOptions?: DataOptions): Observable<U>;
     private getRelationQueryWhere(item);
 }
 export interface IRelationshipRepository extends IReadonlyRepository {
+    sourceEntityType: DataEntityType;
+    dataEntityType: DataEntityType;
+    relationshipConfig: EntityRelationshipConfig;
     queryForItem: (item: EntityModelBase, query?: DataQuery, dataOptions?: DataOptions) => Observable<DataSet<ModelBase>>;
     getRelatedItem: (itemId?: any, query?: DataQuery, dataOptions?: DataOptions) => Observable<ModelBase>;
 }

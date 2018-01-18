@@ -35,7 +35,7 @@ var Repository = /** @class */ (function (_super) {
     Repository.prototype.save = function (item) {
         var _this = this;
         if (!this.entityBackendConfig.endpoint)
-            throw new Error("Entity " + this.entityConstructor.name + " can't be saved - it doesn't specify an endpoint.");
+            throw new Error("Entity " + (this.entityConstructor.entityConfig.singularName || this.entityConstructor.name) + " can't be saved - it doesn't specify an endpoint.");
         try {
             var isNewItem_1 = item.id === undefined;
             var saveData = this.serializeItem(item);
@@ -97,7 +97,7 @@ var Repository = /** @class */ (function (_super) {
         if (!items.length)
             return Observable_1.Observable.of([]);
         if (!this.entityBackendConfig.endpoint)
-            throw new Error("Entity " + this.entityConstructor.name + " can't be deleted - it doesn't specify an endpoint.");
+            throw new Error("Entity " + this.entity.singularName + " can't be deleted - it doesn't specify an endpoint.");
         try {
             var httpOptions = options || { data: {} };
             httpOptions.data.ids = items.map(function (item) { return item.id; });

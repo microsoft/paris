@@ -1,8 +1,7 @@
 import {EntityConfigBase, IEntityConfigBase} from "./entity-config.base";
 import {ParisConfig} from "../config/paris-config";
-import {DataEntityConstructor, DataEntityType} from "./data-entity.base";
+import {DataEntityConstructor} from "./data-entity.base";
 import {DataQuery} from "../dataset/data-query";
-import {EntityRelationship, IEntityRelationship} from "./entity-relationship";
 
 export class ModelEntity extends EntityConfigBase implements EntityConfig{
 	endpoint:EntityConfigFunctionOrValue;
@@ -20,7 +19,7 @@ export class ModelEntity extends EntityConfigBase implements EntityConfig{
 
 		this.loadAll = config.loadAll === true;
 		if (!this.endpoint && !this.values)
-			throw new Error(`Can't create entity ${this.entityConstructor.name}, no endpoint or values defined.`);
+			throw new Error(`Can't create entity ${config.singularName || this.entityConstructor.name}, no endpoint or values defined.`);
 	}
 }
 
