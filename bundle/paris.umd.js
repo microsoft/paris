@@ -748,7 +748,12 @@ var ReadonlyRepository = /** @class */ (function () {
                 httpOptions.params = {};
             Object.assign(httpOptions.params, this.entityBackendConfig.fixedData);
         }
-        return this.dataStore.get("" + this.endpointName + (this.entityBackendConfig.allItemsEndpointTrailingSlash !== false && !this.entityBackendConfig.allItemsEndpoint ? '/' : '') + (this.entityBackendConfig.allItemsEndpoint || ''), httpOptions, this.baseUrl)
+        var endpoint;
+        if (this.entityBackendConfig.endpoint instanceof Function)
+            endpoint = this.entityBackendConfig.endpoint(this.config, query);
+        else
+            endpoint = "" + this.endpointName + (this.entityBackendConfig.allItemsEndpointTrailingSlash !== false && !this.entityBackendConfig.allItemsEndpoint ? '/' : '') + (this.entityBackendConfig.allItemsEndpoint || '');
+        return this.dataStore.get(endpoint, httpOptions, this.baseUrl)
             .map(function (rawDataSet) {
             var allItemsProperty = _this.entityBackendConfig.allItemsProperty || _this.config.allItemsProperty;
             var rawItems = rawDataSet instanceof Array ? rawDataSet : rawDataSet[allItemsProperty];
@@ -789,7 +794,12 @@ var ReadonlyRepository = /** @class */ (function () {
                 httpOptions.params = {};
             Object.assign(httpOptions.params, this.entityBackendConfig.fixedData);
         }
-        return this.dataStore.get("" + this.endpointName + (this.entityBackendConfig.allItemsEndpointTrailingSlash !== false && !this.entityBackendConfig.allItemsEndpoint ? '/' : '') + (this.entityBackendConfig.allItemsEndpoint || ''), httpOptions, this.baseUrl)
+        var endpoint;
+        if (this.entityBackendConfig.endpoint instanceof Function)
+            endpoint = this.entityBackendConfig.endpoint(this.config, query);
+        else
+            endpoint = "" + this.endpointName + (this.entityBackendConfig.allItemsEndpointTrailingSlash !== false && !this.entityBackendConfig.allItemsEndpoint ? '/' : '') + (this.entityBackendConfig.allItemsEndpoint || '');
+        return this.dataStore.get(endpoint, httpOptions, this.baseUrl)
             .flatMap(function (data) { return _this.createItem(data, dataOptions); });
     };
     ReadonlyRepository.prototype.getItemById = function (itemId, options, params) {
@@ -1072,7 +1082,8 @@ var Repository = /** @class */ (function (_super) {
         try {
             var isNewItem_1 = item.id === undefined;
             var saveData = this.serializeItem(item);
-            return this.dataStore.save(this.endpointName + "/" + (item.id || ''), isNewItem_1 ? "POST" : "PUT", { data: saveData }, this.baseUrl)
+            var endpoint = this.entityBackendConfig.parseSaveQuery ? this.entityBackendConfig.parseSaveQuery(item, this.entity, this.config) : this.endpointName + "/" + (item.id || '');
+            return this.dataStore.save(endpoint, isNewItem_1 ? "POST" : "PUT", { data: saveData }, this.baseUrl)
                 .flatMap(function (savedItemData) { return savedItemData ? _this.createItem(savedItemData) : Observable_1.Observable.of(null); })
                 .do(function (savedItem) {
                 if (savedItem && _this._allValues) {

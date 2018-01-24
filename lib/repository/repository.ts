@@ -52,7 +52,9 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 		try {
 			let isNewItem:boolean = item.id === undefined;
 			let saveData: Index = this.serializeItem(item);
-			return this.dataStore.save(`${this.endpointName}/${item.id || ''}`, isNewItem ? "POST" : "PUT", { data: saveData }, this.baseUrl)
+			let endpoint:string = this.entityBackendConfig.parseSaveQuery ? this.entityBackendConfig.parseSaveQuery(item, this.entity, this.config) : `${this.endpointName}/${item.id || ''}`;
+
+			return this.dataStore.save(endpoint, isNewItem ? "POST" : "PUT", { data: saveData }, this.baseUrl)
 				.flatMap((savedItemData: Index) => savedItemData ? this.createItem(savedItemData) : Observable.of(null))
 				.do((savedItem: T) => {
 					if (savedItem && this._allValues) {

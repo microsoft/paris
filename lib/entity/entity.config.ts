@@ -13,6 +13,7 @@ export class ModelEntity extends EntityConfigBase implements EntityConfig{
 	allItemsEndpointTrailingSlash?:boolean;
 	parseDataQuery?:(dataQuery:DataQuery) => { [index:string]:any };
 	parseItemQuery?:(itemId:string|number, entity?:IEntityConfigBase, config?:ParisConfig) => string;
+	parseSaveQuery?:(item:any, entity?:IEntityConfigBase, config?:ParisConfig) => string;
 
 	constructor(config:EntityConfig, entityConstructor:DataEntityConstructor<any>){
 		super(config, entityConstructor);
@@ -28,7 +29,7 @@ export interface EntityConfig extends IEntityConfigBase, EntityBackendConfig{
 
 export interface EntityBackendConfig{
 	loadAll?:boolean,
-	endpoint?:EntityConfigFunctionOrValue,
+	endpoint?:((config?:ParisConfig, query?:DataQuery) => string) | string,
 	cache?:ModelEntityCacheConfig,
 	baseUrl?:EntityConfigFunctionOrValue,
 	allItemsProperty?:string,
@@ -36,7 +37,8 @@ export interface EntityBackendConfig{
 	allItemsEndpointTrailingSlash?:boolean,
 	fixedData?: { [index:string]:any },
 	parseDataQuery?:(dataQuery:DataQuery) => { [index:string]:any },
-	parseItemQuery?:(itemId:string|number, entity?:IEntityConfigBase, config?:ParisConfig) => string
+	parseItemQuery?:(itemId:string|number, entity?:IEntityConfigBase, config?:ParisConfig) => string,
+	parseSaveQuery?:(item:any, entity?:IEntityConfigBase, config?:ParisConfig) => string
 }
 
 export interface ModelEntityCacheConfig{

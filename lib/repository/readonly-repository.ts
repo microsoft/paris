@@ -114,7 +114,13 @@ export class ReadonlyRepository<T extends ModelBase>{
 			Object.assign(httpOptions.params, this.entityBackendConfig.fixedData);
 		}
 
-		return this.dataStore.get(`${this.endpointName}${this.entityBackendConfig.allItemsEndpointTrailingSlash !== false && !this.entityBackendConfig.allItemsEndpoint ? '/' : ''}${this.entityBackendConfig.allItemsEndpoint || ''}`, httpOptions, this.baseUrl)
+		let endpoint:string;
+		if (this.entityBackendConfig.endpoint instanceof Function)
+			endpoint = this.entityBackendConfig.endpoint(this.config, query);
+		else
+			endpoint = `${this.endpointName}${this.entityBackendConfig.allItemsEndpointTrailingSlash !== false && !this.entityBackendConfig.allItemsEndpoint ? '/' : ''}${this.entityBackendConfig.allItemsEndpoint || ''}`;
+
+		return this.dataStore.get(endpoint, httpOptions, this.baseUrl)
 			.map((rawDataSet: any) => {
 				const allItemsProperty = this.entityBackendConfig.allItemsProperty || this.config.allItemsProperty;
 
@@ -162,7 +168,14 @@ export class ReadonlyRepository<T extends ModelBase>{
 			Object.assign(httpOptions.params, this.entityBackendConfig.fixedData);
 		}
 
-		return this.dataStore.get(`${this.endpointName}${this.entityBackendConfig.allItemsEndpointTrailingSlash !== false && !this.entityBackendConfig.allItemsEndpoint ? '/' : ''}${this.entityBackendConfig.allItemsEndpoint || ''}`, httpOptions, this.baseUrl)
+		let endpoint:string;
+
+		if (this.entityBackendConfig.endpoint instanceof Function)
+			endpoint = this.entityBackendConfig.endpoint(this.config, query);
+		else
+			endpoint = `${this.endpointName}${this.entityBackendConfig.allItemsEndpointTrailingSlash !== false && !this.entityBackendConfig.allItemsEndpoint ? '/' : ''}${this.entityBackendConfig.allItemsEndpoint || ''}`;
+
+		return this.dataStore.get(endpoint, httpOptions, this.baseUrl)
 			.flatMap(data => this.createItem(data, dataOptions));
 	}
 
