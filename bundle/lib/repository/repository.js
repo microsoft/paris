@@ -39,7 +39,8 @@ var Repository = /** @class */ (function (_super) {
         try {
             var isNewItem_1 = item.id === undefined;
             var saveData = this.serializeItem(item);
-            return this.dataStore.save(this.endpointName + "/" + (item.id || ''), isNewItem_1 ? "POST" : "PUT", { data: saveData }, this.baseUrl)
+            var endpoint = this.entityBackendConfig.parseSaveQuery ? this.entityBackendConfig.parseSaveQuery(item, this.entity, this.config) : this.endpointName + "/" + (item.id || '');
+            return this.dataStore.save(endpoint, isNewItem_1 ? "POST" : "PUT", { data: saveData }, this.baseUrl)
                 .flatMap(function (savedItemData) { return savedItemData ? _this.createItem(savedItemData) : Observable_1.Observable.of(null); })
                 .do(function (savedItem) {
                 if (savedItem && _this._allValues) {

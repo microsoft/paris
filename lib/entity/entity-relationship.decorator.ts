@@ -6,6 +6,7 @@ export function EntityRelationship(entityRelationshipConfig:EntityRelationshipCo
 		target.sourceEntityType = entityRelationshipConfig.sourceEntity;
 		target.dataEntityType = entityRelationshipConfig.dataEntity;
 		target.relationshipConfig = entityRelationshipConfig;
+		target.allowedTypes = entityRelationshipConfig.allowedTypes;
 
 		entityRelationshipsService.addRelationship(entityRelationshipConfig);
 	}

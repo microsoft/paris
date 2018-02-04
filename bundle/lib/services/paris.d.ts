@@ -8,6 +8,9 @@ import { SaveEntityEvent } from "../events/save-entity.event";
 import { RemoveEntitiesEvent } from "../events/remove-entities.event";
 import { RelationshipRepository } from "../repository/relationship-repository";
 import { ModelBase } from "../models/model.base";
+import { DataSet } from "../dataset/dataset";
+import { DataQuery } from "../dataset/data-query";
+import { DataOptions } from "../dataset/data.options";
 export declare class Paris {
     private repositories;
     private relationshipRepositories;
@@ -21,4 +24,10 @@ export declare class Paris {
     getRepository<T extends ModelBase>(entityConstructor: DataEntityConstructor<T>): Repository<T> | null;
     getRelationshipRepository<T extends ModelBase, U extends ModelBase>(relationshipConstructor: Function): RelationshipRepository<T, U>;
     getModelBaseConfig(entityConstructor: DataEntityType): EntityConfigBase;
+    query<T extends ModelBase>(entityConstructor: DataEntityConstructor<T>, query?: DataQuery, dataOptions?: DataOptions): Observable<DataSet<T>>;
+    getItemById<T extends ModelBase>(entityConstructor: DataEntityConstructor<T>, itemId: string | number, options?: DataOptions, params?: {
+        [index: string]: any;
+    }): Observable<T>;
+    queryForItem<T extends ModelBase, U extends ModelBase>(relationshipConstructor: Function, item: ModelBase, query?: DataQuery, dataOptions?: DataOptions): Observable<DataSet<U>>;
+    getRelatedItem<T extends ModelBase, U extends ModelBase>(relationshipConstructor: Function, item: ModelBase, query?: DataQuery, dataOptions?: DataOptions): Observable<U>;
 }

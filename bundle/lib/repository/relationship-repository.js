@@ -14,9 +14,11 @@ var entity_model_base_1 = require("../models/entity-model.base");
 var data_options_1 = require("../dataset/data.options");
 var readonly_repository_1 = require("./readonly-repository");
 var entity_relationships_service_1 = require("../services/entity-relationships.service");
+var relationship_type_enum_1 = require("../models/relationship-type.enum");
+var DEFAULT_RELATIONSHIP_TYPES = [relationship_type_enum_1.RelationshipType.OneToMany, relationship_type_enum_1.RelationshipType.OneToOne];
 var RelationshipRepository = /** @class */ (function (_super) {
     __extends(RelationshipRepository, _super);
-    function RelationshipRepository(sourceEntityType, dataEntityType, config, dataStore, paris) {
+    function RelationshipRepository(sourceEntityType, dataEntityType, relationTypes, config, dataStore, paris) {
         var _this = _super.call(this, (dataEntityType.entityConfig || dataEntityType.valueObjectConfig), dataEntityType.entityConfig, config, dataEntityType, dataStore, paris) || this;
         _this.sourceEntityType = sourceEntityType;
         _this.dataEntityType = dataEntityType;
@@ -28,6 +30,7 @@ var RelationshipRepository = /** @class */ (function (_super) {
             throw new Error("Can't create RelationshipRepository, since there's no defined relationship in " + sourceEntityName + " for " + dataEntityName + ".");
         _this.entityBackendConfig = Object.assign({}, dataEntityType.entityConfig, _this.relationshipConfig);
         _this.sourceRepository = paris.getRepository(sourceEntityType);
+        _this.allowedTypes = new Set(relationTypes || DEFAULT_RELATIONSHIP_TYPES);
         return _this;
     }
     RelationshipRepository.prototype.query = function (query, dataOptions) {
@@ -44,6 +47,8 @@ var RelationshipRepository = /** @class */ (function (_super) {
     };
     RelationshipRepository.prototype.queryForItem = function (item, query, dataOptions) {
         if (dataOptions === void 0) { dataOptions = data_options_1.defaultDataOptions; }
+        if (!this.allowedTypes.has(relationship_type_enum_1.RelationshipType.OneToMany))
+            throw new Error("Can't query relationship " + this.sourceEntityType.singularName + " -> " + this.dataEntityType.singularName + " since it doesn't have the 'OneToMany' allowed type.");
         var cloneQuery = Object.assign({}, query);
         if (!cloneQuery.where)
             cloneQuery.where = {};
@@ -52,6 +57,8 @@ var RelationshipRepository = /** @class */ (function (_super) {
     };
     RelationshipRepository.prototype.getRelatedItem = function (item, query, dataOptions) {
         if (dataOptions === void 0) { dataOptions = data_options_1.defaultDataOptions; }
+        if (!this.allowedTypes.has(relationship_type_enum_1.RelationshipType.OneToOne))
+            throw new Error("Can't query relationship " + this.sourceEntityType.singularName + " -> " + this.dataEntityType.singularName + " since it doesn't have the 'OneToMany' allowed type.");
         var cloneQuery = Object.assign({}, query);
         if (item) {
             if (!cloneQuery.where)

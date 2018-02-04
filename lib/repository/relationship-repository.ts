@@ -12,15 +12,20 @@ import {IReadonlyRepository} from "./repository.interface";
 import {ModelBase} from "../models/model.base";
 import {entityRelationshipsService} from "../services/entity-relationships.service";
 import {EntityRelationshipConfig} from "../entity/entity-relationship";
+import {RelationshipType} from "../models/relationship-type.enum";
+
+const DEFAULT_RELATIONSHIP_TYPES = [RelationshipType.OneToMany, RelationshipType.OneToOne];
 
 export class RelationshipRepository<T extends ModelBase, U extends ModelBase> extends ReadonlyRepository<U> implements IRelationshipRepository {
 	private sourceRepository: ReadonlyRepository<T>;
 	readonly relationshipConfig:EntityRelationshipConfig;
 
 	sourceItem:T;
+	readonly allowedTypes:Set<RelationshipType>;
 
 	constructor(public sourceEntityType: DataEntityConstructor<T>,
 				public dataEntityType: DataEntityConstructor<U>,
+				relationTypes:Array<RelationshipType>,
 				config: ParisConfig,
 				dataStore: DataStoreService,
 				paris: Paris) {
@@ -40,6 +45,7 @@ export class RelationshipRepository<T extends ModelBase, U extends ModelBase> ex
 
 		this.entityBackendConfig = Object.assign({}, dataEntityType.entityConfig, this.relationshipConfig);
 		this.sourceRepository = paris.getRepository<T>(sourceEntityType);
+		this.allowedTypes = new Set(relationTypes || DEFAULT_RELATIONSHIP_TYPES);
 	}
 
 	query(query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<U>>{
@@ -58,6 +64,9 @@ export class RelationshipRepository<T extends ModelBase, U extends ModelBase> ex
 	}
 
 	queryForItem(item:ModelBase, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<U>> {
+		if (!this.allowedTypes.has(RelationshipType.OneToMany))
+			throw new Error(`Can't query relationship ${this.sourceEntityType.singularName} -> ${this.dataEntityType.singularName} since it doesn't have the 'OneToMany' allowed type.`);
+
 		let cloneQuery:DataQuery = Object.assign({}, query);
 
 		if (!cloneQuery.where)
@@ -69,6 +78,9 @@ export class RelationshipRepository<T extends ModelBase, U extends ModelBase> ex
 	}
 
 	getRelatedItem(item:ModelBase, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions):Observable<U>{
+		if (!this.allowedTypes.has(RelationshipType.OneToOne))
+			throw new Error(`Can't query relationship ${this.sourceEntityType.singularName} -> ${this.dataEntityType.singularName} since it doesn't have the 'OneToMany' allowed type.`);
+
 		let cloneQuery:DataQuery = Object.assign({}, query);
 
 		if (item) {
@@ -101,5 +113,6 @@ export interface IRelationshipRepository extends IReadonlyRepository{
 	dataEntityType: DataEntityType,
 	relationshipConfig:EntityRelationshipConfig,
 	queryForItem:(item:EntityModelBase, query?:DataQuery, dataOptions?:DataOptions) => Observable<DataSet<ModelBase>>,
-	getRelatedItem:(itemId?:any, query?: DataQuery, dataOptions?: DataOptions) => Observable<ModelBase>
+	getRelatedItem:(itemId?:any, query?: DataQuery, dataOptions?: DataOptions) => Observable<ModelBase>,
+	allowedTypes:Set<RelationshipType>
 }

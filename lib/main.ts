@@ -14,13 +14,14 @@ import 'rxjs/add/observable/dom/ajax';
 
 export {EntityRelationshipRepositoryType} from "./entity/entity-relationship-repository-type";
 export {EntityRelationship} from "./entity/entity-relationship.decorator";
+export {RelationshipType} from "./models/relationship-type.enum";
 export {DataEntityType} from "./entity/data-entity.base";
 export {Paris} from "./services/paris";
 export {DataStoreService} from "./services/data-store.service";
 export {EntityModelBase} from "./models/entity-model.base";
 export {ModelBase} from "./models/model.base";
 export {Repository} from "./repository/repository";
-export {RelationshipRepository} from "./repository/relationship-repository";
+export {RelationshipRepository, IRelationshipRepository} from "./repository/relationship-repository";
 export {IRepository} from "./repository/repository.interface";
 export {EntityModelConfigBase} from "./models/entity-config-base.interface";
 export {ParisConfig} from "./config/paris-config";

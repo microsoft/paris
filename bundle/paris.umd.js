@@ -74,6 +74,7 @@ function EntityRelationship(entityRelationshipConfig) {
         target.sourceEntityType = entityRelationshipConfig.sourceEntity;
         target.dataEntityType = entityRelationshipConfig.dataEntity;
         target.relationshipConfig = entityRelationshipConfig;
+        target.allowedTypes = entityRelationshipConfig.allowedTypes;
         entityRelationships_service.entityRelationshipsService.addRelationship(entityRelationshipConfig);
     };
 }
@@ -81,6 +82,18 @@ exports.EntityRelationship = EntityRelationship;
 });
 
 unwrapExports(entityRelationship_decorator);
+
+var relationshipType_enum = createCommonjsModule(function (module, exports) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var RelationshipType;
+(function (RelationshipType) {
+    RelationshipType[RelationshipType["OneToOne"] = 0] = "OneToOne";
+    RelationshipType[RelationshipType["OneToMany"] = 1] = "OneToMany";
+})(RelationshipType = exports.RelationshipType || (exports.RelationshipType = {}));
+});
+
+unwrapExports(relationshipType_enum);
 
 var parisConfig = createCommonjsModule(function (module, exports) {
 "use strict";
@@ -1330,9 +1343,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 
 
+
+var DEFAULT_RELATIONSHIP_TYPES = [relationshipType_enum.RelationshipType.OneToMany, relationshipType_enum.RelationshipType.OneToOne];
 var RelationshipRepository = /** @class */ (function (_super) {
     __extends(RelationshipRepository, _super);
-    function RelationshipRepository(sourceEntityType, dataEntityType, config, dataStore, paris) {
+    function RelationshipRepository(sourceEntityType, dataEntityType, relationTypes, config, dataStore, paris) {
         var _this = _super.call(this, (dataEntityType.entityConfig || dataEntityType.valueObjectConfig), dataEntityType.entityConfig, config, dataEntityType, dataStore, paris) || this;
         _this.sourceEntityType = sourceEntityType;
         _this.dataEntityType = dataEntityType;
@@ -1344,6 +1359,7 @@ var RelationshipRepository = /** @class */ (function (_super) {
             throw new Error("Can't create RelationshipRepository, since there's no defined relationship in " + sourceEntityName + " for " + dataEntityName + ".");
         _this.entityBackendConfig = Object.assign({}, dataEntityType.entityConfig, _this.relationshipConfig);
         _this.sourceRepository = paris.getRepository(sourceEntityType);
+        _this.allowedTypes = new Set(relationTypes || DEFAULT_RELATIONSHIP_TYPES);
         return _this;
     }
     RelationshipRepository.prototype.query = function (query, dataOptions) {
@@ -1360,6 +1376,8 @@ var RelationshipRepository = /** @class */ (function (_super) {
     };
     RelationshipRepository.prototype.queryForItem = function (item, query, dataOptions) {
         if (dataOptions === void 0) { dataOptions = data_options.defaultDataOptions; }
+        if (!this.allowedTypes.has(relationshipType_enum.RelationshipType.OneToMany))
+            throw new Error("Can't query relationship " + this.sourceEntityType.singularName + " -> " + this.dataEntityType.singularName + " since it doesn't have the 'OneToMany' allowed type.");
         var cloneQuery = Object.assign({}, query);
         if (!cloneQuery.where)
             cloneQuery.where = {};
@@ -1368,6 +1386,8 @@ var RelationshipRepository = /** @class */ (function (_super) {
     };
     RelationshipRepository.prototype.getRelatedItem = function (item, query, dataOptions) {
         if (dataOptions === void 0) { dataOptions = data_options.defaultDataOptions; }
+        if (!this.allowedTypes.has(relationshipType_enum.RelationshipType.OneToOne))
+            throw new Error("Can't query relationship " + this.sourceEntityType.singularName + " -> " + this.dataEntityType.singularName + " since it doesn't have the 'OneToMany' allowed type.");
         var cloneQuery = Object.assign({}, query);
         if (item) {
             if (!cloneQuery.where)
@@ -1397,6 +1417,7 @@ unwrapExports(relationshipRepository);
 var paris = createCommonjsModule(function (module, exports) {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+
 
 
 
@@ -1438,13 +1459,45 @@ var Paris = /** @class */ (function () {
         var relationshipId = sourceEntityName + "_" + dataEntityName;
         var repository$$1 = this.relationshipRepositories.get(relationshipId);
         if (!repository$$1) {
-            repository$$1 = new relationshipRepository.RelationshipRepository(relationship.sourceEntityType, relationship.dataEntityType, this.config, this.dataStore, this);
+            repository$$1 = new relationshipRepository.RelationshipRepository(relationship.sourceEntityType, relationship.dataEntityType, relationship.allowedTypes, this.config, this.dataStore, this);
             this.relationshipRepositories.set(relationshipId, repository$$1);
         }
         return repository$$1;
     };
     Paris.prototype.getModelBaseConfig = function (entityConstructor) {
         return entityConstructor.entityConfig || entityConstructor.valueObjectConfig;
+    };
+    Paris.prototype.query = function (entityConstructor, query, dataOptions) {
+        if (dataOptions === void 0) { dataOptions = data_options.defaultDataOptions; }
+        var repository$$1 = this.getRepository(entityConstructor);
+        if (repository$$1)
+            return repository$$1.query(query, dataOptions);
+        else
+            throw new Error("Can't query, no repository exists for " + entityConstructor + ".");
+    };
+    Paris.prototype.getItemById = function (entityConstructor, itemId, options, params) {
+        if (options === void 0) { options = data_options.defaultDataOptions; }
+        var repository$$1 = this.getRepository(entityConstructor);
+        if (repository$$1)
+            return repository$$1.getItemById(itemId, options, params);
+        else
+            throw new Error("Can't get item by ID, no repository exists for " + entityConstructor + ".");
+    };
+    Paris.prototype.queryForItem = function (relationshipConstructor, item, query, dataOptions) {
+        if (dataOptions === void 0) { dataOptions = data_options.defaultDataOptions; }
+        var relationshipRepository$$1 = this.getRelationshipRepository(relationshipConstructor);
+        if (relationshipRepository$$1)
+            return relationshipRepository$$1.queryForItem(item, query, dataOptions);
+        else
+            throw new Error("Can't query for related item, no relationship repository exists for " + relationshipConstructor + ".");
+    };
+    Paris.prototype.getRelatedItem = function (relationshipConstructor, item, query, dataOptions) {
+        if (dataOptions === void 0) { dataOptions = data_options.defaultDataOptions; }
+        var relationshipRepository$$1 = this.getRelationshipRepository(relationshipConstructor);
+        if (relationshipRepository$$1)
+            return relationshipRepository$$1.getRelatedItem(item, query, dataOptions);
+        else
+            throw new Error("Can't get related item, no relationship repository exists for " + relationshipConstructor + ".");
     };
     return Paris;
 }());
@@ -1510,6 +1563,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 exports.EntityRelationship = entityRelationship_decorator.EntityRelationship;
 
+exports.RelationshipType = relationshipType_enum.RelationshipType;
+
 exports.Paris = paris.Paris;
 
 exports.DataStoreService = dataStore_service.DataStoreService;
@@ -1539,35 +1594,37 @@ exports.DataAvailability = dataAvailability_enum.DataAvailability;
 
 var main$1 = unwrapExports(main);
 var main_1 = main.EntityRelationship;
-var main_2 = main.Paris;
-var main_3 = main.DataStoreService;
-var main_4 = main.EntityModelBase;
-var main_5 = main.ModelBase;
-var main_6 = main.Repository;
-var main_7 = main.RelationshipRepository;
-var main_8 = main.DataTransformersService;
-var main_9 = main.ModelEntity;
-var main_10 = main.EntityField;
-var main_11 = main.ValueObject;
-var main_12 = main.Entity;
-var main_13 = main.DataQuerySortDirection;
-var main_14 = main.DataAvailability;
+var main_2 = main.RelationshipType;
+var main_3 = main.Paris;
+var main_4 = main.DataStoreService;
+var main_5 = main.EntityModelBase;
+var main_6 = main.ModelBase;
+var main_7 = main.Repository;
+var main_8 = main.RelationshipRepository;
+var main_9 = main.DataTransformersService;
+var main_10 = main.ModelEntity;
+var main_11 = main.EntityField;
+var main_12 = main.ValueObject;
+var main_13 = main.Entity;
+var main_14 = main.DataQuerySortDirection;
+var main_15 = main.DataAvailability;
 
 exports['default'] = main$1;
 exports.EntityRelationship = main_1;
-exports.Paris = main_2;
-exports.DataStoreService = main_3;
-exports.EntityModelBase = main_4;
-exports.ModelBase = main_5;
-exports.Repository = main_6;
-exports.RelationshipRepository = main_7;
-exports.DataTransformersService = main_8;
-exports.ModelEntity = main_9;
-exports.EntityField = main_10;
-exports.ValueObject = main_11;
-exports.Entity = main_12;
-exports.DataQuerySortDirection = main_13;
-exports.DataAvailability = main_14;
+exports.RelationshipType = main_2;
+exports.Paris = main_3;
+exports.DataStoreService = main_4;
+exports.EntityModelBase = main_5;
+exports.ModelBase = main_6;
+exports.Repository = main_7;
+exports.RelationshipRepository = main_8;
+exports.DataTransformersService = main_9;
+exports.ModelEntity = main_10;
+exports.EntityField = main_11;
+exports.ValueObject = main_12;
+exports.Entity = main_13;
+exports.DataQuerySortDirection = main_14;
+exports.DataAvailability = main_15;
 
 Object.defineProperty(exports, '__esModule', { value: true });
 

@@ -7,6 +7,7 @@ var data_store_service_1 = require("./data-store.service");
 var Subject_1 = require("rxjs/Subject");
 var relationship_repository_1 = require("../repository/relationship-repository");
 var value_objects_service_1 = require("./value-objects.service");
+var data_options_1 = require("../dataset/data.options");
 var Paris = /** @class */ (function () {
     function Paris(config) {
         this.repositories = new Map;
@@ -41,13 +42,45 @@ var Paris = /** @class */ (function () {
         var relationshipId = sourceEntityName + "_" + dataEntityName;
         var repository = this.relationshipRepositories.get(relationshipId);
         if (!repository) {
-            repository = new relationship_repository_1.RelationshipRepository(relationship.sourceEntityType, relationship.dataEntityType, this.config, this.dataStore, this);
+            repository = new relationship_repository_1.RelationshipRepository(relationship.sourceEntityType, relationship.dataEntityType, relationship.allowedTypes, this.config, this.dataStore, this);
             this.relationshipRepositories.set(relationshipId, repository);
         }
         return repository;
     };
     Paris.prototype.getModelBaseConfig = function (entityConstructor) {
         return entityConstructor.entityConfig || entityConstructor.valueObjectConfig;
+    };
+    Paris.prototype.query = function (entityConstructor, query, dataOptions) {
+        if (dataOptions === void 0) { dataOptions = data_options_1.defaultDataOptions; }
+        var repository = this.getRepository(entityConstructor);
+        if (repository)
+            return repository.query(query, dataOptions);
+        else
+            throw new Error("Can't query, no repository exists for " + entityConstructor + ".");
+    };
+    Paris.prototype.getItemById = function (entityConstructor, itemId, options, params) {
+        if (options === void 0) { options = data_options_1.defaultDataOptions; }
+        var repository = this.getRepository(entityConstructor);
+        if (repository)
+            return repository.getItemById(itemId, options, params);
+        else
+            throw new Error("Can't get item by ID, no repository exists for " + entityConstructor + ".");
+    };
+    Paris.prototype.queryForItem = function (relationshipConstructor, item, query, dataOptions) {
+        if (dataOptions === void 0) { dataOptions = data_options_1.defaultDataOptions; }
+        var relationshipRepository = this.getRelationshipRepository(relationshipConstructor);
+        if (relationshipRepository)
+            return relationshipRepository.queryForItem(item, query, dataOptions);
+        else
+            throw new Error("Can't query for related item, no relationship repository exists for " + relationshipConstructor + ".");
+    };
+    Paris.prototype.getRelatedItem = function (relationshipConstructor, item, query, dataOptions) {
+        if (dataOptions === void 0) { dataOptions = data_options_1.defaultDataOptions; }
+        var relationshipRepository = this.getRelationshipRepository(relationshipConstructor);
+        if (relationshipRepository)
+            return relationshipRepository.getRelatedItem(item, query, dataOptions);
+        else
+            throw new Error("Can't get related item, no relationship repository exists for " + relationshipConstructor + ".");
     };
     return Paris;
 }());

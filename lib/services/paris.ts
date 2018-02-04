@@ -15,6 +15,9 @@ import {IRelationshipRepository, RelationshipRepository} from "../repository/rel
 import {ModelBase} from "../models/model.base";
 import {valueObjectsService} from "./value-objects.service";
 import {EntityRelationshipRepositoryType} from "../entity/entity-relationship-repository-type";
+import {DataSet} from "../dataset/dataset";
+import {DataQuery} from "../dataset/data-query";
+import {DataOptions, defaultDataOptions} from "../dataset/data.options";
 
 export class Paris{
 	private repositories:Map<DataEntityType, IRepository> = new Map;
@@ -66,7 +69,7 @@ export class Paris{
 
 		let repository:RelationshipRepository<T, U> = <RelationshipRepository<T, U>>this.relationshipRepositories.get(relationshipId);
 		if (!repository) {
-			repository = new RelationshipRepository<T, U>(relationship.sourceEntityType, relationship.dataEntityType, this.config, this.dataStore, this);
+			repository = new RelationshipRepository<T, U>(relationship.sourceEntityType, relationship.dataEntityType, relationship.allowedTypes, this.config, this.dataStore, this);
 			this.relationshipRepositories.set(relationshipId, repository);
 		}
 
@@ -75,5 +78,37 @@ export class Paris{
 
 	getModelBaseConfig(entityConstructor:DataEntityType):EntityConfigBase{
 		return entityConstructor.entityConfig || entityConstructor.valueObjectConfig;
+	}
+
+	query<T extends ModelBase>(entityConstructor:DataEntityConstructor<T>, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<T>>{
+		let repository:Repository<T> = this.getRepository(entityConstructor);
+		if (repository)
+			return repository.query(query, dataOptions);
+		else
+			throw new Error(`Can't query, no repository exists for ${entityConstructor}.`);
+	}
+
+	getItemById<T extends ModelBase>(entityConstructor:DataEntityConstructor<T>, itemId: string | number, options: DataOptions = defaultDataOptions, params?:{ [index:string]:any }): Observable<T>{
+		let repository:Repository<T> = this.getRepository(entityConstructor);
+		if (repository)
+			return repository.getItemById(itemId, options, params);
+		else
+			throw new Error(`Can't get item by ID, no repository exists for ${entityConstructor}.`);
+	}
+
+	queryForItem<T extends ModelBase, U extends ModelBase>(relationshipConstructor:Function, item:ModelBase, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<U>>{
+		let relationshipRepository:RelationshipRepository<T,U> = this.getRelationshipRepository<T, U>(relationshipConstructor);
+		if (relationshipRepository)
+			return relationshipRepository.queryForItem(item, query, dataOptions);
+		else
+			throw new Error(`Can't query for related item, no relationship repository exists for ${relationshipConstructor}.`);
+	}
+
+	getRelatedItem<T extends ModelBase, U extends ModelBase>(relationshipConstructor:Function, item:ModelBase, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<U>{
+		let relationshipRepository:RelationshipRepository<T,U> = this.getRelationshipRepository<T, U>(relationshipConstructor);
+		if (relationshipRepository)
+			return relationshipRepository.getRelatedItem(item, query, dataOptions);
+		else
+			throw new Error(`Can't get related item, no relationship repository exists for ${relationshipConstructor}.`);
 	}
 }

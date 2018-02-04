@@ -105,7 +105,12 @@ var ReadonlyRepository = /** @class */ (function () {
                 httpOptions.params = {};
             Object.assign(httpOptions.params, this.entityBackendConfig.fixedData);
         }
-        return this.dataStore.get("" + this.endpointName + (this.entityBackendConfig.allItemsEndpointTrailingSlash !== false && !this.entityBackendConfig.allItemsEndpoint ? '/' : '') + (this.entityBackendConfig.allItemsEndpoint || ''), httpOptions, this.baseUrl)
+        var endpoint;
+        if (this.entityBackendConfig.endpoint instanceof Function)
+            endpoint = this.entityBackendConfig.endpoint(this.config, query);
+        else
+            endpoint = "" + this.endpointName + (this.entityBackendConfig.allItemsEndpointTrailingSlash !== false && !this.entityBackendConfig.allItemsEndpoint ? '/' : '') + (this.entityBackendConfig.allItemsEndpoint || '');
+        return this.dataStore.get(endpoint, httpOptions, this.baseUrl)
             .map(function (rawDataSet) {
             var allItemsProperty = _this.entityBackendConfig.allItemsProperty || _this.config.allItemsProperty;
             var rawItems = rawDataSet instanceof Array ? rawDataSet : rawDataSet[allItemsProperty];
@@ -146,7 +151,12 @@ var ReadonlyRepository = /** @class */ (function () {
                 httpOptions.params = {};
             Object.assign(httpOptions.params, this.entityBackendConfig.fixedData);
         }
-        return this.dataStore.get("" + this.endpointName + (this.entityBackendConfig.allItemsEndpointTrailingSlash !== false && !this.entityBackendConfig.allItemsEndpoint ? '/' : '') + (this.entityBackendConfig.allItemsEndpoint || ''), httpOptions, this.baseUrl)
+        var endpoint;
+        if (this.entityBackendConfig.endpoint instanceof Function)
+            endpoint = this.entityBackendConfig.endpoint(this.config, query);
+        else
+            endpoint = "" + this.endpointName + (this.entityBackendConfig.allItemsEndpointTrailingSlash !== false && !this.entityBackendConfig.allItemsEndpoint ? '/' : '') + (this.entityBackendConfig.allItemsEndpoint || '');
+        return this.dataStore.get(endpoint, httpOptions, this.baseUrl)
             .flatMap(function (data) { return _this.createItem(data, dataOptions); });
     };
     ReadonlyRepository.prototype.getItemById = function (itemId, options, params) {

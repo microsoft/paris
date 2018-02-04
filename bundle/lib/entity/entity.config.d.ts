@@ -14,13 +14,14 @@ export declare class ModelEntity extends EntityConfigBase implements EntityConfi
         [index: string]: any;
     };
     parseItemQuery?: (itemId: string | number, entity?: IEntityConfigBase, config?: ParisConfig) => string;
+    parseSaveQuery?: (item: any, entity?: IEntityConfigBase, config?: ParisConfig) => string;
     constructor(config: EntityConfig, entityConstructor: DataEntityConstructor<any>);
 }
 export interface EntityConfig extends IEntityConfigBase, EntityBackendConfig {
 }
 export interface EntityBackendConfig {
     loadAll?: boolean;
-    endpoint?: EntityConfigFunctionOrValue;
+    endpoint?: ((config?: ParisConfig, query?: DataQuery) => string) | string;
     cache?: ModelEntityCacheConfig;
     baseUrl?: EntityConfigFunctionOrValue;
     allItemsProperty?: string;
@@ -33,6 +34,7 @@ export interface EntityBackendConfig {
         [index: string]: any;
     };
     parseItemQuery?: (itemId: string | number, entity?: IEntityConfigBase, config?: ParisConfig) => string;
+    parseSaveQuery?: (item: any, entity?: IEntityConfigBase, config?: ParisConfig) => string;
 }
 export interface ModelEntityCacheConfig {
     time?: number;
