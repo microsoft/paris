@@ -12,7 +12,7 @@ export class ModelEntity extends EntityConfigBase implements EntityConfig{
 	allItemsEndpoint?:string;
 	allItemsEndpointTrailingSlash?:boolean;
 	parseDataQuery?:(dataQuery:DataQuery) => { [index:string]:any };
-	parseItemQuery?:(itemId:string|number, entity?:IEntityConfigBase, config?:ParisConfig) => string;
+	parseItemQuery?:(itemId:string|number, entity?:IEntityConfigBase, config?:ParisConfig, params?:{ [index:string]:any }) => string;
 	parseSaveQuery?:(item:any, entity?:IEntityConfigBase, config?:ParisConfig) => string;
 
 	constructor(config:EntityConfig, entityConstructor:DataEntityConstructor<any>){
@@ -37,7 +37,7 @@ export interface EntityBackendConfig{
 	allItemsEndpointTrailingSlash?:boolean,
 	fixedData?: { [index:string]:any },
 	parseDataQuery?:(dataQuery:DataQuery) => { [index:string]:any },
-	parseItemQuery?:(itemId:string|number, entity?:IEntityConfigBase, config?:ParisConfig) => string,
+	parseItemQuery?:(itemId:string|number, entity?:IEntityConfigBase, config?:ParisConfig, params?:{ [index:string]:any }) => string,
 	parseSaveQuery?:(item:any, entity?:IEntityConfigBase, config?:ParisConfig) => string
 }
 

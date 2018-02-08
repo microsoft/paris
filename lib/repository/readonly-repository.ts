@@ -96,8 +96,8 @@ export class ReadonlyRepository<T extends ModelBase>{
 		return new this.entityConstructor(defaultData);
 	}
 
-	createItem(itemData: any, options: DataOptions = { allowCache: true, availability: DataAvailability.available }): Observable<T> {
-		return ReadonlyRepository.getModelData(itemData, this.entity, this.config, this.paris, options);
+	createItem(itemData: any, options: DataOptions = { allowCache: true, availability: DataAvailability.available }, query?: DataQuery): Observable<T> {
+		return ReadonlyRepository.getModelData(itemData, this.entity, this.config, this.paris, options, query);
 	}
 
 	query(query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<T>> {
@@ -139,7 +139,7 @@ export class ReadonlyRepository<T extends ModelBase>{
 				if (!dataSet.items.length)
 					return Observable.of({ count: 0, items: [] });
 
-				let itemCreators: Array<Observable<T>> = dataSet.items.map((itemData: any) => this.createItem(itemData, dataOptions));
+				let itemCreators: Array<Observable<T>> = dataSet.items.map((itemData: any) => this.createItem(itemData, dataOptions, query));
 
 				return Observable.combineLatest.apply(this, itemCreators).map((items: Array<T>) => {
 					return Object.freeze({
@@ -176,7 +176,7 @@ export class ReadonlyRepository<T extends ModelBase>{
 			endpoint = `${this.endpointName}${this.entityBackendConfig.allItemsEndpointTrailingSlash !== false && !this.entityBackendConfig.allItemsEndpoint ? '/' : ''}${this.entityBackendConfig.allItemsEndpoint || ''}`;
 
 		return this.dataStore.get(endpoint, httpOptions, this.baseUrl)
-			.flatMap(data => this.createItem(data, dataOptions));
+			.flatMap(data => this.createItem(data, dataOptions, query));
 	}
 
 	getItemById(itemId: string | number, options: DataOptions = defaultDataOptions, params?:{ [index:string]:any }): Observable<T> {
@@ -199,8 +199,8 @@ export class ReadonlyRepository<T extends ModelBase>{
 		if (this.entityBackendConfig.loadAll)
 			return this.setAllItems().map(() => this._allValuesMap.get(String(itemId)));
 		else {
-			return this.dataStore.get(this.entityBackendConfig.parseItemQuery ? this.entityBackendConfig.parseItemQuery(itemId, this.entity, this.config) : `${this.endpointName}/${itemId}`, params && { params: params }, this.baseUrl)
-				.flatMap(data => this.createItem(data, options));
+			return this.dataStore.get(this.entityBackendConfig.parseItemQuery ? this.entityBackendConfig.parseItemQuery(itemId, this.entity, this.config, params) : `${this.endpointName}/${itemId}`, params && { params: params }, this.baseUrl)
+				.flatMap(data => this.createItem(data, options, { where: Object.assign({ itemId: itemId }, params) }));
 		}
 	}
 
@@ -225,7 +225,7 @@ export class ReadonlyRepository<T extends ModelBase>{
 	 * @param {DataOptions} options
 	 * @returns {Observable<T extends EntityModelBase>}
 	 */
-	static getModelData<T extends ModelBase>(rawData: Index, entity: IEntityConfigBase, config: ParisConfig, paris: Paris, options: DataOptions = defaultDataOptions): Observable<T> {
+	static getModelData<T extends ModelBase>(rawData: Index, entity: IEntityConfigBase, config: ParisConfig, paris: Paris, options: DataOptions = defaultDataOptions, query?: DataQuery): Observable<T> {
 		let entityIdProperty: string = entity.idProperty || config.entityIdProperty,
 			modelData: Index = entity instanceof ModelEntity ? {id: rawData[entityIdProperty]} : {},
 			subModels: Array<Observable<{ [index: string]: ModelBase | Array<ModelBase> }>> = [];
@@ -268,7 +268,7 @@ export class ReadonlyRepository<T extends ModelBase>{
 
 			if (entityField.parse) {
 				try {
-					propertyValue = entityField.parse(propertyValue, rawData);
+					propertyValue = entityField.parse(propertyValue, rawData, query);
 				}
 				catch(e){
 					getModelDataError.message = getModelDataError.message + ` Error parsing field ${entityField.id}: ` + e.message;

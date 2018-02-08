@@ -1,5 +1,6 @@
 import { DataEntityType } from "./data-entity.base";
 import { ParisConfig } from "../config/paris-config";
+import { DataQuery } from "../dataset/data-query";
 export interface Field {
     id?: string;
     name?: string;
@@ -11,7 +12,7 @@ export interface Field {
     isArray?: boolean;
     required?: boolean;
     require?: ((data: any, config?: ParisConfig) => any) | string;
-    parse?: (fieldData?: any, itemData?: any) => any;
+    parse?: (fieldData?: any, itemData?: any, query?: DataQuery) => any;
     serialize?: (itemData: any) => any;
 }
 export declare const FIELD_DATA_SELF = "__self";

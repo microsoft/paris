@@ -32,7 +32,7 @@ export declare class ReadonlyRepository<T extends ModelBase> {
     readonly endpointUrl: string;
     protected setAllItems(): Observable<Array<T>>;
     createNewItem(): T;
-    createItem(itemData: any, options?: DataOptions): Observable<T>;
+    createItem(itemData: any, options?: DataOptions, query?: DataQuery): Observable<T>;
     query(query?: DataQuery, dataOptions?: DataOptions): Observable<DataSet<T>>;
     queryItem(query: DataQuery, dataOptions?: DataOptions): Observable<T>;
     getItemById(itemId: string | number, options?: DataOptions, params?: {
@@ -54,7 +54,7 @@ export declare class ReadonlyRepository<T extends ModelBase> {
      * @param {DataOptions} options
      * @returns {Observable<T extends EntityModelBase>}
      */
-    static getModelData<T extends ModelBase>(rawData: Index, entity: IEntityConfigBase, config: ParisConfig, paris: Paris, options?: DataOptions): Observable<T>;
+    static getModelData<T extends ModelBase>(rawData: Index, entity: IEntityConfigBase, config: ParisConfig, paris: Paris, options?: DataOptions, query?: DataQuery): Observable<T>;
     private static getSubModel(entityField, value, paris, config, options?);
     private static mapToEntityFieldIndex(entityFieldId, value);
     private static getEntityItem<U>(repository, data, options?);

@@ -745,9 +745,9 @@ var ReadonlyRepository = /** @class */ (function () {
         });
         return new this.entityConstructor(defaultData);
     };
-    ReadonlyRepository.prototype.createItem = function (itemData, options) {
+    ReadonlyRepository.prototype.createItem = function (itemData, options, query) {
         if (options === void 0) { options = { allowCache: true, availability: dataAvailability_enum.DataAvailability.available }; }
-        return ReadonlyRepository.getModelData(itemData, this.entity, this.config, this.paris, options);
+        return ReadonlyRepository.getModelData(itemData, this.entity, this.config, this.paris, options, query);
     };
     ReadonlyRepository.prototype.query = function (query, dataOptions) {
         var _this = this;
@@ -782,7 +782,7 @@ var ReadonlyRepository = /** @class */ (function () {
             .flatMap(function (dataSet) {
             if (!dataSet.items.length)
                 return Observable_1.Observable.of({ count: 0, items: [] });
-            var itemCreators = dataSet.items.map(function (itemData) { return _this.createItem(itemData, dataOptions); });
+            var itemCreators = dataSet.items.map(function (itemData) { return _this.createItem(itemData, dataOptions, query); });
             return Observable_1.Observable.combineLatest.apply(_this, itemCreators).map(function (items) {
                 return Object.freeze({
                     count: dataSet.count,
@@ -813,7 +813,7 @@ var ReadonlyRepository = /** @class */ (function () {
         else
             endpoint = "" + this.endpointName + (this.entityBackendConfig.allItemsEndpointTrailingSlash !== false && !this.entityBackendConfig.allItemsEndpoint ? '/' : '') + (this.entityBackendConfig.allItemsEndpoint || '');
         return this.dataStore.get(endpoint, httpOptions, this.baseUrl)
-            .flatMap(function (data) { return _this.createItem(data, dataOptions); });
+            .flatMap(function (data) { return _this.createItem(data, dataOptions, query); });
     };
     ReadonlyRepository.prototype.getItemById = function (itemId, options, params) {
         var _this = this;
@@ -833,8 +833,8 @@ var ReadonlyRepository = /** @class */ (function () {
         if (this.entityBackendConfig.loadAll)
             return this.setAllItems().map(function () { return _this._allValuesMap.get(String(itemId)); });
         else {
-            return this.dataStore.get(this.entityBackendConfig.parseItemQuery ? this.entityBackendConfig.parseItemQuery(itemId, this.entity, this.config) : this.endpointName + "/" + itemId, params && { params: params }, this.baseUrl)
-                .flatMap(function (data) { return _this.createItem(data, options); });
+            return this.dataStore.get(this.entityBackendConfig.parseItemQuery ? this.entityBackendConfig.parseItemQuery(itemId, this.entity, this.config, params) : this.endpointName + "/" + itemId, params && { params: params }, this.baseUrl)
+                .flatMap(function (data) { return _this.createItem(data, options, { where: Object.assign({ itemId: itemId }, params) }); });
         }
     };
     /**
@@ -856,7 +856,7 @@ var ReadonlyRepository = /** @class */ (function () {
      * @param {DataOptions} options
      * @returns {Observable<T extends EntityModelBase>}
      */
-    ReadonlyRepository.getModelData = function (rawData, entity, config, paris, options) {
+    ReadonlyRepository.getModelData = function (rawData, entity, config, paris, options, query) {
         if (options === void 0) { options = data_options.defaultDataOptions; }
         var entityIdProperty = entity.idProperty || config.entityIdProperty, modelData = entity instanceof entity_config.ModelEntity ? { id: rawData[entityIdProperty] } : {}, subModels = [];
         var getModelDataError = new Error("Failed to create " + entity.singularName + ".");
@@ -892,7 +892,7 @@ var ReadonlyRepository = /** @class */ (function () {
                 propertyValue = rawData[entityField$$1.id];
             if (entityField$$1.parse) {
                 try {
-                    propertyValue = entityField$$1.parse(propertyValue, rawData);
+                    propertyValue = entityField$$1.parse(propertyValue, rawData, query);
                 }
                 catch (e) {
                     getModelDataError.message = getModelDataError.message + (" Error parsing field " + entityField$$1.id + ": ") + e.message;
