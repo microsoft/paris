@@ -1,6 +1,7 @@
 import { EntityFields } from "./entity-fields";
 import { Field } from "./entity-field";
 import { DataEntityConstructor } from "./data-entity.base";
+import { ParisConfig } from "../config/paris-config";
 export declare class EntityConfigBase implements IEntityConfigBase {
     entityConstructor: DataEntityConstructor<any>;
     singularName: string;
@@ -8,6 +9,7 @@ export declare class EntityConfigBase implements IEntityConfigBase {
     fields?: EntityFields;
     idProperty?: string;
     readonly: boolean;
+    serializeItem?: (item: any, serializedItem?: any, entity?: IEntityConfigBase, config?: ParisConfig) => any;
     readonly fieldsArray: Array<Field>;
     values: Array<any>;
     private _valuesMap;
@@ -29,4 +31,5 @@ export interface IEntityConfigBase {
     getDefaultValue?: () => any;
     getValueById?: (valueId: string | number) => any;
     entityConstructor?: DataEntityConstructor<any>;
+    serializeItem?: (item: any, serializedItem?: any, entity?: IEntityConfigBase, config?: ParisConfig) => any;
 }

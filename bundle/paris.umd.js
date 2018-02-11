@@ -453,7 +453,7 @@ var DataCache = /** @class */ (function () {
      * @param key
      * @returns {Observable<T>}
      */
-    DataCache.prototype.get = function (key) {
+    DataCache.prototype.get = function (key, params) {
         var _this = this;
         if (!key && key !== 0)
             throw new Error("Can't get DataCache item, key not specified.");
@@ -465,7 +465,7 @@ var DataCache = /** @class */ (function () {
             var cachedItem = this._values.get(key);
             if (cachedItem)
                 return Observable_1.Observable.of(cachedItem);
-            return this._getObservable[key] = Observable_1.Observable.from(this.getter(key))
+            return this._getObservable[key] = Observable_1.Observable.from(this.getter(key, params))
                 .do(function (value) {
                 _this.add(key, value);
                 delete _this._getObservable[key];
@@ -702,7 +702,7 @@ var ReadonlyRepository = /** @class */ (function () {
             var _this = this;
             if (!this._cache) {
                 var cacheSettings = Object.assign({
-                    getter: function (itemId) { return _this.getItemById(itemId, { allowCache: false }); }
+                    getter: function (itemId, params) { return _this.getItemById(itemId, { allowCache: false }, params); }
                 }, this.entityBackendConfig.cache);
                 this._cache = new cache.DataCache(cacheSettings);
             }
@@ -818,6 +818,16 @@ var ReadonlyRepository = /** @class */ (function () {
     ReadonlyRepository.prototype.getItemById = function (itemId, options, params) {
         var _this = this;
         if (options === void 0) { options = data_options.defaultDataOptions; }
+        var idFieldIndex = lodash.findIndex(this.entity.fieldsArray, function (field) { return field.id === "id"; });
+        if (~idFieldIndex) {
+            var idField = this.entity.fieldsArray[idFieldIndex];
+            if (idField.type === Number && typeof (itemId) === "string") {
+                var originalItemId = itemId;
+                itemId = parseInt(itemId, 10);
+                if (isNaN(itemId))
+                    throw new Error("Invalid ID for " + this.entity.singularName + ". Expected a number but got: " + originalItemId + ".");
+            }
+        }
         if (this.entity.values) {
             var entityValue = void 0;
             if (itemId !== null && itemId !== undefined) {
@@ -829,7 +839,7 @@ var ReadonlyRepository = /** @class */ (function () {
             return Observable_1.Observable.of(entityValue || this.entity.getDefaultValue());
         }
         if (options.allowCache !== false && this.entityBackendConfig.cache)
-            return this.cache.get(itemId);
+            return this.cache.get(itemId, params);
         if (this.entityBackendConfig.loadAll)
             return this.setAllItems().map(function () { return _this._allValuesMap.get(String(itemId)); });
         else {
@@ -1044,6 +1054,8 @@ var ReadonlyRepository = /** @class */ (function () {
                 : entityField$$1.id;
             modelData[modelProperty] = modelValue;
         });
+        if (entity.serializeItem)
+            modelData = entity.serializeItem(item, modelData, entity, paris.config);
         return modelData;
     };
     return ReadonlyRepository;
@@ -1498,6 +1510,23 @@ var Paris = /** @class */ (function () {
             return relationshipRepository$$1.getRelatedItem(item, query, dataOptions);
         else
             throw new Error("Can't get related item, no relationship repository exists for " + relationshipConstructor + ".");
+    };
+    Paris.prototype.getValue = function (entityConstructor, valueId) {
+        var repository$$1 = this.getRepository(entityConstructor);
+        if (!repository$$1)
+            return null;
+        var values = repository$$1.entity.values;
+        if (!values)
+            return null;
+        if (valueId instanceof Function) {
+            for (var i = 0, value = void 0; value = values[i]; i++) {
+                if (valueId(value))
+                    return value;
+            }
+            return null;
+        }
+        else
+            return repository$$1.entity.getValueById(valueId);
     };
     return Paris;
 }());

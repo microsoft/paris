@@ -30,4 +30,5 @@ export declare class Paris {
     }): Observable<T>;
     queryForItem<T extends ModelBase, U extends ModelBase>(relationshipConstructor: Function, item: ModelBase, query?: DataQuery, dataOptions?: DataOptions): Observable<DataSet<U>>;
     getRelatedItem<T extends ModelBase, U extends ModelBase>(relationshipConstructor: Function, item: ModelBase, query?: DataQuery, dataOptions?: DataOptions): Observable<U>;
+    getValue<T extends ModelBase>(entityConstructor: DataEntityConstructor<T>, valueId: any): T;
 }

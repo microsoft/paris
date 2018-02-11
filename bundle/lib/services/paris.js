@@ -82,6 +82,23 @@ var Paris = /** @class */ (function () {
         else
             throw new Error("Can't get related item, no relationship repository exists for " + relationshipConstructor + ".");
     };
+    Paris.prototype.getValue = function (entityConstructor, valueId) {
+        var repository = this.getRepository(entityConstructor);
+        if (!repository)
+            return null;
+        var values = repository.entity.values;
+        if (!values)
+            return null;
+        if (valueId instanceof Function) {
+            for (var i = 0, value = void 0; value = values[i]; i++) {
+                if (valueId(value))
+                    return value;
+            }
+            return null;
+        }
+        else
+            return repository.entity.getValueById(valueId);
+    };
     return Paris;
 }());
 exports.Paris = Paris;

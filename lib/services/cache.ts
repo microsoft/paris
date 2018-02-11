@@ -3,7 +3,7 @@ import {Observable} from "rxjs/Observable";
 export class DataCache<T>{
 	time:number;
 	obj:number;
-	getter:(_:any) => Promise<T> | Observable<T>;
+	getter:(_:any, params?:{ [index:string]: any }) => Promise<T> | Observable<T>;
 
 	private _keys:Array<string>;
 	private _values:Map<string, T>;
@@ -31,7 +31,7 @@ export class DataCache<T>{
 	 * @param key
 	 * @returns {Observable<T>}
 	 */
-	get(key:any):Observable<T>{
+	get(key:any, params?:{ [index:string]: any }):Observable<T>{
 		if (!key && key !== 0)
 			throw new Error("Can't get DataCache item, key not specified.");
 
@@ -46,7 +46,7 @@ export class DataCache<T>{
 			if (cachedItem)
 				return Observable.of(cachedItem);
 
-			return this._getObservable[key] = Observable.from(this.getter(key))
+			return this._getObservable[key] = Observable.from(this.getter(key, params))
 				.do((value:T) => {
 					this.add(key, value);
 					delete this._getObservable[key];

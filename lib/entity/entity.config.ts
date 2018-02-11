@@ -14,6 +14,7 @@ export class ModelEntity extends EntityConfigBase implements EntityConfig{
 	parseDataQuery?:(dataQuery:DataQuery) => { [index:string]:any };
 	parseItemQuery?:(itemId:string|number, entity?:IEntityConfigBase, config?:ParisConfig, params?:{ [index:string]:any }) => string;
 	parseSaveQuery?:(item:any, entity?:IEntityConfigBase, config?:ParisConfig) => string;
+	serializeItem?:(item:any, serializedItem?:any, entity?:IEntityConfigBase, config?:ParisConfig) => any;
 
 	constructor(config:EntityConfig, entityConstructor:DataEntityConstructor<any>){
 		super(config, entityConstructor);
@@ -38,7 +39,8 @@ export interface EntityBackendConfig{
 	fixedData?: { [index:string]:any },
 	parseDataQuery?:(dataQuery:DataQuery) => { [index:string]:any },
 	parseItemQuery?:(itemId:string|number, entity?:IEntityConfigBase, config?:ParisConfig, params?:{ [index:string]:any }) => string,
-	parseSaveQuery?:(item:any, entity?:IEntityConfigBase, config?:ParisConfig) => string
+	parseSaveQuery?:(item:any, entity?:IEntityConfigBase, config?:ParisConfig) => string,
+	serializeItem?:(item:any, serializedItem?:any, entity?:IEntityConfigBase, config?:ParisConfig) => any
 }
 
 export interface ModelEntityCacheConfig{

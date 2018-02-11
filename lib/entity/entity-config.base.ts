@@ -2,6 +2,7 @@ import {EntityFields} from "./entity-fields";
 import {Field} from "./entity-field";
 import {Immutability} from "../services/immutability";
 import {DataEntityConstructor} from "./data-entity.base";
+import {ParisConfig} from "../config/paris-config";
 
 const DEFAULT_VALUE_ID = "__default";
 
@@ -11,6 +12,7 @@ export class EntityConfigBase implements IEntityConfigBase{
 	fields?:EntityFields;
 	idProperty?:string;
 	readonly:boolean = false;
+	serializeItem?:(item:any, serializedItem?:any, entity?:IEntityConfigBase, config?:ParisConfig) => any;
 
 	get fieldsArray():Array<Field>{
 		return this.fields ? Array.from(this.fields.values()) : [];
@@ -67,5 +69,6 @@ export interface IEntityConfigBase{
 	hasValue?: (valueId:string|number) => boolean,
 	getDefaultValue?: () => any,
 	getValueById?: (valueId:string|number) => any,
-	entityConstructor?:DataEntityConstructor<any>
+	entityConstructor?:DataEntityConstructor<any>,
+	serializeItem?:(item:any, serializedItem?:any, entity?:IEntityConfigBase, config?:ParisConfig) => any
 }

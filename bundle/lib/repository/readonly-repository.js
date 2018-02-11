@@ -46,7 +46,7 @@ var ReadonlyRepository = /** @class */ (function () {
             var _this = this;
             if (!this._cache) {
                 var cacheSettings = Object.assign({
-                    getter: function (itemId) { return _this.getItemById(itemId, { allowCache: false }); }
+                    getter: function (itemId, params) { return _this.getItemById(itemId, { allowCache: false }, params); }
                 }, this.entityBackendConfig.cache);
                 this._cache = new cache_1.DataCache(cacheSettings);
             }
@@ -162,6 +162,16 @@ var ReadonlyRepository = /** @class */ (function () {
     ReadonlyRepository.prototype.getItemById = function (itemId, options, params) {
         var _this = this;
         if (options === void 0) { options = data_options_1.defaultDataOptions; }
+        var idFieldIndex = _.findIndex(this.entity.fieldsArray, function (field) { return field.id === "id"; });
+        if (~idFieldIndex) {
+            var idField = this.entity.fieldsArray[idFieldIndex];
+            if (idField.type === Number && typeof (itemId) === "string") {
+                var originalItemId = itemId;
+                itemId = parseInt(itemId, 10);
+                if (isNaN(itemId))
+                    throw new Error("Invalid ID for " + this.entity.singularName + ". Expected a number but got: " + originalItemId + ".");
+            }
+        }
         if (this.entity.values) {
             var entityValue = void 0;
             if (itemId !== null && itemId !== undefined) {
@@ -173,7 +183,7 @@ var ReadonlyRepository = /** @class */ (function () {
             return Observable_1.Observable.of(entityValue || this.entity.getDefaultValue());
         }
         if (options.allowCache !== false && this.entityBackendConfig.cache)
-            return this.cache.get(itemId);
+            return this.cache.get(itemId, params);
         if (this.entityBackendConfig.loadAll)
             return this.setAllItems().map(function () { return _this._allValuesMap.get(String(itemId)); });
         else {
@@ -388,6 +398,8 @@ var ReadonlyRepository = /** @class */ (function () {
                 : entityField.id;
             modelData[modelProperty] = modelValue;
         });
+        if (entity.serializeItem)
+            modelData = entity.serializeItem(item, modelData, entity, paris.config);
         return modelData;
     };
     return ReadonlyRepository;

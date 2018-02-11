@@ -56,7 +56,7 @@ export class ReadonlyRepository<T extends ModelBase>{
 	protected get cache(): DataCache<T> {
 		if (!this._cache) {
 			let cacheSettings: DataCacheSettings<T> = Object.assign({
-				getter: (itemId: string | number) => this.getItemById(itemId, {allowCache: false})
+				getter: (itemId: string | number, params?:{ [index:string]: any }) => this.getItemById(itemId, {allowCache: false}, params)
 			}, this.entityBackendConfig.cache);
 
 			this._cache = new DataCache<T>(cacheSettings);
@@ -180,8 +180,18 @@ export class ReadonlyRepository<T extends ModelBase>{
 	}
 
 	getItemById(itemId: string | number, options: DataOptions = defaultDataOptions, params?:{ [index:string]:any }): Observable<T> {
-		if (this.entity.values) {
+		let idFieldIndex:number = _.findIndex(this.entity.fieldsArray, field => field.id === "id");
+		if (~idFieldIndex){
+			let idField:Field = this.entity.fieldsArray[idFieldIndex];
+			if (idField.type === Number && typeof(itemId) === "string") {
+				let originalItemId = itemId;
+				itemId = parseInt(itemId, 10);
+				if (isNaN(itemId))
+					throw new Error(`Invalid ID for ${this.entity.singularName}. Expected a number but got: ${originalItemId}.`);
+			}
+		}
 
+		if (this.entity.values) {
 			let entityValue: T;
 			if (itemId !== null && itemId !== undefined){
 				if (this.entity.hasValue(itemId))
@@ -194,7 +204,7 @@ export class ReadonlyRepository<T extends ModelBase>{
 		}
 
 		if (options.allowCache !== false && this.entityBackendConfig.cache)
-			return this.cache.get(itemId);
+			return this.cache.get(itemId, params);
 
 		if (this.entityBackendConfig.loadAll)
 			return this.setAllItems().map(() => this._allValuesMap.get(String(itemId)));
@@ -450,6 +460,9 @@ export class ReadonlyRepository<T extends ModelBase>{
 
 			modelData[modelProperty] = modelValue;
 		});
+
+		if (entity.serializeItem)
+			modelData = entity.serializeItem(item, modelData, entity, paris.config);
 
 		return modelData;
 	}

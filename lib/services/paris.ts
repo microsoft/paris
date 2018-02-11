@@ -111,4 +111,25 @@ export class Paris{
 		else
 			throw new Error(`Can't get related item, no relationship repository exists for ${relationshipConstructor}.`);
 	}
+
+	getValue<T extends ModelBase>(entityConstructor:DataEntityConstructor<T>, valueId:any):T{
+		let repository:Repository<T> = this.getRepository(entityConstructor);
+		if (!repository)
+			return null;
+
+		let values:Array<T> = repository.entity.values;
+		if (!values)
+			return null;
+
+		if (valueId instanceof Function){
+			for(let i=0, value; value = values[i]; i++){
+				if (valueId(value))
+					return value;
+			}
+
+			return null;
+		}
+		else
+			return repository.entity.getValueById(valueId);
+	}
 }

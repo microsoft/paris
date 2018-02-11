@@ -17,6 +17,7 @@ export declare class ModelEntity extends EntityConfigBase implements EntityConfi
         [index: string]: any;
     }) => string;
     parseSaveQuery?: (item: any, entity?: IEntityConfigBase, config?: ParisConfig) => string;
+    serializeItem?: (item: any, serializedItem?: any, entity?: IEntityConfigBase, config?: ParisConfig) => any;
     constructor(config: EntityConfig, entityConstructor: DataEntityConstructor<any>);
 }
 export interface EntityConfig extends IEntityConfigBase, EntityBackendConfig {
@@ -39,6 +40,7 @@ export interface EntityBackendConfig {
         [index: string]: any;
     }) => string;
     parseSaveQuery?: (item: any, entity?: IEntityConfigBase, config?: ParisConfig) => string;
+    serializeItem?: (item: any, serializedItem?: any, entity?: IEntityConfigBase, config?: ParisConfig) => any;
 }
 export interface ModelEntityCacheConfig {
     time?: number;
