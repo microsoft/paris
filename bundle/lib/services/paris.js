@@ -4,10 +4,14 @@ var paris_config_1 = require("../config/paris-config");
 var repository_1 = require("../repository/repository");
 var entities_service_1 = require("./entities.service");
 var data_store_service_1 = require("./data-store.service");
+var Observable_1 = require("rxjs/Observable");
 var Subject_1 = require("rxjs/Subject");
 var relationship_repository_1 = require("../repository/relationship-repository");
 var value_objects_service_1 = require("./value-objects.service");
 var data_options_1 = require("../dataset/data.options");
+var readonly_repository_1 = require("../repository/readonly-repository");
+var dataset_service_1 = require("./dataset.service");
+var errors_service_1 = require("./errors.service");
 var Paris = /** @class */ (function () {
     function Paris(config) {
         this.repositories = new Map;
@@ -58,8 +62,60 @@ var Paris = /** @class */ (function () {
         else
             throw new Error("Can't query, no repository exists for " + entityConstructor + ".");
     };
+    Paris.prototype.callQuery = function (entityConstructor, backendConfig, query, dataOptions) {
+        var _this = this;
+        if (dataOptions === void 0) { dataOptions = data_options_1.defaultDataOptions; }
+        var queryError = new Error("Failed to get " + entityConstructor.pluralName + ".");
+        var httpOptions = backendConfig.parseDataQuery ? { params: backendConfig.parseDataQuery(query) } : dataset_service_1.DatasetService.queryToHttpOptions(query);
+        if (backendConfig.fixedData) {
+            if (!httpOptions)
+                httpOptions = {};
+            if (!httpOptions.params)
+                httpOptions.params = {};
+            Object.assign(httpOptions.params, backendConfig.fixedData);
+        }
+        var endpoint;
+        if (backendConfig.endpoint instanceof Function)
+            endpoint = backendConfig.endpoint(this.config, query);
+        else
+            endpoint = "" + backendConfig.endpoint + (backendConfig.allItemsEndpointTrailingSlash !== false && !backendConfig.allItemsEndpoint ? '/' : '') + (backendConfig.allItemsEndpoint || '');
+        var baseUrl = backendConfig.baseUrl instanceof Function ? backendConfig.baseUrl(this.config) : backendConfig.baseUrl;
+        return this.dataStore.get(endpoint, httpOptions, baseUrl)
+            .map(function (rawDataSet) {
+            var allItemsProperty = backendConfig.allItemsProperty || "items";
+            var rawItems = rawDataSet instanceof Array ? rawDataSet : rawDataSet[allItemsProperty];
+            if (!rawItems)
+                errors_service_1.ErrorsService.warn("Property '" + backendConfig.allItemsProperty + "' wasn't found in DataSet for Entity '" + entityConstructor.pluralName + "'.");
+            return {
+                count: rawDataSet.count,
+                items: rawItems,
+                next: rawDataSet.next,
+                previous: rawDataSet.previous
+            };
+        })
+            .flatMap(function (dataSet) {
+            if (!dataSet.items.length)
+                return Observable_1.Observable.of({ count: 0, items: [] });
+            var itemCreators = dataSet.items.map(function (itemData) { return _this.createItem(entityConstructor, itemData, dataOptions, query); });
+            return Observable_1.Observable.combineLatest.apply(_this, itemCreators).map(function (items) {
+                return Object.freeze({
+                    count: dataSet.count,
+                    items: items,
+                    next: dataSet.next,
+                    previous: dataSet.previous
+                });
+            }).catch(function (error) {
+                queryError.message = queryError.message + " Error: " + error.message;
+                throw queryError;
+            });
+        });
+    };
+    Paris.prototype.createItem = function (entityConstructor, data, dataOptions, query) {
+        if (dataOptions === void 0) { dataOptions = data_options_1.defaultDataOptions; }
+        return readonly_repository_1.ReadonlyRepository.getModelData(data, entityConstructor.entityConfig || entityConstructor.valueObjectConfig, this.config, this, dataOptions, query);
+    };
     Paris.prototype.getItemById = function (entityConstructor, itemId, options, params) {
-        if (options === void 0) { options = data_options_1.defaultDataOptions; }
+        options = options || data_options_1.defaultDataOptions;
         var repository = this.getRepository(entityConstructor);
         if (repository)
             return repository.getItemById(itemId, options, params);
@@ -67,7 +123,7 @@ var Paris = /** @class */ (function () {
             throw new Error("Can't get item by ID, no repository exists for " + entityConstructor + ".");
     };
     Paris.prototype.queryForItem = function (relationshipConstructor, item, query, dataOptions) {
-        if (dataOptions === void 0) { dataOptions = data_options_1.defaultDataOptions; }
+        dataOptions = dataOptions || data_options_1.defaultDataOptions;
         var relationshipRepository = this.getRelationshipRepository(relationshipConstructor);
         if (relationshipRepository)
             return relationshipRepository.queryForItem(item, query, dataOptions);

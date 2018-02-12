@@ -2,7 +2,7 @@ import {defaultConfig, ParisConfig} from "../config/paris-config";
 import {EntityModelBase} from "../models/entity-model.base";
 import {DataEntityConstructor, DataEntityType} from "../entity/data-entity.base";
 import {Repository} from "../repository/repository";
-import {EntityConfig, ModelEntity} from "../entity/entity.config";
+import {EntityBackendConfig, EntityConfig, ModelEntity} from "../entity/entity.config";
 import {entitiesService} from "./entities.service";
 import {IRepository} from "../repository/repository.interface";
 import {DataStoreService} from "./data-store.service";
@@ -18,6 +18,10 @@ import {EntityRelationshipRepositoryType} from "../entity/entity-relationship-re
 import {DataSet} from "../dataset/dataset";
 import {DataQuery} from "../dataset/data-query";
 import {DataOptions, defaultDataOptions} from "../dataset/data.options";
+import {ReadonlyRepository} from "../repository/readonly-repository";
+import {DatasetService} from "./dataset.service";
+import {HttpOptions} from "./http.service";
+import {ErrorsService} from "./errors.service";
 
 export class Paris{
 	private repositories:Map<DataEntityType, IRepository> = new Map;
@@ -88,7 +92,70 @@ export class Paris{
 			throw new Error(`Can't query, no repository exists for ${entityConstructor}.`);
 	}
 
-	getItemById<T extends ModelBase>(entityConstructor:DataEntityConstructor<T>, itemId: string | number, options: DataOptions = defaultDataOptions, params?:{ [index:string]:any }): Observable<T>{
+	callQuery<T extends ModelBase>(entityConstructor:DataEntityConstructor<T>, backendConfig:EntityBackendConfig, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions):Observable<DataSet<T>>{
+		let queryError:Error = new Error(`Failed to get ${entityConstructor.pluralName}.`);
+		let httpOptions:HttpOptions = backendConfig.parseDataQuery ? { params: backendConfig.parseDataQuery(query) } : DatasetService.queryToHttpOptions(query);
+
+		if (backendConfig.fixedData){
+			if (!httpOptions)
+				httpOptions = {};
+
+			if (!httpOptions.params)
+				httpOptions.params = {};
+
+			Object.assign(httpOptions.params, backendConfig.fixedData);
+		}
+
+		let endpoint:string;
+		if (backendConfig.endpoint instanceof Function)
+			endpoint = backendConfig.endpoint(this.config, query);
+		else
+			endpoint = `${backendConfig.endpoint}${backendConfig.allItemsEndpointTrailingSlash !== false && !backendConfig.allItemsEndpoint ? '/' : ''}${backendConfig.allItemsEndpoint || ''}`;
+
+		let baseUrl:string = backendConfig.baseUrl instanceof Function ? backendConfig.baseUrl(this.config) : backendConfig.baseUrl;
+
+		return this.dataStore.get(endpoint, httpOptions, baseUrl)
+			.map((rawDataSet: any) => {
+				const allItemsProperty = backendConfig.allItemsProperty || "items";
+
+				let rawItems: Array<any> = rawDataSet instanceof Array ? rawDataSet : rawDataSet[allItemsProperty];
+
+				if (!rawItems)
+					ErrorsService.warn(`Property '${backendConfig.allItemsProperty}' wasn't found in DataSet for Entity '${entityConstructor.pluralName}'.`);
+				return {
+					count: rawDataSet.count,
+					items: rawItems,
+					next: rawDataSet.next,
+					previous: rawDataSet.previous
+				}
+			})
+			.flatMap((dataSet: DataSet<any>) => {
+				if (!dataSet.items.length)
+					return Observable.of({ count: 0, items: [] });
+
+				let itemCreators: Array<Observable<T>> = dataSet.items.map((itemData: any) => this.createItem(entityConstructor, itemData, dataOptions, query));
+
+				return Observable.combineLatest.apply(this, itemCreators).map((items: Array<T>) => {
+					return Object.freeze({
+						count: dataSet.count,
+						items: items,
+						next: dataSet.next,
+						previous: dataSet.previous
+					});
+				}).catch((error:Error) => {
+					queryError.message = queryError.message + " Error: " + error.message;
+					throw queryError;
+				});
+			});
+	}
+
+	createItem<T extends ModelBase>(entityConstructor:DataEntityConstructor<T>, data:any, dataOptions: DataOptions = defaultDataOptions, query?:DataQuery):Observable<T>{
+		return ReadonlyRepository.getModelData(data, entityConstructor.entityConfig || entityConstructor.valueObjectConfig, this.config, this, dataOptions, query);
+	}
+
+	getItemById<T extends ModelBase>(entityConstructor:DataEntityConstructor<T>, itemId: string | number, options?:DataOptions, params?:{ [index:string]:any }): Observable<T>{
+		options = options || defaultDataOptions;
+
 		let repository:Repository<T> = this.getRepository(entityConstructor);
 		if (repository)
 			return repository.getItemById(itemId, options, params);
@@ -96,7 +163,9 @@ export class Paris{
 			throw new Error(`Can't get item by ID, no repository exists for ${entityConstructor}.`);
 	}
 
-	queryForItem<T extends ModelBase, U extends ModelBase>(relationshipConstructor:Function, item:ModelBase, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<U>>{
+	queryForItem<T extends ModelBase, U extends ModelBase>(relationshipConstructor:Function, item:ModelBase, query?: DataQuery, dataOptions?:DataOptions): Observable<DataSet<U>>{
+		dataOptions = dataOptions || defaultDataOptions;
+
 		let relationshipRepository:RelationshipRepository<T,U> = this.getRelationshipRepository<T, U>(relationshipConstructor);
 		if (relationshipRepository)
 			return relationshipRepository.queryForItem(item, query, dataOptions);

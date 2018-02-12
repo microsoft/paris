@@ -45,7 +45,7 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 	 * @param {T} item
 	 * @returns {Observable<T extends EntityModelBase>}
 	 */
-	save(item: T): Observable<T> {
+	save(item: T, options?:HttpOptions): Observable<T> {
 		if (!this.entityBackendConfig.endpoint)
 			throw new Error(`Entity ${this.entityConstructor.entityConfig.singularName || this.entityConstructor.name} can't be saved - it doesn't specify an endpoint.`);
 
@@ -54,7 +54,7 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 			let saveData: Index = this.serializeItem(item);
 			let endpoint:string = this.entityBackendConfig.parseSaveQuery ? this.entityBackendConfig.parseSaveQuery(item, this.entity, this.config) : `${this.endpointName}/${item.id || ''}`;
 
-			return this.dataStore.save(endpoint, isNewItem ? "POST" : "PUT", { data: saveData }, this.baseUrl)
+			return this.dataStore.save(endpoint, isNewItem ? "POST" : "PUT", Object.assign({}, options, { data: saveData }), this.baseUrl)
 				.flatMap((savedItemData: Index) => savedItemData ? this.createItem(savedItemData) : Observable.of(null))
 				.do((savedItem: T) => {
 					if (savedItem && this._allValues) {
@@ -75,7 +75,7 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 	 * @param {Array<T extends EntityModelBase>} items
 	 * @returns {Observable<Array<T extends EntityModelBase>>}
 	 */
-	saveItems(items:Array<T>):Observable<Array<T>>{
+	saveItems(items:Array<T>, options?:HttpOptions):Observable<Array<T>>{
 		if (!this.entityBackendConfig.endpoint)
 			throw new Error(`${this.entity.pluralName} can't be saved - it doesn't specify an endpoint.`);
 
@@ -88,7 +88,7 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 
 		let saveItemsArray:Array<Observable<Array<T>>> = [newItems, existingItems]
 			.filter((saveItems:SaveItems) => saveItems.items.length)
-			.map((saveItems:SaveItems) => this.doSaveItems(saveItems.items, saveItems.method));
+			.map((saveItems:SaveItems) => this.doSaveItems(saveItems.items, saveItems.method, options));
 
 		return Observable.combineLatest.apply(this, saveItemsArray).map((savedItems:Array<Array<T>>) => _.flatMap(savedItems));
 	}
@@ -99,8 +99,8 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 	 * @param {"PUT" | "POST"} method
 	 * @returns {Observable<Array<T extends EntityModelBase>>}
 	 */
-	private doSaveItems(itemsData:Array<any>, method:"PUT" | "POST"):Observable<Array<T>>{
-		return this.dataStore.save(`${this.endpointName}/`, method, { data: { items: itemsData } }, this.baseUrl)
+	private doSaveItems(itemsData:Array<any>, method:"PUT" | "POST", options?:HttpOptions):Observable<Array<T>>{
+		return this.dataStore.save(`${this.endpointName}/`, method, Object.assign({}, options, { data: { items: itemsData } }), this.baseUrl)
 			.flatMap((savedItemsData?: Array<any> | {items:Array<any>}) => {
 				if (!savedItemsData)
 					return Observable.of(null);

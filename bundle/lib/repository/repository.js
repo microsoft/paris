@@ -32,7 +32,7 @@ var Repository = /** @class */ (function (_super) {
      * @param {T} item
      * @returns {Observable<T extends EntityModelBase>}
      */
-    Repository.prototype.save = function (item) {
+    Repository.prototype.save = function (item, options) {
         var _this = this;
         if (!this.entityBackendConfig.endpoint)
             throw new Error("Entity " + (this.entityConstructor.entityConfig.singularName || this.entityConstructor.name) + " can't be saved - it doesn't specify an endpoint.");
@@ -40,7 +40,7 @@ var Repository = /** @class */ (function (_super) {
             var isNewItem_1 = item.id === undefined;
             var saveData = this.serializeItem(item);
             var endpoint = this.entityBackendConfig.parseSaveQuery ? this.entityBackendConfig.parseSaveQuery(item, this.entity, this.config) : this.endpointName + "/" + (item.id || '');
-            return this.dataStore.save(endpoint, isNewItem_1 ? "POST" : "PUT", { data: saveData }, this.baseUrl)
+            return this.dataStore.save(endpoint, isNewItem_1 ? "POST" : "PUT", Object.assign({}, options, { data: saveData }), this.baseUrl)
                 .flatMap(function (savedItemData) { return savedItemData ? _this.createItem(savedItemData) : Observable_1.Observable.of(null); })
                 .do(function (savedItem) {
                 if (savedItem && _this._allValues) {
@@ -59,7 +59,7 @@ var Repository = /** @class */ (function (_super) {
      * @param {Array<T extends EntityModelBase>} items
      * @returns {Observable<Array<T extends EntityModelBase>>}
      */
-    Repository.prototype.saveItems = function (items) {
+    Repository.prototype.saveItems = function (items, options) {
         var _this = this;
         if (!this.entityBackendConfig.endpoint)
             throw new Error(this.entity.pluralName + " can't be saved - it doesn't specify an endpoint.");
@@ -69,7 +69,7 @@ var Repository = /** @class */ (function (_super) {
         });
         var saveItemsArray = [newItems, existingItems]
             .filter(function (saveItems) { return saveItems.items.length; })
-            .map(function (saveItems) { return _this.doSaveItems(saveItems.items, saveItems.method); });
+            .map(function (saveItems) { return _this.doSaveItems(saveItems.items, saveItems.method, options); });
         return Observable_1.Observable.combineLatest.apply(this, saveItemsArray).map(function (savedItems) { return _.flatMap(savedItems); });
     };
     /**
@@ -78,9 +78,9 @@ var Repository = /** @class */ (function (_super) {
      * @param {"PUT" | "POST"} method
      * @returns {Observable<Array<T extends EntityModelBase>>}
      */
-    Repository.prototype.doSaveItems = function (itemsData, method) {
+    Repository.prototype.doSaveItems = function (itemsData, method, options) {
         var _this = this;
-        return this.dataStore.save(this.endpointName + "/", method, { data: { items: itemsData } }, this.baseUrl)
+        return this.dataStore.save(this.endpointName + "/", method, Object.assign({}, options, { data: { items: itemsData } }), this.baseUrl)
             .flatMap(function (savedItemsData) {
             if (!savedItemsData)
                 return Observable_1.Observable.of(null);

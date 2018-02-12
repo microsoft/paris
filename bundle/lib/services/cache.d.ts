@@ -2,7 +2,9 @@ import { Observable } from "rxjs/Observable";
 export declare class DataCache<T> {
     time: number;
     obj: number;
-    getter: (_: any) => Promise<T> | Observable<T>;
+    getter: (_: any, params?: {
+        [index: string]: any;
+    }) => Promise<T> | Observable<T>;
     private _keys;
     private _values;
     private _timeouts;
@@ -14,7 +16,9 @@ export declare class DataCache<T> {
      * @param key
      * @returns {Observable<T>}
      */
-    get(key: any): Observable<T>;
+    get(key: any, params?: {
+        [index: string]: any;
+    }): Observable<T>;
     /**
      * Adds an item to the Cached collection. If DataCache.time was specified, the item will expire after this time (in milliseconds), and will be deleted.
      * @param key {String}

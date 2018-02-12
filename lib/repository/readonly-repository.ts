@@ -101,58 +101,7 @@ export class ReadonlyRepository<T extends ModelBase>{
 	}
 
 	query(query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<T>> {
-		let queryError:Error = new Error(`Failed to get ${this.entity.pluralName}.`);
-		let httpOptions:HttpOptions = this.entityBackendConfig.parseDataQuery ? { params: this.entityBackendConfig.parseDataQuery(query) } : DatasetService.queryToHttpOptions(query);
-
-		if (this.entityBackendConfig.fixedData){
-			if (!httpOptions)
-				httpOptions = {};
-
-			if (!httpOptions.params)
-				httpOptions.params = {};
-
-			Object.assign(httpOptions.params, this.entityBackendConfig.fixedData);
-		}
-
-		let endpoint:string;
-		if (this.entityBackendConfig.endpoint instanceof Function)
-			endpoint = this.entityBackendConfig.endpoint(this.config, query);
-		else
-			endpoint = `${this.endpointName}${this.entityBackendConfig.allItemsEndpointTrailingSlash !== false && !this.entityBackendConfig.allItemsEndpoint ? '/' : ''}${this.entityBackendConfig.allItemsEndpoint || ''}`;
-
-		return this.dataStore.get(endpoint, httpOptions, this.baseUrl)
-			.map((rawDataSet: any) => {
-				const allItemsProperty = this.entityBackendConfig.allItemsProperty || this.config.allItemsProperty;
-
-				let rawItems: Array<any> = rawDataSet instanceof Array ? rawDataSet : rawDataSet[allItemsProperty];
-
-				if (!rawItems)
-					ErrorsService.warn(`Property '${this.config.allItemsProperty}' wasn't found in DataSet for Entity '${this.entity.pluralName}'.`);
-				return {
-					count: rawDataSet.count,
-					items: rawItems,
-					next: rawDataSet.next,
-					previous: rawDataSet.previous
-				}
-			})
-			.flatMap((dataSet: DataSet<any>) => {
-				if (!dataSet.items.length)
-					return Observable.of({ count: 0, items: [] });
-
-				let itemCreators: Array<Observable<T>> = dataSet.items.map((itemData: any) => this.createItem(itemData, dataOptions, query));
-
-				return Observable.combineLatest.apply(this, itemCreators).map((items: Array<T>) => {
-					return Object.freeze({
-						count: dataSet.count,
-						items: items,
-						next: dataSet.next,
-						previous: dataSet.previous
-					});
-				}).catch((error:Error) => {
-					queryError.message = queryError.message + " Error: " + error.message;
-					throw queryError;
-				});
-			});
+		return this.paris.callQuery(this.entityConstructor, this.entityBackendConfig, query, dataOptions);
 	}
 
 	queryItem(query: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<T> {

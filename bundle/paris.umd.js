@@ -750,51 +750,8 @@ var ReadonlyRepository = /** @class */ (function () {
         return ReadonlyRepository.getModelData(itemData, this.entity, this.config, this.paris, options, query);
     };
     ReadonlyRepository.prototype.query = function (query, dataOptions) {
-        var _this = this;
         if (dataOptions === void 0) { dataOptions = data_options.defaultDataOptions; }
-        var queryError = new Error("Failed to get " + this.entity.pluralName + ".");
-        var httpOptions = this.entityBackendConfig.parseDataQuery ? { params: this.entityBackendConfig.parseDataQuery(query) } : dataset_service.DatasetService.queryToHttpOptions(query);
-        if (this.entityBackendConfig.fixedData) {
-            if (!httpOptions)
-                httpOptions = {};
-            if (!httpOptions.params)
-                httpOptions.params = {};
-            Object.assign(httpOptions.params, this.entityBackendConfig.fixedData);
-        }
-        var endpoint;
-        if (this.entityBackendConfig.endpoint instanceof Function)
-            endpoint = this.entityBackendConfig.endpoint(this.config, query);
-        else
-            endpoint = "" + this.endpointName + (this.entityBackendConfig.allItemsEndpointTrailingSlash !== false && !this.entityBackendConfig.allItemsEndpoint ? '/' : '') + (this.entityBackendConfig.allItemsEndpoint || '');
-        return this.dataStore.get(endpoint, httpOptions, this.baseUrl)
-            .map(function (rawDataSet) {
-            var allItemsProperty = _this.entityBackendConfig.allItemsProperty || _this.config.allItemsProperty;
-            var rawItems = rawDataSet instanceof Array ? rawDataSet : rawDataSet[allItemsProperty];
-            if (!rawItems)
-                errors_service.ErrorsService.warn("Property '" + _this.config.allItemsProperty + "' wasn't found in DataSet for Entity '" + _this.entity.pluralName + "'.");
-            return {
-                count: rawDataSet.count,
-                items: rawItems,
-                next: rawDataSet.next,
-                previous: rawDataSet.previous
-            };
-        })
-            .flatMap(function (dataSet) {
-            if (!dataSet.items.length)
-                return Observable_1.Observable.of({ count: 0, items: [] });
-            var itemCreators = dataSet.items.map(function (itemData) { return _this.createItem(itemData, dataOptions, query); });
-            return Observable_1.Observable.combineLatest.apply(_this, itemCreators).map(function (items) {
-                return Object.freeze({
-                    count: dataSet.count,
-                    items: items,
-                    next: dataSet.next,
-                    previous: dataSet.previous
-                });
-            }).catch(function (error) {
-                queryError.message = queryError.message + " Error: " + error.message;
-                throw queryError;
-            });
-        });
+        return this.paris.callQuery(this.entityConstructor, this.entityBackendConfig, query, dataOptions);
     };
     ReadonlyRepository.prototype.queryItem = function (query, dataOptions) {
         var _this = this;
@@ -1100,7 +1057,7 @@ var Repository = /** @class */ (function (_super) {
      * @param {T} item
      * @returns {Observable<T extends EntityModelBase>}
      */
-    Repository.prototype.save = function (item) {
+    Repository.prototype.save = function (item, options) {
         var _this = this;
         if (!this.entityBackendConfig.endpoint)
             throw new Error("Entity " + (this.entityConstructor.entityConfig.singularName || this.entityConstructor.name) + " can't be saved - it doesn't specify an endpoint.");
@@ -1108,7 +1065,7 @@ var Repository = /** @class */ (function (_super) {
             var isNewItem_1 = item.id === undefined;
             var saveData = this.serializeItem(item);
             var endpoint = this.entityBackendConfig.parseSaveQuery ? this.entityBackendConfig.parseSaveQuery(item, this.entity, this.config) : this.endpointName + "/" + (item.id || '');
-            return this.dataStore.save(endpoint, isNewItem_1 ? "POST" : "PUT", { data: saveData }, this.baseUrl)
+            return this.dataStore.save(endpoint, isNewItem_1 ? "POST" : "PUT", Object.assign({}, options, { data: saveData }), this.baseUrl)
                 .flatMap(function (savedItemData) { return savedItemData ? _this.createItem(savedItemData) : Observable_1.Observable.of(null); })
                 .do(function (savedItem) {
                 if (savedItem && _this._allValues) {
@@ -1127,7 +1084,7 @@ var Repository = /** @class */ (function (_super) {
      * @param {Array<T extends EntityModelBase>} items
      * @returns {Observable<Array<T extends EntityModelBase>>}
      */
-    Repository.prototype.saveItems = function (items) {
+    Repository.prototype.saveItems = function (items, options) {
         var _this = this;
         if (!this.entityBackendConfig.endpoint)
             throw new Error(this.entity.pluralName + " can't be saved - it doesn't specify an endpoint.");
@@ -1137,7 +1094,7 @@ var Repository = /** @class */ (function (_super) {
         });
         var saveItemsArray = [newItems, existingItems]
             .filter(function (saveItems) { return saveItems.items.length; })
-            .map(function (saveItems) { return _this.doSaveItems(saveItems.items, saveItems.method); });
+            .map(function (saveItems) { return _this.doSaveItems(saveItems.items, saveItems.method, options); });
         return Observable_1.Observable.combineLatest.apply(this, saveItemsArray).map(function (savedItems) { return lodash.flatMap(savedItems); });
     };
     /**
@@ -1146,9 +1103,9 @@ var Repository = /** @class */ (function (_super) {
      * @param {"PUT" | "POST"} method
      * @returns {Observable<Array<T extends EntityModelBase>>}
      */
-    Repository.prototype.doSaveItems = function (itemsData, method) {
+    Repository.prototype.doSaveItems = function (itemsData, method, options) {
         var _this = this;
-        return this.dataStore.save(this.endpointName + "/", method, { data: { items: itemsData } }, this.baseUrl)
+        return this.dataStore.save(this.endpointName + "/", method, Object.assign({}, options, { data: { items: itemsData } }), this.baseUrl)
             .flatMap(function (savedItemsData) {
             if (!savedItemsData)
                 return Observable_1.Observable.of(null);
@@ -1437,6 +1394,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 
 
+
+
+
+
 var Paris = /** @class */ (function () {
     function Paris(config) {
         this.repositories = new Map;
@@ -1487,8 +1448,60 @@ var Paris = /** @class */ (function () {
         else
             throw new Error("Can't query, no repository exists for " + entityConstructor + ".");
     };
+    Paris.prototype.callQuery = function (entityConstructor, backendConfig, query, dataOptions) {
+        var _this = this;
+        if (dataOptions === void 0) { dataOptions = data_options.defaultDataOptions; }
+        var queryError = new Error("Failed to get " + entityConstructor.pluralName + ".");
+        var httpOptions = backendConfig.parseDataQuery ? { params: backendConfig.parseDataQuery(query) } : dataset_service.DatasetService.queryToHttpOptions(query);
+        if (backendConfig.fixedData) {
+            if (!httpOptions)
+                httpOptions = {};
+            if (!httpOptions.params)
+                httpOptions.params = {};
+            Object.assign(httpOptions.params, backendConfig.fixedData);
+        }
+        var endpoint;
+        if (backendConfig.endpoint instanceof Function)
+            endpoint = backendConfig.endpoint(this.config, query);
+        else
+            endpoint = "" + backendConfig.endpoint + (backendConfig.allItemsEndpointTrailingSlash !== false && !backendConfig.allItemsEndpoint ? '/' : '') + (backendConfig.allItemsEndpoint || '');
+        var baseUrl = backendConfig.baseUrl instanceof Function ? backendConfig.baseUrl(this.config) : backendConfig.baseUrl;
+        return this.dataStore.get(endpoint, httpOptions, baseUrl)
+            .map(function (rawDataSet) {
+            var allItemsProperty = backendConfig.allItemsProperty || "items";
+            var rawItems = rawDataSet instanceof Array ? rawDataSet : rawDataSet[allItemsProperty];
+            if (!rawItems)
+                errors_service.ErrorsService.warn("Property '" + backendConfig.allItemsProperty + "' wasn't found in DataSet for Entity '" + entityConstructor.pluralName + "'.");
+            return {
+                count: rawDataSet.count,
+                items: rawItems,
+                next: rawDataSet.next,
+                previous: rawDataSet.previous
+            };
+        })
+            .flatMap(function (dataSet) {
+            if (!dataSet.items.length)
+                return Observable_1.Observable.of({ count: 0, items: [] });
+            var itemCreators = dataSet.items.map(function (itemData) { return _this.createItem(entityConstructor, itemData, dataOptions, query); });
+            return Observable_1.Observable.combineLatest.apply(_this, itemCreators).map(function (items) {
+                return Object.freeze({
+                    count: dataSet.count,
+                    items: items,
+                    next: dataSet.next,
+                    previous: dataSet.previous
+                });
+            }).catch(function (error) {
+                queryError.message = queryError.message + " Error: " + error.message;
+                throw queryError;
+            });
+        });
+    };
+    Paris.prototype.createItem = function (entityConstructor, data, dataOptions, query) {
+        if (dataOptions === void 0) { dataOptions = data_options.defaultDataOptions; }
+        return readonlyRepository.ReadonlyRepository.getModelData(data, entityConstructor.entityConfig || entityConstructor.valueObjectConfig, this.config, this, dataOptions, query);
+    };
     Paris.prototype.getItemById = function (entityConstructor, itemId, options, params) {
-        if (options === void 0) { options = data_options.defaultDataOptions; }
+        options = options || data_options.defaultDataOptions;
         var repository$$1 = this.getRepository(entityConstructor);
         if (repository$$1)
             return repository$$1.getItemById(itemId, options, params);
@@ -1496,7 +1509,7 @@ var Paris = /** @class */ (function () {
             throw new Error("Can't get item by ID, no repository exists for " + entityConstructor + ".");
     };
     Paris.prototype.queryForItem = function (relationshipConstructor, item, query, dataOptions) {
-        if (dataOptions === void 0) { dataOptions = data_options.defaultDataOptions; }
+        dataOptions = dataOptions || data_options.defaultDataOptions;
         var relationshipRepository$$1 = this.getRelationshipRepository(relationshipConstructor);
         if (relationshipRepository$$1)
             return relationshipRepository$$1.queryForItem(item, query, dataOptions);

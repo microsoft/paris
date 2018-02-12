@@ -94,51 +94,8 @@ var ReadonlyRepository = /** @class */ (function () {
         return ReadonlyRepository.getModelData(itemData, this.entity, this.config, this.paris, options, query);
     };
     ReadonlyRepository.prototype.query = function (query, dataOptions) {
-        var _this = this;
         if (dataOptions === void 0) { dataOptions = data_options_1.defaultDataOptions; }
-        var queryError = new Error("Failed to get " + this.entity.pluralName + ".");
-        var httpOptions = this.entityBackendConfig.parseDataQuery ? { params: this.entityBackendConfig.parseDataQuery(query) } : dataset_service_1.DatasetService.queryToHttpOptions(query);
-        if (this.entityBackendConfig.fixedData) {
-            if (!httpOptions)
-                httpOptions = {};
-            if (!httpOptions.params)
-                httpOptions.params = {};
-            Object.assign(httpOptions.params, this.entityBackendConfig.fixedData);
-        }
-        var endpoint;
-        if (this.entityBackendConfig.endpoint instanceof Function)
-            endpoint = this.entityBackendConfig.endpoint(this.config, query);
-        else
-            endpoint = "" + this.endpointName + (this.entityBackendConfig.allItemsEndpointTrailingSlash !== false && !this.entityBackendConfig.allItemsEndpoint ? '/' : '') + (this.entityBackendConfig.allItemsEndpoint || '');
-        return this.dataStore.get(endpoint, httpOptions, this.baseUrl)
-            .map(function (rawDataSet) {
-            var allItemsProperty = _this.entityBackendConfig.allItemsProperty || _this.config.allItemsProperty;
-            var rawItems = rawDataSet instanceof Array ? rawDataSet : rawDataSet[allItemsProperty];
-            if (!rawItems)
-                errors_service_1.ErrorsService.warn("Property '" + _this.config.allItemsProperty + "' wasn't found in DataSet for Entity '" + _this.entity.pluralName + "'.");
-            return {
-                count: rawDataSet.count,
-                items: rawItems,
-                next: rawDataSet.next,
-                previous: rawDataSet.previous
-            };
-        })
-            .flatMap(function (dataSet) {
-            if (!dataSet.items.length)
-                return Observable_1.Observable.of({ count: 0, items: [] });
-            var itemCreators = dataSet.items.map(function (itemData) { return _this.createItem(itemData, dataOptions, query); });
-            return Observable_1.Observable.combineLatest.apply(_this, itemCreators).map(function (items) {
-                return Object.freeze({
-                    count: dataSet.count,
-                    items: items,
-                    next: dataSet.next,
-                    previous: dataSet.previous
-                });
-            }).catch(function (error) {
-                queryError.message = queryError.message + " Error: " + error.message;
-                throw queryError;
-            });
-        });
+        return this.paris.callQuery(this.entityConstructor, this.entityBackendConfig, query, dataOptions);
     };
     ReadonlyRepository.prototype.queryItem = function (query, dataOptions) {
         var _this = this;

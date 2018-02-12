@@ -19,7 +19,7 @@ var DataCache = /** @class */ (function () {
      * @param key
      * @returns {Observable<T>}
      */
-    DataCache.prototype.get = function (key) {
+    DataCache.prototype.get = function (key, params) {
         var _this = this;
         if (!key && key !== 0)
             throw new Error("Can't get DataCache item, key not specified.");
@@ -31,7 +31,7 @@ var DataCache = /** @class */ (function () {
             var cachedItem = this._values.get(key);
             if (cachedItem)
                 return Observable_1.Observable.of(cachedItem);
-            return this._getObservable[key] = Observable_1.Observable.from(this.getter(key))
+            return this._getObservable[key] = Observable_1.Observable.from(this.getter(key, params))
                 .do(function (value) {
                 _this.add(key, value);
                 delete _this._getObservable[key];

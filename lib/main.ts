@@ -35,6 +35,7 @@ export {DataQuerySortDirection, DataQuerySortField} from "./dataset/data-query-s
 export {HttpOptions} from "./services/http.service";
 export {DataAvailability} from "./dataset/data-availability.enum";
 export {DataSet} from "./dataset/dataset";
+export {EntityEvent} from "./events/entity.event";
 export {SaveEntityEvent} from "./events/save-entity.event";
 export {RemoveEntitiesEvent} from "./events/remove-entities.event";
 export {Field} from "./entity/entity-field";
