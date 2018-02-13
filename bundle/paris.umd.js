@@ -1126,6 +1126,8 @@ var Repository = /** @class */ (function (_super) {
             throw new Error("Entity " + this.entity.singularName + " can't be deleted - it doesn't specify an endpoint.");
         try {
             var httpOptions = options || { data: {} };
+            if (!httpOptions.data)
+                httpOptions.data = {};
             httpOptions.data.ids = items.map(function (item) { return item.id; });
             return this.dataStore.delete(this.endpointName, httpOptions, this.baseUrl)
                 .do(function () {

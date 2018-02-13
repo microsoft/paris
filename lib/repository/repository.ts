@@ -126,6 +126,9 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 
 		try {
 			let httpOptions:HttpOptions = options || { data: {}};
+			if (!httpOptions.data)
+				httpOptions.data = {};
+
 			httpOptions.data.ids = items.map(item => item.id);
 
 			return this.dataStore.delete(this.endpointName, httpOptions, this.baseUrl)
