@@ -75,8 +75,13 @@ export class Http{
 		let paramsArray:Array<string> = [];
 
 		for(let param in params){
-			let value:string = encodeURIComponent(String(params[param]));
-			paramsArray.push(`${param}=${value}`);
+			let paramValue:any = params[param];
+			if (paramValue instanceof Array)
+				paramsArray = paramsArray.concat(paramValue.map(value => `${param}=${encodeURIComponent(String(value))}`));
+			else{
+				let value:string = encodeURIComponent(String(params[param]));
+				paramsArray.push(`${param}=${value}`);
+			}
 		}
 
 		return paramsArray.join("&");
