@@ -20,7 +20,7 @@ var Http = /** @class */ (function () {
         return Http.request("PATCH", url, options, httpConfig);
     };
     Http.request = function (method, url, options, httpConfig) {
-        var fullUrl = options && options.params ? Http.addParamsToUrl(url, options.params) : url, tmpError = new Error("Failed to " + method + " from " + url + ".");
+        var fullUrl = options && options.params ? Http.addParamsToUrl(url, options.params, options.separateArrayParams) : url, tmpError = new Error("Failed to " + method + " from " + url + ".");
         if (options && options.data) {
             httpConfig = httpConfig || {};
             if (!httpConfig.headers)
@@ -49,16 +49,26 @@ var Http = /** @class */ (function () {
         }
         return requestOptions;
     };
-    Http.addParamsToUrl = function (url, params) {
+    Http.addParamsToUrl = function (url, params, separateArrayParams) {
+        if (separateArrayParams === void 0) { separateArrayParams = false; }
         if (params && !/\?/.test(url))
-            return url + "?" + Http.getParamsQuery(params);
-        return params && !/\?/.test(url) ? url + "?" + Http.getParamsQuery(params) : url;
+            return url + "?" + Http.getParamsQuery(params, separateArrayParams);
+        return params && !/\?/.test(url) ? url + "?" + Http.getParamsQuery(params, separateArrayParams) : url;
     };
-    Http.getParamsQuery = function (params) {
+    Http.getParamsQuery = function (params, separateArrayParams) {
+        if (separateArrayParams === void 0) { separateArrayParams = false; }
         var paramsArray = [];
+        var _loop_1 = function (param) {
+            var paramValue = params[param];
+            if (separateArrayParams && paramValue instanceof Array)
+                paramsArray = paramsArray.concat(paramValue.map(function (value) { return param + "=" + encodeURIComponent(String(value)); }));
+            else {
+                var value = encodeURIComponent(String(params[param]));
+                paramsArray.push(param + "=" + value);
+            }
+        };
         for (var param in params) {
-            var value = encodeURIComponent(String(params[param]));
-            paramsArray.push(param + "=" + value);
+            _loop_1(param);
         }
         return paramsArray.join("&");
     };

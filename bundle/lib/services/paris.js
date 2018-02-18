@@ -67,6 +67,9 @@ var Paris = /** @class */ (function () {
         if (dataOptions === void 0) { dataOptions = data_options_1.defaultDataOptions; }
         var queryError = new Error("Failed to get " + entityConstructor.pluralName + ".");
         var httpOptions = backendConfig.parseDataQuery ? { params: backendConfig.parseDataQuery(query) } : dataset_service_1.DatasetService.queryToHttpOptions(query);
+        if (backendConfig.separateArrayParams) {
+            (httpOptions || (httpOptions = {})).separateArrayParams = true;
+        }
         if (backendConfig.fixedData) {
             if (!httpOptions)
                 httpOptions = {};

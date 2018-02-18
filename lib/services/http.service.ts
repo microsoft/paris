@@ -25,7 +25,7 @@ export class Http{
 	}
 
 	static request(method:RequestMethod, url:string, options?:HttpOptions, httpConfig?:ParisHttpConfig):Observable<any> {
-		let fullUrl:string = options && options.params ? Http.addParamsToUrl(url, options.params) : url,
+		let fullUrl:string = options && options.params ? Http.addParamsToUrl(url, options.params, options.separateArrayParams) : url,
 			tmpError:Error = new Error(`Failed to ${method} from ${url}.`);
 
 		if (options && options.data) {
@@ -64,19 +64,19 @@ export class Http{
 		return requestOptions;
 	}
 
-	static addParamsToUrl(url:string, params?:UrlParams):string{
+	static addParamsToUrl(url:string, params?:UrlParams, separateArrayParams:boolean = false):string{
 		if (params && !/\?/.test(url))
-			return `${url}?${Http.getParamsQuery(params)}`;
+			return `${url}?${Http.getParamsQuery(params, separateArrayParams)}`;
 
-		return params && !/\?/.test(url) ? `${url}?${Http.getParamsQuery(params)}` : url;
+		return params && !/\?/.test(url) ? `${url}?${Http.getParamsQuery(params, separateArrayParams)}` : url;
 	}
 
-	static getParamsQuery(params:UrlParams):string{
+	static getParamsQuery(params:UrlParams, separateArrayParams:boolean = false):string{
 		let paramsArray:Array<string> = [];
 
 		for(let param in params){
 			let paramValue:any = params[param];
-			if (paramValue instanceof Array)
+			if (separateArrayParams && paramValue instanceof Array)
 				paramsArray = paramsArray.concat(paramValue.map(value => `${param}=${encodeURIComponent(String(value))}`));
 			else{
 				let value:string = encodeURIComponent(String(params[param]));
@@ -90,7 +90,8 @@ export class Http{
 
 export interface HttpOptions{
 	data?:any,
-	params?:UrlParams
+	params?:UrlParams,
+	separateArrayParams?:boolean
 }
 
 export type UrlParams = { [index:string]:any };

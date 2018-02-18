@@ -41,6 +41,7 @@ export interface EntityBackendConfig {
     }) => string;
     parseSaveQuery?: (item: any, entity?: IEntityConfigBase, config?: ParisConfig) => string;
     serializeItem?: (item: any, serializedItem?: any, entity?: IEntityConfigBase, config?: ParisConfig) => any;
+    separateArrayParams?: boolean;
 }
 export interface ModelEntityCacheConfig {
     time?: number;

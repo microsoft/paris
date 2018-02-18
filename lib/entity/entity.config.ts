@@ -40,7 +40,8 @@ export interface EntityBackendConfig{
 	parseDataQuery?:(dataQuery:DataQuery) => { [index:string]:any },
 	parseItemQuery?:(itemId:string|number, entity?:IEntityConfigBase, config?:ParisConfig, params?:{ [index:string]:any }) => string,
 	parseSaveQuery?:(item:any, entity?:IEntityConfigBase, config?:ParisConfig) => string,
-	serializeItem?:(item:any, serializedItem?:any, entity?:IEntityConfigBase, config?:ParisConfig) => any
+	serializeItem?:(item:any, serializedItem?:any, entity?:IEntityConfigBase, config?:ParisConfig) => any,
+	separateArrayParams?:boolean
 }
 
 export interface ModelEntityCacheConfig{

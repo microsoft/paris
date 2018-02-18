@@ -96,6 +96,10 @@ export class Paris{
 		let queryError:Error = new Error(`Failed to get ${entityConstructor.pluralName}.`);
 		let httpOptions:HttpOptions = backendConfig.parseDataQuery ? { params: backendConfig.parseDataQuery(query) } : DatasetService.queryToHttpOptions(query);
 
+		if (backendConfig.separateArrayParams) {
+			(httpOptions || (httpOptions = {})).separateArrayParams = true;
+		}
+
 		if (backendConfig.fixedData){
 			if (!httpOptions)
 				httpOptions = {};
