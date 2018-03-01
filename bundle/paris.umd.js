@@ -1065,7 +1065,7 @@ var Repository = /** @class */ (function (_super) {
             var isNewItem_1 = item.id === undefined;
             var saveData = this.serializeItem(item);
             var endpoint = this.entityBackendConfig.parseSaveQuery ? this.entityBackendConfig.parseSaveQuery(item, this.entity, this.config) : this.endpointName + "/" + (item.id || '');
-            return this.dataStore.save(endpoint, isNewItem_1 ? "POST" : "PUT", Object.assign({}, options, { data: saveData }), this.baseUrl)
+            return this.dataStore.save(endpoint, this.getSaveMethod(item), Object.assign({}, options, { data: saveData }), this.baseUrl)
                 .flatMap(function (savedItemData) { return savedItemData ? _this.createItem(savedItemData) : Observable_1.Observable.of(null); })
                 .do(function (savedItem) {
                 if (savedItem && _this._allValues) {
@@ -1079,6 +1079,11 @@ var Repository = /** @class */ (function (_super) {
             return Observable_1.Observable.throw(e);
         }
     };
+    Repository.prototype.getSaveMethod = function (item) {
+        return this.entityBackendConfig.saveMethod
+            ? this.entityBackendConfig.saveMethod instanceof Function ? this.entityBackendConfig.saveMethod(item, this.config) : this.entityBackendConfig.saveMethod
+            : item.id === undefined ? "POST" : "PUT";
+    };
     /**
      * Saves multiple items to the server, all at once
      * @param {Array<T extends EntityModelBase>} items
@@ -1090,7 +1095,8 @@ var Repository = /** @class */ (function (_super) {
             throw new Error(this.entity.pluralName + " can't be saved - it doesn't specify an endpoint.");
         var newItems = { method: "POST", items: [] }, existingItems = { method: "PUT", items: [] };
         items.forEach(function (item) {
-            (item.id === undefined ? newItems : existingItems).items.push(_this.serializeItem(item));
+            var saveMethod = _this.getSaveMethod(item);
+            (saveMethod === "POST" ? newItems : existingItems).items.push(_this.serializeItem(item));
         });
         var saveItemsArray = [newItems, existingItems]
             .filter(function (saveItems) { return saveItems.items.length; })
@@ -1221,15 +1227,9 @@ var Http = /** @class */ (function () {
     Http.httpOptionsToRequestInit = function (options, httpConfig) {
         if (!options && !httpConfig)
             return null;
-        var requestOptions = {};
-        if (options) {
-            if (options.data)
-                requestOptions.body = options.data;
-        }
-        if (httpConfig) {
-            if (httpConfig.headers)
-                requestOptions.headers = httpConfig.headers;
-        }
+        var requestOptions = Object.assign({}, httpConfig);
+        if (options && options.data)
+            requestOptions.body = options.data;
         return requestOptions;
     };
     Http.addParamsToUrl = function (url, params, separateArrayParams) {

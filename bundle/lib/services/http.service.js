@@ -38,15 +38,9 @@ var Http = /** @class */ (function () {
     Http.httpOptionsToRequestInit = function (options, httpConfig) {
         if (!options && !httpConfig)
             return null;
-        var requestOptions = {};
-        if (options) {
-            if (options.data)
-                requestOptions.body = options.data;
-        }
-        if (httpConfig) {
-            if (httpConfig.headers)
-                requestOptions.headers = httpConfig.headers;
-        }
+        var requestOptions = Object.assign({}, httpConfig);
+        if (options && options.data)
+            requestOptions.body = options.data;
         return requestOptions;
     };
     Http.addParamsToUrl = function (url, params, separateArrayParams) {

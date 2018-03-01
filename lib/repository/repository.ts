@@ -10,7 +10,7 @@ import * as _ from "lodash";
 import {ModelBase} from "../models/model.base";
 import {EntityModelBase} from "../models/entity-model.base";
 import {Paris} from "../services/paris";
-import {HttpOptions} from "../services/http.service";
+import {HttpOptions, RequestMethod} from "../services/http.service";
 import {SaveEntityEvent} from "../events/save-entity.event";
 import {RemoveEntitiesEvent} from "../events/remove-entities.event";
 import {ReadonlyRepository} from "./readonly-repository";
@@ -54,7 +54,7 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 			let saveData: Index = this.serializeItem(item);
 			let endpoint:string = this.entityBackendConfig.parseSaveQuery ? this.entityBackendConfig.parseSaveQuery(item, this.entity, this.config) : `${this.endpointName}/${item.id || ''}`;
 
-			return this.dataStore.save(endpoint, isNewItem ? "POST" : "PUT", Object.assign({}, options, { data: saveData }), this.baseUrl)
+			return this.dataStore.save(endpoint, this.getSaveMethod(item), Object.assign({}, options, { data: saveData }), this.baseUrl)
 				.flatMap((savedItemData: Index) => savedItemData ? this.createItem(savedItemData) : Observable.of(null))
 				.do((savedItem: T) => {
 					if (savedItem && this._allValues) {
@@ -70,6 +70,12 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 		}
 	}
 
+	private getSaveMethod(item:T):RequestMethod{
+		return this.entityBackendConfig.saveMethod
+			? this.entityBackendConfig.saveMethod instanceof Function ? this.entityBackendConfig.saveMethod(item, this.config) : this.entityBackendConfig.saveMethod
+			: item.id === undefined ? "POST" : "PUT";
+	}
+
 	/**
 	 * Saves multiple items to the server, all at once
 	 * @param {Array<T extends EntityModelBase>} items
@@ -83,7 +89,8 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 			existingItems:SaveItems = { method: "PUT", items: [] };
 
 		items.forEach((item:any) => {
-			(item.id === undefined ? newItems : existingItems).items.push(this.serializeItem(item));
+			let saveMethod:RequestMethod = this.getSaveMethod(item);
+			(saveMethod === "POST" ? newItems : existingItems).items.push(this.serializeItem(item));
 		});
 
 		let saveItemsArray:Array<Observable<Array<T>>> = [newItems, existingItems]

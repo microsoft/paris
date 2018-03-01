@@ -22,6 +22,7 @@ export declare class Repository<T extends ModelBase> extends ReadonlyRepository<
      * @returns {Observable<T extends EntityModelBase>}
      */
     save(item: T, options?: HttpOptions): Observable<T>;
+    private getSaveMethod(item);
     /**
      * Saves multiple items to the server, all at once
      * @param {Array<T extends EntityModelBase>} items
