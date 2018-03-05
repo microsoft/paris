@@ -1,6 +1,6 @@
 {
 	"name": "wcdportal.paris",
-	"version": "0.6.4",
+	"version": "0.6.5",
 	"description": "Library for the implementation of Domain Driven Design in Angular/TypeScript apps",
 	"repository": {
 		"type": "git",

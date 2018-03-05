@@ -14,7 +14,7 @@ import 'rxjs/add/observable/dom/ajax';
 export { EntityRelationshipRepositoryType } from "./entity/entity-relationship-repository-type";
 export { EntityRelationship } from "./entity/entity-relationship.decorator";
 export { RelationshipType } from "./models/relationship-type.enum";
-export { DataEntityType } from "./entity/data-entity.base";
+export { DataEntityType, DataEntityConstructor } from "./entity/data-entity.base";
 export { Paris } from "./services/paris";
 export { DataStoreService } from "./services/data-store.service";
 export { EntityModelBase } from "./models/entity-model.base";
