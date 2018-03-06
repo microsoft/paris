@@ -14,6 +14,7 @@ import {HttpOptions, RequestMethod} from "../services/http.service";
 import {SaveEntityEvent} from "../events/save-entity.event";
 import {RemoveEntitiesEvent} from "../events/remove-entities.event";
 import {ReadonlyRepository} from "./readonly-repository";
+import {AjaxError} from "rxjs/Rx";
 
 export class Repository<T extends ModelBase> extends ReadonlyRepository<T> implements IRepository {
 	save$: Observable<SaveEntityEvent>;
@@ -54,7 +55,11 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 			let saveData: Index = this.serializeItem(item);
 			let endpoint:string = this.entityBackendConfig.parseSaveQuery ? this.entityBackendConfig.parseSaveQuery(item, this.entity, this.config) : `${this.endpointName}/${item.id || ''}`;
 
-			return this.dataStore.save(endpoint, this.getSaveMethod(item), Object.assign({}, options, { data: saveData }), this.baseUrl)
+			return this.dataStore.save(endpoint, this.getSaveMethod(item), Object.assign({}, options, {data: saveData}), this.baseUrl)
+				.catch((err: AjaxError) => {
+					this.emitEntityHttpErrorEvent(err);
+					throw err;
+				})
 				.flatMap((savedItemData: Index) => savedItemData ? this.createItem(savedItemData) : Observable.of(null))
 				.do((savedItem: T) => {
 					if (savedItem && this._allValues) {
@@ -107,7 +112,11 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 	 * @returns {Observable<Array<T extends EntityModelBase>>}
 	 */
 	private doSaveItems(itemsData:Array<any>, method:"PUT" | "POST", options?:HttpOptions):Observable<Array<T>>{
-		return this.dataStore.save(`${this.endpointName}/`, method, Object.assign({}, options, { data: { items: itemsData } }), this.baseUrl)
+		return this.dataStore.save(`${this.endpointName}/`, method, Object.assign({}, options, {data: {items: itemsData}}), this.baseUrl)
+			.catch((err: AjaxError) => {
+				this.emitEntityHttpErrorEvent(err);
+				throw err
+			})
 			.flatMap((savedItemsData?: Array<any> | {items:Array<any>}) => {
 				if (!savedItemsData)
 					return Observable.of(null);
@@ -139,6 +148,10 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 			httpOptions.data.ids = items.map(item => item.id);
 
 			return this.dataStore.delete(this.endpointName, httpOptions, this.baseUrl)
+				.catch((err: AjaxError) => {
+					this.emitEntityHttpErrorEvent(err);
+					throw err;
+				})
 				.do(() => {
 					if (this._allValues) {
 						items.forEach((item:T) => {

@@ -21,14 +21,23 @@ import {ModelBase} from "../models/model.base";
 import {DataTransformersService} from "../services/data-transformers.service";
 import * as _ from "lodash";
 import {valueObjectsService} from "../services/value-objects.service";
+import {AjaxError} from "rxjs/Rx";
+import {EntityErrorEvent, EntityErrorTypes} from "../events/entity-error.event";
+
 
 export class ReadonlyRepository<T extends ModelBase>{
+	protected _errorSubject$: Subject<EntityErrorEvent>;
+	error$: Observable<EntityErrorEvent>;
+
 	constructor(public readonly entity: IEntityConfigBase,
 				public entityBackendConfig: EntityBackendConfig,
 				protected config: ParisConfig,
 				public entityConstructor: DataEntityConstructor<T>,
 				protected dataStore: DataStoreService,
-				protected paris: Paris) {}
+				protected paris: Paris) {
+		this._errorSubject$ = new Subject();
+		this.error$ = this._errorSubject$.asObservable();
+	}
 
 	protected _allItems$: Observable<Array<T>>;
 	protected _allValues: Array<T>;
@@ -125,6 +134,10 @@ export class ReadonlyRepository<T extends ModelBase>{
 			endpoint = `${this.endpointName}${this.entityBackendConfig.allItemsEndpointTrailingSlash !== false && !this.entityBackendConfig.allItemsEndpoint ? '/' : ''}${this.entityBackendConfig.allItemsEndpoint || ''}`;
 
 		return this.dataStore.get(endpoint, httpOptions, this.baseUrl)
+			.catch((err: AjaxError) => {
+				this.emitEntityHttpErrorEvent(err);
+				throw err
+			})
 			.flatMap(data => this.createItem(data, dataOptions, query));
 	}
 
@@ -158,7 +171,11 @@ export class ReadonlyRepository<T extends ModelBase>{
 		if (this.entityBackendConfig.loadAll)
 			return this.setAllItems().map(() => this._allValuesMap.get(String(itemId)));
 		else {
-			return this.dataStore.get(this.entityBackendConfig.parseItemQuery ? this.entityBackendConfig.parseItemQuery(itemId, this.entity, this.config, params) : `${this.endpointName}/${itemId}`, params && { params: params }, this.baseUrl)
+			return this.dataStore.get(this.entityBackendConfig.parseItemQuery ? this.entityBackendConfig.parseItemQuery(itemId, this.entity, this.config, params) : `${this.endpointName}/${itemId}`, params && {params: params}, this.baseUrl)
+				.catch((err: AjaxError) => {
+					this.emitEntityHttpErrorEvent(err);
+					throw err;
+				})
 				.flatMap(data => this.createItem(data, options, { where: Object.assign({ itemId: itemId }, params) }));
 		}
 	}
@@ -414,6 +431,14 @@ export class ReadonlyRepository<T extends ModelBase>{
 			modelData = entity.serializeItem(item, modelData, entity, paris.config);
 
 		return modelData;
+	}
+
+	protected emitEntityHttpErrorEvent(err: AjaxError) {
+		this._errorSubject$.next({
+			entity: this.entityConstructor,
+			type: EntityErrorTypes.HttpError,
+			originalError: err
+		});
 	}
 }
 

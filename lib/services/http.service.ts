@@ -1,5 +1,6 @@
 import {Observable} from "rxjs/Observable";
 import {AjaxRequest} from "rxjs/observable/dom/AjaxObservable";
+import {AjaxError, AjaxResponse} from "rxjs/Rx";
 
 export type RequestMethod = "GET"|"POST"|"PUT"|"PATCH"|"DELETE";
 
@@ -25,8 +26,7 @@ export class Http{
 	}
 
 	static request(method:RequestMethod, url:string, options?:HttpOptions, httpConfig?:AjaxRequest):Observable<any> {
-		let fullUrl:string = options && options.params ? Http.addParamsToUrl(url, options.params, options.separateArrayParams) : url,
-			tmpError:Error = new Error(`Failed to ${method} from ${url}.`);
+		let fullUrl:string = options && options.params ? Http.addParamsToUrl(url, options.params, options.separateArrayParams) : url;
 
 		if (options && options.data) {
 			httpConfig = httpConfig || {};
@@ -41,8 +41,14 @@ export class Http{
 			url: fullUrl,
 			body: options && options.data
 		}, Http.httpOptionsToRequestInit(options, httpConfig)))
-			.map(e => e.response)
-			.catch(() => { throw tmpError });
+			.catch((err: AjaxError) => {
+				if (err.response && ~['json', 'text', 'arraybuffer', ''].indexOf(err.responseType))
+					err.message = err.response;
+				else
+					err.message = `Failed to ${method} from ${url}. Status code: ${err.status}`;
+				throw err
+			})
+			.map((e: AjaxResponse) => e.response)
 	}
 
 	static httpOptionsToRequestInit(options?:HttpOptions, httpConfig?:AjaxRequest):AjaxRequest{

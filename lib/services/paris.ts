@@ -1,12 +1,11 @@
 import {defaultConfig, ParisConfig} from "../config/paris-config";
-import {EntityModelBase} from "../models/entity-model.base";
 import {DataEntityConstructor, DataEntityType} from "../entity/data-entity.base";
 import {Repository} from "../repository/repository";
-import {EntityBackendConfig, EntityConfig, ModelEntity} from "../entity/entity.config";
+import {EntityBackendConfig, EntityConfig} from "../entity/entity.config";
 import {entitiesService} from "./entities.service";
 import {IRepository} from "../repository/repository.interface";
 import {DataStoreService} from "./data-store.service";
-import {EntityConfigBase, IEntityConfigBase} from "../entity/entity-config.base";
+import {EntityConfigBase} from "../entity/entity-config.base";
 import {Observable} from "rxjs/Observable";
 import {SaveEntityEvent} from "../events/save-entity.event";
 import {Subject} from "rxjs/Subject";
@@ -22,6 +21,8 @@ import {ReadonlyRepository} from "../repository/readonly-repository";
 import {DatasetService} from "./dataset.service";
 import {HttpOptions} from "./http.service";
 import {ErrorsService} from "./errors.service";
+import {AjaxError} from "rxjs/Rx";
+import {EntityErrorEvent, EntityErrorTypes} from "../events/entity-error.event" ;
 
 export class Paris{
 	private repositories:Map<DataEntityType, IRepository> = new Map;
@@ -35,12 +36,16 @@ export class Paris{
 	remove$:Observable<RemoveEntitiesEvent>;
 	private _removeSubject$:Subject<RemoveEntitiesEvent> = new Subject;
 
+	error$:Observable<EntityErrorEvent>;
+	private _errorSubject$:Subject<EntityErrorEvent> = new Subject;
+
 	constructor(config?:ParisConfig){
 		this.config = Object.assign({}, defaultConfig, config);
 		this.dataStore = new DataStoreService(this.config);
 
 		this.save$ = this._saveSubject$.asObservable();
 		this.remove$ = this._removeSubject$.asObservable();
+		this.error$ = this._errorSubject$.asObservable();
 	}
 
 	getRepository<T extends ModelBase>(entityConstructor:DataEntityConstructor<T>):Repository<T> | null{
@@ -57,6 +62,7 @@ export class Paris{
 			if (entityConfig.endpoint){
 				repository.save$.subscribe((saveEvent:SaveEntityEvent) => this._saveSubject$.next(saveEvent));
 				repository.remove$.subscribe((removeEvent:RemoveEntitiesEvent) => this._removeSubject$.next(removeEvent));
+				repository.error$.subscribe((error) => this._errorSubject$.next(error))
 			}
 		}
 
@@ -119,6 +125,14 @@ export class Paris{
 		let baseUrl:string = backendConfig.baseUrl instanceof Function ? backendConfig.baseUrl(this.config) : backendConfig.baseUrl;
 
 		return this.dataStore.get(endpoint, httpOptions, baseUrl)
+			.catch((err: AjaxError) => {
+				this._errorSubject$.next({
+					entity: entityConstructor,
+					type: EntityErrorTypes.HttpError,
+					originalError: err
+				});
+				throw err
+			})
 			.map((rawDataSet: any) => {
 				const allItemsProperty = backendConfig.allItemsProperty || "items";
 
@@ -148,6 +162,11 @@ export class Paris{
 					});
 				}).catch((error:Error) => {
 					queryError.message = queryError.message + " Error: " + error.message;
+					this._errorSubject$.next({
+						entity: entityConstructor,
+						originalError: queryError.message,
+						type: EntityErrorTypes.DataParseError
+					});
 					throw queryError;
 				});
 			});
