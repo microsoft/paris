@@ -62,4 +62,5 @@ typings/
 #NPM package-lock
 package-lock.json
 
-
+# Build output
+bundle
