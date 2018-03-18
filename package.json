@@ -13,7 +13,9 @@
 	"typings": "index.d.ts",
 	"scripts": {
 		"build": "gulp build && rollup -c",
-		"dev": "rollup -c -w"
+		"dev": "rollup -c -w",
+		"bundle": "npm run build && rimraf bundle/lib/**/*.js",
+		"publish": "npm run bundle && npm publish"
 	},
 	"author": "Yossi Kolesnicov",
 	"license": "MIT",
