@@ -3,6 +3,7 @@ import {AjaxRequest} from "rxjs/observable/dom/AjaxObservable";
 import {AjaxError, AjaxResponse} from "rxjs/Rx";
 
 export type RequestMethod = "GET"|"POST"|"PUT"|"PATCH"|"DELETE";
+const DEFAULT_TIMEOUT = 60000;
 
 export class Http{
 	static get(url:string, options?:HttpOptions, httpConfig?:AjaxRequest):Observable<any>{
@@ -39,7 +40,8 @@ export class Http{
 		return Observable.ajax(Object.assign({
 			method: method,
 			url: fullUrl,
-			body: options && options.data
+			body: options && options.data,
+			timeout: DEFAULT_TIMEOUT
 		}, Http.httpOptionsToRequestInit(options, httpConfig)))
 			.catch((err: AjaxError) => {
 				if (err.response && ~['json', 'text', 'arraybuffer', ''].indexOf(err.responseType))
