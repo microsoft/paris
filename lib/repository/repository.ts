@@ -127,6 +127,45 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 			});
 	}
 
+	removeItem(item:T, options?:HttpOptions):Observable<T>{
+		if (!item)
+			return Observable.of(null);
+
+		if (!this.entityBackendConfig.endpoint)
+			throw new Error(`Entity ${this.entity.singularName} can't be deleted - it doesn't specify an endpoint.`);
+
+		try {
+			let httpOptions:HttpOptions = options || { data: {}};
+			if (!httpOptions.data)
+				httpOptions.data = {};
+
+			if (this.entityBackendConfig.getRemoveData)
+				Object.assign(httpOptions.data, this.entityBackendConfig.getRemoveData([item]));
+
+			let endpoint:string = this.entityBackendConfig.parseRemoveQuery ? this.entityBackendConfig.parseRemoveQuery([item], this.entity, this.config) : `${this.endpointName}/${item.id || ''}`;
+
+			return this.dataStore.delete(endpoint, httpOptions, this.baseUrl)
+				.catch((err: AjaxError) => {
+					this.emitEntityHttpErrorEvent(err);
+					throw err;
+				})
+				.do(() => {
+					if (this._allValues) {
+						let itemIndex:number = _.findIndex(this._allValues, (_item:T) => _item.id === item.id);
+						if (~itemIndex)
+							this._allValues.splice(itemIndex, 1);
+
+						this._allItemsSubject$.next(this._allValues);
+					}
+
+					this._removeSubject$.next({ entity: this.entityConstructor, items: [item] });
+				}).map(() => item);
+		}
+		catch(e){
+			return Observable.throw(e);
+		}
+	}
+
 	remove(items:Array<T>, options?:HttpOptions):Observable<Array<T>>{
 		if (!items)
 			throw new Error(`No ${this.entity.pluralName.toLowerCase()} specified for removing.`);
@@ -145,9 +184,14 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 			if (!httpOptions.data)
 				httpOptions.data = {};
 
-			httpOptions.data.ids = items.map(item => item.id);
+			Object.assign(httpOptions.data, this.entityBackendConfig.getRemoveData
+				? this.entityBackendConfig.getRemoveData(items)
+				: { ids: items.map(item => item.id) }
+			);
 
-			return this.dataStore.delete(this.endpointName, httpOptions, this.baseUrl)
+			let endpoint:string = this.entityBackendConfig.parseRemoveQuery ? this.entityBackendConfig.parseRemoveQuery(items, this.entity, this.config) : this.endpointName;
+
+			return this.dataStore.delete(endpoint, httpOptions, this.baseUrl)
 				.catch((err: AjaxError) => {
 					this.emitEntityHttpErrorEvent(err);
 					throw err;

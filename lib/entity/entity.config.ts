@@ -3,6 +3,7 @@ import {ParisConfig} from "../config/paris-config";
 import {DataEntityConstructor} from "./data-entity.base";
 import {DataQuery} from "../dataset/data-query";
 import {RequestMethod} from "../services/http.service";
+import {ModelBase} from "../models/model.base";
 
 export class ModelEntity extends EntityConfigBase implements EntityConfig{
 	endpoint:EntityConfigFunctionOrValue;
@@ -15,7 +16,9 @@ export class ModelEntity extends EntityConfigBase implements EntityConfig{
 	parseDataQuery?:(dataQuery:DataQuery) => { [index:string]:any };
 	parseItemQuery?:(itemId:string|number, entity?:IEntityConfigBase, config?:ParisConfig, params?:{ [index:string]:any }) => string;
 	parseSaveQuery?:(item:any, entity?:IEntityConfigBase, config?:ParisConfig) => string;
+	parseRemoveQuery?:(items:Array<ModelBase>, entity?:IEntityConfigBase, config?:ParisConfig) => string;
 	serializeItem?:(item:any, serializedItem?:any, entity?:IEntityConfigBase, config?:ParisConfig) => any;
+	getRemoveData?:(items:Array<ModelBase>) => any;
 
 	constructor(config:EntityConfig, entityConstructor:DataEntityConstructor<any>){
 		super(config, entityConstructor);
@@ -38,9 +41,11 @@ export interface EntityBackendConfig{
 	allItemsEndpoint?:string,
 	allItemsEndpointTrailingSlash?:boolean,
 	fixedData?: { [index:string]:any },
+	getRemoveData?:(items:Array<ModelBase>) => any,
 	parseDataQuery?:(dataQuery:DataQuery) => { [index:string]:any },
 	parseItemQuery?:(itemId:string|number, entity?:IEntityConfigBase, config?:ParisConfig, params?:{ [index:string]:any }) => string,
 	parseSaveQuery?:(item:any, entity?:IEntityConfigBase, config?:ParisConfig) => string,
+	parseRemoveQuery?:(items:Array<ModelBase>, entity?:IEntityConfigBase, config?:ParisConfig) => string,
 	serializeItem?:(item:any, serializedItem?:any, entity?:IEntityConfigBase, config?:ParisConfig) => any,
 	separateArrayParams?:boolean,
 	saveMethod?:((item:any, config?:ParisConfig) => RequestMethod) | RequestMethod
