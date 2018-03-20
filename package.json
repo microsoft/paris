@@ -1,6 +1,6 @@
 {
 	"name": "wcdportal.paris",
-	"version": "0.6.8",
+	"version": "0.6.9",
 	"description": "Library for the implementation of Domain Driven Design in Angular/TypeScript apps",
 	"repository": {
 		"type": "git",
@@ -14,7 +14,7 @@
 	"scripts": {
 		"build": "gulp build && rollup -c",
 		"dev": "rollup -c -w",
-		"bundle": "npm run build && rimraf bundle/lib/**/*.js",
+		"bundle": "npm run build",
 		"publish": "npm run bundle && npm publish"
 	},
 	"author": "Yossi Kolesnicov",
