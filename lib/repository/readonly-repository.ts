@@ -411,8 +411,13 @@ export class ReadonlyRepository<T extends ModelBase>{
 
 			if (entityField.serialize)
 				modelValue = entityField.serialize(itemFieldValue);
-			else if (entityField.isArray)
-				modelValue =  itemFieldValue ? itemFieldValue.map((element:any) => ReadonlyRepository.serializeItem(element, fieldRepository ? fieldRepository.entity : fieldValueObjectType, paris)) : null;
+			else if (entityField.isArray) {
+				if (itemFieldValue) {
+					if (fieldRepository || fieldValueObjectType)
+						modelValue = itemFieldValue.map((element:any) => ReadonlyRepository.serializeItem(element, fieldRepository ? fieldRepository.entity : fieldValueObjectType, paris));
+					else modelValue = itemFieldValue.map((item:any) => DataTransformersService.serialize(entityField.arrayOf, item));
+				} else modelValue = null;
+			}
 			else if (fieldRepository)
 				modelValue = isNilValue ? fieldRepository.entity.getDefaultValue() || null : itemFieldValue.id;
 			else if (fieldValueObjectType)
