@@ -97,7 +97,7 @@ export class ReadonlyRepository<T extends ModelBase>{
 		let defaultData:{ [index:string]:any } = {};
 		this.entity.fieldsArray.forEach((field:Field) => {
 			if (field.defaultValue !== undefined)
-				defaultData[field.id] = field.defaultValue;
+				defaultData[field.id] = _.clone(field.defaultValue);
 			else if (field.isArray)
 				defaultData[field.id] = [];
 		});
