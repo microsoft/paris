@@ -1,6 +1,7 @@
 import {Observable} from "rxjs/Observable";
 import {AjaxRequest} from "rxjs/observable/dom/AjaxObservable";
 import {AjaxError, AjaxResponse} from "rxjs/Rx";
+import * as _ from "lodash";
 
 export type RequestMethod = "GET"|"POST"|"PUT"|"PATCH"|"DELETE";
 const DEFAULT_TIMEOUT = 60000;
@@ -29,12 +30,18 @@ export class Http{
 	static request(method:RequestMethod, url:string, options?:HttpOptions, httpConfig?:AjaxRequest):Observable<any> {
 		let fullUrl:string = options && options.params ? Http.addParamsToUrl(url, options.params, options.separateArrayParams) : url;
 
-		if (options && options.data) {
-			httpConfig = httpConfig || {};
-			if (!httpConfig.headers)
-				httpConfig.headers = {};
+		let currentHttpConfig: AjaxRequest = _.clone(httpConfig);
 
-			(<any>httpConfig.headers)["Content-Type"] = "application/json";
+		if (options && options.data) {
+			currentHttpConfig = currentHttpConfig || {};
+			if (!currentHttpConfig.headers)
+				currentHttpConfig.headers = {};
+
+			// remove content type so the browser sets it automatically. this is required for multipart forms
+			if (options.data instanceof FormData)
+				delete (<any>currentHttpConfig.headers)["Content-Type"];
+			else
+				(<any>currentHttpConfig.headers)["Content-Type"] = "application/json";
 		}
 
 		return Observable.ajax(Object.assign({
@@ -42,7 +49,7 @@ export class Http{
 			url: fullUrl,
 			body: options && options.data,
 			timeout: DEFAULT_TIMEOUT
-		}, Http.httpOptionsToRequestInit(options, httpConfig)))
+		}, Http.httpOptionsToRequestInit(options, currentHttpConfig)))
 			.catch((err: AjaxError) => {
 				if (err.response && ~['json', 'text', 'arraybuffer', ''].indexOf(err.responseType))
 					err.message = err.response;

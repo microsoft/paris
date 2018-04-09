@@ -2,7 +2,7 @@ import {EntityConfigBase, IEntityConfigBase} from "./entity-config.base";
 import {ParisConfig} from "../config/paris-config";
 import {DataEntityConstructor} from "./data-entity.base";
 import {DataQuery} from "../dataset/data-query";
-import {RequestMethod} from "../services/http.service";
+import {HttpOptions, RequestMethod} from "../services/http.service";
 import {ModelBase} from "../models/model.base";
 
 export class ModelEntity extends EntityConfigBase implements EntityConfig{
@@ -44,7 +44,7 @@ export interface EntityBackendConfig{
 	getRemoveData?:(items:Array<ModelBase>) => any,
 	parseDataQuery?:(dataQuery:DataQuery) => { [index:string]:any },
 	parseItemQuery?:(itemId:string|number, entity?:IEntityConfigBase, config?:ParisConfig, params?:{ [index:string]:any }) => string,
-	parseSaveQuery?:(item:any, entity?:IEntityConfigBase, config?:ParisConfig) => string,
+	parseSaveQuery?:(item:any, entity?:IEntityConfigBase, config?:ParisConfig, options?: HttpOptions) => string,
 	parseRemoveQuery?:(items:Array<ModelBase>, entity?:IEntityConfigBase, config?:ParisConfig) => string,
 	serializeItem?:(item:any, serializedItem?:any, entity?:IEntityConfigBase, config?:ParisConfig) => any,
 	separateArrayParams?:boolean,

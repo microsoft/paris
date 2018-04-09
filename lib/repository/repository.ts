@@ -53,7 +53,7 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 		try {
 			let isNewItem:boolean = item.id === undefined;
 			let saveData: Index = this.serializeItem(item);
-			let endpoint:string = this.entityBackendConfig.parseSaveQuery ? this.entityBackendConfig.parseSaveQuery(item, this.entity, this.config) : `${this.endpointName}/${item.id || ''}`;
+			let endpoint:string = this.entityBackendConfig.parseSaveQuery ? this.entityBackendConfig.parseSaveQuery(item, this.entity, this.config, options) : `${this.endpointName}/${item.id || ''}`;
 
 			return this.dataStore.save(endpoint, this.getSaveMethod(item), Object.assign({}, options, {data: saveData}), this.baseUrl)
 				.catch((err: AjaxError) => {

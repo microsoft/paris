@@ -40,7 +40,7 @@ export class Paris{
 	private _errorSubject$:Subject<EntityErrorEvent> = new Subject;
 
 	constructor(config?:ParisConfig){
-		this.config = Object.assign({}, defaultConfig, config);
+		this.config = Object.freeze(Object.assign({}, defaultConfig, config));
 		this.dataStore = new DataStoreService(this.config);
 
 		this.save$ = this._saveSubject$.asObservable();
