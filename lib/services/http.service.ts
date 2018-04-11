@@ -1,6 +1,9 @@
 import {Observable} from "rxjs/Observable";
 import {AjaxRequest} from "rxjs/observable/dom/AjaxObservable";
 import {AjaxError, AjaxResponse} from "rxjs/Rx";
+import {ajax} from "rxjs/observable/dom/ajax";
+import {map} from "rxjs/operators/map";
+import {catchError} from "rxjs/operators/catchError";
 import * as _ from "lodash";
 
 export type RequestMethod = "GET"|"POST"|"PUT"|"PATCH"|"DELETE";
@@ -27,7 +30,7 @@ export class Http{
 		return Http.request("PATCH", url, options, httpConfig);
 	}
 
-	static request(method:RequestMethod, url:string, options?:HttpOptions, httpConfig?:AjaxRequest):Observable<any> {
+	static request<T = any>(method:RequestMethod, url:string, options?:HttpOptions, httpConfig?:AjaxRequest):Observable<any> {
 		let fullUrl:string = options && options.params ? Http.addParamsToUrl(url, options.params, options.separateArrayParams) : url;
 
 		let currentHttpConfig: AjaxRequest = _.clone(httpConfig);
@@ -44,20 +47,22 @@ export class Http{
 				(<any>currentHttpConfig.headers)["Content-Type"] = "application/json";
 		}
 
-		return Observable.ajax(Object.assign({
+		return ajax(Object.assign({
 			method: method,
 			url: fullUrl,
 			body: options && options.data,
 			timeout: DEFAULT_TIMEOUT
 		}, Http.httpOptionsToRequestInit(options, currentHttpConfig)))
-			.catch((err: AjaxError) => {
-				if (err.response && ~['json', 'text', 'arraybuffer', ''].indexOf(err.responseType))
-					err.message = err.response;
-				else
-					err.message = `Failed to ${method} from ${url}. Status code: ${err.status}`;
-				throw err
-			})
-			.map((e: AjaxResponse) => e.response)
+			.pipe(
+				catchError((err: AjaxError) => {
+					if (err.response && ~['json', 'text', 'arraybuffer', ''].indexOf(err.responseType))
+						err.message = err.response;
+					else
+						err.message = `Failed to ${method} from ${url}. Status code: ${err.status}`;
+					throw err
+				}),
+				map((e: AjaxResponse) => e.response)
+			)
 	}
 
 	static httpOptionsToRequestInit(options?:HttpOptions, httpConfig?:AjaxRequest):AjaxRequest{
@@ -96,9 +101,9 @@ export class Http{
 	}
 }
 
-export interface HttpOptions{
-	data?:any,
-	params?:UrlParams,
+export interface HttpOptions<T = any, U = UrlParams>{
+	data?:T,
+	params?:U,
 	separateArrayParams?:boolean
 }
 

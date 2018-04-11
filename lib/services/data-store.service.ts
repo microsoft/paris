@@ -1,22 +1,28 @@
 import {ParisConfig} from "../config/paris-config";
 import {Http, HttpOptions, RequestMethod} from "./http.service";
 import {Observable} from "rxjs/Observable";
+import {finalize} from "rxjs/operators/finalize";
+import {share} from "rxjs/operators/share";
 
 export class DataStoreService{
 	private activeRequests:Map<string, Observable<any>> = new Map();
 
 	constructor(private config:ParisConfig){}
 
-	get(endpoint:string, data?:HttpOptions, baseUrl?:string):Observable<any>{
-		return this.setActiveRequest(Observable.from(Http.get(this.getEndpointUrl(endpoint, baseUrl), data, this.config.http)), "GET", endpoint, data);
+	get<T = any>(endpoint:string, data?:HttpOptions, baseUrl?:string):Observable<T>{
+		return this.request<T>("GET", endpoint, data, baseUrl);
 	}
 
-	save(endpoint:string, method:RequestMethod = "POST", data?:HttpOptions, baseUrl?:string):Observable<any>{
+	save<T = any>(endpoint:string, method:RequestMethod = "POST", data?:HttpOptions, baseUrl?:string):Observable<T>{
 		return Http.request(method, this.getEndpointUrl(endpoint, baseUrl), data, this.config.http);
 	}
 
 	delete(endpoint:string, data?:HttpOptions, baseUrl?:string):Observable<any>{
 		return Http.request("DELETE", this.getEndpointUrl(endpoint, baseUrl), data, this.config.http);
+	}
+
+	request<T = any>(method:RequestMethod, endpoint:string, data?:HttpOptions,baseUrl?:string):Observable<T>{
+		return this.setActiveRequest(Http.request(method, this.getEndpointUrl(endpoint, baseUrl), data, this.config.http), method, endpoint, data);
 	}
 
 	private getEndpointUrl(endpoint:string, baseUrl?:string):string{
@@ -30,9 +36,11 @@ export class DataStoreService{
 		if (existingActiveRequest)
 			return existingActiveRequest;
 		else {
-			let warmObservable: Observable<any> = obs.share();
+			let warmObservable: Observable<any> = obs.pipe(
+				finalize(() => this.activeRequests.delete(activeRequestId)),
+				share()
+			);
 
-			obs.finally(() => this.activeRequests.delete(activeRequestId));
 			this.activeRequests.set(activeRequestId, warmObservable);
 			return warmObservable;
 		}

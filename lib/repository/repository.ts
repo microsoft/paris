@@ -15,6 +15,16 @@ import {SaveEntityEvent} from "../events/save-entity.event";
 import {RemoveEntitiesEvent} from "../events/remove-entities.event";
 import {ReadonlyRepository} from "./readonly-repository";
 import {AjaxError} from "rxjs/Rx";
+import {defer} from "rxjs/observable/defer";
+import {mergeMap} from "rxjs/operators/mergeMap";
+import {tap} from "rxjs/operators/tap";
+import {map} from "rxjs/operators/map";
+import {_throw} from "rxjs/observable/throw";
+import {of} from "rxjs/observable/of";
+import {merge} from "rxjs/observable/merge";
+import {combineLatest} from "rxjs/observable/combineLatest";
+import {catchError} from "rxjs/operators/catchError";
+import {DataSet} from "../dataset/dataset";
 
 export class Repository<T extends ModelBase> extends ReadonlyRepository<T> implements IRepository {
 	save$: Observable<SaveEntityEvent>;
@@ -30,10 +40,10 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 				paris: Paris) {
 		super(entity, entity, config, entityConstructor, dataStore, paris);
 
-		let getAllItems$: Observable<Array<T>> = this.query().map(dataSet => dataSet.items);
+		const getAllItems$: Observable<Array<T>> = defer(() => this.query().pipe(map((dataSet:DataSet<T>) => dataSet.items)));
 
 		this._allItemsSubject$ = new Subject<Array<T>>();
-		this._allItems$ = Observable.merge(getAllItems$, this._allItemsSubject$.asObservable());
+		this._allItems$ = merge(getAllItems$, this._allItemsSubject$.asObservable());
 
 		this._saveSubject$ = new Subject();
 		this._removeSubject$ = new Subject();
@@ -56,22 +66,25 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 			let endpoint:string = this.entityBackendConfig.parseSaveQuery ? this.entityBackendConfig.parseSaveQuery(item, this.entity, this.config, options) : `${this.endpointName}/${item.id || ''}`;
 
 			return this.dataStore.save(endpoint, this.getSaveMethod(item), Object.assign({}, options, {data: saveData}), this.baseUrl)
-				.catch((err: AjaxError) => {
-					this.emitEntityHttpErrorEvent(err);
-					throw err;
-				})
-				.flatMap((savedItemData: Index) => savedItemData ? this.createItem(savedItemData) : Observable.of(null))
-				.do((savedItem: T) => {
-					if (savedItem && this._allValues) {
-						this._allValues = [...this._allValues, savedItem];
-						this._allItemsSubject$.next(this._allValues);
-					}
+				.pipe(
+					catchError((err: AjaxError) => {
+						this.emitEntityHttpErrorEvent(err);
+						throw err;
+					}),
+					mergeMap((savedItemData: Index) =>
+						savedItemData ? this.createItem(savedItemData) : of(null)),
+					tap((savedItem: T) => {
+						if (savedItem && this._allValues) {
+							this._allValues = [...this._allValues, savedItem];
+							this._allItemsSubject$.next(this._allValues);
+						}
 
-					this._saveSubject$.next({ entity: this.entityConstructor, newValue: item, isNew: isNewItem });
-				});
+						this._saveSubject$.next({ entity: this.entityConstructor, newValue: item, isNew: isNewItem });
+					})
+				);
 		}
 		catch(e){
-			return Observable.throw(e);
+			return _throw(e);
 		}
 	}
 
@@ -102,7 +115,9 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 			.filter((saveItems:SaveItems) => saveItems.items.length)
 			.map((saveItems:SaveItems) => this.doSaveItems(saveItems.items, saveItems.method, options));
 
-		return Observable.combineLatest.apply(this, saveItemsArray).map((savedItems:Array<Array<T>>) => _.flatMap(savedItems));
+		return combineLatest.apply(this, saveItemsArray).pipe(
+			map((savedItems:Array<Array<T>>) => _.flatMap(savedItems))
+		);
 	}
 
 	/**
@@ -113,23 +128,25 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 	 */
 	private doSaveItems(itemsData:Array<any>, method:"PUT" | "POST", options?:HttpOptions):Observable<Array<T>>{
 		return this.dataStore.save(`${this.endpointName}/`, method, Object.assign({}, options, {data: {items: itemsData}}), this.baseUrl)
-			.catch((err: AjaxError) => {
-				this.emitEntityHttpErrorEvent(err);
-				throw err
-			})
-			.flatMap((savedItemsData?: Array<any> | {items:Array<any>}) => {
-				if (!savedItemsData)
-					return Observable.of(null);
+			.pipe(
+				catchError((err: AjaxError) => {
+					this.emitEntityHttpErrorEvent(err);
+					throw err
+				}),
+				mergeMap((savedItemsData?: Array<any> | {items:Array<any>}) => {
+					if (!savedItemsData)
+						return of(null);
 
-				let itemsData:Array<any> = savedItemsData instanceof Array ? savedItemsData : savedItemsData.items;
-				let itemCreators:Array<Observable<T>> = itemsData.map(savedItemData => this.createItem(savedItemData));
-				return Observable.combineLatest.apply(this, itemCreators);
-			});
+					let itemsData:Array<any> = savedItemsData instanceof Array ? savedItemsData : savedItemsData.items;
+					let itemCreators:Array<Observable<T>> = itemsData.map(savedItemData => this.createItem(savedItemData));
+					return combineLatest.apply(this, itemCreators);
+				})
+			)
 	}
 
 	removeItem(item:T, options?:HttpOptions):Observable<T>{
 		if (!item)
-			return Observable.of(null);
+			return of(null);
 
 		if (!this.entityBackendConfig.endpoint)
 			throw new Error(`Entity ${this.entity.singularName} can't be deleted - it doesn't specify an endpoint.`);
@@ -145,24 +162,27 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 			let endpoint:string = this.entityBackendConfig.parseRemoveQuery ? this.entityBackendConfig.parseRemoveQuery([item], this.entity, this.config) : `${this.endpointName}/${item.id || ''}`;
 
 			return this.dataStore.delete(endpoint, httpOptions, this.baseUrl)
-				.catch((err: AjaxError) => {
-					this.emitEntityHttpErrorEvent(err);
-					throw err;
-				})
-				.do(() => {
-					if (this._allValues) {
-						let itemIndex:number = _.findIndex(this._allValues, (_item:T) => _item.id === item.id);
-						if (~itemIndex)
-							this._allValues.splice(itemIndex, 1);
+				.pipe(
+					catchError((err: AjaxError) => {
+						this.emitEntityHttpErrorEvent(err);
+						throw err;
+					}),
+					tap(() => {
+						if (this._allValues) {
+							let itemIndex:number = _.findIndex(this._allValues, (_item:T) => _item.id === item.id);
+							if (~itemIndex)
+								this._allValues.splice(itemIndex, 1);
 
-						this._allItemsSubject$.next(this._allValues);
-					}
+							this._allItemsSubject$.next(this._allValues);
+						}
 
-					this._removeSubject$.next({ entity: this.entityConstructor, items: [item] });
-				}).map(() => item);
+						this._removeSubject$.next({ entity: this.entityConstructor, items: [item] });
+					}),
+					map(() => item)
+				)
 		}
 		catch(e){
-			return Observable.throw(e);
+			return _throw(e);
 		}
 	}
 
@@ -174,7 +194,7 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 			items = [items];
 
 		if (!items.length)
-			return Observable.of([]);
+			return of([]);
 
 		if (!this.entityBackendConfig.endpoint)
 			throw new Error(`Entity ${this.entity.singularName} can't be deleted - it doesn't specify an endpoint.`);
@@ -192,26 +212,29 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 			let endpoint:string = this.entityBackendConfig.parseRemoveQuery ? this.entityBackendConfig.parseRemoveQuery(items, this.entity, this.config) : this.endpointName;
 
 			return this.dataStore.delete(endpoint, httpOptions, this.baseUrl)
-				.catch((err: AjaxError) => {
-					this.emitEntityHttpErrorEvent(err);
-					throw err;
-				})
-				.do(() => {
-					if (this._allValues) {
-						items.forEach((item:T) => {
-							let itemIndex:number = _.findIndex(this._allValues, (_item:T) => _item.id === item.id);
-							if (~itemIndex)
-								this._allValues.splice(itemIndex, 1);
-						});
+				.pipe(
+					catchError((err: AjaxError) => {
+						this.emitEntityHttpErrorEvent(err);
+						throw err;
+					}),
+					tap(() => {
+						if (this._allValues) {
+							items.forEach((item:T) => {
+								let itemIndex:number = _.findIndex(this._allValues, (_item:T) => _item.id === item.id);
+								if (~itemIndex)
+									this._allValues.splice(itemIndex, 1);
+							});
 
-						this._allItemsSubject$.next(this._allValues);
-					}
+							this._allItemsSubject$.next(this._allValues);
+						}
 
-					this._removeSubject$.next({ entity: this.entityConstructor, items: items });
-				}).map(() => items);
+						this._removeSubject$.next({ entity: this.entityConstructor, items: items });
+					}),
+					map(() => items)
+				)
 		}
 		catch(e){
-			return Observable.throw(e);
+			return _throw(e);
 		}
 	}
 }

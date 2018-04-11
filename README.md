@@ -15,3 +15,32 @@ provided by the bot. You will only need to do this once across all repos using o
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
 contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+
+
+## Usage
+
+First, define an Entity:
+
+```code
+	@Entity({
+		singularName: "Todo Item",
+		pluralName: "Todo Items",
+		endpoint: "todo/items"
+	})
+	export class TodoItem extends EntityModelBase{
+		@EntityField()
+		text:string;
+		
+		@EntityField()
+		time:Date;
+	}
+```
+
+The above defines an Entity, which can be used to query the todo/items server endpoint, like this:
+
+```code
+	const paris = new Paris();
+	paris.query(TodoItem).subscribe((todoItemsDataset:DataSet<TodoItem>) => {
+		console.log("Here are the items: ", todoItemsDataset.items);
+	});
+``

@@ -1,17 +1,3 @@
-import 'rxjs/add/observable/throw';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/observable/combineLatest';
-import 'rxjs/add/observable/from';
-import 'rxjs/add/operator/do';
-import 'rxjs/add/operator/mergeMap';
-import 'rxjs/add/operator/share';
-import 'rxjs/add/operator/finally';
-import 'rxjs/add/operator/toPromise';
-import 'rxjs/add/observable/merge';
-import 'rxjs/add/observable/dom/ajax';
-
 export {EntityRelationshipRepositoryType} from "./entity/entity-relationship-repository-type";
 export {EntityRelationship} from "./entity/entity-relationship.decorator";
 export {RelationshipType} from "./models/relationship-type.enum";
@@ -40,3 +26,7 @@ export {SaveEntityEvent} from "./events/save-entity.event";
 export {RemoveEntitiesEvent} from "./events/remove-entities.event";
 export {EntityErrorEvent, EntityErrorTypes} from "./events/entity-error.event";
 export {Field} from "./entity/entity-field";
+export {ApiCall} from "./entity/api-call.decorator";
+export {ApiCallBackendConfigInterface} from "./models/api-call-backend-config.interface";
+export {ApiCallModel, ApiCallConfig} from "./models/api-call.model";
+export {EntityGetMethod} from "./entity/entity-config.base";

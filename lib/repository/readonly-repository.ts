@@ -16,14 +16,20 @@ import {Field, FIELD_DATA_SELF} from "../entity/entity-field";
 import {DataCache, DataCacheSettings} from "../services/cache";
 import {Subject} from "rxjs/Subject";
 import {Index} from "../models";
-import {EntityConfigBase, IEntityConfigBase} from "../entity/entity-config.base";
+import {EntityConfigBase, EntityGetMethod, IEntityConfigBase} from "../entity/entity-config.base";
 import {ModelBase} from "../models/model.base";
 import {DataTransformersService} from "../services/data-transformers.service";
 import * as _ from "lodash";
 import {valueObjectsService} from "../services/value-objects.service";
 import {AjaxError} from "rxjs/Rx";
 import {EntityErrorEvent, EntityErrorTypes} from "../events/entity-error.event";
-
+import {tap} from "rxjs/operators/tap";
+import {map} from "rxjs/operators/map";
+import {merge} from "rxjs/observable/merge";
+import {of} from "rxjs/observable/of";
+import {combineLatest} from "rxjs/observable/combineLatest";
+import {mergeMap} from "rxjs/operators/mergeMap";
+import {catchError} from "rxjs/operators/catchError";
 
 export class ReadonlyRepository<T extends ModelBase>{
 	protected _errorSubject$: Subject<EntityErrorEvent>;
@@ -54,7 +60,7 @@ export class ReadonlyRepository<T extends ModelBase>{
 
 	get allItems$(): Observable<Array<T>> {
 		if (this._allValues)
-			return Observable.merge(Observable.of(this._allValues), this._allItemsSubject$.asObservable());
+			return merge(of(this._allValues), this._allItemsSubject$.asObservable());
 
 		if (this.entityBackendConfig.loadAll)
 			return this.setAllItems();
@@ -65,8 +71,8 @@ export class ReadonlyRepository<T extends ModelBase>{
 	protected get cache(): DataCache<T> {
 		if (!this._cache) {
 			let cacheSettings: DataCacheSettings<T> = Object.assign({
-				getter: (itemId: string | number, params?:{ [index:string]: any }) => this.getItemById(itemId, {allowCache: false}, params)
-			}, this.entityBackendConfig.cache);
+				getter: (endpoint:string, params?:{ [index:string]: any }) => this.dataStore.get(endpoint, { params: params }, this.baseUrl)
+			}, this.entityBackendConfig.cache instanceof Object ? this.entityBackendConfig.cache : null);
 
 			this._cache = new DataCache<T>(cacheSettings);
 		}
@@ -84,13 +90,16 @@ export class ReadonlyRepository<T extends ModelBase>{
 
 	protected setAllItems(): Observable<Array<T>> {
 		if (this._allValues)
-			return Observable.of(this._allValues);
+			return of(this._allValues);
 
-		return this.query().do((dataSet: DataSet<T>) => {
-			this._allValues = dataSet.items;
-			this._allValuesMap = new Map();
-			this._allValues.forEach((value: T) => this._allValuesMap.set(String(value instanceof EntityModelBase ? value.id : value.toString()), value));
-		}).map(dataSet => dataSet.items);
+		return this.query().pipe(
+			tap((dataSet: DataSet<T>) => {
+				this._allValues = dataSet.items;
+				this._allValuesMap = new Map();
+				this._allValues.forEach((value: T) => this._allValuesMap.set(String(value instanceof EntityModelBase ? value.id : value.toString()), value));
+			}),
+			map((dataSet:DataSet<T>) => dataSet.items)
+		);
 	}
 
 	createNewItem(): T {
@@ -105,11 +114,14 @@ export class ReadonlyRepository<T extends ModelBase>{
 		return new this.entityConstructor(defaultData);
 	}
 
-	createItem(itemData: any, options: DataOptions = { allowCache: true, availability: DataAvailability.available }, query?: DataQuery): Observable<T> {
+	createItem(itemData: {}, options: DataOptions = { allowCache: true, availability: DataAvailability.available }, query?: DataQuery): Observable<T> {
 		return ReadonlyRepository.getModelData(itemData, this.entity, this.config, this.paris, options, query);
 	}
 
 	query(query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<T>> {
+		if (this.entityConstructor.entityConfig && !this.entityConstructor.entityConfig.supportsGetMethod(EntityGetMethod.query))
+			throw new Error(`Can't query ${this.entityConstructor.singularName}, query isn't supported.`);
+
 		return this.paris.callQuery(this.entityConstructor, this.entityBackendConfig, query, dataOptions);
 	}
 
@@ -133,15 +145,24 @@ export class ReadonlyRepository<T extends ModelBase>{
 		else
 			endpoint = `${this.endpointName}${this.entityBackendConfig.allItemsEndpointTrailingSlash !== false && !this.entityBackendConfig.allItemsEndpoint ? '/' : ''}${this.entityBackendConfig.allItemsEndpoint || ''}`;
 
-		return this.dataStore.get(endpoint, httpOptions, this.baseUrl)
-			.catch((err: AjaxError) => {
-				this.emitEntityHttpErrorEvent(err);
-				throw err
-			})
-			.flatMap(data => this.createItem(data, dataOptions, query));
+		const getItem$:Observable<any> = dataOptions.allowCache !== false && this.entityBackendConfig.cache
+			? this.cache.get(endpoint, httpOptions.params)
+			: this.dataStore.get(endpoint, httpOptions, this.baseUrl);
+
+		return getItem$
+			.pipe(
+				catchError((err: AjaxError) => {
+					this.emitEntityHttpErrorEvent(err);
+					throw err
+				}),
+				mergeMap(data => this.createItem(data, dataOptions, query))
+			);
 	}
 
 	getItemById(itemId: string | number, options: DataOptions = defaultDataOptions, params?:{ [index:string]:any }): Observable<T> {
+		if (!this.entityConstructor.entityConfig.supportsGetMethod(EntityGetMethod.getItem))
+			throw new Error(`Can't get ${this.entityConstructor.singularName}, getItem isn't supported.`);
+
 		let idFieldIndex:number = _.findIndex(this.entity.fieldsArray, field => field.id === "id");
 		if (~idFieldIndex){
 			let idField:Field = this.entity.fieldsArray[idFieldIndex];
@@ -162,21 +183,30 @@ export class ReadonlyRepository<T extends ModelBase>{
 					ErrorsService.warn(`Unknown value for ${this.entity.singularName}: `, itemId);
 			}
 
-			return Observable.of(entityValue || this.entity.getDefaultValue());
+			return of(entityValue || this.entity.getDefaultValue());
 		}
 
-		if (options.allowCache !== false && this.entityBackendConfig.cache)
-			return this.cache.get(itemId, params);
-
-		if (this.entityBackendConfig.loadAll)
-			return this.setAllItems().map(() => this._allValuesMap.get(String(itemId)));
+		if (this.entityBackendConfig.loadAll) {
+			return this.setAllItems().pipe(
+				map(() => this._allValuesMap.get(String(itemId)))
+			);
+		}
 		else {
-			return this.dataStore.get(this.entityBackendConfig.parseItemQuery ? this.entityBackendConfig.parseItemQuery(itemId, this.entity, this.config, params) : `${this.endpointName}/${itemId}`, params && {params: params}, this.baseUrl)
-				.catch((err: AjaxError) => {
-					this.emitEntityHttpErrorEvent(err);
-					throw err;
-				})
-				.flatMap(data => this.createItem(data, options, { where: Object.assign({ itemId: itemId }, params) }));
+			const endpoint:string = this.entityBackendConfig.parseItemQuery ? this.entityBackendConfig.parseItemQuery(itemId, this.entity, this.config, params) : `${this.endpointName}/${itemId}`;
+
+			const getItem$:Observable<any> = options.allowCache !== false && this.entityBackendConfig.cache
+				? this.cache.get(endpoint, params)
+				: this.dataStore.get(endpoint, params && {params: params}, this.baseUrl);
+
+			return getItem$
+				.pipe(
+					catchError((err: AjaxError) => {
+						this.emitEntityHttpErrorEvent(err);
+						throw err;
+					}),
+					mergeMap(data =>
+						this.createItem(data, options, { where: Object.assign({ itemId: itemId }, params) }))
+				);
 		}
 	}
 
@@ -282,34 +312,36 @@ export class ReadonlyRepository<T extends ModelBase>{
 		let model$:Observable<T>;
 
 		if (subModels.length) {
-			model$ = Observable.combineLatest.apply(Observable, subModels).map((propertyEntityValues: Array<ModelPropertyValue>) => {
-				propertyEntityValues.forEach((propertyEntityValue: { [index: string]: any }) => Object.assign(modelData, propertyEntityValue));
+			model$ = combineLatest(subModels).pipe(
+				map((propertyEntityValues: Array<ModelPropertyValue>) => {
+					propertyEntityValues.forEach((propertyEntityValue: { [index: string]: any }) => Object.assign(modelData, propertyEntityValue));
 
-				let model: T;
+					let model: T;
 
-				try {
-					model = new entity.entityConstructor(modelData, rawData);
-				} catch (e) {
-					getModelDataError.message = getModelDataError.message + " Error: " + e.message;
-					throw getModelDataError;
-				}
-
-				propertyEntityValues.forEach((modelPropertyValue: ModelPropertyValue) => {
-					for (let p in modelPropertyValue) {
-						let modelValue: ModelBase | Array<ModelBase> = modelPropertyValue[p];
-
-						if (modelValue instanceof Array)
-							modelValue.forEach((modelValueItem: ModelBase) => {
-								if (!Object.isFrozen(modelValueItem))
-									modelValueItem.$parent = model;
-							});
-						else if (!Object.isFrozen(modelValue))
-							modelValue.$parent = model;
+					try {
+						model = new entity.entityConstructor(modelData, rawData);
+					} catch (e) {
+						getModelDataError.message = getModelDataError.message + " Error: " + e.message;
+						throw getModelDataError;
 					}
-				});
 
-				return model;
-			});
+					propertyEntityValues.forEach((modelPropertyValue: ModelPropertyValue) => {
+						for (let p in modelPropertyValue) {
+							let modelValue: ModelBase | Array<ModelBase> = modelPropertyValue[p];
+
+							if (modelValue instanceof Array)
+								modelValue.forEach((modelValueItem: ModelBase) => {
+									if (!Object.isFrozen(modelValueItem))
+										modelValueItem.$parent = model;
+								});
+							else if (!Object.isFrozen(modelValue))
+								modelValue.$parent = model;
+						}
+					});
+
+					return model;
+				})
+			);
 		}
 		else {
 			let model: T;
@@ -321,10 +353,10 @@ export class ReadonlyRepository<T extends ModelBase>{
 				throw getModelDataError;
 			}
 
-			model$ = Observable.of(model);
+			model$ = of(model);
 		}
 
-		return entity.readonly ? model$.map(model => Object.freeze(model)) : model$;
+		return entity.readonly ? model$.pipe(map(model => Object.freeze(model))) : model$;
 	}
 
 	private static getSubModel(entityField:Field, value:any, paris:Paris, config:ParisConfig, options: DataOptions = defaultDataOptions):Observable<ModelPropertyValue>{
@@ -337,6 +369,8 @@ export class ReadonlyRepository<T extends ModelBase>{
 		if (!repository && !valueObjectType)
 			return null;
 
+		let tempGetPropertyEntityValue$:Observable<ModelBase | Array<ModelBase>>;
+
 		const getItem = repository
 			? ReadonlyRepository.getEntityItem.bind(null, repository)
 			: ReadonlyRepository.getValueObjectItem.bind(null, valueObjectType);
@@ -344,14 +378,16 @@ export class ReadonlyRepository<T extends ModelBase>{
 		if (entityField.isArray) {
 			if (value.length) {
 				let propertyMembers$: Array<Observable<ModelPropertyValue>> = value.map((memberData: any) => getItem(memberData, options, paris, config));
-				getPropertyEntityValue$ = Observable.combineLatest.apply(Observable, propertyMembers$).map(mapValueToEntityFieldIndex);
+				tempGetPropertyEntityValue$ = combineLatest(propertyMembers$);
 			}
 			else
-				getPropertyEntityValue$ = Observable.of([]).map(mapValueToEntityFieldIndex);
+				tempGetPropertyEntityValue$ = of([]);
 		}
-		else
-			getPropertyEntityValue$ = getItem(value, options, paris, config)
-				.map(mapValueToEntityFieldIndex);
+		else {
+			tempGetPropertyEntityValue$ = getItem(value, options, paris, config);
+		}
+
+		getPropertyEntityValue$ = tempGetPropertyEntityValue$.pipe(map(mapValueToEntityFieldIndex));
 
 		return getPropertyEntityValue$;
 	}
@@ -369,18 +405,19 @@ export class ReadonlyRepository<T extends ModelBase>{
 	private static getValueObjectItem<U extends ModelBase>(valueObjectType: EntityConfigBase, data: any, options: DataOptions = defaultDataOptions, paris: Paris, config?: ParisConfig): Observable<U> {
 		// If the value object is one of a list of values, just set it to the model
 		if (valueObjectType.values)
-			return Observable.of(valueObjectType.getValueById(data) || valueObjectType.getDefaultValue() || null);
+			return of(valueObjectType.getValueById(data) || valueObjectType.getDefaultValue() || null);
 
 		return ReadonlyRepository.getModelData(data, valueObjectType, config, paris, options);
 	}
 
 	/**
 	 * Validates that the specified item is valid, according to the requirements of the entity (or value object) it belongs to.
+	 * Meaning, that it can be used as data for creating an instance of T.
 	 * @param item
 	 * @param {EntityConfigBase} entity
 	 * @returns {boolean}
 	 */
-	static validateItem(item:any, entity:IEntityConfigBase):boolean{
+	static validateItem(item:{}, entity:IEntityConfigBase):boolean{
 		entity.fields.forEach((entityField:Field) => {
 			let itemFieldValue: any = (<any>item)[entityField.id];
 
@@ -396,7 +433,7 @@ export class ReadonlyRepository<T extends ModelBase>{
 	 * @param item
 	 * @returns {Index}
 	 */
-	static serializeItem(item:any, entity:IEntityConfigBase, paris:Paris):Index{
+	static serializeItem(item:{}, entity:IEntityConfigBase, paris:Paris):Index{
 		ReadonlyRepository.validateItem(item, entity);
 
 		let modelData: Index = {};

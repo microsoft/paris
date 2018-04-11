@@ -4,23 +4,24 @@ import {DataEntityConstructor} from "./data-entity.base";
 import {DataQuery} from "../dataset/data-query";
 import {HttpOptions, RequestMethod} from "../services/http.service";
 import {ModelBase} from "../models/model.base";
+import {ApiCallBackendConfigInterface} from "../models/api-call-backend-config.interface";
 
-export class ModelEntity extends EntityConfigBase implements EntityConfig{
+export class ModelEntity<T extends ModelBase = any> extends EntityConfigBase<T> implements EntityConfig{
 	endpoint:EntityConfigFunctionOrValue;
 	loadAll?:boolean = false;
-	cache?:ModelEntityCacheConfig;
+	cache?:boolean | ModelEntityCacheConfig<T>;
 	baseUrl?:EntityConfigFunctionOrValue;
 	allItemsProperty?:string;
 	allItemsEndpoint?:string;
 	allItemsEndpointTrailingSlash?:boolean;
 	parseDataQuery?:(dataQuery:DataQuery) => { [index:string]:any };
-	parseItemQuery?:(itemId:string|number, entity?:IEntityConfigBase, config?:ParisConfig, params?:{ [index:string]:any }) => string;
-	parseSaveQuery?:(item:any, entity?:IEntityConfigBase, config?:ParisConfig) => string;
-	parseRemoveQuery?:(items:Array<ModelBase>, entity?:IEntityConfigBase, config?:ParisConfig) => string;
-	serializeItem?:(item:any, serializedItem?:any, entity?:IEntityConfigBase, config?:ParisConfig) => any;
-	getRemoveData?:(items:Array<ModelBase>) => any;
+	parseItemQuery?:(itemId:string|number, entity?:IEntityConfigBase<T>, config?:ParisConfig, params?:{ [index:string]:any }) => string;
+	parseSaveQuery?:(item:T, entity?:IEntityConfigBase, config?:ParisConfig) => string;
+	parseRemoveQuery?:(items:Array<T>, entity?:IEntityConfigBase, config?:ParisConfig) => string;
+	serializeItem?:(item:T, serializedItem?:any, entity?:IEntityConfigBase, config?:ParisConfig) => any;
+	getRemoveData?:(items:Array<T>) => any;
 
-	constructor(config:EntityConfig, entityConstructor:DataEntityConstructor<any>){
+	constructor(config:EntityConfig, entityConstructor:DataEntityConstructor<T>){
 		super(config, entityConstructor);
 
 		this.loadAll = config.loadAll === true;
@@ -32,27 +33,22 @@ export class ModelEntity extends EntityConfigBase implements EntityConfig{
 export interface EntityConfig extends IEntityConfigBase, EntityBackendConfig{
 }
 
-export interface EntityBackendConfig{
+export interface EntityBackendConfig extends ApiCallBackendConfigInterface{
 	loadAll?:boolean,
-	endpoint?:((config?:ParisConfig, query?:DataQuery) => string) | string,
-	cache?:ModelEntityCacheConfig,
-	baseUrl?:EntityConfigFunctionOrValue,
 	allItemsProperty?:string,
 	allItemsEndpoint?:string,
 	allItemsEndpointTrailingSlash?:boolean,
-	fixedData?: { [index:string]:any },
 	getRemoveData?:(items:Array<ModelBase>) => any,
 	parseDataQuery?:(dataQuery:DataQuery) => { [index:string]:any },
 	parseItemQuery?:(itemId:string|number, entity?:IEntityConfigBase, config?:ParisConfig, params?:{ [index:string]:any }) => string,
 	parseSaveQuery?:(item:any, entity?:IEntityConfigBase, config?:ParisConfig, options?: HttpOptions) => string,
 	parseRemoveQuery?:(items:Array<ModelBase>, entity?:IEntityConfigBase, config?:ParisConfig) => string,
 	serializeItem?:(item:any, serializedItem?:any, entity?:IEntityConfigBase, config?:ParisConfig) => any,
-	separateArrayParams?:boolean,
 	saveMethod?:((item:any, config?:ParisConfig) => RequestMethod) | RequestMethod
 }
 
-export interface ModelEntityCacheConfig{
-	time?: number,
+export interface ModelEntityCacheConfig<T extends ModelBase = any>{
+	time?: ((item:T) => number) | number,
 	max?: number
 }
 

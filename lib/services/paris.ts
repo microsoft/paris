@@ -19,10 +19,18 @@ import {DataQuery} from "../dataset/data-query";
 import {DataOptions, defaultDataOptions} from "../dataset/data.options";
 import {ReadonlyRepository} from "../repository/readonly-repository";
 import {DatasetService} from "./dataset.service";
-import {HttpOptions} from "./http.service";
-import {ErrorsService} from "./errors.service";
-import {AjaxError} from "rxjs/Rx";
-import {EntityErrorEvent, EntityErrorTypes} from "../events/entity-error.event" ;
+import {HttpOptions, RequestMethod, UrlParams} from "./http.service";
+import {EntityErrorEvent, EntityErrorTypes} from "../events/entity-error.event";
+import {ApiCallType} from "../models/api-call.model";
+import {ApiCallBackendConfigInterface} from "../models/api-call-backend-config.interface";
+import {modelArray, rawDataToDataSet} from "../repository/data-to-model";
+import {_throw} from "rxjs/observable/throw";
+import {catchError} from "rxjs/operators/catchError";
+import {map, mergeMap, switchMap, tap} from "rxjs/operators";
+import {DataTransformersService} from "./data-transformers.service";
+import {DataCache, DataCacheSettings} from "./cache";
+import {of} from "rxjs/observable/of";
+import * as _ from "lodash";
 
 export class Paris{
 	private repositories:Map<DataEntityType, IRepository> = new Map;
@@ -38,6 +46,8 @@ export class Paris{
 
 	error$:Observable<EntityErrorEvent>;
 	private _errorSubject$:Subject<EntityErrorEvent> = new Subject;
+
+	private apiCallsCache:Map<ApiCallType, DataCache> = new Map<ApiCallType, DataCache>();
 
 	constructor(config?:ParisConfig){
 		this.config = Object.freeze(Object.assign({}, defaultConfig, config));
@@ -98,78 +108,129 @@ export class Paris{
 			throw new Error(`Can't query, no repository exists for ${entityConstructor}.`);
 	}
 
-	callQuery<T extends ModelBase>(entityConstructor:DataEntityConstructor<T>, backendConfig:EntityBackendConfig, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions):Observable<DataSet<T>>{
-		let queryError:Error = new Error(`Failed to get ${entityConstructor.pluralName}.`);
-		let httpOptions:HttpOptions = backendConfig.parseDataQuery ? { params: backendConfig.parseDataQuery(query) } : DatasetService.queryToHttpOptions(query);
+	apiCall<TResult = any, TInput = any>(apiCallType:ApiCallType<TResult, TInput>, input?:TInput, dataOptions:DataOptions = defaultDataOptions, allowCache:boolean = true):Observable<TResult>{
+		const cacheKey:string = JSON.stringify(input) || "{}";
+
+		if (allowCache) {
+			const apiCallTypeCache: DataCache<TResult> = this.getApiCallCache<TResult, TInput>(apiCallType);
+			if (apiCallTypeCache) {
+				return apiCallTypeCache.get(cacheKey).pipe(
+					switchMap((value:TResult) => value !== undefined && value !== null
+						? of(value)
+						: this.apiCall(apiCallType, input, dataOptions, false)
+					)
+				);
+			}
+		}
+
+		const httpOptions:HttpOptions = input
+			? apiCallType.config.parseQuery
+				? apiCallType.config.parseQuery(input)
+				: apiCallType.config.method !== "GET" ? { data: input } : { params: input }
+			: null;
+
+		let apiCall$:Observable<any> = this.makeApiCall(apiCallType.config, apiCallType.config.method || "GET", httpOptions);
+
+		let typeRepository:ReadonlyRepository<TResult> = apiCallType.config.type
+			? this.getRepository(apiCallType.config.type)
+			: null;
+
+		if (typeRepository) {
+			apiCall$ = apiCall$.pipe(
+				mergeMap<any, TResult | Array<TResult>>((data:any) => data instanceof Array
+					? modelArray<TResult>(data, apiCallType.config.type, this, dataOptions)
+					: this.createItem<TResult>(apiCallType.config.type, data, dataOptions)
+				)
+			);
+		}
+		else if (apiCallType.config.type){
+			apiCall$ = apiCall$.pipe(
+				map((data:any) => DataTransformersService.parse(apiCallType.config.type, data))
+			);
+		}
+
+		if (apiCallType.config.parse) {
+			apiCall$ = apiCall$.pipe(
+				map((data: any) => apiCallType.config.parse(data, input))
+			);
+		}
+
+		if (apiCallType.config.cache){
+			apiCall$ = apiCall$.pipe(
+				tap((data:any) => {
+					this.getApiCallCache(apiCallType, true).add(cacheKey, data);
+				})
+			);
+		}
+
+		return apiCall$;
+	}
+
+	private getApiCallCache<TResult, TInput>(apiCallType:ApiCallType<TResult, TInput>, addIfNotExists:boolean = false):DataCache<TResult>{
+		let apiCallCache:DataCache<TResult> = this.apiCallsCache.get(apiCallType);
+		if (!apiCallCache && addIfNotExists){
+			let cacheSettings:DataCacheSettings = apiCallType.config.cache instanceof Object ? <DataCacheSettings>apiCallType.config.cache : null;
+			this.apiCallsCache.set(apiCallType, apiCallCache = new DataCache<TResult>(cacheSettings));
+		}
+
+		return apiCallCache;
+	}
+
+	private makeApiCall<TResult, TParams = UrlParams, TData = any>(backendConfig:ApiCallBackendConfigInterface, method:RequestMethod, httpOptions:Readonly<HttpOptions<TData, TParams>>):Observable<TResult>{
+		let endpoint:string;
+		if (backendConfig.endpoint instanceof Function)
+			endpoint = backendConfig.endpoint(this.config, { where: httpOptions && httpOptions.params });
+		else if (backendConfig.endpoint)
+			endpoint = backendConfig.endpoint;
+		else
+			throw new Error(`Can't call API, no endpoint specified.`);
+
+		const baseUrl:string = backendConfig.baseUrl instanceof Function ? backendConfig.baseUrl(this.config) : backendConfig.baseUrl;
+		let apiCallHttpOptions:HttpOptions<TData> = _.clone(httpOptions) || {};
 
 		if (backendConfig.separateArrayParams) {
-			(httpOptions || (httpOptions = {})).separateArrayParams = true;
+			apiCallHttpOptions.separateArrayParams = true;
 		}
 
 		if (backendConfig.fixedData){
-			if (!httpOptions)
-				httpOptions = {};
+			if (!apiCallHttpOptions.params)
+				apiCallHttpOptions.params = <TParams>{};
 
-			if (!httpOptions.params)
-				httpOptions.params = {};
-
-			Object.assign(httpOptions.params, backendConfig.fixedData);
+			Object.assign(apiCallHttpOptions.params, backendConfig.fixedData);
 		}
 
-		let endpoint:string;
-		if (backendConfig.endpoint instanceof Function)
-			endpoint = backendConfig.endpoint(this.config, query);
-		else
-			endpoint = `${backendConfig.endpoint}${backendConfig.allItemsEndpointTrailingSlash !== false && !backendConfig.allItemsEndpoint ? '/' : ''}${backendConfig.allItemsEndpoint || ''}`;
+		return this.dataStore.request<TResult>(method || "GET", endpoint, apiCallHttpOptions, baseUrl);
+	}
 
-		let baseUrl:string = backendConfig.baseUrl instanceof Function ? backendConfig.baseUrl(this.config) : backendConfig.baseUrl;
+	callQuery<T extends ModelBase>(entityConstructor:DataEntityConstructor<T>, backendConfig:EntityBackendConfig, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions):Observable<DataSet<T>>{
+		const httpOptions:HttpOptions = backendConfig.parseDataQuery ? { params: backendConfig.parseDataQuery(query) } : DatasetService.queryToHttpOptions(query);
+		const queryError:Error = new Error(`Failed to get ${entityConstructor.pluralName}.`);
 
-		return this.dataStore.get(endpoint, httpOptions, baseUrl)
-			.catch((err: AjaxError) => {
+		const endpoint:string = backendConfig.endpoint instanceof Function ? backendConfig.endpoint(this.config, query) : backendConfig.endpoint;
+
+		const apiCallConfig:ApiCallBackendConfigInterface = Object.assign({}, backendConfig, {
+			endpoint: `${endpoint}${backendConfig.allItemsEndpointTrailingSlash !== false && !backendConfig.allItemsEndpoint ? '/' : ''}${backendConfig.allItemsEndpoint || ''}`
+		});
+
+		return this.makeApiCall<T>(apiCallConfig, "GET", httpOptions).pipe(
+			catchError((error:Error) => {
+				queryError.message = queryError.message + " Error: " + error.message;
 				this._errorSubject$.next({
 					entity: entityConstructor,
-					type: EntityErrorTypes.HttpError,
-					originalError: err
+					originalError: queryError.message,
+					type: EntityErrorTypes.DataParseError
 				});
-				throw err
-			})
-			.map((rawDataSet: any) => {
-				const allItemsProperty = backendConfig.allItemsProperty || "items";
-
-				let rawItems: Array<any> = rawDataSet instanceof Array ? rawDataSet : rawDataSet[allItemsProperty];
-
-				if (!rawItems)
-					ErrorsService.warn(`Property '${backendConfig.allItemsProperty}' wasn't found in DataSet for Entity '${entityConstructor.pluralName}'.`);
-				return {
-					count: rawDataSet.count,
-					items: rawItems,
-					next: rawDataSet.next,
-					previous: rawDataSet.previous
-				}
-			})
-			.flatMap((dataSet: DataSet<any>) => {
-				if (!dataSet.items.length)
-					return Observable.of({ count: 0, items: [] });
-
-				let itemCreators: Array<Observable<T>> = dataSet.items.map((itemData: any) => this.createItem(entityConstructor, itemData, dataOptions, query));
-
-				return Observable.combineLatest.apply(this, itemCreators).map((items: Array<T>) => {
-					return Object.freeze({
-						count: dataSet.count,
-						items: items,
-						next: dataSet.next,
-						previous: dataSet.previous
-					});
-				}).catch((error:Error) => {
-					queryError.message = queryError.message + " Error: " + error.message;
-					this._errorSubject$.next({
-						entity: entityConstructor,
-						originalError: queryError.message,
-						type: EntityErrorTypes.DataParseError
-					});
-					throw queryError;
-				});
-			});
+				return _throw(queryError);
+			}),
+			mergeMap((rawDataSet:T) => rawDataToDataSet<T>(
+				rawDataSet,
+				entityConstructor,
+				backendConfig.allItemsProperty,
+				this,
+				dataOptions,
+				query
+			))
+		);
 	}
 
 	createItem<T extends ModelBase>(entityConstructor:DataEntityConstructor<T>, data:any, dataOptions: DataOptions = defaultDataOptions, query?:DataQuery):Observable<T>{

@@ -1,7 +1,11 @@
 import {Observable} from "rxjs/Observable";
+import {from} from "rxjs/observable/from";
+import {tap} from "rxjs/operators/tap";
+import {of} from "rxjs/observable/of";
+import {finalize} from "rxjs/operators";
 
-export class DataCache<T>{
-	time:number;
+export class DataCache<T = any>{
+	time:((item:T) => number) | number;
 	obj:number;
 	getter:(_:any, params?:{ [index:string]: any }) => Promise<T> | Observable<T>;
 
@@ -11,11 +15,13 @@ export class DataCache<T>{
 	private _getObservable:{ [index:string]:Observable<T> };
 
 	constructor(settings?:DataCacheSettings<T>){
-		DataCache.validateSettings<T>(settings);
+		if (settings) {
+			DataCache.validateSettings<T>(settings);
 
-		this.time = settings.time || null; // milliseconds
-		this.obj = settings.max;
-		this.getter = settings.getter;
+			this.time = settings.time || null; // milliseconds
+			this.obj = settings.max;
+			this.getter = settings.getter;
+		}
 
 		this._keys = [];
 		this._values = new Map<string, T>();
@@ -37,23 +43,29 @@ export class DataCache<T>{
 
 		key = key.toString();
 
+		const cacheKey:string = key + (params !== undefined && params !== null ? "_" + JSON.stringify(params) : "");
+
 		if (this.getter){
-			let getObservable = this._getObservable[key];
+			let getObservable = this._getObservable[cacheKey];
 			if (getObservable)
 				return getObservable;
 
-			let cachedItem = this._values.get(key);
-			if (cachedItem)
-				return Observable.of(cachedItem);
+			let cachedItem:T = this._values.get(cacheKey);
+			if (cachedItem !== undefined)
+				return of(cachedItem);
 
-			return this._getObservable[key] = Observable.from(this.getter(key, params))
-				.do((value:T) => {
-					this.add(key, value);
-					delete this._getObservable[key];
-				});
+			return this._getObservable[cacheKey] = from(this.getter(key, params))
+				.pipe(
+					tap((value:T) => {
+						this.add(cacheKey, value);
+					}),
+					finalize(() => {
+						delete this._getObservable[cacheKey];
+					})
+				);
 		}
 		else
-			return Observable.of(this._values.get(key));
+			return of(this._values.get(key));
 	}
 
 	/**
@@ -80,10 +92,14 @@ export class DataCache<T>{
 		}
 
 		if (this.time){
-			this._timeouts[key] = setTimeout(() => {
-				this.remove(key);
-				delete this._timeouts[key];
-			}, this.time);
+			let time:number = this.time instanceof Function ? this.time(value) : this.time;
+
+			if (!isNaN(time) && time > 0) {
+				this._timeouts[key] = setTimeout(() => {
+					this.remove(key);
+					delete this._timeouts[key];
+				}, time);
+			}
 		}
 
 		return this;
@@ -130,8 +146,8 @@ export class DataCache<T>{
 	};
 }
 
-export interface DataCacheSettings<T>{
+export interface DataCacheSettings<T = any>{
 	max?:number,
-	time?:number,
+	time?:((item:T) => number) | number,
 	getter?:(_:any) => Observable<T>
 }
