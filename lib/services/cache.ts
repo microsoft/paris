@@ -2,7 +2,7 @@ import {Observable} from "rxjs/Observable";
 import {from} from "rxjs/observable/from";
 import {tap} from "rxjs/operators/tap";
 import {of} from "rxjs/observable/of";
-import {finalize, map, share} from "rxjs/operators";
+import {finalize, share} from "rxjs/operators";
 
 export class DataCache<T = any>{
 	time:((item:T) => number) | number;
