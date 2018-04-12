@@ -176,7 +176,7 @@ export class Paris{
 		return apiCallCache;
 	}
 
-	private makeApiCall<TResult, TParams = UrlParams, TData = any>(backendConfig:ApiCallBackendConfigInterface, method:RequestMethod, httpOptions:Readonly<HttpOptions<TData, TParams>>):Observable<TResult>{
+	private makeApiCall<TResult, TParams = UrlParams, TData = any, TRawDataResult = TResult>(backendConfig:ApiCallBackendConfigInterface<TResult, TRawDataResult>, method:RequestMethod, httpOptions:Readonly<HttpOptions<TData, TParams>>):Observable<TResult>{
 		let endpoint:string;
 		if (backendConfig.endpoint instanceof Function)
 			endpoint = backendConfig.endpoint(this.config, { where: httpOptions && httpOptions.params });
@@ -197,6 +197,12 @@ export class Paris{
 				apiCallHttpOptions.params = <TParams>{};
 
 			Object.assign(apiCallHttpOptions.params, backendConfig.fixedData);
+		}
+
+		if (backendConfig.parseData) {
+			return this.dataStore.request<TRawDataResult>(method || "GET", endpoint, apiCallHttpOptions, baseUrl).pipe(
+				map((rawData: TRawDataResult) => backendConfig.parseData(rawData, this.config))
+			);
 		}
 
 		return this.dataStore.request<TResult>(method || "GET", endpoint, apiCallHttpOptions, baseUrl);
@@ -225,7 +231,7 @@ export class Paris{
 			mergeMap((rawDataSet:T) => rawDataToDataSet<T>(
 				rawDataSet,
 				entityConstructor,
-				backendConfig.allItemsProperty,
+				backendConfig.allItemsProperty || this.config.allItemsProperty,
 				this,
 				dataOptions,
 				query

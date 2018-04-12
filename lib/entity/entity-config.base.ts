@@ -7,7 +7,7 @@ import {ModelBase} from "../models/model.base";
 
 const DEFAULT_VALUE_ID = "__default";
 
-export class EntityConfigBase<T extends ModelBase = any> implements IEntityConfigBase{
+export class EntityConfigBase<T extends ModelBase = any> implements IEntityConfigBase<T>{
 	singularName:string;
 	pluralName:string;
 	fields?:EntityFields;

@@ -3,10 +3,11 @@ import {ParisConfig} from "../config/paris-config";
 import {DataQuery} from "../dataset/data-query";
 import {DataCacheSettings} from "../services/cache";
 
-export interface ApiCallBackendConfigInterface<T = any>{
+export interface ApiCallBackendConfigInterface<T = any, TRawData = any>{
 	endpoint?:((config?:ParisConfig, query?:DataQuery) => string) | string,
 	cache?:boolean | DataCacheSettings<T>,
 	baseUrl?:EntityConfigFunctionOrValue,
 	fixedData?: { [index:string]:any },
-	separateArrayParams?:boolean
+	separateArrayParams?:boolean,
+	parseData?:(data:TRawData, config?:ParisConfig, query?:DataQuery) => T
 }
