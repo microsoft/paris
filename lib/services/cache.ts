@@ -43,7 +43,7 @@ export class DataCache<T = any>{
 
 		key = key.toString();
 
-		const cacheKey:string = key + (params !== undefined && params !== null ? "_" + JSON.stringify(params) : "");
+		const cacheKey:string = this.getCacheKey(key, params);
 
 		if (this.getter){
 			let getObservable = this._getObservable[cacheKey];
@@ -109,9 +109,9 @@ export class DataCache<T = any>{
 	/**
 	 * Removes an item from the cache collection.
 	 * @param key
-	 * @returns {*}
+	 * @returns {T} The removed value, or null if none was removed
 	 */
-	remove(key:any){
+	remove(key:any):T{
 		key = key.toString();
 
 		let valueTimeout = this._timeouts[key];
@@ -126,12 +126,23 @@ export class DataCache<T = any>{
 		let keyIndex = this._keys.indexOf(key);
 		if (~keyIndex){
 			this._keys.splice(keyIndex, 1);
-			let value = this._values.get(key);
+			let value:T = this._values.get(key);
 			this._values.delete(key);
 			return value;
 		}
 
 		return null;
+	}
+
+	private getCacheKey(key:string, params?:{ [index:string]: any }):string{
+		return key + (params !== undefined && params !== null ? "_" + JSON.stringify(params) : "");
+	}
+
+	/**
+	 * Removes all cached items
+	 */
+	clear(){
+		this._keys.forEach((key:string) => this.remove(key));
 	}
 
 	clearGetters(){

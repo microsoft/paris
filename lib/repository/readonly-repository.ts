@@ -159,6 +159,10 @@ export class ReadonlyRepository<T extends ModelBase>{
 			);
 	}
 
+	clearCache():void {
+		this.cache.clear();
+	}
+
 	getItemById(itemId: string | number, options: DataOptions = defaultDataOptions, params?:{ [index:string]:any }): Observable<T> {
 		if (!this.entityConstructor.entityConfig.supportsGetMethod(EntityGetMethod.getItem))
 			throw new Error(`Can't get ${this.entityConstructor.singularName}, getItem isn't supported.`);
