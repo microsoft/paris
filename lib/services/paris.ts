@@ -129,7 +129,11 @@ export class Paris{
 				: apiCallType.config.method !== "GET" ? { data: input } : { params: input }
 			: null;
 
-		let apiCall$:Observable<any> = this.makeApiCall(apiCallType.config, apiCallType.config.method || "GET", httpOptions);
+		let apiCall$: Observable<any> = this.makeApiCall(apiCallType.config, apiCallType.config.method || "GET", httpOptions)
+			.pipe(tap(null,
+				(err: EntityErrorEvent) => {
+					this._errorSubject$.next(err);
+				}));
 
 		let typeRepository:ReadonlyRepository<TResult> = apiCallType.config.type
 			? this.getRepository(apiCallType.config.type)
@@ -137,21 +141,57 @@ export class Paris{
 
 		if (typeRepository) {
 			apiCall$ = apiCall$.pipe(
-				mergeMap<any, TResult | Array<TResult>>((data:any) => data instanceof Array
-					? modelArray<TResult>(data, apiCallType.config.type, this, dataOptions)
-					: this.createItem<TResult>(apiCallType.config.type, data, dataOptions)
+				mergeMap<any, TResult | Array<TResult>>((data: any) => {
+						const createItem$: Observable<TResult | Array<TResult>> = data instanceof Array
+							? modelArray<TResult>(data, apiCallType.config.type, this, dataOptions)
+							: this.createItem<TResult>(apiCallType.config.type, data, dataOptions);
+						return createItem$.pipe(
+							tap(null,
+								(err) => {
+									this._errorSubject$.next({
+										originalError: err,
+										type: EntityErrorTypes.DataParseError,
+										entity: typeRepository.entityConstructor
+									})
+								})
+						)
+					}
 				)
 			);
 		}
 		else if (apiCallType.config.type){
 			apiCall$ = apiCall$.pipe(
-				map((data:any) => DataTransformersService.parse(apiCallType.config.type, data))
+				map((data:any) => {
+					try {
+						return DataTransformersService.parse(apiCallType.config.type, data)
+					}
+					catch (err) {
+						this._errorSubject$.next({
+							originalError: err.originalError || err,
+							type: EntityErrorTypes.DataParseError,
+							entity: typeRepository && typeRepository.entityConstructor
+						});
+						throw err;
+					}
+				})
 			);
 		}
 
 		if (apiCallType.config.parse) {
 			apiCall$ = apiCall$.pipe(
-				map((data: any) => apiCallType.config.parse(data, input))
+				map((data: any) => {
+					try {
+						return apiCallType.config.parse(data, input)
+					}
+					catch (err) {
+						this._errorSubject$.next({
+							originalError: err.originalError || err,
+							type: EntityErrorTypes.DataParseError,
+							entity: typeRepository && typeRepository.entityConstructor
+						});
+						throw err;
+					}
+				})
 			);
 		}
 
@@ -201,16 +241,41 @@ export class Paris{
 
 		if (backendConfig.parseData) {
 			return this.dataStore.request<TRawDataResult>(method || "GET", endpoint, apiCallHttpOptions, baseUrl).pipe(
-				map((rawData: TRawDataResult) => backendConfig.parseData(rawData, this.config))
+				catchError(err => {
+					return _throw({
+						originalError: err,
+						type: EntityErrorTypes.HttpError,
+						entity: null
+					})
+				}),
+				map((rawData: TRawDataResult) => {
+					try {
+						return backendConfig.parseData(rawData, this.config)
+					}
+					catch (err) {
+						throw {
+							originalError: err,
+							type: EntityErrorTypes.DataParseError,
+							entity: null
+						}
+					}
+				}),
 			);
 		}
 
-		return this.dataStore.request<TResult>(method || "GET", endpoint, apiCallHttpOptions, baseUrl);
+		return this.dataStore.request<TResult>(method || "GET", endpoint, apiCallHttpOptions, baseUrl).pipe(
+			catchError(err => {
+				return _throw({
+					originalError: err,
+					type: EntityErrorTypes.HttpError,
+					entity: null
+				})
+			}),
+		)
 	}
 
 	callQuery<T extends ModelBase>(entityConstructor:DataEntityConstructor<T>, backendConfig:EntityBackendConfig, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions):Observable<DataSet<T>>{
 		const httpOptions:HttpOptions = backendConfig.parseDataQuery ? { params: backendConfig.parseDataQuery(query) } : DatasetService.queryToHttpOptions(query);
-		const queryError:Error = new Error(`Failed to get ${entityConstructor.pluralName}.`);
 
 		const endpoint:string = backendConfig.endpoint instanceof Function ? backendConfig.endpoint(this.config, query) : backendConfig.endpoint;
 
@@ -219,23 +284,30 @@ export class Paris{
 		});
 
 		return this.makeApiCall<T>(apiCallConfig, "GET", httpOptions).pipe(
-			catchError((error:Error) => {
-				queryError.message = queryError.message + " Error: " + error.message;
-				this._errorSubject$.next({
-					entity: entityConstructor,
-					originalError: queryError.message,
-					type: EntityErrorTypes.DataParseError
-				});
-				return _throw(queryError);
+			tap(null,
+				(error: EntityErrorEvent) => {
+					this._errorSubject$.next(Object.assign({}, error, {entity: entityConstructor}));
+				}),
+			mergeMap((rawDataSet: T) => {
+				return rawDataToDataSet<T>(
+					rawDataSet,
+					entityConstructor,
+					backendConfig.allItemsProperty || this.config.allItemsProperty,
+					this,
+					dataOptions,
+					query
+				).pipe(
+					tap(null,
+						(error) => {
+							this._errorSubject$.next({
+								originalError: error,
+								type: EntityErrorTypes.DataParseError,
+								entity: entityConstructor
+							});
+						}
+					)
+				)
 			}),
-			mergeMap((rawDataSet:T) => rawDataToDataSet<T>(
-				rawDataSet,
-				entityConstructor,
-				backendConfig.allItemsProperty || this.config.allItemsProperty,
-				this,
-				dataOptions,
-				query
-			))
 		);
 	}
 
