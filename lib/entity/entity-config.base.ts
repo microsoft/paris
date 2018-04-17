@@ -13,7 +13,7 @@ export class EntityConfigBase<T extends ModelBase = any> implements IEntityConfi
 	fields?:EntityFields;
 	idProperty?:string;
 	readonly:boolean = false;
-	serializeItem?:(item:T, serializedItem?:any, entity?:IEntityConfigBase, config?:ParisConfig) => any;
+	serializeItem?:(item:T, serializedItem?:any, entity?:IEntityConfigBase, config?:ParisConfig, serializationData?:any) => any;
 
 	get fieldsArray():Array<Field>{
 		return this.fields ? Array.from(this.fields.values()) : [];
@@ -82,7 +82,7 @@ export interface IEntityConfigBase<T extends ModelBase = any>{
 	getDefaultValue?: () => T,
 	getValueById?: (valueId:string|number) => T,
 	entityConstructor?:DataEntityConstructor<T>,
-	serializeItem?:(item:T, serializedItem?:any, entity?:IEntityConfigBase<T>, config?:ParisConfig) => any,
+	serializeItem?:(item:T, serializedItem?:any, entity?:IEntityConfigBase<T>, config?:ParisConfig, serializationData?:any) => any,
 	supportedEntityGetMethods?:Array<EntityGetMethod>
 }
 

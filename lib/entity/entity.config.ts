@@ -18,7 +18,7 @@ export class ModelEntity<T extends ModelBase = any> extends EntityConfigBase<T> 
 	parseItemQuery?:(itemId:string|number, entity?:IEntityConfigBase<T>, config?:ParisConfig, params?:{ [index:string]:any }) => string;
 	parseSaveQuery?:(item:T, entity?:IEntityConfigBase, config?:ParisConfig) => string;
 	parseRemoveQuery?:(items:Array<T>, entity?:IEntityConfigBase, config?:ParisConfig) => string;
-	serializeItem?:(item:T, serializedItem?:any, entity?:IEntityConfigBase, config?:ParisConfig) => any;
+	serializeItem?:(item:T, serializedItem?:any, entity?:IEntityConfigBase, config?:ParisConfig, serializationData?:any) => any;
 	getRemoveData?:(items:Array<T>) => any;
 
 	constructor(config:EntityConfig, entityConstructor:DataEntityConstructor<T>){
@@ -43,7 +43,7 @@ export interface EntityBackendConfig extends ApiCallBackendConfigInterface{
 	parseItemQuery?:(itemId:string|number, entity?:IEntityConfigBase, config?:ParisConfig, params?:{ [index:string]:any }) => string,
 	parseSaveQuery?:(item:any, entity?:IEntityConfigBase, config?:ParisConfig, options?: HttpOptions) => string,
 	parseRemoveQuery?:(items:Array<ModelBase>, entity?:IEntityConfigBase, config?:ParisConfig) => string,
-	serializeItem?:(item:any, serializedItem?:any, entity?:IEntityConfigBase, config?:ParisConfig) => any,
+	serializeItem?:(item:any, serializedItem?:any, entity?:IEntityConfigBase, config?:ParisConfig, serializationData?:any) => any,
 	saveMethod?:((item:any, config?:ParisConfig) => RequestMethod) | RequestMethod
 }
 

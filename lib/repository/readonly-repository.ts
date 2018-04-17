@@ -219,10 +219,10 @@ export class ReadonlyRepository<T extends ModelBase>{
 	 * @param {T} item
 	 * @returns {Index}
 	 */
-	serializeItem(item:T): Index {
+	serializeItem(item:T, serializationData?:any): Index {
 		ReadonlyRepository.validateItem(item, this.entity);
 
-		return ReadonlyRepository.serializeItem(item, this.entity, this.paris);
+		return ReadonlyRepository.serializeItem(item, this.entity, this.paris, serializationData);
 	}
 
 	/**
@@ -437,7 +437,7 @@ export class ReadonlyRepository<T extends ModelBase>{
 	 * @param item
 	 * @returns {Index}
 	 */
-	static serializeItem(item:{}, entity:IEntityConfigBase, paris:Paris):Index{
+	static serializeItem(item:{}, entity:IEntityConfigBase, paris:Paris, serializationData?:any):Index{
 		ReadonlyRepository.validateItem(item, entity);
 
 		let modelData: Index = {};
@@ -451,18 +451,18 @@ export class ReadonlyRepository<T extends ModelBase>{
 			let modelValue:any;
 
 			if (entityField.serialize)
-				modelValue = entityField.serialize(itemFieldValue);
+				modelValue = entityField.serialize(itemFieldValue, serializationData);
 			else if (entityField.isArray) {
 				if (itemFieldValue) {
 					if (fieldRepository || fieldValueObjectType)
-						modelValue = itemFieldValue.map((element:any) => ReadonlyRepository.serializeItem(element, fieldRepository ? fieldRepository.entity : fieldValueObjectType, paris));
+						modelValue = itemFieldValue.map((element:any) => ReadonlyRepository.serializeItem(element, fieldRepository ? fieldRepository.entity : fieldValueObjectType, paris, serializationData));
 					else modelValue = itemFieldValue.map((item:any) => DataTransformersService.serialize(entityField.arrayOf, item));
 				} else modelValue = null;
 			}
 			else if (fieldRepository)
 				modelValue = isNilValue ? fieldRepository.entity.getDefaultValue() || null : itemFieldValue.id;
 			else if (fieldValueObjectType)
-				modelValue = isNilValue ? fieldValueObjectType.getDefaultValue() || null : ReadonlyRepository.serializeItem(itemFieldValue, fieldValueObjectType, paris);
+				modelValue = isNilValue ? fieldValueObjectType.getDefaultValue() || null : ReadonlyRepository.serializeItem(itemFieldValue, fieldValueObjectType, paris, serializationData);
 			else
 				modelValue = DataTransformersService.serialize(entityField.type, itemFieldValue);
 
@@ -474,7 +474,7 @@ export class ReadonlyRepository<T extends ModelBase>{
 		});
 
 		if (entity.serializeItem)
-			modelData = entity.serializeItem(item, modelData, entity, paris.config);
+			modelData = entity.serializeItem(item, modelData, entity, paris.config, serializationData);
 
 		return modelData;
 	}

@@ -54,15 +54,16 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 	/**
 	 * Saves an entity to the server
 	 * @param {T} item
+	 * @param {any} serializationData Any data to pass to serialize or serializeItem
 	 * @returns {Observable<T extends EntityModelBase>}
 	 */
-	save(item: T, options?:HttpOptions): Observable<T> {
+	save(item: T, options?:HttpOptions, serializationData?:any): Observable<T> {
 		if (!this.entityBackendConfig.endpoint)
 			throw new Error(`Entity ${this.entityConstructor.entityConfig.singularName || this.entityConstructor.name} can't be saved - it doesn't specify an endpoint.`);
 
 		try {
 			let isNewItem:boolean = item.id === undefined;
-			let saveData: Index = this.serializeItem(item);
+			let saveData: Index = this.serializeItem(item, serializationData);
 			let endpoint:string = this.entityBackendConfig.parseSaveQuery ? this.entityBackendConfig.parseSaveQuery(item, this.entity, this.config, options) : `${this.endpointName}/${item.id || ''}`;
 
 			return this.dataStore.save(endpoint, this.getSaveMethod(item), Object.assign({}, options, {data: saveData}), this.baseUrl)

@@ -13,7 +13,7 @@ export interface IReadonlyRepository{
 	createNewItem:() => ModelBase,
 	getItemById:(id:any, options?:DataOptions, params?:{ [index:string]:any }) => Observable<any>,
 	query:(options?:DataQuery) => Observable<DataSet<any>>,
-	serializeItem:(item:ModelBase) => Object,
+	serializeItem:(item:ModelBase, serializationData?:any) => Object,
 	allItems$:Observable<Array<any>>,
 	endpointName:string,
 	endpointUrl:string,
