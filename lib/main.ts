@@ -1,3 +1,4 @@
+export  {DataCache} from "./services/cache";
 export {EntityRelationshipRepositoryType} from "./entity/entity-relationship-repository-type";
 export {EntityRelationship} from "./entity/entity-relationship.decorator";
 export {RelationshipType} from "./models/relationship-type.enum";
