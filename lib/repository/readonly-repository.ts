@@ -203,7 +203,7 @@ export class ReadonlyRepository<T extends ModelBase>{
 			);
 
 			if (options.allowCache !== false && this.entityBackendConfig.cache)
-				return this.cache.get(endpoint, params && {params: params}, () => getItem$);
+				return this.cache.get(endpoint, params, () => getItem$);
 			else
 				return getItem$;
 		}
