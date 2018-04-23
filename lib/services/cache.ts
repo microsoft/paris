@@ -37,7 +37,7 @@ export class DataCache<T = any>{
 	 * @param key
 	 * @returns {Observable<T>}
 	 */
-	get(key:any, params?:{ [index:string]: any }):Observable<T>{
+	get(key:any, params?:{ [index:string]: any }, getter?:() => Promise<T> | Observable<T>):Observable<T>{
 		if (!key && key !== 0)
 			throw new Error("Can't get DataCache item, key not specified.");
 
@@ -45,7 +45,7 @@ export class DataCache<T = any>{
 
 		const cacheKey:string = this.getCacheKey(key, params);
 
-		if (this.getter){
+		if (getter || this.getter){
 			let getObservable = this._getObservable[cacheKey];
 			if (getObservable)
 				return getObservable;
@@ -54,7 +54,7 @@ export class DataCache<T = any>{
 			if (cachedItem !== undefined)
 				return of(cachedItem);
 
-			return this._getObservable[cacheKey] = from(this.getter(key, params))
+			return this._getObservable[cacheKey] = from(getter ? getter() : this.getter(key, params))
 				.pipe(
 					tap((value:T) => {
 						this.add(cacheKey, value);

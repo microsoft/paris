@@ -70,11 +70,7 @@ export class ReadonlyRepository<T extends ModelBase>{
 
 	protected get cache(): DataCache<T> {
 		if (!this._cache) {
-			let cacheSettings: DataCacheSettings<T> = Object.assign({
-				getter: (endpoint:string, params?:{ [index:string]: any }) => this.dataStore.get(endpoint, { params: params }, this.baseUrl)
-			}, this.entityBackendConfig.cache instanceof Object ? this.entityBackendConfig.cache : null);
-
-			this._cache = new DataCache<T>(cacheSettings);
+			this._cache = new DataCache<T>(this.entityBackendConfig.cache);
 		}
 
 		return this._cache;
@@ -145,18 +141,18 @@ export class ReadonlyRepository<T extends ModelBase>{
 		else
 			endpoint = `${this.endpointName}${this.entityBackendConfig.allItemsEndpointTrailingSlash !== false && !this.entityBackendConfig.allItemsEndpoint ? '/' : ''}${this.entityBackendConfig.allItemsEndpoint || ''}`;
 
-		const getItem$:Observable<any> = dataOptions.allowCache !== false && this.entityBackendConfig.cache
-			? this.cache.get(endpoint, httpOptions.params)
-			: this.dataStore.get(endpoint, httpOptions, this.baseUrl);
+		const getItem$:Observable<T> = this.dataStore.get(endpoint, httpOptions, this.baseUrl).pipe(
+			catchError((err: AjaxError) => {
+				this.emitEntityHttpErrorEvent(err);
+				throw err
+			}),
+			mergeMap(data => this.createItem(data, dataOptions, query))
+		);
 
-		return getItem$
-			.pipe(
-				catchError((err: AjaxError) => {
-					this.emitEntityHttpErrorEvent(err);
-					throw err
-				}),
-				mergeMap(data => this.createItem(data, dataOptions, query))
-			);
+		if (dataOptions.allowCache !== false && this.entityBackendConfig.cache)
+			return this.cache.get(endpoint, httpOptions.params, () => getItem$);
+		else
+			return getItem$;
 	}
 
 	clearCache():void {
@@ -198,19 +194,18 @@ export class ReadonlyRepository<T extends ModelBase>{
 		else {
 			const endpoint:string = this.entityBackendConfig.parseItemQuery ? this.entityBackendConfig.parseItemQuery(itemId, this.entity, this.config, params) : `${this.endpointName}/${itemId}`;
 
-			const getItem$:Observable<any> = options.allowCache !== false && this.entityBackendConfig.cache
-				? this.cache.get(endpoint, params)
-				: this.dataStore.get(endpoint, params && {params: params}, this.baseUrl);
+			const getItem$:Observable<T> = this.dataStore.get(endpoint, params && {params: params}, this.baseUrl).pipe(
+				catchError((err: AjaxError) => {
+					this.emitEntityHttpErrorEvent(err);
+					throw err
+				}),
+				mergeMap(data => this.createItem(data, options, { where: Object.assign({ itemId: itemId }, params) }))
+			);
 
-			return getItem$
-				.pipe(
-					catchError((err: AjaxError) => {
-						this.emitEntityHttpErrorEvent(err);
-						throw err;
-					}),
-					mergeMap(data =>
-						this.createItem(data, options, { where: Object.assign({ itemId: itemId }, params) }))
-				);
+			if (options.allowCache !== false && this.entityBackendConfig.cache)
+				return this.cache.get(endpoint, params && {params: params}, () => getItem$);
+			else
+				return getItem$;
 		}
 	}
 
