@@ -117,7 +117,23 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 			.map((saveItems:SaveItems) => this.doSaveItems(saveItems.items, saveItems.method, options));
 
 		return combineLatest.apply(this, saveItemsArray).pipe(
-			map((savedItems:Array<Array<T>>) => _.flatMap(savedItems))
+			map((savedItems:Array<Array<T>>) => _.flatMap(savedItems)),
+			tap((savedItems:Array<T>) => {
+				if (savedItems && savedItems.length && this._allValues) {
+					let itemsAdded: Array<T> = [];
+					savedItems.forEach((item:T) => {
+						const originalItemIndex:number = _.findIndex(this._allValues,_item => item.id === _item.id);
+						if (!!~originalItemIndex)
+							this._allValues[originalItemIndex] = item;
+						else itemsAdded.push(item);
+					});
+					if (itemsAdded.length)
+						this._allValues = [...this._allValues, ...itemsAdded];
+					this._allItemsSubject$.next(this._allValues);
+
+					this._saveSubject$.next({ entity: this.entityConstructor, newValue: savedItems, isNew: !!itemsAdded });
+				}
+			})
 		);
 	}
 
@@ -140,7 +156,7 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 				}),
 				mergeMap((savedItemsData?: Array<any> | {items:Array<any>}) => {
 					if (!savedItemsData)
-						return of(null);
+						return of([]);
 
 					let itemsData:Array<any> = savedItemsData instanceof Array ? savedItemsData : savedItemsData.items;
 					let itemCreators:Array<Observable<T>> = itemsData.map(savedItemData => this.createItem(savedItemData));
