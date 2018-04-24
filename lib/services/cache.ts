@@ -56,9 +56,14 @@ export class DataCache<T = any>{
 
 			return this._getObservable[cacheKey] = from(getter ? getter() : this.getter(key, params))
 				.pipe(
-					tap((value:T) => {
-						this.add(cacheKey, value);
-					}),
+					tap(
+						(value: T) => {
+							this.add(cacheKey, value);
+							delete this._getObservable[cacheKey];
+						},
+						err => {
+							delete this._getObservable[cacheKey];
+						}),
 					finalize(() => {
 						delete this._getObservable[cacheKey];
 					}),
