@@ -128,7 +128,11 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 	 * @returns {Observable<Array<T extends EntityModelBase>>}
 	 */
 	private doSaveItems(itemsData:Array<any>, method:"PUT" | "POST", options?:HttpOptions):Observable<Array<T>>{
-		return this.dataStore.save(`${this.endpointName}/`, method, Object.assign({}, options, {data: {items: itemsData}}), this.baseUrl)
+		const saveHttpOptions:HttpOptions = this.entity.parseSaveItemsQuery
+			? this.entity.parseSaveItemsQuery(itemsData, options, this.entity, this.config)
+			: Object.assign({}, options, {data: {items: itemsData}});
+
+		return this.dataStore.save(`${this.endpointName}/`, method, saveHttpOptions, this.baseUrl)
 			.pipe(
 				catchError((err: AjaxError) => {
 					this.emitEntityHttpErrorEvent(err);

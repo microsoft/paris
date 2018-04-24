@@ -70,7 +70,7 @@ export class ReadonlyRepository<T extends ModelBase>{
 
 	protected get cache(): DataCache<T> {
 		if (!this._cache) {
-			this._cache = new DataCache<T>(this.entityBackendConfig.cache);
+			this._cache = new DataCache<T>(typeof(this.entityBackendConfig.cache) === "boolean" ? null : this.entityBackendConfig.cache);
 		}
 
 		return this._cache;

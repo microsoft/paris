@@ -4,6 +4,7 @@ import {Immutability} from "../services/immutability";
 import {DataEntityConstructor} from "./data-entity.base";
 import {ParisConfig} from "../config/paris-config";
 import {ModelBase} from "../models/model.base";
+import {HttpOptions} from "../services/http.service";
 
 const DEFAULT_VALUE_ID = "__default";
 
@@ -83,7 +84,8 @@ export interface IEntityConfigBase<T extends ModelBase = any>{
 	getValueById?: (valueId:string|number) => T,
 	entityConstructor?:DataEntityConstructor<T>,
 	serializeItem?:(item:T, serializedItem?:any, entity?:IEntityConfigBase<T>, config?:ParisConfig, serializationData?:any) => any,
-	supportedEntityGetMethods?:Array<EntityGetMethod>
+	supportedEntityGetMethods?:Array<EntityGetMethod>,
+	parseSaveItemsQuery?: (items:Array<T>, options?:HttpOptions, entity?:IEntityConfigBase<T>, config?:ParisConfig) => HttpOptions
 }
 
 export enum EntityGetMethod{
