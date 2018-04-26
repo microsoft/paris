@@ -1,3 +1,5 @@
+import {IEntityConfigBase} from "./entity/entity-config.base";
+
 export  {DataCache} from "./services/cache";
 export {EntityRelationshipRepositoryType} from "./entity/entity-relationship-repository-type";
 export {EntityRelationship} from "./entity/entity-relationship.decorator";
@@ -30,4 +32,4 @@ export {Field} from "./entity/entity-field";
 export {ApiCall} from "./entity/api-call.decorator";
 export {ApiCallBackendConfigInterface} from "./models/api-call-backend-config.interface";
 export {ApiCallModel, ApiCallConfig} from "./models/api-call.model";
-export {EntityGetMethod} from "./entity/entity-config.base";
+export {EntityGetMethod, IEntityConfigBase} from "./entity/entity-config.base";
