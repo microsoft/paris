@@ -1,4 +1,4 @@
-export  {DataCache} from "./services/cache";
+export {DataCache} from "./services/cache";
 export {EntityRelationshipRepositoryType} from "./entity/entity-relationship-repository-type";
 export {EntityRelationship} from "./entity/entity-relationship.decorator";
 export {RelationshipType} from "./models/relationship-type.enum";
@@ -8,6 +8,8 @@ export {DataStoreService} from "./services/data-store.service";
 export {EntityModelBase} from "./models/entity-model.base";
 export {ModelBase} from "./models/model.base";
 export {Repository} from "./repository/repository";
+export {ReadonlyRepository} from "./repository/readonly-repository";
+export {IReadonlyRepository} from "./repository/repository.interface";
 export {RelationshipRepository, IRelationshipRepository} from "./repository/relationship-repository";
 export {IRepository} from "./repository/repository.interface";
 export {EntityModelConfigBase} from "./models/entity-config-base.interface";
