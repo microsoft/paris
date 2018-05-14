@@ -1,8 +1,6 @@
 import {ChangeDetectionStrategy, Component} from '@angular/core';
-import './operators';
 import {TodoItemModel} from "./@model/todo-item.model";
-import {Observable} from "rxjs/Observable";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {Observable} from "rxjs";
 import {Repository} from "../../../lib/repository/repository";
 import {RepositoryManagerService} from "../../../lib/repository/repository-manager.service";
 import {ProtectionLevel} from "./@model/atp/protection-levels/protection-level.entity";

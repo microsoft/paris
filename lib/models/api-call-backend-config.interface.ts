@@ -1,4 +1,4 @@
-import {EntityConfigFunctionOrValue, ModelEntityCacheConfig} from "../entity/entity.config";
+import {EntityConfigFunctionOrValue} from "../entity/entity.config";
 import {ParisConfig} from "../config/paris-config";
 import {DataQuery} from "../dataset/data-query";
 import {DataCacheSettings} from "../services/cache";

@@ -1,9 +1,6 @@
-import {Observable} from "rxjs/Observable";
-import {AjaxRequest} from "rxjs/observable/dom/AjaxObservable";
-import {AjaxError, AjaxResponse} from "rxjs/Rx";
-import {ajax} from "rxjs/observable/dom/ajax";
-import {map} from "rxjs/operators/map";
-import {catchError} from "rxjs/operators/catchError";
+import {Observable} from "rxjs";
+import {ajax, AjaxError, AjaxRequest, AjaxResponse} from "rxjs/ajax";
+import {catchError, map} from "rxjs/operators";
 import * as _ from "lodash";
 
 export type RequestMethod = "GET"|"POST"|"PUT"|"PATCH"|"DELETE";

@@ -4,7 +4,7 @@ import {ErrorsService} from "../services/errors.service";
 import {DataSet} from "../dataset/dataset";
 import {DataQuery} from "../dataset/data-query";
 import {DataOptions, defaultDataOptions} from "../dataset/data.options";
-import {Observable} from "rxjs/Observable";
+import {combineLatest, merge, Observable, of, Subject} from "rxjs";
 import {HttpOptions} from "../services/http.service";
 import {DataStoreService} from "../services/data-store.service";
 import {ParisConfig} from "../config/paris-config";
@@ -14,24 +14,18 @@ import {Paris} from "../services/paris";
 import {DataAvailability} from "../dataset/data-availability.enum";
 import {Field, FIELD_DATA_SELF} from "../entity/entity-field";
 import {DataCache, DataCacheSettings} from "../services/cache";
-import {Subject} from "rxjs/Subject";
 import {Index} from "../models";
 import {EntityConfigBase, EntityGetMethod, IEntityConfigBase} from "../entity/entity-config.base";
 import {ModelBase} from "../models/model.base";
 import {DataTransformersService} from "../services/data-transformers.service";
 import * as _ from "lodash";
 import {valueObjectsService} from "../services/value-objects.service";
-import {AjaxError} from "rxjs/Rx";
+import {AjaxError} from "rxjs/ajax";
 import {EntityErrorEvent, EntityErrorTypes} from "../events/entity-error.event";
-import {tap} from "rxjs/operators/tap";
-import {map} from "rxjs/operators/map";
-import {merge} from "rxjs/observable/merge";
-import {of} from "rxjs/observable/of";
-import {combineLatest} from "rxjs/observable/combineLatest";
-import {mergeMap} from "rxjs/operators/mergeMap";
-import {catchError} from "rxjs/operators/catchError";
+import {catchError, map, mergeMap, tap} from "rxjs/operators";
+import {IReadonlyRepository} from "./repository.interface";
 
-export class ReadonlyRepository<T extends ModelBase>{
+export class ReadonlyRepository<T extends ModelBase> implements IReadonlyRepository<T>{
 	protected _errorSubject$: Subject<EntityErrorEvent>;
 	error$: Observable<EntityErrorEvent>;
 
@@ -110,8 +104,8 @@ export class ReadonlyRepository<T extends ModelBase>{
 		return new this.entityConstructor(defaultData);
 	}
 
-	createItem(itemData: {}, options: DataOptions = { allowCache: true, availability: DataAvailability.available }, query?: DataQuery): Observable<T> {
-		return ReadonlyRepository.getModelData(itemData, this.entity, this.config, this.paris, options, query);
+	createItem<T extends ModelBase>(itemData: {}, options: DataOptions = { allowCache: true, availability: DataAvailability.available }, query?: DataQuery): Observable<T> {
+		return ReadonlyRepository.getModelData<T>(itemData, this.entity, this.config, this.paris, options, query);
 	}
 
 	query(query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<T>> {

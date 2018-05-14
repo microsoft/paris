@@ -1,8 +1,7 @@
 import {ParisConfig} from "../config/paris-config";
 import {Http, HttpOptions, RequestMethod} from "./http.service";
-import {Observable} from "rxjs/Observable";
-import {finalize} from "rxjs/operators/finalize";
-import {share} from "rxjs/operators/share";
+import {Observable} from "rxjs";
+import {finalize, share} from "rxjs/operators";
 
 export class DataStoreService{
 	private activeRequests:Map<string, Observable<any>> = new Map();

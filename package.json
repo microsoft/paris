@@ -1,18 +1,15 @@
 {
 	"name": "wcdportal.paris",
-	"version": "0.7.14",
+	"version": "0.8.0",
 	"description": "Library for the implementation of Domain Driven Design in Angular/TypeScript apps",
 	"repository": {
 		"type": "git",
 		"url": "https://microsoft.visualstudio.com/DefaultCollection/WDATP/_git/Paris"
 	},
-	"dist": "./bundle",
-	"main": "bundle/paris.cjs.js",
-	"module": "bundle/paris.esm.js",
-	"browser": "bundle/paris.umd.js",
-	"typings": "index.d.ts",
+	"main": "dist/index.js",
+	"typings": "dist/index.d.ts",
 	"scripts": {
-		"build": "gulp build && rollup -c",
+		"build": "gulp build",
 		"dev": "rollup -c -w",
 		"bundle": "npm run build",
 		"publish": "npm run bundle && npm publish"
@@ -53,15 +50,15 @@
 		"rollup-plugin-commonjs": "^8.2.4",
 		"rollup-plugin-node-resolve": "^3.0.0",
 		"rollup-plugin-typescript": "^0.8.1",
-		"rxjs": ">=5.2.0",
+		"run-sequence": "^2.2.0",
+		"rxjs": "^6.0.0",
 		"standard-version": "^3.0.0",
 		"systemjs": ">=0.20.12",
-		"typescript": "^2.4.2",
-		"zone.js": ">=0.8.7",
-		"run-sequence": "^2.2.0"
+		"typescript": "^2.7.2",
+		"zone.js": ">=0.8.7"
 	},
 	"peerDependencies": {
-		"rxjs": ">=5.2.0",
+		"rxjs": ">=6.0.0",
 		"lodash.get": ">=4.4.2",
 		"lodash.findIndex": ">=4.4.2",
 		"lodash.clone": ">=4.4.2",

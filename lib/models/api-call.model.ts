@@ -1,7 +1,5 @@
 import {ApiCallBackendConfigInterface} from "./api-call-backend-config.interface";
 import {HttpOptions, RequestMethod} from "../services/http.service";
-import {DataEntityConstructor, DataEntityType} from "../entity/data-entity.base";
-import {ModelBase} from "./model.base";
 
 export class ApiCallModel<TResult = any, TInput = any>{
 	config:ApiCallConfig<TResult, TInput>

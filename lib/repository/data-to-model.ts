@@ -3,12 +3,10 @@ import {DataEntityConstructor} from "../entity/data-entity.base";
 import {Paris} from "../services/paris";
 import {DataOptions, defaultDataOptions} from "../dataset/data.options";
 import {DataQuery} from "../dataset/data-query";
-import {Observable} from "rxjs/Observable";
+import {combineLatest, Observable, of} from "rxjs";
 import {DataSet} from "../dataset/dataset";
-import {of} from "rxjs/observable/of";
 import {ReadonlyRepository} from "./readonly-repository";
-import {combineLatest} from "rxjs/observable/combineLatest";
-import {map} from "rxjs/operators/map";
+import {map} from "rxjs/operators";
 
 export function rawDataToDataSet<T extends ModelBase, R = any>(
 		rawDataSet:any,

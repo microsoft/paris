@@ -6,9 +6,8 @@ import {entitiesService} from "./entities.service";
 import {IRepository} from "../repository/repository.interface";
 import {DataStoreService} from "./data-store.service";
 import {EntityConfigBase} from "../entity/entity-config.base";
-import {Observable} from "rxjs/Observable";
+import {Observable, of, Subject, throwError} from "rxjs";
 import {SaveEntityEvent} from "../events/save-entity.event";
-import {Subject} from "rxjs/Subject";
 import {RemoveEntitiesEvent} from "../events/remove-entities.event";
 import {IRelationshipRepository, RelationshipRepository} from "../repository/relationship-repository";
 import {ModelBase} from "../models/model.base";
@@ -24,17 +23,14 @@ import {EntityErrorEvent, EntityErrorTypes} from "../events/entity-error.event";
 import {ApiCallType} from "../models/api-call.model";
 import {ApiCallBackendConfigInterface} from "../models/api-call-backend-config.interface";
 import {modelArray, rawDataToDataSet} from "../repository/data-to-model";
-import {_throw} from "rxjs/observable/throw";
-import {catchError} from "rxjs/operators/catchError";
-import {map, mergeMap, switchMap, tap} from "rxjs/operators";
+import {catchError, map, mergeMap, switchMap, tap} from "rxjs/operators";
 import {DataTransformersService} from "./data-transformers.service";
 import {DataCache, DataCacheSettings} from "./cache";
-import {of} from "rxjs/observable/of";
 import * as _ from "lodash";
 
 export class Paris{
-	private repositories:Map<DataEntityType, IRepository> = new Map;
-	private relationshipRepositories:Map<string, IRelationshipRepository> = new Map;
+	private repositories:Map<DataEntityType, IRepository<ModelBase>> = new Map;
+	private relationshipRepositories:Map<string, IRelationshipRepository<ModelBase>> = new Map;
 	readonly dataStore:DataStoreService;
 	readonly config:ParisConfig;
 
@@ -242,7 +238,7 @@ export class Paris{
 		if (backendConfig.parseData) {
 			return this.dataStore.request<TRawDataResult>(method || "GET", endpoint, apiCallHttpOptions, baseUrl).pipe(
 				catchError(err => {
-					return _throw({
+					return throwError({
 						originalError: err,
 						type: EntityErrorTypes.HttpError,
 						entity: null
@@ -265,7 +261,7 @@ export class Paris{
 
 		return this.dataStore.request<TResult>(method || "GET", endpoint, apiCallHttpOptions, baseUrl).pipe(
 			catchError(err => {
-				return _throw({
+				return throwError({
 					originalError: err,
 					type: EntityErrorTypes.HttpError,
 					entity: null
@@ -312,7 +308,7 @@ export class Paris{
 	}
 
 	createItem<T extends ModelBase>(entityConstructor:DataEntityConstructor<T>, data:any, dataOptions: DataOptions = defaultDataOptions, query?:DataQuery):Observable<T>{
-		return ReadonlyRepository.getModelData(data, entityConstructor.entityConfig || entityConstructor.valueObjectConfig, this.config, this, dataOptions, query);
+		return ReadonlyRepository.getModelData<T>(data, entityConstructor.entityConfig || entityConstructor.valueObjectConfig, this.config, this, dataOptions, query);
 	}
 
 	getItemById<T extends ModelBase>(entityConstructor:DataEntityConstructor<T>, itemId: string | number, options?:DataOptions, params?:{ [index:string]:any }): Observable<T>{

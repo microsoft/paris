@@ -1,4 +1,4 @@
-import {AjaxRequest} from "rxjs/observable/dom/AjaxObservable";
+import {AjaxRequest} from "rxjs/ajax";
 
 export interface ParisConfig{
 	apiRoot?:string,

@@ -1,7 +1,6 @@
 import {EntityConfig} from "../entity/entity.config";
 import {DataEntityConstructor} from "../entity/data-entity.base";
-import {Observable} from "rxjs/Observable";
-import {Subject} from "rxjs/Subject";
+import {combineLatest, defer, merge, Observable, of, Subject, throwError} from "rxjs";
 import {IRepository} from "./repository.interface";
 import {DataStoreService} from "../services/data-store.service";
 import {ParisConfig} from "../config/paris-config";
@@ -14,19 +13,11 @@ import {HttpOptions, RequestMethod} from "../services/http.service";
 import {SaveEntityEvent} from "../events/save-entity.event";
 import {RemoveEntitiesEvent} from "../events/remove-entities.event";
 import {ReadonlyRepository} from "./readonly-repository";
-import {AjaxError} from "rxjs/Rx";
-import {defer} from "rxjs/observable/defer";
-import {mergeMap} from "rxjs/operators/mergeMap";
-import {tap} from "rxjs/operators/tap";
-import {map} from "rxjs/operators/map";
-import {_throw} from "rxjs/observable/throw";
-import {of} from "rxjs/observable/of";
-import {merge} from "rxjs/observable/merge";
-import {combineLatest} from "rxjs/observable/combineLatest";
-import {catchError} from "rxjs/operators/catchError";
+import {AjaxError} from "rxjs/ajax";
+import {catchError, map, mergeMap, tap} from "rxjs/operators";
 import {DataSet} from "../dataset/dataset";
 
-export class Repository<T extends ModelBase> extends ReadonlyRepository<T> implements IRepository {
+export class Repository<T extends ModelBase> extends ReadonlyRepository<T> implements IRepository<T> {
 	save$: Observable<SaveEntityEvent>;
 	remove$: Observable<RemoveEntitiesEvent>;
 
@@ -85,7 +76,7 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 				);
 		}
 		catch(e){
-			return _throw(e);
+			return throwError(e);
 		}
 	}
 
@@ -203,7 +194,7 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 				)
 		}
 		catch(e){
-			return _throw(e);
+			return throwError(e);
 		}
 	}
 
@@ -255,7 +246,7 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 				)
 		}
 		catch(e){
-			return _throw(e);
+			return throwError(e);
 		}
 	}
 }

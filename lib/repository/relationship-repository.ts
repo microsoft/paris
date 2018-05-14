@@ -3,7 +3,7 @@ import {EntityModelBase} from "../models/entity-model.base";
 import {DataSet} from "../dataset/dataset";
 import {DataQuery} from "../dataset/data-query";
 import {DataOptions, defaultDataOptions} from "../dataset/data.options";
-import {Observable} from "rxjs/Observable";
+import {Observable} from "rxjs";
 import {DataStoreService} from "../services/data-store.service";
 import {ParisConfig} from "../config/paris-config";
 import {Paris} from "../services/paris";
@@ -16,7 +16,7 @@ import {RelationshipType} from "../models/relationship-type.enum";
 
 const DEFAULT_RELATIONSHIP_TYPES = [RelationshipType.OneToMany, RelationshipType.OneToOne];
 
-export class RelationshipRepository<T extends ModelBase, U extends ModelBase> extends ReadonlyRepository<U> implements IRelationshipRepository {
+export class RelationshipRepository<T extends ModelBase, U extends ModelBase> extends ReadonlyRepository<U> implements IRelationshipRepository<U> {
 	private sourceRepository: ReadonlyRepository<T>;
 	readonly relationshipConfig:EntityRelationshipConfig;
 
@@ -108,7 +108,7 @@ export class RelationshipRepository<T extends ModelBase, U extends ModelBase> ex
 	}
 }
 
-export interface IRelationshipRepository extends IReadonlyRepository{
+export interface IRelationshipRepository<U extends ModelBase = ModelBase> extends IReadonlyRepository<U>{
 	sourceEntityType: DataEntityType,
 	dataEntityType: DataEntityType,
 	relationshipConfig:EntityRelationshipConfig,
