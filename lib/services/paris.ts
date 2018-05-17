@@ -126,9 +126,10 @@ export class Paris{
 			: null;
 
 		let apiCall$: Observable<any> = this.makeApiCall(apiCallType.config, apiCallType.config.method || "GET", httpOptions)
-			.pipe(tap(null,
-				(err: EntityErrorEvent) => {
+			.pipe(
+				catchError((err: EntityErrorEvent) => {
 					this._errorSubject$.next(err);
+					return throwError(err.originalError || err)
 				}));
 
 		let typeRepository:ReadonlyRepository<TResult> = apiCallType.config.type
@@ -280,9 +281,9 @@ export class Paris{
 		});
 
 		return this.makeApiCall<T>(apiCallConfig, "GET", httpOptions).pipe(
-			tap(null,
-				(error: EntityErrorEvent) => {
+			catchError((error: EntityErrorEvent) => {
 					this._errorSubject$.next(Object.assign({}, error, {entity: entityConstructor}));
+					return throwError(error.originalError || error)
 				}),
 			mergeMap((rawDataSet: T) => {
 				return rawDataToDataSet<T>(
