@@ -436,34 +436,36 @@ export class ReadonlyRepository<T extends ModelBase> implements IReadonlyReposit
 		let modelData: Index = {};
 
 		entity.fields.forEach((entityField:Field) => {
-			let itemFieldValue:any = (<any>item)[entityField.id],
-				fieldRepository = paris.getRepository(<DataEntityType>entityField.type),
-				fieldValueObjectType:EntityConfigBase = !fieldRepository && valueObjectsService.getEntityByType(<DataEntityType>entityField.type),
-				isNilValue = itemFieldValue === undefined || itemFieldValue === null;
+			if (entityField.serialize !== false) {
+				let itemFieldValue: any = (<any>item)[entityField.id],
+					fieldRepository = paris.getRepository(<DataEntityType>entityField.type),
+					fieldValueObjectType: EntityConfigBase = !fieldRepository && valueObjectsService.getEntityByType(<DataEntityType>entityField.type),
+					isNilValue = itemFieldValue === undefined || itemFieldValue === null;
 
-			let modelValue:any;
+				let modelValue: any;
 
-			if (entityField.serialize)
-				modelValue = entityField.serialize(itemFieldValue, serializationData);
-			else if (entityField.isArray) {
-				if (itemFieldValue) {
-					if (fieldRepository || fieldValueObjectType)
-						modelValue = itemFieldValue.map((element:any) => ReadonlyRepository.serializeItem(element, fieldRepository ? fieldRepository.entity : fieldValueObjectType, paris, serializationData));
-					else modelValue = itemFieldValue.map((item:any) => DataTransformersService.serialize(entityField.arrayOf, item));
-				} else modelValue = null;
+				if (entityField.serialize)
+					modelValue = entityField.serialize(itemFieldValue, serializationData);
+				else if (entityField.isArray) {
+					if (itemFieldValue) {
+						if (fieldRepository || fieldValueObjectType)
+							modelValue = itemFieldValue.map((element: any) => ReadonlyRepository.serializeItem(element, fieldRepository ? fieldRepository.entity : fieldValueObjectType, paris, serializationData));
+						else modelValue = itemFieldValue.map((item: any) => DataTransformersService.serialize(entityField.arrayOf, item));
+					} else modelValue = null;
+				}
+				else if (fieldRepository)
+					modelValue = isNilValue ? fieldRepository.entity.getDefaultValue() || null : itemFieldValue.id;
+				else if (fieldValueObjectType)
+					modelValue = isNilValue ? fieldValueObjectType.getDefaultValue() || null : ReadonlyRepository.serializeItem(itemFieldValue, fieldValueObjectType, paris, serializationData);
+				else
+					modelValue = DataTransformersService.serialize(entityField.type, itemFieldValue);
+
+				let modelProperty: string = entityField.data
+					? entityField.data instanceof Array ? entityField.data[0] : entityField.data
+					: entityField.id;
+
+				modelData[modelProperty] = modelValue;
 			}
-			else if (fieldRepository)
-				modelValue = isNilValue ? fieldRepository.entity.getDefaultValue() || null : itemFieldValue.id;
-			else if (fieldValueObjectType)
-				modelValue = isNilValue ? fieldValueObjectType.getDefaultValue() || null : ReadonlyRepository.serializeItem(itemFieldValue, fieldValueObjectType, paris, serializationData);
-			else
-				modelValue = DataTransformersService.serialize(entityField.type, itemFieldValue);
-
-			let modelProperty:string = entityField.data
-				? entityField.data instanceof Array ? entityField.data[0] : entityField.data
-				: entityField.id;
-
-			modelData[modelProperty] = modelValue;
 		});
 
 		if (entity.serializeItem)
