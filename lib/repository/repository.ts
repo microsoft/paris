@@ -57,7 +57,7 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 			let saveData: Index = this.serializeItem(item, serializationData);
 			let endpoint:string = this.entityBackendConfig.parseSaveQuery ? this.entityBackendConfig.parseSaveQuery(item, this.entity, this.config, options) : `${this.endpointName}/${item.id || ''}`;
 
-			return this.dataStore.save(endpoint, this.getSaveMethod(item), Object.assign({}, options, {data: saveData}), this.baseUrl)
+			return this.dataStore.save(endpoint, this.getSaveMethod(item), Object.assign({}, options, {data: saveData}), this.getBaseUrl(options && {where: options.params}))
 				.pipe(
 					catchError((err: AjaxError) => {
 						this.emitEntityHttpErrorEvent(err);
@@ -139,7 +139,7 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 			? this.entity.parseSaveItemsQuery(itemsData, options, this.entity, this.config)
 			: Object.assign({}, options, {data: {items: itemsData}});
 
-		return this.dataStore.save(`${this.endpointName}/`, method, saveHttpOptions, this.baseUrl)
+		return this.dataStore.save(`${this.endpointName}/`, method, saveHttpOptions, this.getBaseUrl(options && {where: options.params}))
 			.pipe(
 				catchError((err: AjaxError) => {
 					this.emitEntityHttpErrorEvent(err);
@@ -173,7 +173,7 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 
 			let endpoint:string = this.entityBackendConfig.parseRemoveQuery ? this.entityBackendConfig.parseRemoveQuery([item], this.entity, this.config) : `${this.endpointName}/${item.id || ''}`;
 
-			return this.dataStore.delete(endpoint, httpOptions, this.baseUrl)
+			return this.dataStore.delete(endpoint, httpOptions, this.getBaseUrl(options && {where: options.params}))
 				.pipe(
 					catchError((err: AjaxError) => {
 						this.emitEntityHttpErrorEvent(err);
@@ -223,7 +223,7 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 
 			let endpoint:string = this.entityBackendConfig.parseRemoveQuery ? this.entityBackendConfig.parseRemoveQuery(items, this.entity, this.config) : this.endpointName;
 
-			return this.dataStore.delete(endpoint, httpOptions, this.baseUrl)
+			return this.dataStore.delete(endpoint, httpOptions, this.getBaseUrl(options && {where: options.params}))
 				.pipe(
 					catchError((err: AjaxError) => {
 						this.emitEntityHttpErrorEvent(err);

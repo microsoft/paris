@@ -14,7 +14,7 @@ export interface IReadonlyRepository<T extends ModelBase = ModelBase>{
 	serializeItem:(item:T, serializationData?:any) => Object,
 	allItems$:Observable<Array<T>>,
 	endpointName:string,
-	endpointUrl:string,
+	getEndpointUrl: (query?: DataQuery) => string,
 }
 
 export interface IRepository<T extends ModelBase = ModelBase> extends IReadonlyRepository<T>{

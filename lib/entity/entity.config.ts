@@ -52,4 +52,4 @@ export interface ModelEntityCacheConfig<T extends ModelBase = any>{
 	max?: number
 }
 
-export type EntityConfigFunctionOrValue = ((config?:ParisConfig) => string) | string;
+export type EntityConfigFunctionOrValue = ((config?:ParisConfig, query?:DataQuery) => string) | string;

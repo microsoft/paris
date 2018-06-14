@@ -1,5 +1,5 @@
 import {EntityModelBase} from "../models/entity-model.base";
-import {DatasetService} from "../services/dataset.service";
+import {queryToHttpOptions} from "../dataset/query-to-http";
 import {ErrorsService} from "../services/errors.service";
 import {DataSet} from "../dataset/dataset";
 import {DataQuery} from "../dataset/data-query";
@@ -45,11 +45,11 @@ export class ReadonlyRepository<T extends ModelBase> implements IReadonlyReposit
 	protected _cache: DataCache<T>;
 	protected _allItemsSubject$: Subject<Array<T>>;
 
-	protected get baseUrl(): string {
+	protected getBaseUrl(query?: DataQuery): string {
 		if (!this.entityBackendConfig.baseUrl)
 			return null;
 
-		return this.entityBackendConfig.baseUrl instanceof Function ? this.entityBackendConfig.baseUrl(this.config) : this.entityBackendConfig.baseUrl;
+		return this.entityBackendConfig.baseUrl instanceof Function ? this.entityBackendConfig.baseUrl(this.config, query) : this.entityBackendConfig.baseUrl;
 	}
 
 	get allItems$(): Observable<Array<T>> {
@@ -74,8 +74,8 @@ export class ReadonlyRepository<T extends ModelBase> implements IReadonlyReposit
 		return this.entityBackendConfig.endpoint instanceof Function ? this.entityBackendConfig.endpoint(this.config) : this.entityBackendConfig.endpoint;
 	}
 
-	get endpointUrl():string{
-		return `${this.baseUrl}/${this.endpointName}`;
+	getEndpointUrl(query?: DataQuery): string{
+		return `${this.getBaseUrl(query)}/${this.endpointName}`;
 	}
 
 	protected setAllItems(): Observable<Array<T>> {
@@ -116,7 +116,7 @@ export class ReadonlyRepository<T extends ModelBase> implements IReadonlyReposit
 	}
 
 	queryItem(query: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<T> {
-		let httpOptions:HttpOptions = this.entityBackendConfig.parseDataQuery ? { params: this.entityBackendConfig.parseDataQuery(query) } : DatasetService.queryToHttpOptions(query);
+		let httpOptions:HttpOptions = this.entityBackendConfig.parseDataQuery ? { params: this.entityBackendConfig.parseDataQuery(query) } : queryToHttpOptions(query);
 
 		if (this.entityBackendConfig.fixedData){
 			if (!httpOptions)
@@ -135,7 +135,7 @@ export class ReadonlyRepository<T extends ModelBase> implements IReadonlyReposit
 		else
 			endpoint = `${this.endpointName}${this.entityBackendConfig.allItemsEndpointTrailingSlash !== false && !this.entityBackendConfig.allItemsEndpoint ? '/' : ''}${this.entityBackendConfig.allItemsEndpoint || ''}`;
 
-		const getItem$:Observable<T> = this.dataStore.get(endpoint, httpOptions, this.baseUrl).pipe(
+		const getItem$:Observable<T> = this.dataStore.get(endpoint, httpOptions, this.getBaseUrl(query)).pipe(
 			catchError((err: AjaxError) => {
 				this.emitEntityHttpErrorEvent(err);
 				throw err
@@ -192,7 +192,7 @@ export class ReadonlyRepository<T extends ModelBase> implements IReadonlyReposit
 		else {
 			const endpoint:string = this.entityBackendConfig.parseItemQuery ? this.entityBackendConfig.parseItemQuery(itemId, this.entity, this.config, params) : `${this.endpointName}/${itemId}`;
 
-			const getItem$:Observable<T> = this.dataStore.get(endpoint, params && {params: params}, this.baseUrl).pipe(
+			const getItem$:Observable<T> = this.dataStore.get(endpoint, params && {params: params}, this.getBaseUrl({where: params})).pipe(
 				catchError((err: AjaxError) => {
 					this.emitEntityHttpErrorEvent(err);
 					throw err

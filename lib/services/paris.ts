@@ -17,7 +17,7 @@ import {DataSet} from "../dataset/dataset";
 import {DataQuery} from "../dataset/data-query";
 import {DataOptions, defaultDataOptions} from "../dataset/data.options";
 import {ReadonlyRepository} from "../repository/readonly-repository";
-import {DatasetService} from "./dataset.service";
+import {queryToHttpOptions} from "../dataset/query-to-http";
 import {HttpOptions, RequestMethod, UrlParams} from "./http.service";
 import {EntityErrorEvent, EntityErrorTypes} from "../events/entity-error.event";
 import {ApiCallType} from "../models/api-call.model";
@@ -213,16 +213,17 @@ export class Paris{
 		return apiCallCache;
 	}
 
-	private makeApiCall<TResult, TParams = UrlParams, TData = any, TRawDataResult = TResult>(backendConfig:ApiCallBackendConfigInterface<TResult, TRawDataResult>, method:RequestMethod, httpOptions:Readonly<HttpOptions<TData, TParams>>):Observable<TResult>{
+	private makeApiCall<TResult, TParams = UrlParams, TData = any, TRawDataResult = TResult>(backendConfig:ApiCallBackendConfigInterface<TResult, TRawDataResult>, method:RequestMethod, httpOptions:Readonly<HttpOptions<TData, TParams>>, query?: DataQuery):Observable<TResult>{
+		const dataQuery: DataQuery = query || { where: httpOptions && httpOptions.params };
 		let endpoint:string;
 		if (backendConfig.endpoint instanceof Function)
-			endpoint = backendConfig.endpoint(this.config, { where: httpOptions && httpOptions.params });
+			endpoint = backendConfig.endpoint(this.config, dataQuery);
 		else if (backendConfig.endpoint)
 			endpoint = backendConfig.endpoint;
 		else
 			throw new Error(`Can't call API, no endpoint specified.`);
 
-		const baseUrl:string = backendConfig.baseUrl instanceof Function ? backendConfig.baseUrl(this.config) : backendConfig.baseUrl;
+		const baseUrl:string = backendConfig.baseUrl instanceof Function ? backendConfig.baseUrl(this.config, dataQuery) : backendConfig.baseUrl;
 		let apiCallHttpOptions:HttpOptions<TData> = _.clone(httpOptions) || {};
 
 		if (backendConfig.separateArrayParams) {
@@ -247,7 +248,7 @@ export class Paris{
 				}),
 				map((rawData: TRawDataResult) => {
 					try {
-						return backendConfig.parseData(rawData, this.config)
+						return backendConfig.parseData(rawData, this.config, dataQuery)
 					}
 					catch (err) {
 						throw {
@@ -272,7 +273,7 @@ export class Paris{
 	}
 
 	callQuery<T extends ModelBase>(entityConstructor:DataEntityConstructor<T>, backendConfig:EntityBackendConfig, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions):Observable<DataSet<T>>{
-		const httpOptions:HttpOptions = backendConfig.parseDataQuery ? { params: backendConfig.parseDataQuery(query) } : DatasetService.queryToHttpOptions(query);
+		const httpOptions:HttpOptions = backendConfig.parseDataQuery ? { params: backendConfig.parseDataQuery(query) } : queryToHttpOptions(query);
 
 		const endpoint:string = backendConfig.endpoint instanceof Function ? backendConfig.endpoint(this.config, query) : backendConfig.endpoint;
 
@@ -280,7 +281,7 @@ export class Paris{
 			endpoint: `${endpoint}${backendConfig.allItemsEndpointTrailingSlash !== false && !backendConfig.allItemsEndpoint ? '/' : ''}${backendConfig.allItemsEndpoint || ''}`
 		});
 
-		return this.makeApiCall<T>(apiCallConfig, "GET", httpOptions).pipe(
+		return this.makeApiCall<T>(apiCallConfig, "GET", httpOptions, query).pipe(
 			catchError((error: EntityErrorEvent) => {
 					this._errorSubject$.next(Object.assign({}, error, {entity: entityConstructor}));
 					return throwError(error.originalError || error)

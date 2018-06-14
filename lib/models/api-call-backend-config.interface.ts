@@ -4,7 +4,7 @@ import {DataQuery} from "../dataset/data-query";
 import {DataCacheSettings} from "../services/cache";
 
 export interface ApiCallBackendConfigInterface<T = any, TRawData = any>{
-	endpoint?:((config?:ParisConfig, query?:DataQuery) => string) | string,
+	endpoint?:EntityConfigFunctionOrValue,
 	cache?:boolean | DataCacheSettings<T>,
 	baseUrl?:EntityConfigFunctionOrValue,
 	fixedData?: { [index:string]:any },

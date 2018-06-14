@@ -33,3 +33,4 @@ export {ApiCall} from "./entity/api-call.decorator";
 export {ApiCallBackendConfigInterface} from "./models/api-call-backend-config.interface";
 export {ApiCallModel, ApiCallConfig} from "./models/api-call.model";
 export {EntityGetMethod, IEntityConfigBase} from "./entity/entity-config.base";
+export {queryToHttpOptions} from "./dataset/query-to-http";
