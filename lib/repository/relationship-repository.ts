@@ -77,6 +77,28 @@ export class RelationshipRepository<T extends ModelBase, U extends ModelBase> ex
 		return super.query(cloneQuery, dataOptions);
 	}
 
+	/**
+	 * Queries the relationship for an item ID instead of sourceItem or entity/valueObject.
+	 * Note: there has to be a foreignKey set in the RelationshipRepository config, otherwise this will not work.
+	 * @param {string | number} itemId
+	 * @param {DataQuery} query
+	 * @param {DataOptions} dataOptions
+	 * @returns {Observable<DataSet<U extends ModelBase>>}
+	 */
+	queryForItemId(itemId:string|number, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<U>> {
+		if (!this.allowedTypes.has(RelationshipType.OneToMany))
+			throw new Error(`Can't query relationship ${this.sourceEntityType.singularName} -> ${this.dataEntityType.singularName} since it doesn't have the 'OneToMany' allowed type.`);
+
+		let cloneQuery:DataQuery = Object.assign({}, query);
+
+		if (!cloneQuery.where)
+			cloneQuery.where = {};
+
+		Object.assign(cloneQuery.where, this.getRelationQueryWhereById(itemId));
+
+		return super.query(cloneQuery, dataOptions);
+	}
+
 	getRelatedItem(item:ModelBase, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions):Observable<U>{
 		if (!this.allowedTypes.has(RelationshipType.OneToOne))
 			throw new Error(`Can't query relationship ${this.sourceEntityType.singularName} -> ${this.dataEntityType.singularName} since it doesn't have the 'OneToMany' allowed type.`);
@@ -88,6 +110,30 @@ export class RelationshipRepository<T extends ModelBase, U extends ModelBase> ex
 				cloneQuery.where = {};
 
 			Object.assign(cloneQuery.where, this.getRelationQueryWhere(item));
+		}
+
+		return super.queryItem(cloneQuery, dataOptions);
+	}
+
+	/**
+	 * Returns a related item by an item ID
+	 * Note: there has to be a foreignKey set in the RelationshipRepository config, otherwise this will not work.
+	 * @param {string | number} itemId
+	 * @param {DataQuery} query
+	 * @param {DataOptions} dataOptions
+	 * @returns {Observable<U extends ModelBase>}
+	 */
+	getRelatedItemById(itemId:string|number, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions):Observable<U>{
+		if (!this.allowedTypes.has(RelationshipType.OneToOne))
+			throw new Error(`Can't query relationship ${this.sourceEntityType.singularName} -> ${this.dataEntityType.singularName} since it doesn't have the 'OneToMany' allowed type.`);
+
+		let cloneQuery:DataQuery = Object.assign({}, query);
+
+		if (itemId) {
+			if (!cloneQuery.where)
+				cloneQuery.where = {};
+
+			Object.assign(cloneQuery.where, this.getRelationQueryWhereById(itemId));
 		}
 
 		return super.queryItem(cloneQuery, dataOptions);
@@ -105,6 +151,15 @@ export class RelationshipRepository<T extends ModelBase, U extends ModelBase> ex
 			Object.assign(sourceItemWhereQuery, this.relationshipConfig.getRelationshipData(item));
 
 		return Object.assign(where, sourceItemWhereQuery);
+	}
+
+	private getRelationQueryWhereById(itemId:string|number):{ [index:string]:any }{
+		let sourceItemWhereQuery:{ [index:string]:any } = {};
+
+		if (this.relationshipConfig.foreignKey)
+			sourceItemWhereQuery[this.relationshipConfig.foreignKey] = itemId;
+
+		return sourceItemWhereQuery;
 	}
 }
 
