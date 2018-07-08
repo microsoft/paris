@@ -1,7 +1,7 @@
 import {ParisConfig} from "../config/paris-config";
 import {Http, HttpOptions, RequestMethod} from "./http.service";
 import {Observable} from "rxjs";
-import {finalize, share} from "rxjs/operators";
+import {finalize, share, tap} from "rxjs/operators";
 
 export class DataStoreService{
 	private activeRequests:Map<string, Observable<any>> = new Map();
@@ -36,6 +36,8 @@ export class DataStoreService{
 			return existingActiveRequest;
 		else {
 			let warmObservable: Observable<any> = obs.pipe(
+				tap(() => this.activeRequests.delete(activeRequestId),
+					err => this.activeRequests.delete(activeRequestId)),
 				finalize(() => this.activeRequests.delete(activeRequestId)),
 				share()
 			);
