@@ -1,6 +1,6 @@
 {
 	"name": "wcdportal.paris",
-	"version": "0.8.8",
+	"version": "0.8.9",
 	"description": "Library for the implementation of Domain Driven Design in Angular/TypeScript apps",
 	"repository": {
 		"type": "git",
@@ -12,7 +12,8 @@
 		"build": "gulp build",
 		"dev": "rollup -c -w",
 		"bundle": "npm run build",
-		"publish": "npm run bundle && npm publish"
+		"publish": "npm run bundle && npm publish",
+		"test": "mocha -r ts-node/register lib/**/*.spec.ts"
 	},
 	"author": "Yossi Kolesnicov",
 	"license": "MIT",
@@ -20,6 +21,8 @@
 		"@compodoc/compodoc": "^1.0.0-beta.7",
 		"@types/async": "^2.0.32",
 		"@types/browser-sync": "^0.0.36",
+		"@types/chai": "^4.1.4",
+		"@types/chai-spies": "^1.0.0",
 		"@types/es6-shim": "^0.31.32",
 		"@types/express": "^4.0.33",
 		"@types/gulp": ">=4.0.0",
@@ -31,11 +34,14 @@
 		"@types/gulp-util": "^3.0.29",
 		"@types/jasmine": "^2.5.52",
 		"@types/lodash.get": "^4.4.3",
+		"@types/mocha": "^5.2.4",
 		"@types/node": "^8.0.25",
 		"@types/rimraf": "2.0.2",
 		"@types/run-sequence": "^0.0.29",
 		"@types/systemjs": "^0.20.2",
 		"@types/yargs": "^8.0.2",
+		"chai": "^4.1.2",
+		"chai-spies": "^1.0.0",
 		"core-js": ">=2.4.1",
 		"gulp": "^3.9.1",
 		"gulp-clean": "^0.3.2",
@@ -45,6 +51,8 @@
 		"intl": "^1.2.5",
 		"lodash.get": "^4.4.2",
 		"merge2": "^1.0.2",
+		"mocha": "^5.2.0",
+		"reflect-metadata": "^0.1.12",
 		"rimraf": "~2.5.4",
 		"rollup": "^0.50.0",
 		"rollup-plugin-commonjs": "^8.2.4",
@@ -54,6 +62,7 @@
 		"rxjs": "^6.0.0",
 		"standard-version": "^3.0.0",
 		"systemjs": ">=0.20.12",
+		"ts-node": "^7.0.0",
 		"typescript": "^2.7.2",
 		"zone.js": ">=0.8.7"
 	},

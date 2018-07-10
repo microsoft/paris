@@ -44,7 +44,13 @@ export interface EntityBackendConfig extends ApiCallBackendConfigInterface{
 	parseSaveQuery?:(item:any, entity?:IEntityConfigBase, config?:ParisConfig, options?: HttpOptions) => string,
 	parseRemoveQuery?:(items:Array<ModelBase>, entity?:IEntityConfigBase, config?:ParisConfig) => string,
 	serializeItem?:(item:any, serializedItem?:any, entity?:IEntityConfigBase, config?:ParisConfig, serializationData?:any) => any,
-	saveMethod?:((item:any, config?:ParisConfig) => RequestMethod) | RequestMethod
+	saveMethod?:((item:any, config?:ParisConfig) => RequestMethod) | RequestMethod,
+
+	/**
+	 * If the HTTP request takes longer than this number (milliseconds), the request will fail with status 0.
+	 * @default 60000
+	 */
+	timeout?:number
 }
 
 export interface ModelEntityCacheConfig<T extends ModelBase = any>{

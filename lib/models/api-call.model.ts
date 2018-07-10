@@ -15,5 +15,6 @@ export interface ApiCallConfig<TResult = any, TInput = any> extends ApiCallBacke
 	parseQuery?:(input:TInput) => HttpOptions,
 	parse?:(data?:any, input?:TInput) => TResult,
 	method?:RequestMethod,
+	timeout?:number,
 	type?:{ new():TResult }
 }

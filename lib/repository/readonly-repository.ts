@@ -13,7 +13,7 @@ import {DataEntityConstructor, DataEntityType} from "../entity/data-entity.base"
 import {Paris} from "../services/paris";
 import {DataAvailability} from "../dataset/data-availability.enum";
 import {Field, FIELD_DATA_SELF} from "../entity/entity-field";
-import {DataCache, DataCacheSettings} from "../services/cache";
+import {DataCache} from "../services/cache";
 import {Index} from "../models";
 import {EntityConfigBase, EntityGetMethod, IEntityConfigBase} from "../entity/entity-config.base";
 import {ModelBase} from "../models/model.base";
@@ -135,7 +135,11 @@ export class ReadonlyRepository<T extends ModelBase> implements IReadonlyReposit
 		else
 			endpoint = `${this.endpointName}${this.entityBackendConfig.allItemsEndpointTrailingSlash !== false && !this.entityBackendConfig.allItemsEndpoint ? '/' : ''}${this.entityBackendConfig.allItemsEndpoint || ''}`;
 
-		const getItem$:Observable<T> = this.dataStore.get(endpoint, httpOptions, this.getBaseUrl(query)).pipe(
+		const getItem$:Observable<T> = this.dataStore.get(
+			endpoint,
+			httpOptions,
+			this.getBaseUrl(query),
+			this.entityBackendConfig.timeout ? { timeout: this.entityBackendConfig.timeout } : null).pipe(
 			catchError((err: AjaxError) => {
 				this.emitEntityHttpErrorEvent(err);
 				throw err
@@ -192,7 +196,12 @@ export class ReadonlyRepository<T extends ModelBase> implements IReadonlyReposit
 		else {
 			const endpoint:string = this.entityBackendConfig.parseItemQuery ? this.entityBackendConfig.parseItemQuery(itemId, this.entity, this.config, params) : `${this.endpointName}/${itemId}`;
 
-			const getItem$:Observable<T> = this.dataStore.get(endpoint, params && {params: params}, this.getBaseUrl({where: params})).pipe(
+			const getItem$:Observable<T> = this.dataStore.get(
+				endpoint,
+				params && {params: params},
+				this.getBaseUrl({where: params}),
+				this.entityBackendConfig.timeout ? { timeout: this.entityBackendConfig.timeout } : null
+			).pipe(
 				catchError((err: AjaxError) => {
 					this.emitEntityHttpErrorEvent(err);
 					throw err

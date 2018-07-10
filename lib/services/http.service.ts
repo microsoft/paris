@@ -48,7 +48,7 @@ export class Http{
 			method: method,
 			url: fullUrl,
 			body: options && options.data,
-			timeout: DEFAULT_TIMEOUT
+			timeout: currentHttpConfig && currentHttpConfig.timeout || DEFAULT_TIMEOUT
 		}, Http.httpOptionsToRequestInit(options, currentHttpConfig)))
 			.pipe(
 				catchError((err: AjaxError) => {
@@ -101,7 +101,8 @@ export class Http{
 export interface HttpOptions<T = any, U = UrlParams>{
 	data?:T,
 	params?:U,
-	separateArrayParams?:boolean
+	separateArrayParams?:boolean,
+	timeout?:number
 }
 
 export type UrlParams = { [index:string]:any };
