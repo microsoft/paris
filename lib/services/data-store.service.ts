@@ -10,7 +10,7 @@ export class DataStoreService{
 	constructor(private config:ParisConfig){}
 
 	get<T = any>(endpoint:string, data?:HttpOptions, baseUrl?:string, httpConfig?:AjaxRequest):Observable<T>{
-		return this.setActiveRequest(this.request<T>("GET", endpoint, data, baseUrl, httpConfig), "GET", endpoint, data);
+		return this.request<T>("GET", endpoint, data, baseUrl, httpConfig);
 	}
 
 	save<T = any>(endpoint:string, method:RequestMethod = "POST", data?:HttpOptions, baseUrl?:string, httpConfig?:AjaxRequest):Observable<T>{
@@ -23,7 +23,9 @@ export class DataStoreService{
 
 	request<T = any>(method:RequestMethod, endpoint:string, data?:HttpOptions, baseUrl?:string, httpConfig?:AjaxRequest):Observable<T>{
 		const fullHttpConfig:AjaxRequest = Object.assign({}, this.config.http, httpConfig);
-		return Http.request(method, this.getEndpointUrl(endpoint, baseUrl), data, fullHttpConfig);
+		const endpointUrl = this.getEndpointUrl(endpoint, baseUrl);
+
+		return  this.setActiveRequest(Http.request(method, endpointUrl, data, fullHttpConfig), method, endpointUrl, data);
 	}
 
 	private getEndpointUrl(endpoint:string, baseUrl?:string):string{
