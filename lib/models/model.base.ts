@@ -1,4 +1,4 @@
-export class ModelBase{
+export class ModelBase<TRawData = any>{
 	id?:any;
 	$parent?:ModelBase;
 
