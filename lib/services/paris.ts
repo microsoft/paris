@@ -368,9 +368,9 @@ export class Paris{
 	/**
 	 * Gets an item by ID from backend and returns an Observable with the model
 	 *
-	 * @example <caption>Get a ToDo item with ID 1</caption>
-	 * const toDo$:Observable<ToDo> = paris.getItemById<ToDo>(ToDo, 1);
-	 * toDo$.subscribe((toDo:ToDo) => console.log('Found ToDo item: ', toDo);
+	 * @example <caption>Get a TodoItem with ID 1</caption>
+	 * const toDo$:Observable<TodoItem> = paris.getItemById<TodoItem>(TodoItem, 1);
+	 * toDo$.subscribe((toDo:TodoItem) => console.log('Found TodoItem item: ', toDo);
 	 *
 	 * @param {DataEntityConstructor<T extends ModelBase>} entityConstructor
 	 * @param {string | number} itemId
@@ -391,15 +391,15 @@ export class Paris{
 	/**
 	 * Query items in a relationship - fetches multiple items that relate to a specified item.
 	 *
-	 * @example <caption>Get all the ToDo items in a ToDoList</caption>
+	 * @example <caption>Get all the TodoItem items in a TodoList</caption>
 	 * const toDoListId = 1;
-	 * const toDoList$:Observable<ToDoList> = paris.getItemById(ToDoList, toDoListId);
+	 * const toDoList$:Observable<TodoList> = paris.getItemById(TodoList, toDoListId);
 	 *
-	 * const toDoListItems$:Observable<DataSet<ToDo>> = toDoList$.pipe(
-	 * 	mergeMap((toDoList:ToDoList) => paris.queryForItem<ToDoList, Todo>(TodoListItemsRelationship, toDoList))
+	 * const toDoListItems$:Observable<DataSet<TodoItem>> = toDoList$.pipe(
+	 * 	mergeMap((toDoList:TodoList) => paris.queryForItem<TodoList, Todo>(TodoListItemsRelationship, toDoList))
 	 * );
 	 *
-	 * toDoListItems$.subscribe((toDoListItems:DataSet<ToDo>) => console.log(`Items in ToDoList #${toDoListId}:`, toDoListItems.items));
+	 * toDoListItems$.subscribe((toDoListItems:DataSet<TodoItem>) => console.log(`Items in TodoList #${toDoListId}:`, toDoListItems.items));
 	 *
 	 * @param {Function} relationshipConstructor
 	 * @param {ModelBase} item
@@ -422,13 +422,13 @@ export class Paris{
 	 *
 	 * @example <caption>Get an item for another item</caption>
 	 * const toDoListId = 1;
-	 * const toDoList$:Observable<ToDoList> = paris.getItemById(ToDoList, toDoListId);
+	 * const toDoList$:Observable<TodoList> = paris.getItemById(TodoList, toDoListId);
 	 *
 	 * const toDoListHistory$:Observable<ToDoListHistory> = toDoList$.pipe(
-	 * 	mergeMap((toDoList:ToDoList) => paris.getRelatedItem<ToDoList, ToDoListHistory>(TodoListItemsRelationship, toDoList))
+	 * 	mergeMap((toDoList:TodoList) => paris.getRelatedItem<TodoList, ToDoListHistory>(TodoListItemsRelationship, toDoList))
 	 * );
 	 *
-	 * toDoListHistory$.subscribe((toDoListHistory$:ToDoListHistory) => console.log(`History for ToDoList #${toDoListId}:`, toDoListHistory));
+	 * toDoListHistory$.subscribe((toDoListHistory$:ToDoListHistory) => console.log(`History for TodoList #${toDoListId}:`, toDoListHistory));
 	 *
 	 * @param {Function} relationshipConstructor
 	 * @param {ModelBase} item
@@ -451,7 +451,7 @@ export class Paris{
 	 * const openStatusId = 'open';
 	 * const toDoStatus = paris.getValue(ToDoStatus, openStatusId);
 	 *
-	 * console.log("ToDo 'open' status: ", toDoStatus);
+	 * console.log("TodoItem 'open' status: ", toDoStatus);
 	 *
 	 * @param {DataEntityConstructor<T extends ModelBase>} entityConstructor
 	 * @param valueId

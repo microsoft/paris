@@ -21,7 +21,7 @@ contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additio
 
 First, define an Entity:
 
-```code
+```typescript
 	@Entity({
 		singularName: "Todo Item",
 		pluralName: "Todo Items",
@@ -38,9 +38,9 @@ First, define an Entity:
 
 The above defines an Entity, which can be used to query the todo/items server endpoint, like this:
 
-```code
+```typescript
 	const paris = new Paris();
-	paris.query(TodoItem).subscribe((todoItemsDataset:DataSet<TodoItem>) => {
-		console.log("Here are the items: ", todoItemsDataset.items);
+	paris.getItemById(TodoItem, 1).subscribe((todoItem:TodoItem) => {
+		console.log("Todo item with ID 1: ", todoItem);
 	});
-``
+```
