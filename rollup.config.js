@@ -1,39 +1,52 @@
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import pkg from './package.json';
-
-// found this online, it does seem to correctly rewrite the rxjs paths
-// but is it helping or hurting?
-class RollupRx {
-
-	constructor( options ){
-		this.options = options;
-	}
-
-	resolveId( id ){
-		if(id.startsWith('rxjs/')){
-			return `${__dirname}/node_modules/rxjs-es/${id.replace('rxjs/', '')}.js`;
-		}
-	}
-}
-
-const rollupRx = config => new RollupRx( config );
+//
+// // found this online, it does seem to correctly rewrite the rxjs paths
+// // but is it helping or hurting?
+// class RollupRx {
+//
+// 	constructor(options) {
+// 		this.options = options;
+// 	}
+//
+// 	resolveId(id) {
+// 		if (id.startsWith('rxjs/')) {
+// 			return `${__dirname}/node_modules/rxjs-es/${id.replace('rxjs/', '')}.js`;
+// 		}
+// 	}
+// }
+//
+// const rollupRx = config => new RollupRx(config);
 
 export default [
 	// browser-friendly UMD build
 	{
-		entry: 'bundle/lib/main.js',
-		dest: pkg.browser,
-		format: 'umd',
-		moduleName: 'paris',
+		input: 'dist/lib/main.js',
+		name: 'wcdportal.paris',
+		output: [
+			{
+				file: pkg.main,
+				format: 'umd'
+			},
+			{
+				file: pkg.module,
+				format: 'es'
+			}
+		],
 		plugins: [
 			resolve(), // so Rollup can find `ms`
 			commonjs() // so Rollup can convert `ms` to an ES module
 		],
 		external: id => {
 			return /^(rxjs|lodash)/.test(id);
-		}
-	}
+		},
+		globals: {
+			rxjs: 'rxjs',
+			'rxjs/operators': 'rxjs/operators',
+			'rxjs/ajax': 'rxjs/ajax'
+		},
+	},
 	/*
 	,
 

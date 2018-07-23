@@ -1,12 +1,13 @@
 {
 	"compilerOptions": {
-		"lib": ["es2016", "dom"], // we target Node.js(v6)
+		"lib": ["es2015", "dom"], // we target Node.js(v6)
 		"target": "es5", // we target Node.js(v6)
-		"module": "commonjs",
+		"module": "es2015",
 		"moduleResolution": "node", // we target Node.js(v6)
 		"declaration": true, // generate TypeScript definitions
 		"rootDir": ".",
-		"outDir": "./bundle",
+		"outDir": "./dist",
+		"sourceMap": true,
 		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true,
 		"noImplicitAny": true,
@@ -18,14 +19,10 @@
 			"node_modules"
 		],
 		"types" : ["node"], // only use needed types
-		"baseUrl": "/",
-		"paths": {
-			"@angular/*": [
-				"../node_modules/@angular/*"
-			],
-			"rxjs/*": [
-				"../node_modules/rxjs/*"
-			]
-		}
-	}
+		"baseUrl": "/"
+	},
+	"include": [
+		"index.ts",
+		"lib/**/*"
+	]
 }

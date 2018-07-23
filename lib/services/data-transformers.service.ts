@@ -1,10 +1,8 @@
-import {DataEntityType} from "../entity/data-entity.base";
-
 const transformers:Array<DataTransformer> = [
 	{
 		type: Date,
 		parse: (dateValue:string) => new Date(dateValue),
-		serialize: (date:Date) => date ? date.valueOf() : null
+		serialize: (date:Date) => date ? date.toISOString() : null
 	},
 	{
 		type: RegExp,
@@ -13,16 +11,16 @@ const transformers:Array<DataTransformer> = [
 	}
 ];
 
-const transformersMap:Map<DataEntityType, DataTransformer> = new Map;
+const transformersMap:Map<Function, DataTransformer> = new Map;
 transformers.forEach((transformer:DataTransformer) => transformersMap.set(transformer.type, transformer));
 
 export class DataTransformersService{
-	static parse(type:DataEntityType, value:any):any{
+	static parse(type:Function, value:any):any{
 		let transformer:DataTransformer = transformersMap.get(type);
 		return transformer ? transformer.parse(value) : value;
 	}
 
-	static serialize(type:DataEntityType, value:any):any{
+	static serialize(type:Function, value:any):any{
 		let transformer:DataTransformer = transformersMap.get(type);
 		return transformer ? transformer.serialize(value) : value;
 	}

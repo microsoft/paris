@@ -1,9 +1,10 @@
-import {Observable} from "rxjs/Observable";
+import {from, Observable, of} from "rxjs";
+import {finalize, share, tap} from "rxjs/operators";
 
-export class DataCache<T>{
-	time:number;
+export class DataCache<T = any>{
+	time:((item:T) => number) | number;
 	obj:number;
-	getter:(_:any) => Promise<T> | Observable<T>;
+	getter:(_:any, params?:{ [index:string]: any }) => Promise<T> | Observable<T>;
 
 	private _keys:Array<string>;
 	private _values:Map<string, T>;
@@ -11,11 +12,13 @@ export class DataCache<T>{
 	private _getObservable:{ [index:string]:Observable<T> };
 
 	constructor(settings?:DataCacheSettings<T>){
-		DataCache.validateSettings<T>(settings);
+		if (settings) {
+			DataCache.validateSettings<T>(settings);
 
-		this.time = settings.time || null; // milliseconds
-		this.obj = settings.max;
-		this.getter = settings.getter;
+			this.time = settings.time || null; // milliseconds
+			this.obj = settings.max;
+			this.getter = settings.getter;
+		}
 
 		this._keys = [];
 		this._values = new Map<string, T>();
@@ -31,29 +34,41 @@ export class DataCache<T>{
 	 * @param key
 	 * @returns {Observable<T>}
 	 */
-	get(key:any):Observable<T>{
+	get(key:any, params?:{ [index:string]: any }, getter?:() => Promise<T> | Observable<T>):Observable<T>{
 		if (!key && key !== 0)
 			throw new Error("Can't get DataCache item, key not specified.");
 
 		key = key.toString();
 
-		if (this.getter){
-			let getObservable = this._getObservable[key];
+		const cacheKey:string = this.getCacheKey(key, params);
+
+		if (getter || this.getter){
+			let getObservable = this._getObservable[cacheKey];
 			if (getObservable)
 				return getObservable;
 
-			let cachedItem = this._values.get(key);
-			if (cachedItem)
-				return Observable.of(cachedItem);
+			let cachedItem:T = this._values.get(cacheKey);
+			if (cachedItem !== undefined)
+				return of(cachedItem);
 
-			return this._getObservable[key] = Observable.from(this.getter(key))
-				.do((value:T) => {
-					this.add(key, value);
-					delete this._getObservable[key];
-				});
+			return this._getObservable[cacheKey] = from(getter ? getter() : this.getter(key, params))
+				.pipe(
+					tap(
+						(value: T) => {
+							this.add(cacheKey, value);
+							delete this._getObservable[cacheKey];
+						},
+						err => {
+							delete this._getObservable[cacheKey];
+						}),
+					finalize(() => {
+						delete this._getObservable[cacheKey];
+					}),
+					share()
+				);
 		}
 		else
-			return Observable.of(this._values.get(key));
+			return of(this._values.get(key));
 	}
 
 	/**
@@ -80,10 +95,14 @@ export class DataCache<T>{
 		}
 
 		if (this.time){
-			this._timeouts[key] = setTimeout(() => {
-				this.remove(key);
-				delete this._timeouts[key];
-			}, this.time);
+			let time:number = this.time instanceof Function ? this.time(value) : this.time;
+
+			if (!isNaN(time) && time > 0) {
+				this._timeouts[key] = setTimeout(() => {
+					this.remove(key);
+					delete this._timeouts[key];
+				}, time);
+			}
 		}
 
 		return this;
@@ -92,9 +111,9 @@ export class DataCache<T>{
 	/**
 	 * Removes an item from the cache collection.
 	 * @param key
-	 * @returns {*}
+	 * @returns {T} The removed value, or null if none was removed
 	 */
-	remove(key:any){
+	remove(key:any):T{
 		key = key.toString();
 
 		let valueTimeout = this._timeouts[key];
@@ -109,12 +128,23 @@ export class DataCache<T>{
 		let keyIndex = this._keys.indexOf(key);
 		if (~keyIndex){
 			this._keys.splice(keyIndex, 1);
-			let value = this._values.get(key);
+			let value:T = this._values.get(key);
 			this._values.delete(key);
 			return value;
 		}
 
 		return null;
+	}
+
+	private getCacheKey(key:string, params?:{ [index:string]: any }):string{
+		return key + (params !== undefined && params !== null ? "_" + JSON.stringify(params) : "");
+	}
+
+	/**
+	 * Removes all cached items
+	 */
+	clear(){
+		this._keys.forEach((key:string) => this.remove(key));
 	}
 
 	clearGetters(){
@@ -130,8 +160,8 @@ export class DataCache<T>{
 	};
 }
 
-export interface DataCacheSettings<T>{
+export interface DataCacheSettings<T = any>{
 	max?:number,
-	time?:number,
+	time?:((item:T) => number) | number,
 	getter?:(_:any) => Observable<T>
 }

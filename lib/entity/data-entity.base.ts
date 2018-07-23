@@ -9,6 +9,8 @@ export interface DataEntityConstructor<T extends ModelBase> extends DataEntityTy
 
 export interface DataEntityType{
 	new(data?:EntityModelConfigBase, rawData?:any):any,
+	singularName?:string,
+	pluralName?:string,
 	entityConfig?:ModelEntity,
-	valueObjectConfig?:EntityConfigBase
+	valueObjectConfig?:EntityConfigBase,
 }

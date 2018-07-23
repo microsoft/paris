@@ -1,19 +1,23 @@
-import {Observable} from "rxjs/Observable";
+import {Observable} from "rxjs";
 import {DataQuery} from "../dataset/data-query";
 import {DataSet} from "../dataset/dataset";
-import {ModelEntity} from "../entity/entity.config";
-import {EntityModelBase} from "../models/entity-model.base";
+import {IEntityConfigBase} from "../entity/entity-config.base";
+import {ModelBase} from "../models/model.base";
+import {DataOptions} from "../dataset/data.options";
 
-export interface IRepository{
-	entity:ModelEntity,
-	createItem:(itemData:any) => Observable<Readonly<any>>,
-	createNewItem:() => EntityModelBase,
-	getItemById:(id:any) => Observable<any>,
-	query:(options?:DataQuery) => Observable<DataSet<any>>,
-	serializeItem:(item:EntityModelBase) => Object,
-	allItems$:Observable<Array<any>>,
+export interface IReadonlyRepository<T extends ModelBase = ModelBase>{
+	entity:IEntityConfigBase,
+	createItem:(itemData:any) => Observable<Readonly<T>>,
+	createNewItem:() => T,
+	getItemById:(id:any, options?:DataOptions, params?:{ [index:string]:any }) => Observable<T>,
+	query:(options?:DataQuery) => Observable<DataSet<T>>,
+	serializeItem:(item:T, serializationData?:any) => Object,
+	allItems$:Observable<Array<T>>,
 	endpointName:string,
-	endpointUrl:string,
-	save:(item:EntityModelBase) => Observable<EntityModelBase>
+	getEndpointUrl: (query?: DataQuery) => string,
+}
+
+export interface IRepository<T extends ModelBase = ModelBase> extends IReadonlyRepository<T>{
+	save:(item:T) => Observable<T>
 	//save$:Observable<any>
 }

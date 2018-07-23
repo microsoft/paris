@@ -3,4 +3,4 @@ import {EntitiesServiceBase} from "./entities.service.base";
 
 export class EntitiesService extends EntitiesServiceBase<ModelEntity>{}
 
-export let entitiesService = new EntitiesService();
+export let entitiesService:EntitiesService = new EntitiesService();

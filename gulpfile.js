@@ -4,7 +4,7 @@ const clean = require('gulp-clean');
 const runSequence = require('run-sequence');
 
 gulp.task('build', ["clean"], function() {
-	const tsProject = ts.createProject('tsconfig.json');
+	const tsProject = ts.createProject('tsconfig.lib.json');
 
 	const merge = require('merge2');
 
@@ -20,7 +20,7 @@ gulp.task('build', ["clean"], function() {
 });
 
 gulp.task('clean', function () {
-	const tsProject = ts.createProject('tsconfig.json');
+	const tsProject = ts.createProject('tsconfig.lib.json');
 
 	return gulp.src(tsProject.config.compilerOptions.outDir, { read: false })
 		.pipe(clean());
