@@ -25,7 +25,7 @@ import {EntityErrorEvent, EntityErrorTypes} from "../events/entity-error.event";
 import {catchError, map, mergeMap, tap} from "rxjs/operators";
 import {IReadonlyRepository} from "./repository.interface";
 
-export class ReadonlyRepository<T extends ModelBase> implements IReadonlyRepository<T>{
+export class ReadonlyRepository<T extends ModelBase<TRawData>, TRawData = object> implements IReadonlyRepository<T>{
 	protected _errorSubject$: Subject<EntityErrorEvent>;
 	error$: Observable<EntityErrorEvent>;
 
@@ -104,8 +104,8 @@ export class ReadonlyRepository<T extends ModelBase> implements IReadonlyReposit
 		return new this.entityConstructor(defaultData);
 	}
 
-	createItem<T extends ModelBase>(itemData: {}, options: DataOptions = { allowCache: true, availability: DataAvailability.available }, query?: DataQuery): Observable<T> {
-		return ReadonlyRepository.getModelData<T>(itemData, this.entity, this.config, this.paris, options, query);
+	createItem(rawData: TRawData, options: DataOptions = { allowCache: true, availability: DataAvailability.available }, query?: DataQuery): Observable<T> {
+		return ReadonlyRepository.getModelData<T>(rawData, this.entity, this.config, this.paris, options, query);
 	}
 
 	query(query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<T>> {
@@ -221,10 +221,10 @@ export class ReadonlyRepository<T extends ModelBase> implements IReadonlyReposit
 	 * @param {T} item
 	 * @returns {Index}
 	 */
-	serializeItem(item:T, serializationData?:any): Index {
+	serializeItem(item:T, serializationData?:any): TRawData {
 		ReadonlyRepository.validateItem(item, this.entity);
 
-		return ReadonlyRepository.serializeItem(item, this.entity, this.paris, serializationData);
+		return ReadonlyRepository.serializeItem<TRawData>(item, this.entity, this.paris, serializationData);
 	}
 
 	/**
@@ -237,7 +237,7 @@ export class ReadonlyRepository<T extends ModelBase> implements IReadonlyReposit
 	 * @param {DataOptions} options
 	 * @returns {Observable<T extends EntityModelBase>}
 	 */
-	static getModelData<T extends ModelBase>(rawData: Index, entity: IEntityConfigBase, config: ParisConfig, paris: Paris, options: DataOptions = defaultDataOptions, query?: DataQuery): Observable<T> {
+	static getModelData<T extends ModelBase, TRawData extends any = any>(rawData: TRawData, entity: IEntityConfigBase, config: ParisConfig, paris: Paris, options: DataOptions = defaultDataOptions, query?: DataQuery): Observable<T> {
 		let entityIdProperty: string = entity.idProperty || config.entityIdProperty,
 			modelData: Index = entity instanceof ModelEntity ? {id: rawData[entityIdProperty]} : {},
 			subModels: Array<Observable<{ [index: string]: ModelBase | Array<ModelBase> }>> = [];
@@ -439,10 +439,10 @@ export class ReadonlyRepository<T extends ModelBase> implements IReadonlyReposit
 	 * @param item
 	 * @returns {Index}
 	 */
-	static serializeItem(item:{}, entity:IEntityConfigBase, paris:Paris, serializationData?:any):Index{
+	static serializeItem<TRawData extends any = object>(item:{}, entity:IEntityConfigBase, paris:Paris, serializationData?:any):TRawData{
 		ReadonlyRepository.validateItem(item, entity);
 
-		let modelData: Index = {};
+		let modelData: TRawData = <TRawData>{};
 
 		entity.fields.forEach((entityField:Field) => {
 			if (entityField.serialize !== false) {

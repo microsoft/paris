@@ -16,15 +16,15 @@ import {RelationshipType} from "../models/relationship-type.enum";
 
 const DEFAULT_RELATIONSHIP_TYPES = [RelationshipType.OneToMany, RelationshipType.OneToOne];
 
-export class RelationshipRepository<T extends ModelBase, U extends ModelBase> extends ReadonlyRepository<U> implements IRelationshipRepository<U> {
-	private sourceRepository: ReadonlyRepository<T>;
+export class RelationshipRepository<TSource extends ModelBase, TResult extends ModelBase> extends ReadonlyRepository<TResult> implements IRelationshipRepository<TSource, TResult> {
+	private sourceRepository: ReadonlyRepository<TSource>;
 	readonly relationshipConfig:EntityRelationshipConfig;
 
-	sourceItem:T;
+	sourceItem:TSource;
 	readonly allowedTypes:Set<RelationshipType>;
 
-	constructor(public sourceEntityType: DataEntityConstructor<T>,
-				public dataEntityType: DataEntityConstructor<U>,
+	constructor(public sourceEntityType: DataEntityConstructor<TSource>,
+				public dataEntityType: DataEntityConstructor<TResult>,
 				relationTypes:Array<RelationshipType>,
 				config: ParisConfig,
 				dataStore: DataStoreService,
@@ -44,11 +44,11 @@ export class RelationshipRepository<T extends ModelBase, U extends ModelBase> ex
 			throw new Error(`Can't create RelationshipRepository, since there's no defined relationship in ${sourceEntityName} for ${dataEntityName}.`);
 
 		this.entityBackendConfig = Object.assign({}, dataEntityType.entityConfig, this.relationshipConfig);
-		this.sourceRepository = paris.getRepository<T>(sourceEntityType);
+		this.sourceRepository = paris.getRepository<TSource>(sourceEntityType);
 		this.allowedTypes = new Set(relationTypes || DEFAULT_RELATIONSHIP_TYPES);
 	}
 
-	query(query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<U>>{
+	query(query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<TResult>>{
 		if (!this.sourceItem)
 			throw new Error(`Can't query RelationshipRepository<${this.sourceEntityType.singularName}, ${this.dataEntityType.singularName}>, since no source item was defined.`);
 
@@ -56,14 +56,14 @@ export class RelationshipRepository<T extends ModelBase, U extends ModelBase> ex
 	}
 
 
-	queryItem(query?: DataQuery, dataOptions: DataOptions = defaultDataOptions):Observable<U>{
+	queryItem(query?: DataQuery, dataOptions: DataOptions = defaultDataOptions):Observable<TResult>{
 		if (!this.sourceItem)
 			throw new Error(`Can't query RelationshipRepository<${this.sourceEntityType.singularName}, ${this.dataEntityType.singularName}>, since no source item was defined.`);
 
 		return this.getRelatedItem(this.sourceItem, query, dataOptions);
 	}
 
-	queryForItem(item:ModelBase, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<U>> {
+	queryForItem(item:TSource, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<TResult>> {
 		if (!this.allowedTypes.has(RelationshipType.OneToMany))
 			throw new Error(`Can't query relationship ${this.sourceEntityType.singularName} -> ${this.dataEntityType.singularName} since it doesn't have the 'OneToMany' allowed type.`);
 
@@ -85,7 +85,7 @@ export class RelationshipRepository<T extends ModelBase, U extends ModelBase> ex
 	 * @param {DataOptions} dataOptions
 	 * @returns {Observable<DataSet<U extends ModelBase>>}
 	 */
-	queryForItemId(itemId:string|number, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<U>> {
+	queryForItemId(itemId:string|number, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<TResult>> {
 		if (!this.allowedTypes.has(RelationshipType.OneToMany))
 			throw new Error(`Can't query relationship ${this.sourceEntityType.singularName} -> ${this.dataEntityType.singularName} since it doesn't have the 'OneToMany' allowed type.`);
 
@@ -99,7 +99,7 @@ export class RelationshipRepository<T extends ModelBase, U extends ModelBase> ex
 		return super.query(cloneQuery, dataOptions);
 	}
 
-	getRelatedItem(item:ModelBase, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions):Observable<U>{
+	getRelatedItem(item:ModelBase, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions):Observable<TResult>{
 		if (!this.allowedTypes.has(RelationshipType.OneToOne))
 			throw new Error(`Can't query relationship ${this.sourceEntityType.singularName} -> ${this.dataEntityType.singularName} since it doesn't have the 'OneToMany' allowed type.`);
 
@@ -123,7 +123,7 @@ export class RelationshipRepository<T extends ModelBase, U extends ModelBase> ex
 	 * @param {DataOptions} dataOptions
 	 * @returns {Observable<U extends ModelBase>}
 	 */
-	getRelatedItemById(itemId:string|number, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions):Observable<U>{
+	getRelatedItemById(itemId:string|number, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions):Observable<TResult>{
 		if (!this.allowedTypes.has(RelationshipType.OneToOne))
 			throw new Error(`Can't query relationship ${this.sourceEntityType.singularName} -> ${this.dataEntityType.singularName} since it doesn't have the 'OneToMany' allowed type.`);
 
@@ -163,11 +163,11 @@ export class RelationshipRepository<T extends ModelBase, U extends ModelBase> ex
 	}
 }
 
-export interface IRelationshipRepository<U extends ModelBase = ModelBase> extends IReadonlyRepository<U>{
+export interface IRelationshipRepository<TSource extends ModelBase = ModelBase, TResult extends ModelBase = ModelBase> extends IReadonlyRepository<TResult>{
 	sourceEntityType: DataEntityType,
 	dataEntityType: DataEntityType,
 	relationshipConfig:EntityRelationshipConfig,
-	queryForItem:(item:EntityModelBase, query?:DataQuery, dataOptions?:DataOptions) => Observable<DataSet<ModelBase>>,
-	getRelatedItem:(itemId?:any, query?: DataQuery, dataOptions?: DataOptions) => Observable<ModelBase>,
+	queryForItem:(sourceItem:TSource, query?:DataQuery, dataOptions?:DataOptions) => Observable<DataSet<TResult>>,
+	getRelatedItem:(itemId?:any, query?: DataQuery, dataOptions?: DataOptions) => Observable<TResult>,
 	allowedTypes:Set<RelationshipType>
 }
