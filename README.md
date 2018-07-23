@@ -22,25 +22,25 @@ contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additio
 First, define an Entity:
 
 ```typescript
-	@Entity({
-		singularName: "Todo Item",
-		pluralName: "Todo Items",
-		endpoint: "todo/items"
-	})
-	export class TodoItem extends EntityModelBase{
-		@EntityField()
-		text:string;
-		
-		@EntityField()
-		time:Date;
-	}
+@Entity({
+	singularName: "Todo Item",
+	pluralName: "Todo Items",
+	endpoint: "todo/items"
+})
+export class TodoItem extends EntityModelBase{
+	@EntityField()
+	text:string;
+	
+	@EntityField()
+	time:Date;
+}
 ```
 
 The above defines an Entity, which can be used to query the todo/items server endpoint, like this:
 
 ```typescript
-	const paris = new Paris();
-	paris.getItemById(TodoItem, 1).subscribe((todoItem:TodoItem) => {
-		console.log("Todo item with ID 1: ", todoItem);
-	});
+const paris = new Paris();
+paris.getItemById(TodoItem, 1).subscribe((todoItem:TodoItem) => {
+	console.log("Todo item with ID 1: ", todoItem);
+});
 ```
