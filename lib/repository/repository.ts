@@ -17,23 +17,23 @@ import {AjaxError} from "rxjs/ajax";
 import {catchError, map, mergeMap, tap} from "rxjs/operators";
 import {DataSet} from "../dataset/dataset";
 
-export class Repository<T extends ModelBase> extends ReadonlyRepository<T> implements IRepository<T> {
+export class Repository<TEntity extends ModelBase> extends ReadonlyRepository<TEntity> implements IRepository<TEntity> {
 	save$: Observable<SaveEntityEvent>;
 	remove$: Observable<RemoveEntitiesEvent>;
 
 	private _saveSubject$: Subject<SaveEntityEvent>;
 	private _removeSubject$: Subject<RemoveEntitiesEvent>;
 
-	constructor(entity: EntityConfig<T>,
+	constructor(entity: EntityConfig<TEntity>,
 				config: ParisConfig,
-				entityConstructor: DataEntityConstructor<T>,
+				entityConstructor: DataEntityConstructor<TEntity>,
 				dataStore: DataStoreService,
 				paris: Paris) {
 		super(entity, entity, config, entityConstructor, dataStore, paris);
 
-		const getAllItems$: Observable<Array<T>> = defer(() => this.query().pipe(map((dataSet:DataSet<T>) => dataSet.items)));
+		const getAllItems$: Observable<Array<TEntity>> = defer(() => this.query().pipe(map((dataSet:DataSet<TEntity>) => dataSet.items)));
 
-		this._allItemsSubject$ = new Subject<Array<T>>();
+		this._allItemsSubject$ = new Subject<Array<TEntity>>();
 		this._allItems$ = merge(getAllItems$, this._allItemsSubject$.asObservable());
 
 		this._saveSubject$ = new Subject();
@@ -48,7 +48,7 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 	 * @param {any} serializationData Any data to pass to serialize or serializeItem
 	 * @returns {Observable<T extends EntityModelBase>}
 	 */
-	save(item: T, options?:HttpOptions, serializationData?:any): Observable<T> {
+	save(item: TEntity, options?:HttpOptions, serializationData?:any): Observable<TEntity> {
 		if (!this.entityBackendConfig.endpoint)
 			throw new Error(`Entity ${this.entityConstructor.entityConfig.singularName || this.entityConstructor.name} can't be saved - it doesn't specify an endpoint.`);
 
@@ -65,7 +65,7 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 					}),
 					mergeMap((savedItemData: Index) =>
 						savedItemData ? this.createItem(savedItemData) : of(null)),
-					tap((savedItem: T) => {
+					tap((savedItem: TEntity) => {
 						if (savedItem && this._allValues) {
 							this._allValues = [...this._allValues, savedItem];
 							this._allItemsSubject$.next(this._allValues);
@@ -80,7 +80,7 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 		}
 	}
 
-	private getSaveMethod(item:T):RequestMethod{
+	private getSaveMethod(item:TEntity):RequestMethod{
 		return this.entityBackendConfig.saveMethod
 			? this.entityBackendConfig.saveMethod instanceof Function ? this.entityBackendConfig.saveMethod(item, this.config) : this.entityBackendConfig.saveMethod
 			: item.id === undefined ? "POST" : "PUT";
@@ -91,7 +91,7 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 	 * @param {Array<T extends EntityModelBase>} items
 	 * @returns {Observable<Array<T extends EntityModelBase>>}
 	 */
-	saveItems(items:Array<T>, options?:HttpOptions):Observable<Array<T>>{
+	saveItems(items:Array<TEntity>, options?:HttpOptions):Observable<Array<TEntity>>{
 		if (!this.entityBackendConfig.endpoint)
 			throw new Error(`${this.entity.pluralName} can't be saved - it doesn't specify an endpoint.`);
 
@@ -103,16 +103,16 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 			(saveMethod === "POST" ? newItems : existingItems).items.push(this.serializeItem(item));
 		});
 
-		let saveItemsArray:Array<Observable<Array<T>>> = [newItems, existingItems]
+		let saveItemsArray:Array<Observable<Array<TEntity>>> = [newItems, existingItems]
 			.filter((saveItems:SaveItems) => saveItems.items.length)
 			.map((saveItems:SaveItems) => this.doSaveItems(saveItems.items, saveItems.method, options));
 
 		return combineLatest.apply(this, saveItemsArray).pipe(
-			map((savedItems:Array<Array<T>>) => _.flatMap(savedItems)),
-			tap((savedItems:Array<T>) => {
+			map((savedItems:Array<Array<TEntity>>) => _.flatMap(savedItems)),
+			tap((savedItems:Array<TEntity>) => {
 				if (savedItems && savedItems.length && this._allValues) {
-					let itemsAdded: Array<T> = [];
-					savedItems.forEach((item:T) => {
+					let itemsAdded: Array<TEntity> = [];
+					savedItems.forEach((item:TEntity) => {
 						const originalItemIndex:number = _.findIndex(this._allValues,_item => item.id === _item.id);
 						if (!!~originalItemIndex)
 							this._allValues[originalItemIndex] = item;
@@ -134,7 +134,7 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 	 * @param {"PUT" | "POST"} method
 	 * @returns {Observable<Array<T extends EntityModelBase>>}
 	 */
-	private doSaveItems(itemsData:Array<any>, method:"PUT" | "POST", options?:HttpOptions):Observable<Array<T>>{
+	private doSaveItems(itemsData:Array<any>, method:"PUT" | "POST", options?:HttpOptions):Observable<Array<TEntity>>{
 		const saveHttpOptions:HttpOptions = this.entity.parseSaveItemsQuery
 			? this.entity.parseSaveItemsQuery(itemsData, options, this.entity, this.config)
 			: Object.assign({}, options, {data: {items: itemsData}});
@@ -150,13 +150,19 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 						return of([]);
 
 					let itemsData:Array<any> = savedItemsData instanceof Array ? savedItemsData : savedItemsData.items;
-					let itemCreators:Array<Observable<T>> = itemsData.map(savedItemData => this.createItem(savedItemData));
+					let itemCreators:Array<Observable<TEntity>> = itemsData.map(savedItemData => this.createItem(savedItemData));
 					return combineLatest.apply(this, itemCreators);
 				})
 			)
 	}
 
-	removeItem(item:T, options?:HttpOptions):Observable<T>{
+	/**
+	 * Sends a DELETE request to the backend for deleting an item.
+	 * @param {TEntity} item
+	 * @param {HttpOptions} options
+	 * @returns {Observable<TEntity extends ModelBase>}
+	 */
+	removeItem(item:TEntity, options?:HttpOptions):Observable<TEntity>{
 		if (!item)
 			return of(null);
 
@@ -181,7 +187,7 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 					}),
 					tap(() => {
 						if (this._allValues) {
-							let itemIndex:number = _.findIndex(this._allValues, (_item:T) => _item.id === item.id);
+							let itemIndex:number = _.findIndex(this._allValues, (_item:TEntity) => _item.id === item.id);
 							if (~itemIndex)
 								this._allValues.splice(itemIndex, 1);
 
@@ -198,7 +204,13 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 		}
 	}
 
-	remove(items:Array<T>, options?:HttpOptions):Observable<Array<T>>{
+	/**
+	 * Sends a DELETE request to the backend for deleting multiple entities.
+	 * @param {Array<TEntity extends ModelBase>} items
+	 * @param {HttpOptions} options
+	 * @returns {Observable<Array<TEntity extends ModelBase>>}
+	 */
+	remove(items:Array<TEntity>, options?:HttpOptions):Observable<Array<TEntity>>{
 		if (!items)
 			throw new Error(`No ${this.entity.pluralName.toLowerCase()} specified for removing.`);
 
@@ -231,8 +243,8 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 					}),
 					tap(() => {
 						if (this._allValues) {
-							items.forEach((item:T) => {
-								let itemIndex:number = _.findIndex(this._allValues, (_item:T) => _item.id === item.id);
+							items.forEach((item:TEntity) => {
+								let itemIndex:number = _.findIndex(this._allValues, (_item:TEntity) => _item.id === item.id);
 								if (~itemIndex)
 									this._allValues.splice(itemIndex, 1);
 							});

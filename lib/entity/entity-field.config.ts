@@ -3,7 +3,7 @@ import {ParisConfig} from "../config/paris-config";
 import {DataQuery} from "../dataset/data-query";
 
 /**
- * Configuration for a model field decorator
+ * Configuration for a model EntityField decorator
  */
 export interface FieldConfig{
 	/**

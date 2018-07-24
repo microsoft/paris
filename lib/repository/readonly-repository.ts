@@ -25,7 +25,12 @@ import {EntityErrorEvent, EntityErrorTypes} from "../events/entity-error.event";
 import {catchError, map, mergeMap, tap} from "rxjs/operators";
 import {IReadonlyRepository} from "./repository.interface";
 import {FIELD_DATA_SELF} from "../entity/entity-field.config";
+import {EntityId} from "../models/entity-id.type";
 
+/**
+ * A Repository is a service through which all of an Entity's data is fetched, cached and saved back to the backend
+ * `ReadonlyRepository` is the base class for all Repositories, and the class used for Repositories that are readonly.
+ */
 export class ReadonlyRepository<TEntity extends ModelBase<TRawData>, TRawData = object> implements IReadonlyRepository<TEntity>{
 	protected _errorSubject$: Subject<EntityErrorEvent>;
 	error$: Observable<EntityErrorEvent>;
@@ -53,6 +58,11 @@ export class ReadonlyRepository<TEntity extends ModelBase<TRawData>, TRawData = 
 		return this.entityBackendConfig.baseUrl instanceof Function ? this.entityBackendConfig.baseUrl(this.config, query) : this.entityBackendConfig.baseUrl;
 	}
 
+	/**
+	 * An Observable for all the items of this entity. If the Entity has already loaded all possible items (if `loadAll` is set to `true`, for example), those items are returned.
+	 * Otherwise, a query with no DataQuery will be performed to the backend and the data will be fetched.
+	 * @returns {Observable<Array<TEntity extends ModelBase<TRawData>>>}
+	 */
 	get allItems$(): Observable<Array<TEntity>> {
 		if (this._allValues)
 			return merge(of(this._allValues), this._allItemsSubject$.asObservable());
@@ -71,10 +81,19 @@ export class ReadonlyRepository<TEntity extends ModelBase<TRawData>, TRawData = 
 		return this._cache;
 	}
 
+	/**
+	 * The base URL for this Repository's API calls (not including base URL - the domain)
+	 * @returns {string}
+	 */
 	get endpointName():string{
 		return this.entityBackendConfig.endpoint instanceof Function ? this.entityBackendConfig.endpoint(this.config) : this.entityBackendConfig.endpoint;
 	}
 
+	/**
+	 * Returns the full URL for an API call
+	 * @param {DataQuery} query
+	 * @returns {string}
+	 */
 	getEndpointUrl(query?: DataQuery): string{
 		return `${this.getBaseUrl(query)}/${this.endpointName}`;
 	}
@@ -93,6 +112,11 @@ export class ReadonlyRepository<TEntity extends ModelBase<TRawData>, TRawData = 
 		);
 	}
 
+	/**
+	 * Creates a new instance of the Repository's entity.
+	 * All fields will be undefined, except those that have defaultValue or those that are arrays, which will have an empty array as value.
+	 * @returns {TEntity}
+	 */
 	createNewItem(): TEntity {
 		let defaultData:{ [index:string]:any } = {};
 		this.entity.fieldsArray.forEach((field:Field) => {
@@ -105,10 +129,34 @@ export class ReadonlyRepository<TEntity extends ModelBase<TRawData>, TRawData = 
 		return new this.entityConstructor(defaultData);
 	}
 
+	/**
+	 * Creates a full model of this Repository's Entity. Any sub-models that need to be fetched from backend will be fetched (if options.availability === DataAvailability.deep).
+	 * This method is used internally when modeling entities and value objects, but may be used externally as well, in case an item should be created programmatically from raw data.
+	 * @param {TRawData} rawData The raw data for the entity, as it arrives from backend
+	 * @param {DataOptions} options
+	 * @param {DataQuery} query
+	 * @returns {Observable<TEntity extends ModelBase<TRawData>>}
+	 */
 	createItem(rawData: TRawData, options: DataOptions = { allowCache: true, availability: DataAvailability.available }, query?: DataQuery): Observable<TEntity> {
 		return ReadonlyRepository.getModelData<TEntity>(rawData, this.entity, this.config, this.paris, options, query);
 	}
 
+	/**
+	 * Gets multiple items from backend.
+	 * The backend may add paging information, such as count, page, etc, so a DataSet object is returned rather than just an Array.
+	 *
+	 * @example <caption>Get all Todo items</caption>
+	 * repository.query()
+	 * 		.subscribe((todoItems:DataSet<TodoItem>) => console.log('Current items: ', todoItems.items));
+	 *
+	 * @example <caption>Get all Todo items, sorted by name</caption>
+	 * repository.query({ sortBy: { field: 'name' }})
+	 * 		.subscribe((todoItems:DataSet<TodoItem>) => console.log('Items by name: ', todoItems.items));
+	 *
+	 * @param {DataQuery} query
+	 * @param {DataOptions} dataOptions
+	 * @returns {Observable<DataSet<TEntity extends ModelBase<TRawData>>>}
+	 */
 	query(query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<TEntity>> {
 		if (this.entityConstructor.entityConfig && !this.entityConstructor.entityConfig.supportsGetMethod(EntityGetMethod.query))
 			throw new Error(`Can't query ${this.entityConstructor.singularName}, query isn't supported.`);
@@ -116,6 +164,13 @@ export class ReadonlyRepository<TEntity extends ModelBase<TRawData>, TRawData = 
 		return this.paris.callQuery(this.entityConstructor, this.entityBackendConfig, query, dataOptions);
 	}
 
+	/**
+	 * Same as {@link ReadonlyRepository#query|query}, but returns a single item rather than a {DataSet}.
+	 * Useful for when we require to fetch a single model from backend, but it's either a ValueObject (so we can't refer to it by ID) or it's fetched by a more complex data query.
+	 * @param {DataQuery} query
+	 * @param {DataOptions} dataOptions
+	 * @returns {Observable<TEntity extends ModelBase<TRawData>>}
+	 */
 	queryItem(query: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<TEntity> {
 		let httpOptions:HttpOptions = this.entityBackendConfig.parseDataQuery ? { params: this.entityBackendConfig.parseDataQuery(query) } : queryToHttpOptions(query);
 
@@ -154,15 +209,28 @@ export class ReadonlyRepository<TEntity extends ModelBase<TRawData>, TRawData = 
 			return getItem$;
 	}
 
+	/**
+	 * Clears all cached data in this Repository
+	 */
 	clearCache():void {
 		this.cache.clear();
 	}
 
+	/**
+	 * Clears the cached values in the Repository, if they were set as a result of using allItems$ or `loadAll: true`.
+	 */
 	clearAllValues():void {
 		this._allValues = null;
 	}
 
-	getItemById(itemId: string | number, options: DataOptions = defaultDataOptions, params?:{ [index:string]:any }): Observable<TEntity> {
+	/**
+	 * Fetches an item from backend, for the specified ID, or from cache, if it's available.
+	 * @param {string | number} itemId
+	 * @param {DataOptions} options
+	 * @param {{[p: string]: any}} params
+	 * @returns {Observable<TEntity extends ModelBase<TRawData>>}
+	 */
+	getItemById(itemId: EntityId, options: DataOptions = defaultDataOptions, params?:{ [index:string]:any }): Observable<TEntity> {
 		if (!this.entityConstructor.entityConfig.supportsGetMethod(EntityGetMethod.getItem))
 			throw new Error(`Can't get ${this.entityConstructor.singularName}, getItem isn't supported.`);
 
@@ -219,7 +287,7 @@ export class ReadonlyRepository<TEntity extends ModelBase<TRawData>, TRawData = 
 
 	/**
 	 * Creates a JSON object that can be saved to server, with the reverse logic of getItemModelData
-	 * @param {T} item
+	 * @param {TEntity} item
 	 * @returns {Index}
 	 */
 	serializeItem(item:TEntity, serializationData?:any): TRawData {
@@ -229,8 +297,9 @@ export class ReadonlyRepository<TEntity extends ModelBase<TRawData>, TRawData = 
 	}
 
 	/**
-	 * Populates the item dataset with any sub @model. For example, if an ID is found for a property whose type is an entity,
+	 * Populates the item dataset with any sub-model. For example, if an ID is found for a property whose type is an entity,
 	 * the property's value will be an instance of that entity, for the ID, not the ID.
+	 * This method does the actual heavy lifting required for modeling an Entity or ValueObject - parses the fields, models sub-models, etc.
 	 * @param {Index} rawData
 	 * @param {EntityConfigBase} entity
 	 * @param {ParisConfig} config
@@ -436,7 +505,7 @@ export class ReadonlyRepository<TEntity extends ModelBase<TRawData>, TRawData = 
 	}
 
 	/**
-	 * Serializes an object value
+	 * Serializes an an entity into raw data, so it can be sent back to backend.
 	 * @param item
 	 * @returns {Index}
 	 */
