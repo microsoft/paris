@@ -18,7 +18,7 @@
 	},
 	"husky": {
 		"hooks": {
-			"pre-push": "npm docs"
+			"pre-push": "npm run docs"
 		}
 	},
 	"author": "Yossi Kolesnicov",
