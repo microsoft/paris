@@ -16,6 +16,11 @@
 		"test": "mocha -r ts-node/register lib/**/*.spec.ts",
 		"docs": "typedoc --options typedocconfig.ts"
 	},
+	"husky": {
+		"hooks": {
+			"pre-push": "npm docs"
+		}
+	},
 	"author": "Yossi Kolesnicov",
 	"license": "MIT",
 	"devDependencies": {
@@ -49,6 +54,7 @@
 		"gulp-concat": "^2.6.1",
 		"gulp-jasmine": "^2.4.2",
 		"gulp-typescript": "^3.1.3",
+		"husky": "^1.0.0-rc.13",
 		"intl": "^1.2.5",
 		"lodash.get": "^4.4.2",
 		"merge2": "^1.0.2",
