@@ -33,6 +33,8 @@ paris.getItemById(TodoItem, 1).subscribe((todoItem:TodoItem) => {
 
 ## Advanced
 
+[Github](https://github.com/Microsoft/paris)
+
 Check the [Wiki](https://github.com/Microsoft/paris/wiki) for advanced uses and explanations.
 
 Check the [Source Typescript models](https://microsoft.github.io/paris/) for detailed look under the hood.
