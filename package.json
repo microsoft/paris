@@ -14,7 +14,7 @@
 		"bundle": "npm run build",
 		"publish": "npm run bundle && npm publish",
 		"test": "mocha -r ts-node/register lib/**/*.spec.ts",
-		"docs": "typedoc --out docs/api lib --theme markdown --excludePrivate --ignoreCompilerErrors"
+		"docs": "typedoc --out paris.wiki/api lib --theme markdown --excludePrivate --ignoreCompilerErrors"
 	},
 	"author": "Yossi Kolesnicov",
 	"license": "MIT",
