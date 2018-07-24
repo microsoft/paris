@@ -1,18 +1,19 @@
 import {DataEntityType} from "./data-entity.base";
-import {Field} from "./entity-field";
+import {FieldConfig} from "./entity-field.config";
 import {entityFieldsService} from "../services/entity-fields.service";
+import {Field} from "./entity-field";
 
-export function EntityField(fieldConfig?:Field):PropertyDecorator {
+export function EntityField(fieldConfig?:FieldConfig):PropertyDecorator {
 	return function (entityPrototype: DataEntityType, propertyKey: string | symbol) {
 		let propertyConstructor:Function = (<any>Reflect).getMetadata("design:type", entityPrototype, propertyKey);
 
 		fieldConfig = fieldConfig || {};
-		let fieldConfigCopy:Field = Object.assign({}, fieldConfig);
-		if (!fieldConfigCopy.id)
-			fieldConfigCopy.id = String(propertyKey);
+		let field:Field = Object.assign({}, fieldConfig);
+		if (!field.id)
+			field.id = String(propertyKey);
 
-		fieldConfigCopy.type = fieldConfig.arrayOf || propertyConstructor;
-		fieldConfigCopy.isArray = propertyConstructor === Array;
-		entityFieldsService.addField(entityPrototype, fieldConfigCopy);
+		field.type = fieldConfig.arrayOf || propertyConstructor;
+		field.isArray = propertyConstructor === Array;
+		entityFieldsService.addField(entityPrototype, field);
 	}
 }
