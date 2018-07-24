@@ -13,7 +13,8 @@
 		"dev": "rollup -c -w",
 		"bundle": "npm run build",
 		"publish": "npm run bundle && npm publish",
-		"test": "mocha -r ts-node/register lib/**/*.spec.ts"
+		"test": "mocha -r ts-node/register lib/**/*.spec.ts",
+		"docs": "typedoc --out docs/api lib --theme markdown --excludePrivate --ignoreCompilerErrors"
 	},
 	"author": "Yossi Kolesnicov",
 	"license": "MIT",
@@ -63,6 +64,8 @@
 		"standard-version": "^3.0.0",
 		"systemjs": ">=0.20.12",
 		"ts-node": "^7.0.0",
+		"typedoc": "^0.11.1",
+		"typedoc-plugin-markdown": "^1.1.13",
 		"typescript": "^2.7.2",
 		"zone.js": ">=0.8.7"
 	},
