@@ -51,11 +51,12 @@ contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additio
 If you are the current maintainer of this NPM package:
 
 1. Create a branch for the release: `git checkout -b release-vxx.xx.xx`
-2. Make sure your local dependencies are up to date: `npm install`
-3. Ensure that tests pass: `npm run test`
-4. Create a build: `npm run build`
-5. If possible, test the new build with an actual app that uses Paris. It's recommended to use `npm link` for this, to ensure using the exact build from step 4.
-6. Make a PR to github.com/Microsoft/paris
-7. (After PR approval) merge to master branch
-8. Tag and push: `git tag vx.xx.xx; git push --tags`
-9. Publish to NPM: `npm publish`
+2. Upgrade the package's version in packge.json to the appropriate version. Follow the [SemVer specification](https://semver.org/) to determine the correct version.
+3. Make sure your local dependencies are up to date: `npm install`
+4. Ensure that tests pass: `npm run test`
+5. Create a build: `npm run build`
+6. If possible, test the new build with an actual app that uses Paris. It's recommended to use `npm link` for this, to ensure using the exact build from step 4.
+7. Make a PR to github.com/Microsoft/paris
+8. (After PR approval) merge to master branch
+9. Tag and push: `git tag vx.xx.xx; git push --tags`
+10. Publish to NPM: `npm publish`
