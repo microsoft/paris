@@ -31,6 +31,14 @@ paris.getItemById(TodoItem, 1).subscribe((todoItem:TodoItem) => {
 });
 ```
 
+## Advanced
+
+Check the [Wiki](https://github.com/Microsoft/paris/wiki) for advanced uses and explanations.
+
+Check the [Source Typescript models](https://microsoft.github.io/paris/) for detailed look under the hood.
+
+
+
 ## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
@@ -45,18 +53,3 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
 contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
-
-## Releasing
-
-If you are the current maintainer of this NPM package:
-
-1. Create a branch for the release: `git checkout -b release-vxx.xx.xx`
-2. Upgrade the package's version in packge.json to the appropriate version. Follow the [SemVer specification](https://semver.org/) to determine the correct version.
-3. Make sure your local dependencies are up to date: `npm install`
-4. Ensure that tests pass: `npm run test`
-5. Create a build: `npm run build`
-6. If possible, test the new build with an actual app that uses Paris. It's recommended to use `npm link` for this, to ensure using the exact build from step 4.
-7. Make a PR to github.com/Microsoft/paris
-8. (After PR approval) merge to master branch
-9. Tag and push: `git tag vx.xx.xx; git push --tags`
-10. Publish to NPM: `npm publish`
