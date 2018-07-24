@@ -13,6 +13,7 @@ import {ModelBase} from "../models/model.base";
 import {entityRelationshipsService} from "../services/entity-relationships.service";
 import {EntityRelationshipConfig} from "../entity/entity-relationship";
 import {RelationshipType} from "../models/relationship-type.enum";
+import {EntityId} from "../models/entity-id.type";
 
 const DEFAULT_RELATIONSHIP_TYPES = [RelationshipType.OneToMany, RelationshipType.OneToOne];
 
@@ -31,7 +32,7 @@ export class RelationshipRepository<TSource extends ModelBase, TResult extends M
 				paris: Paris) {
 		super((dataEntityType.entityConfig || dataEntityType.valueObjectConfig), dataEntityType.entityConfig, config, dataEntityType, dataStore, paris);
 
-		if (sourceEntityType === dataEntityType)
+		if (<Function>sourceEntityType === <Function>dataEntityType)
 			throw new Error("RelationshipRepository doesn't support a single entity type.");
 
 		let sourceEntityConfig = sourceEntityType.entityConfig || sourceEntityType.valueObjectConfig,
@@ -80,12 +81,12 @@ export class RelationshipRepository<TSource extends ModelBase, TResult extends M
 	/**
 	 * Queries the relationship for an item ID instead of sourceItem or entity/valueObject.
 	 * Note: there has to be a foreignKey set in the RelationshipRepository config, otherwise this will not work.
-	 * @param {string | number} itemId
+	 * @param {EntityId} itemId
 	 * @param {DataQuery} query
 	 * @param {DataOptions} dataOptions
 	 * @returns {Observable<DataSet<U extends ModelBase>>}
 	 */
-	queryForItemId(itemId:string|number, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<TResult>> {
+	queryForItemId(itemId:EntityId, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<TResult>> {
 		if (!this.allowedTypes.has(RelationshipType.OneToMany))
 			throw new Error(`Can't query relationship ${this.sourceEntityType.singularName} -> ${this.dataEntityType.singularName} since it doesn't have the 'OneToMany' allowed type.`);
 
@@ -118,12 +119,12 @@ export class RelationshipRepository<TSource extends ModelBase, TResult extends M
 	/**
 	 * Returns a related item by an item ID
 	 * Note: there has to be a foreignKey set in the RelationshipRepository config, otherwise this will not work.
-	 * @param {string | number} itemId
+	 * @param {EntityId} itemId
 	 * @param {DataQuery} query
 	 * @param {DataOptions} dataOptions
 	 * @returns {Observable<U extends ModelBase>}
 	 */
-	getRelatedItemById(itemId:string|number, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions):Observable<TResult>{
+	getRelatedItemById(itemId:EntityId, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions):Observable<TResult>{
 		if (!this.allowedTypes.has(RelationshipType.OneToOne))
 			throw new Error(`Can't query relationship ${this.sourceEntityType.singularName} -> ${this.dataEntityType.singularName} since it doesn't have the 'OneToMany' allowed type.`);
 
@@ -153,7 +154,7 @@ export class RelationshipRepository<TSource extends ModelBase, TResult extends M
 		return Object.assign(where, sourceItemWhereQuery);
 	}
 
-	private getRelationQueryWhereById(itemId:string|number):{ [index:string]:any }{
+	private getRelationQueryWhereById(itemId:EntityId):{ [index:string]:any }{
 		let sourceItemWhereQuery:{ [index:string]:any } = {};
 
 		if (this.relationshipConfig.foreignKey)

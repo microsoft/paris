@@ -24,7 +24,7 @@ export class Repository<T extends ModelBase> extends ReadonlyRepository<T> imple
 	private _saveSubject$: Subject<SaveEntityEvent>;
 	private _removeSubject$: Subject<RemoveEntitiesEvent>;
 
-	constructor(entity: EntityConfig,
+	constructor(entity: EntityConfig<T>,
 				config: ParisConfig,
 				entityConstructor: DataEntityConstructor<T>,
 				dataStore: DataStoreService,

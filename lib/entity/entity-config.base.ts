@@ -5,25 +5,26 @@ import {DataEntityConstructor} from "./data-entity.base";
 import {ParisConfig} from "../config/paris-config";
 import {ModelBase} from "../models/model.base";
 import {HttpOptions} from "../services/http.service";
+import {EntityId} from "../models/entity-id.type";
 
 const DEFAULT_VALUE_ID = "__default";
 
-export class EntityConfigBase<T extends ModelBase = any> implements IEntityConfigBase<T>{
+export class EntityConfigBase<TEntity extends ModelBase<TRawData> = any, TRawData = any> implements IEntityConfigBase<TEntity, TRawData>{
 	singularName:string;
 	pluralName:string;
 	fields?:EntityFields;
 	idProperty?:string;
 	readonly:boolean = false;
-	serializeItem?:(item:T, serializedItem?:any, entity?:IEntityConfigBase, config?:ParisConfig, serializationData?:any) => any;
+	serializeItem?:(item:TEntity, serializedItem?:any, entity?:IEntityConfigBase<TEntity, TRawData>, config?:ParisConfig, serializationData?:any) => any;
 
 	get fieldsArray():Array<Field>{
 		return this.fields ? Array.from(this.fields.values()) : [];
 	}
 
-	values:Array<T>;
+	values:Array<TEntity>;
 
-	private _valuesMap:Map<string|number, T>;
-	private get valuesMap():Map<string|number, T> {
+	private _valuesMap:Map<EntityId, TEntity>;
+	private get valuesMap():Map<EntityId, TEntity> {
 		if (this._valuesMap === undefined) {
 			if (!this.values)
 				this._valuesMap = null;
@@ -40,7 +41,7 @@ export class EntityConfigBase<T extends ModelBase = any> implements IEntityConfi
 
 	private _supportedEntityGetMethodsSet:Readonly<Set<EntityGetMethod>>;
 
-	constructor(config:IEntityConfigBase<T>, public entityConstructor:DataEntityConstructor<T>){
+	constructor(config:IEntityConfigBase<TEntity, TRawData>, public entityConstructor:DataEntityConstructor<TEntity>){
 		if (config.values) {
 			config.values = config.values.map(valueConfig => new entityConstructor(valueConfig));
 			Immutability.freeze(config.values);
@@ -54,15 +55,15 @@ export class EntityConfigBase<T extends ModelBase = any> implements IEntityConfi
 		));
 	}
 
-	getValueById(valueId:string|number):T{
+	getValueById(valueId:EntityId):TEntity{
 		return this.valuesMap ? this.valuesMap.get(valueId) : null;
 	}
 
-	getDefaultValue():T{
+	getDefaultValue():TEntity{
 		return this.getValueById(DEFAULT_VALUE_ID) || null;
 	}
 
-	hasValue(valueId:string|number):boolean{
+	hasValue(valueId:EntityId):boolean{
 		return this.valuesMap ? this.valuesMap.has(valueId) : false;
 	}
 
@@ -71,21 +72,21 @@ export class EntityConfigBase<T extends ModelBase = any> implements IEntityConfi
 	}
 }
 
-export interface IEntityConfigBase<T extends ModelBase = any>{
+export interface IEntityConfigBase<TEntity extends ModelBase = any, TRawData = any>{
 	singularName:string,
 	pluralName:string,
 	fields?:EntityFields,
 	idProperty?:string,
 	readonly?:boolean,
-	values?:Array<T>,
+	values?:Array<TEntity>,
 	fieldsArray?:Array<Field>,
-	hasValue?: (valueId:string|number) => boolean,
-	getDefaultValue?: () => T,
-	getValueById?: (valueId:string|number) => T,
-	entityConstructor?:DataEntityConstructor<T>,
-	serializeItem?:(item:T, serializedItem?:any, entity?:IEntityConfigBase<T>, config?:ParisConfig, serializationData?:any) => any,
+	hasValue?: (valueId:EntityId) => boolean,
+	getDefaultValue?: () => TEntity,
+	getValueById?: (valueId:EntityId) => TEntity,
+	entityConstructor?:DataEntityConstructor<TEntity>,
+	serializeItem?:(item:TEntity, serializedItem?:any, entity?:IEntityConfigBase<TEntity>, config?:ParisConfig, serializationData?:any) => TRawData,
 	supportedEntityGetMethods?:Array<EntityGetMethod>,
-	parseSaveItemsQuery?: (items:Array<T>, options?:HttpOptions, entity?:IEntityConfigBase<T>, config?:ParisConfig) => HttpOptions
+	parseSaveItemsQuery?: (items:Array<TEntity>, options?:HttpOptions, entity?:IEntityConfigBase<TEntity>, config?:ParisConfig) => HttpOptions
 }
 
 export enum EntityGetMethod{

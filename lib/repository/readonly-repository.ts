@@ -25,25 +25,25 @@ import {EntityErrorEvent, EntityErrorTypes} from "../events/entity-error.event";
 import {catchError, map, mergeMap, tap} from "rxjs/operators";
 import {IReadonlyRepository} from "./repository.interface";
 
-export class ReadonlyRepository<T extends ModelBase<TRawData>, TRawData = object> implements IReadonlyRepository<T>{
+export class ReadonlyRepository<TEntity extends ModelBase<TRawData>, TRawData = object> implements IReadonlyRepository<TEntity>{
 	protected _errorSubject$: Subject<EntityErrorEvent>;
 	error$: Observable<EntityErrorEvent>;
 
 	constructor(public readonly entity: IEntityConfigBase,
-				public entityBackendConfig: EntityBackendConfig,
+				public entityBackendConfig: EntityBackendConfig<TEntity, TRawData>,
 				protected config: ParisConfig,
-				public entityConstructor: DataEntityConstructor<T>,
+				public entityConstructor: DataEntityConstructor<TEntity>,
 				protected dataStore: DataStoreService,
 				protected paris: Paris) {
 		this._errorSubject$ = new Subject();
 		this.error$ = this._errorSubject$.asObservable();
 	}
 
-	protected _allItems$: Observable<Array<T>>;
-	protected _allValues: Array<T>;
-	protected _allValuesMap: Map<string, T>;
-	protected _cache: DataCache<T>;
-	protected _allItemsSubject$: Subject<Array<T>>;
+	protected _allItems$: Observable<Array<TEntity>>;
+	protected _allValues: Array<TEntity>;
+	protected _allValuesMap: Map<string, TEntity>;
+	protected _cache: DataCache<TEntity>;
+	protected _allItemsSubject$: Subject<Array<TEntity>>;
 
 	protected getBaseUrl(query?: DataQuery): string {
 		if (!this.entityBackendConfig.baseUrl)
@@ -52,7 +52,7 @@ export class ReadonlyRepository<T extends ModelBase<TRawData>, TRawData = object
 		return this.entityBackendConfig.baseUrl instanceof Function ? this.entityBackendConfig.baseUrl(this.config, query) : this.entityBackendConfig.baseUrl;
 	}
 
-	get allItems$(): Observable<Array<T>> {
+	get allItems$(): Observable<Array<TEntity>> {
 		if (this._allValues)
 			return merge(of(this._allValues), this._allItemsSubject$.asObservable());
 
@@ -62,9 +62,9 @@ export class ReadonlyRepository<T extends ModelBase<TRawData>, TRawData = object
 		return this._allItems$;
 	}
 
-	protected get cache(): DataCache<T> {
+	protected get cache(): DataCache<TEntity> {
 		if (!this._cache) {
-			this._cache = new DataCache<T>(typeof(this.entityBackendConfig.cache) === "boolean" ? null : this.entityBackendConfig.cache);
+			this._cache = new DataCache<TEntity>(typeof(this.entityBackendConfig.cache) === "boolean" ? null : this.entityBackendConfig.cache);
 		}
 
 		return this._cache;
@@ -78,21 +78,21 @@ export class ReadonlyRepository<T extends ModelBase<TRawData>, TRawData = object
 		return `${this.getBaseUrl(query)}/${this.endpointName}`;
 	}
 
-	protected setAllItems(): Observable<Array<T>> {
+	protected setAllItems(): Observable<Array<TEntity>> {
 		if (this._allValues)
 			return of(this._allValues);
 
 		return this.query().pipe(
-			tap((dataSet: DataSet<T>) => {
+			tap((dataSet: DataSet<TEntity>) => {
 				this._allValues = dataSet.items;
 				this._allValuesMap = new Map();
-				this._allValues.forEach((value: T) => this._allValuesMap.set(String(value instanceof EntityModelBase ? value.id : value.toString()), value));
+				this._allValues.forEach((value: TEntity) => this._allValuesMap.set(String(value instanceof EntityModelBase ? value.id : value.toString()), value));
 			}),
-			map((dataSet:DataSet<T>) => dataSet.items)
+			map((dataSet:DataSet<TEntity>) => dataSet.items)
 		);
 	}
 
-	createNewItem(): T {
+	createNewItem(): TEntity {
 		let defaultData:{ [index:string]:any } = {};
 		this.entity.fieldsArray.forEach((field:Field) => {
 			if (field.defaultValue !== undefined)
@@ -104,18 +104,18 @@ export class ReadonlyRepository<T extends ModelBase<TRawData>, TRawData = object
 		return new this.entityConstructor(defaultData);
 	}
 
-	createItem(rawData: TRawData, options: DataOptions = { allowCache: true, availability: DataAvailability.available }, query?: DataQuery): Observable<T> {
-		return ReadonlyRepository.getModelData<T>(rawData, this.entity, this.config, this.paris, options, query);
+	createItem(rawData: TRawData, options: DataOptions = { allowCache: true, availability: DataAvailability.available }, query?: DataQuery): Observable<TEntity> {
+		return ReadonlyRepository.getModelData<TEntity>(rawData, this.entity, this.config, this.paris, options, query);
 	}
 
-	query(query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<T>> {
+	query(query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<TEntity>> {
 		if (this.entityConstructor.entityConfig && !this.entityConstructor.entityConfig.supportsGetMethod(EntityGetMethod.query))
 			throw new Error(`Can't query ${this.entityConstructor.singularName}, query isn't supported.`);
 
 		return this.paris.callQuery(this.entityConstructor, this.entityBackendConfig, query, dataOptions);
 	}
 
-	queryItem(query: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<T> {
+	queryItem(query: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<TEntity> {
 		let httpOptions:HttpOptions = this.entityBackendConfig.parseDataQuery ? { params: this.entityBackendConfig.parseDataQuery(query) } : queryToHttpOptions(query);
 
 		if (this.entityBackendConfig.fixedData){
@@ -135,7 +135,7 @@ export class ReadonlyRepository<T extends ModelBase<TRawData>, TRawData = object
 		else
 			endpoint = `${this.endpointName}${this.entityBackendConfig.allItemsEndpointTrailingSlash !== false && !this.entityBackendConfig.allItemsEndpoint ? '/' : ''}${this.entityBackendConfig.allItemsEndpoint || ''}`;
 
-		const getItem$:Observable<T> = this.dataStore.get(
+		const getItem$:Observable<TEntity> = this.dataStore.get(
 			endpoint,
 			httpOptions,
 			this.getBaseUrl(query),
@@ -161,7 +161,7 @@ export class ReadonlyRepository<T extends ModelBase<TRawData>, TRawData = object
 		this._allValues = null;
 	}
 
-	getItemById(itemId: string | number, options: DataOptions = defaultDataOptions, params?:{ [index:string]:any }): Observable<T> {
+	getItemById(itemId: string | number, options: DataOptions = defaultDataOptions, params?:{ [index:string]:any }): Observable<TEntity> {
 		if (!this.entityConstructor.entityConfig.supportsGetMethod(EntityGetMethod.getItem))
 			throw new Error(`Can't get ${this.entityConstructor.singularName}, getItem isn't supported.`);
 
@@ -177,7 +177,7 @@ export class ReadonlyRepository<T extends ModelBase<TRawData>, TRawData = object
 		}
 
 		if (this.entity.values) {
-			let entityValue: T;
+			let entityValue: TEntity;
 			if (itemId !== null && itemId !== undefined){
 				if (this.entity.hasValue(itemId))
 					entityValue = this.entity.getValueById(itemId);
@@ -196,7 +196,7 @@ export class ReadonlyRepository<T extends ModelBase<TRawData>, TRawData = object
 		else {
 			const endpoint:string = this.entityBackendConfig.parseItemQuery ? this.entityBackendConfig.parseItemQuery(itemId, this.entity, this.config, params) : `${this.endpointName}/${itemId}`;
 
-			const getItem$:Observable<T> = this.dataStore.get(
+			const getItem$:Observable<TEntity> = this.dataStore.get(
 				endpoint,
 				params && {params: params},
 				this.getBaseUrl({where: params}),
@@ -221,7 +221,7 @@ export class ReadonlyRepository<T extends ModelBase<TRawData>, TRawData = object
 	 * @param {T} item
 	 * @returns {Index}
 	 */
-	serializeItem(item:T, serializationData?:any): TRawData {
+	serializeItem(item:TEntity, serializationData?:any): TRawData {
 		ReadonlyRepository.validateItem(item, this.entity);
 
 		return ReadonlyRepository.serializeItem<TRawData>(item, this.entity, this.paris, serializationData);

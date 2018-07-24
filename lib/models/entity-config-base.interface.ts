@@ -1,4 +1,6 @@
+import {EntityId} from "./entity-id.type";
+
 export interface EntityModelConfigBase{
-	id:string|number,
+	id:EntityId,
 	[index:string]:any
 }
