@@ -1,11 +1,11 @@
 import {EntityFields} from "./entity-fields";
-import {Field} from "./entity-field";
 import {Immutability} from "../services/immutability";
 import {DataEntityConstructor} from "./data-entity.base";
 import {ParisConfig} from "../config/paris-config";
 import {ModelBase} from "../models/model.base";
 import {HttpOptions} from "../services/http.service";
 import {EntityId} from "../models/entity-id.type";
+import {Field} from "./entity-field";
 
 const DEFAULT_VALUE_ID = "__default";
 

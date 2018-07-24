@@ -12,7 +12,7 @@ import {EntityBackendConfig, ModelEntity} from "../entity/entity.config";
 import {DataEntityConstructor, DataEntityType} from "../entity/data-entity.base";
 import {Paris} from "../services/paris";
 import {DataAvailability} from "../dataset/data-availability.enum";
-import {Field, FIELD_DATA_SELF} from "../entity/entity-field";
+import {Field} from "../entity/entity-field";
 import {DataCache} from "../services/cache";
 import {Index} from "../models";
 import {EntityConfigBase, EntityGetMethod, IEntityConfigBase} from "../entity/entity-config.base";
@@ -24,6 +24,7 @@ import {AjaxError} from "rxjs/ajax";
 import {EntityErrorEvent, EntityErrorTypes} from "../events/entity-error.event";
 import {catchError, map, mergeMap, tap} from "rxjs/operators";
 import {IReadonlyRepository} from "./repository.interface";
+import {FIELD_DATA_SELF} from "../entity/entity-field.config";
 
 export class ReadonlyRepository<TEntity extends ModelBase<TRawData>, TRawData = object> implements IReadonlyRepository<TEntity>{
 	protected _errorSubject$: Subject<EntityErrorEvent>;
