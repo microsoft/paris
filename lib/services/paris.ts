@@ -368,10 +368,14 @@ export class Paris{
 	/**
 	 * Gets an item by ID from backend and returns an Observable with the model
 	 *
-	 * @example <caption>Get a TodoItem with ID 1</caption>
+	 * @example Get a TodoItem with ID 1
+	 *
+	 * ```typescript
+	 *
 	 * const toDo$:Observable<TodoItem> = paris.getItemById<TodoItem>(TodoItem, 1);
 	 * toDo$.subscribe((toDo:TodoItem) => console.log('Found TodoItem item: ', toDo);
 	 *
+	 * ```
 	 * @param {DataEntityConstructor<T extends ModelBase>} entityConstructor
 	 * @param {string | number} itemId
 	 * @param {DataOptions} options
