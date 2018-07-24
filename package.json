@@ -13,7 +13,13 @@
 		"dev": "rollup -c -w",
 		"bundle": "npm run build",
 		"publish": "npm run bundle && npm publish",
-		"test": "mocha -r ts-node/register lib/**/*.spec.ts"
+		"test": "mocha -r ts-node/register lib/**/*.spec.ts",
+		"docs": "typedoc --options typedocconfig.ts"
+	},
+	"husky": {
+		"hooks": {
+			"pre-push": "npm run docs"
+		}
 	},
 	"author": "Yossi Kolesnicov",
 	"license": "MIT",
@@ -48,6 +54,7 @@
 		"gulp-concat": "^2.6.1",
 		"gulp-jasmine": "^2.4.2",
 		"gulp-typescript": "^3.1.3",
+		"husky": "^1.0.0-rc.13",
 		"intl": "^1.2.5",
 		"lodash.get": "^4.4.2",
 		"merge2": "^1.0.2",
@@ -63,6 +70,7 @@
 		"standard-version": "^3.0.0",
 		"systemjs": ">=0.20.12",
 		"ts-node": "^7.0.0",
+		"typedoc": "^0.11.1",
 		"typescript": "^2.7.2",
 		"zone.js": ">=0.8.7"
 	},

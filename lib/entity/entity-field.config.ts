@@ -29,16 +29,16 @@ export interface FieldConfig{
 	 *
 	 * @example <caption>Mapping from a different raw data property with `data`</caption>
 	 * If your raw data has properties in snake-case rather than camel-case, you'd need to map the properties:
-	 *
+	 * ```typescript
 	 * @EntityField({ data: "creation_date" })
 	 * creationData: Date;
-	 *
+	 * ```
 	 * @example <caption>Using the first available value from the raw data for the model's property</caption>
 	 * If an array of strings is provided for `data`, Paris will assign to the model's property value the first value from the raw data which isn't undefined or null:
-	 *
+	 * ```typescript
 	 * @EntityField({ data: ['creation_date', 'init_date', 'start_date'] })
 	 * date: Date;
-	 *
+	 * ```
 	 * If the raw data is:
 	 * {
 	 * 		"creation_date": null,
@@ -50,7 +50,7 @@ export interface FieldConfig{
 	 * @example <caption>Using '__self' for data to pass the whole raw data</caption>
 	 * In the case when we want to separate some properties of the raw data to a sub-model, it's possible to use the special value '__self' for the `data` field configuration.
 	 * This passes the whole raw data object to the field's creation, rather than just the value of a property. e.g:
-	 *
+	 * ```typescript
 	 * Person extends EntityModelBase{
 	 * 		@EntityField()
 	 * 		name:string;
@@ -58,7 +58,7 @@ export interface FieldConfig{
 	 * 		@EntityField({ data: '__self' })
 	 * 		address:Address;
 	 * }
-	 *
+	 * ```
 	 * In case we want to separate all address properties from a user into an encapsulated object, for the following raw data:
 	 *
 	 * {
@@ -82,8 +82,10 @@ export interface FieldConfig{
 	 *
 	 * @example <caption>Using a model field's arrayOf configuration for assigning an array sub-model</caption>
 	 * // Without the arrayOf, addresses won't be modeled by Paris.
+	 * ```typescript
 	 * @EntityField({ arrayOf: Address })
 	 * addresses: Array<Address>
+	 * ```
 	 */
 	arrayOf?:DataEntityType,
 
@@ -98,12 +100,17 @@ export interface FieldConfig{
 	 * A condition that has to be satisfied in order to assign value to the property.
 	 *
 	 * @example <caption>Assigning ZIP code only if street exists</caption>
+	 *
+	 * ```typescript
 	 * @EntityField({ require: "street" })
 	 * zip:string;
+	 * ```
 	 *
 	 * @example <caption>Assigning ZIP code only if both street and country exist</caption>
+	 * ```typescript
 	 * @EntityField({ require: (data:AddressRawData) => data.street && data.country })
 	 * zip:string;
+	 * ```
 	 */
 	require?:((data:any, config?:ParisConfig) => any) | string,
 
@@ -113,6 +120,7 @@ export interface FieldConfig{
 	 * Important: `parse` should return a new RAW data, not a Paris model.
 	 *
 	 * @example <caption>Parsing a bitwise value into an array</caption>
+	 * ```typescript
 	 * @EntityField({
 	 *		arrayOf: NotificationFormat,
 	 *		parse: (formatBitWise: number) => {
@@ -122,7 +130,7 @@ export interface FieldConfig{
 	 *		},
 	 *	})
 	 * formatFlavor: Array<NotificationFormat>;
-	 *
+	 * ```
 	 * @param fieldData The field's data from the raw data
 	 * @param itemData The whole object's raw data
 	 * @param {DataQuery} query The query (if any) that was used for getting the data
