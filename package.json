@@ -14,6 +14,7 @@
 		"bundle": "npm run build",
 		"publish": "npm run bundle && npm publish",
 		"test": "mocha -r ts-node/register lib/**/*.spec.ts",
+		"docs:markdown": "typedoc --options typedocconfig.ts",
 		"docs": "typedoc --options typedocconfig.ts"
 	},
 	"author": "Yossi Kolesnicov",

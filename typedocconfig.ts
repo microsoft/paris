@@ -2,8 +2,8 @@ module.exports = {
 	src: [
 		'lib',
 	],
-	out: './paris.wiki/api',
-	theme: 'markdown',
+	out: './docs',
+	// theme: 'markdown',
 	mode: 'file',
 	includeDeclarations: true,
 	tsconfig: 'tsconfig.lib.json',
