@@ -3,7 +3,6 @@ module.exports = {
 		'lib',
 	],
 	out: './docs',
-	// theme: 'markdown',
 	mode: 'file',
 	includeDeclarations: true,
 	tsconfig: 'tsconfig.lib.json',
