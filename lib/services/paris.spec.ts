@@ -47,5 +47,4 @@ describe('Paris main', () => {
 			expect(Http.request).to.have.been.called.with('GET', '/todo/1', undefined, { timeout: 20000 });
 		});
 	});
-
 });

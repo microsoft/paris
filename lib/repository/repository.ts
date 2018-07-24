@@ -48,7 +48,7 @@ export class Repository<TEntity extends ModelBase> extends ReadonlyRepository<TE
 	 * @param {any} serializationData Any data to pass to serialize or serializeItem
 	 * @returns {Observable<T extends EntityModelBase>}
 	 */
-	save(item: TEntity, options?:HttpOptions, serializationData?:any): Observable<TEntity> {
+	save(item: Partial<TEntity>, options?:HttpOptions, serializationData?:any): Observable<TEntity> {
 		if (!this.entityBackendConfig.endpoint)
 			throw new Error(`Entity ${this.entityConstructor.entityConfig.singularName || this.entityConstructor.name} can't be saved - it doesn't specify an endpoint.`);
 
@@ -80,7 +80,7 @@ export class Repository<TEntity extends ModelBase> extends ReadonlyRepository<TE
 		}
 	}
 
-	private getSaveMethod(item:TEntity):RequestMethod{
+	private getSaveMethod(item:Partial<TEntity>):RequestMethod{
 		return this.entityBackendConfig.saveMethod
 			? this.entityBackendConfig.saveMethod instanceof Function ? this.entityBackendConfig.saveMethod(item, this.config) : this.entityBackendConfig.saveMethod
 			: item.id === undefined ? "POST" : "PUT";

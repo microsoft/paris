@@ -17,15 +17,15 @@ import {EntityId} from "../models/entity-id.type";
 
 const DEFAULT_RELATIONSHIP_TYPES = [RelationshipType.OneToMany, RelationshipType.OneToOne];
 
-export class RelationshipRepository<TSource extends ModelBase, TResult extends ModelBase> extends ReadonlyRepository<TResult> implements IRelationshipRepository<TSource, TResult> {
+export class RelationshipRepository<TSource extends ModelBase, TData extends ModelBase> extends ReadonlyRepository<TData> implements IRelationshipRepository<TSource, TData> {
 	private sourceRepository: ReadonlyRepository<TSource>;
-	readonly relationshipConfig:EntityRelationshipConfig;
+	readonly relationshipConfig:EntityRelationshipConfig<TSource, TData>;
 
 	sourceItem:TSource;
 	readonly allowedTypes:Set<RelationshipType>;
 
 	constructor(public sourceEntityType: DataEntityConstructor<TSource>,
-				public dataEntityType: DataEntityConstructor<TResult>,
+				public dataEntityType: DataEntityConstructor<TData>,
 				relationTypes:Array<RelationshipType>,
 				config: ParisConfig,
 				dataStore: DataStoreService,
@@ -49,7 +49,7 @@ export class RelationshipRepository<TSource extends ModelBase, TResult extends M
 		this.allowedTypes = new Set(relationTypes || DEFAULT_RELATIONSHIP_TYPES);
 	}
 
-	query(query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<TResult>>{
+	query(query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<TData>>{
 		if (!this.sourceItem)
 			throw new Error(`Can't query RelationshipRepository<${this.sourceEntityType.singularName}, ${this.dataEntityType.singularName}>, since no source item was defined.`);
 
@@ -57,14 +57,14 @@ export class RelationshipRepository<TSource extends ModelBase, TResult extends M
 	}
 
 
-	queryItem(query?: DataQuery, dataOptions: DataOptions = defaultDataOptions):Observable<TResult>{
+	queryItem(query?: DataQuery, dataOptions: DataOptions = defaultDataOptions):Observable<TData>{
 		if (!this.sourceItem)
 			throw new Error(`Can't query RelationshipRepository<${this.sourceEntityType.singularName}, ${this.dataEntityType.singularName}>, since no source item was defined.`);
 
 		return this.getRelatedItem(this.sourceItem, query, dataOptions);
 	}
 
-	queryForItem(item:TSource, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<TResult>> {
+	queryForItem(item:TSource, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<TData>> {
 		if (!this.allowedTypes.has(RelationshipType.OneToMany))
 			throw new Error(`Can't query relationship ${this.sourceEntityType.singularName} -> ${this.dataEntityType.singularName} since it doesn't have the 'OneToMany' allowed type.`);
 
@@ -86,7 +86,7 @@ export class RelationshipRepository<TSource extends ModelBase, TResult extends M
 	 * @param {DataOptions} dataOptions
 	 * @returns {Observable<DataSet<U extends ModelBase>>}
 	 */
-	queryForItemId(itemId:EntityId, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<TResult>> {
+	queryForItemId(itemId:EntityId, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<TData>> {
 		if (!this.allowedTypes.has(RelationshipType.OneToMany))
 			throw new Error(`Can't query relationship ${this.sourceEntityType.singularName} -> ${this.dataEntityType.singularName} since it doesn't have the 'OneToMany' allowed type.`);
 
@@ -100,7 +100,7 @@ export class RelationshipRepository<TSource extends ModelBase, TResult extends M
 		return super.query(cloneQuery, dataOptions);
 	}
 
-	getRelatedItem(item:ModelBase, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions):Observable<TResult>{
+	getRelatedItem(item:TSource, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions):Observable<TData>{
 		if (!this.allowedTypes.has(RelationshipType.OneToOne))
 			throw new Error(`Can't query relationship ${this.sourceEntityType.singularName} -> ${this.dataEntityType.singularName} since it doesn't have the 'OneToMany' allowed type.`);
 
@@ -124,7 +124,7 @@ export class RelationshipRepository<TSource extends ModelBase, TResult extends M
 	 * @param {DataOptions} dataOptions
 	 * @returns {Observable<U extends ModelBase>}
 	 */
-	getRelatedItemById(itemId:EntityId, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions):Observable<TResult>{
+	getRelatedItemById(itemId:EntityId, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions):Observable<TData>{
 		if (!this.allowedTypes.has(RelationshipType.OneToOne))
 			throw new Error(`Can't query relationship ${this.sourceEntityType.singularName} -> ${this.dataEntityType.singularName} since it doesn't have the 'OneToMany' allowed type.`);
 
@@ -140,7 +140,7 @@ export class RelationshipRepository<TSource extends ModelBase, TResult extends M
 		return super.queryItem(cloneQuery, dataOptions);
 	}
 
-	private getRelationQueryWhere(item:ModelBase):{ [index:string]:any }{
+	private getRelationQueryWhere(item:TSource):{ [index:string]:any }{
 		let where:{ [index:string]:any } = {};
 
 		let sourceItemWhereQuery:{ [index:string]:any } = {};
@@ -164,11 +164,11 @@ export class RelationshipRepository<TSource extends ModelBase, TResult extends M
 	}
 }
 
-export interface IRelationshipRepository<TSource extends ModelBase = ModelBase, TResult extends ModelBase = ModelBase> extends IReadonlyRepository<TResult>{
+export interface IRelationshipRepository<TSource extends ModelBase = ModelBase, TData extends ModelBase = ModelBase> extends IReadonlyRepository<TData>{
 	sourceEntityType: DataEntityType,
 	dataEntityType: DataEntityType,
-	relationshipConfig:EntityRelationshipConfig,
-	queryForItem:(sourceItem:TSource, query?:DataQuery, dataOptions?:DataOptions) => Observable<DataSet<TResult>>,
-	getRelatedItem:(itemId?:any, query?: DataQuery, dataOptions?: DataOptions) => Observable<TResult>,
+	relationshipConfig:EntityRelationshipConfig<TSource, TData>,
+	queryForItem:(sourceItem:TSource, query?:DataQuery, dataOptions?:DataOptions) => Observable<DataSet<TData>>,
+	getRelatedItem:(itemId?:any, query?: DataQuery, dataOptions?: DataOptions) => Observable<TData>,
 	allowedTypes:Set<RelationshipType>
 }

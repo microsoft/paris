@@ -9,13 +9,13 @@ import {Field} from "./entity-field";
 
 const DEFAULT_VALUE_ID = "__default";
 
-export class EntityConfigBase<TEntity extends ModelBase<TRawData> = any, TRawData = any> implements IEntityConfigBase<TEntity, TRawData>{
+export class EntityConfigBase<TEntity extends ModelBase = any, TRawData = any, TId extends EntityId = string> implements ModelConfig<TEntity, TRawData, TId>{
 	singularName:string;
 	pluralName:string;
 	fields?:EntityFields;
 	idProperty?:string;
 	readonly:boolean = false;
-	serializeItem?:(item:TEntity, serializedItem?:any, entity?:IEntityConfigBase<TEntity, TRawData>, config?:ParisConfig, serializationData?:any) => any;
+	serializeItem?:(item:Partial<TEntity>, serializedItem?:any, entity?:IEntityConfigBase<TEntity, TRawData, TId>, config?:ParisConfig, serializationData?:any) => any;
 
 	get fieldsArray():Array<Field>{
 		return this.fields ? Array.from(this.fields.values()) : [];
@@ -41,7 +41,7 @@ export class EntityConfigBase<TEntity extends ModelBase<TRawData> = any, TRawDat
 
 	private _supportedEntityGetMethodsSet:Readonly<Set<EntityGetMethod>>;
 
-	constructor(config:IEntityConfigBase<TEntity, TRawData>, public entityConstructor:DataEntityConstructor<TEntity>){
+	constructor(config:IEntityConfigBase<TEntity, TRawData, TId>, public entityConstructor:DataEntityConstructor<TEntity, TRawData, TId>){
 		if (config.values) {
 			config.values = config.values.map(valueConfig => new entityConstructor(valueConfig));
 			Immutability.freeze(config.values);
@@ -72,21 +72,24 @@ export class EntityConfigBase<TEntity extends ModelBase<TRawData> = any, TRawDat
 	}
 }
 
-export interface IEntityConfigBase<TEntity extends ModelBase = any, TRawData = any>{
+export interface IEntityConfigBase<TEntity extends ModelBase = any, TRawData = any, TId extends EntityId = string>{
 	singularName:string,
 	pluralName:string,
-	fields?:EntityFields,
 	idProperty?:string,
 	readonly?:boolean,
 	values?:Array<TEntity>,
-	fieldsArray?:Array<Field>,
 	hasValue?: (valueId:EntityId) => boolean,
 	getDefaultValue?: () => TEntity,
 	getValueById?: (valueId:EntityId) => TEntity,
-	entityConstructor?:DataEntityConstructor<TEntity>,
-	serializeItem?:(item:TEntity, serializedItem?:any, entity?:IEntityConfigBase<TEntity>, config?:ParisConfig, serializationData?:any) => TRawData,
+	entityConstructor?:DataEntityConstructor<TEntity, TRawData, TId>,
+	serializeItem?:(item:Partial<TEntity>, serializedItem?:any, entity?:IEntityConfigBase<TEntity, TRawData, TId>, config?:ParisConfig, serializationData?:any) => TRawData,
 	supportedEntityGetMethods?:Array<EntityGetMethod>,
-	parseSaveItemsQuery?: (items:Array<TEntity>, options?:HttpOptions, entity?:IEntityConfigBase<TEntity>, config?:ParisConfig) => HttpOptions
+	parseSaveItemsQuery?: (items:Array<TEntity>, options?:HttpOptions, entity?:IEntityConfigBase<TEntity, TRawData, TId>, config?:ParisConfig) => HttpOptions
+}
+
+export interface ModelConfig<TEntity extends ModelBase, TRawData = any, TId extends EntityId = string> extends IEntityConfigBase<TEntity, TRawData, TId>{
+	fields?:EntityFields,
+	fieldsArray?:Array<Field>,
 }
 
 export enum EntityGetMethod{

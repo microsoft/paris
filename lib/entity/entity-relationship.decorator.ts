@@ -1,7 +1,7 @@
 import {EntityRelationshipConfig} from "./entity-relationship";
 import {entityRelationshipsService} from "../services/entity-relationships.service";
 
-export function EntityRelationship(entityRelationshipConfig:EntityRelationshipConfig){
+export function EntityRelationship(entityRelationshipConfig:EntityRelationshipConfig<any, any>){
 	return (target:any) => {
 		target.sourceEntityType = entityRelationshipConfig.sourceEntity;
 		target.dataEntityType = entityRelationshipConfig.dataEntity;

@@ -15,7 +15,7 @@ import {DataAvailability} from "../dataset/data-availability.enum";
 import {Field} from "../entity/entity-field";
 import {DataCache} from "../services/cache";
 import {Index} from "../models";
-import {EntityConfigBase, EntityGetMethod, IEntityConfigBase} from "../entity/entity-config.base";
+import {EntityConfigBase, EntityGetMethod, ModelConfig} from "../entity/entity-config.base";
 import {ModelBase} from "../models/model.base";
 import {DataTransformersService} from "../services/data-transformers.service";
 import * as _ from "lodash";
@@ -31,11 +31,11 @@ import {EntityId} from "../models/entity-id.type";
  * A Repository is a service through which all of an Entity's data is fetched, cached and saved back to the backend
  * `ReadonlyRepository` is the base class for all Repositories, and the class used for Repositories that are readonly.
  */
-export class ReadonlyRepository<TEntity extends ModelBase<TRawData>, TRawData = object> implements IReadonlyRepository<TEntity>{
+export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> implements IReadonlyRepository<TEntity>{
 	protected _errorSubject$: Subject<EntityErrorEvent>;
 	error$: Observable<EntityErrorEvent>;
 
-	constructor(public readonly entity: IEntityConfigBase,
+	constructor(public readonly entity: ModelConfig<TEntity, TRawData>,
 				public entityBackendConfig: EntityBackendConfig<TEntity, TRawData>,
 				protected config: ParisConfig,
 				public entityConstructor: DataEntityConstructor<TEntity>,
@@ -61,7 +61,7 @@ export class ReadonlyRepository<TEntity extends ModelBase<TRawData>, TRawData = 
 	/**
 	 * An Observable for all the items of this entity. If the Entity has already loaded all possible items (if `loadAll` is set to `true`, for example), those items are returned.
 	 * Otherwise, a query with no DataQuery will be performed to the backend and the data will be fetched.
-	 * @returns {Observable<Array<TEntity extends ModelBase<TRawData>>>}
+	 * @returns {Observable<Array<TEntity extends ModelBase>>}
 	 */
 	get allItems$(): Observable<Array<TEntity>> {
 		if (this._allValues)
@@ -135,7 +135,7 @@ export class ReadonlyRepository<TEntity extends ModelBase<TRawData>, TRawData = 
 	 * @param {TRawData} rawData The raw data for the entity, as it arrives from backend
 	 * @param {DataOptions} options
 	 * @param {DataQuery} query
-	 * @returns {Observable<TEntity extends ModelBase<TRawData>>}
+	 * @returns {Observable<TEntity extends ModelBase>}
 	 */
 	createItem(rawData: TRawData, options: DataOptions = { allowCache: true, availability: DataAvailability.available }, query?: DataQuery): Observable<TEntity> {
 		return ReadonlyRepository.getModelData<TEntity>(rawData, this.entity, this.config, this.paris, options, query);
@@ -155,7 +155,7 @@ export class ReadonlyRepository<TEntity extends ModelBase<TRawData>, TRawData = 
 	 *
 	 * @param {DataQuery} query
 	 * @param {DataOptions} dataOptions
-	 * @returns {Observable<DataSet<TEntity extends ModelBase<TRawData>>>}
+	 * @returns {Observable<DataSet<TEntity extends ModelBase>>}
 	 */
 	query(query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<TEntity>> {
 		if (this.entityConstructor.entityConfig && !this.entityConstructor.entityConfig.supportsGetMethod(EntityGetMethod.query))
@@ -169,7 +169,7 @@ export class ReadonlyRepository<TEntity extends ModelBase<TRawData>, TRawData = 
 	 * Useful for when we require to fetch a single model from backend, but it's either a ValueObject (so we can't refer to it by ID) or it's fetched by a more complex data query.
 	 * @param {DataQuery} query
 	 * @param {DataOptions} dataOptions
-	 * @returns {Observable<TEntity extends ModelBase<TRawData>>}
+	 * @returns {Observable<TEntity extends ModelBase>}
 	 */
 	queryItem(query: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<TEntity> {
 		let httpOptions:HttpOptions = this.entityBackendConfig.parseDataQuery ? { params: this.entityBackendConfig.parseDataQuery(query) } : queryToHttpOptions(query);
@@ -228,7 +228,7 @@ export class ReadonlyRepository<TEntity extends ModelBase<TRawData>, TRawData = 
 	 * @param {string | number} itemId
 	 * @param {DataOptions} options
 	 * @param {{[p: string]: any}} params
-	 * @returns {Observable<TEntity extends ModelBase<TRawData>>}
+	 * @returns {Observable<TEntity extends ModelBase>}
 	 */
 	getItemById(itemId: EntityId, options: DataOptions = defaultDataOptions, params?:{ [index:string]:any }): Observable<TEntity> {
 		if (!this.entityConstructor.entityConfig.supportsGetMethod(EntityGetMethod.getItem))
@@ -290,10 +290,10 @@ export class ReadonlyRepository<TEntity extends ModelBase<TRawData>, TRawData = 
 	 * @param {TEntity} item
 	 * @returns {Index}
 	 */
-	serializeItem(item:TEntity, serializationData?:any): TRawData {
+	serializeItem(item:Partial<TEntity>, serializationData?:any): TRawData {
 		ReadonlyRepository.validateItem(item, this.entity);
 
-		return ReadonlyRepository.serializeItem<TRawData>(item, this.entity, this.paris, serializationData);
+		return ReadonlyRepository.serializeItem<TEntity, TRawData>(item, this.entity, this.paris, serializationData);
 	}
 
 	/**
@@ -305,9 +305,9 @@ export class ReadonlyRepository<TEntity extends ModelBase<TRawData>, TRawData = 
 	 * @param {ParisConfig} config
 	 * @param {Paris} paris
 	 * @param {DataOptions} options
-	 * @returns {Observable<T extends EntityModelBase>}
+	 * @returns {Observable<TEntity extends EntityModelBase>}
 	 */
-	static getModelData<T extends ModelBase, TRawData extends any = any>(rawData: TRawData, entity: IEntityConfigBase, config: ParisConfig, paris: Paris, options: DataOptions = defaultDataOptions, query?: DataQuery): Observable<T> {
+	static getModelData<TEntity extends ModelBase, TRawData extends any = any>(rawData: TRawData, entity: ModelConfig<TEntity, TRawData>, config: ParisConfig, paris: Paris, options: DataOptions = defaultDataOptions, query?: DataQuery): Observable<TEntity> {
 		let entityIdProperty: string = entity.idProperty || config.entityIdProperty,
 			modelData: Index = entity instanceof ModelEntity ? {id: rawData[entityIdProperty]} : {},
 			subModels: Array<Observable<{ [index: string]: ModelBase | Array<ModelBase> }>> = [];
@@ -385,14 +385,14 @@ export class ReadonlyRepository<TEntity extends ModelBase<TRawData>, TRawData = 
 			}
 		});
 
-		let model$:Observable<T>;
+		let model$:Observable<TEntity>;
 
 		if (subModels.length) {
 			model$ = combineLatest(subModels).pipe(
 				map((propertyEntityValues: Array<ModelPropertyValue>) => {
 					propertyEntityValues.forEach((propertyEntityValue: { [index: string]: any }) => Object.assign(modelData, propertyEntityValue));
 
-					let model: T;
+					let model: TEntity;
 
 					try {
 						model = new entity.entityConstructor(modelData, rawData);
@@ -420,7 +420,7 @@ export class ReadonlyRepository<TEntity extends ModelBase<TRawData>, TRawData = 
 			);
 		}
 		else {
-			let model: T;
+			let model: TEntity;
 
 			try {
 				model = new entity.entityConstructor(modelData, rawData);
@@ -493,7 +493,7 @@ export class ReadonlyRepository<TEntity extends ModelBase<TRawData>, TRawData = 
 	 * @param {EntityConfigBase} entity
 	 * @returns {boolean}
 	 */
-	static validateItem(item:{}, entity:IEntityConfigBase):boolean{
+	static validateItem<TEntity extends ModelBase, TRawData = object>(item:{}, entity:ModelConfig<TEntity, TRawData>):boolean{
 		entity.fields.forEach((entityField:Field) => {
 			let itemFieldValue: any = (<any>item)[entityField.id];
 
@@ -509,7 +509,7 @@ export class ReadonlyRepository<TEntity extends ModelBase<TRawData>, TRawData = 
 	 * @param item
 	 * @returns {Index}
 	 */
-	static serializeItem<TRawData extends any = object>(item:{}, entity:IEntityConfigBase, paris:Paris, serializationData?:any):TRawData{
+	static serializeItem<TEntity extends ModelBase, TRawData = object>(item:Partial<TEntity>, entity:ModelConfig<TEntity, TRawData>, paris:Paris, serializationData?:any):TRawData {
 		ReadonlyRepository.validateItem(item, entity);
 
 		let modelData: TRawData = <TRawData>{};
@@ -539,9 +539,9 @@ export class ReadonlyRepository<TEntity extends ModelBase<TRawData>, TRawData = 
 				else
 					modelValue = DataTransformersService.serialize(entityField.type, itemFieldValue);
 
-				let modelProperty: string = entityField.data
+				let modelProperty: keyof TRawData = <keyof TRawData>(entityField.data
 					? entityField.data instanceof Array ? entityField.data[0] : entityField.data
-					: entityField.id;
+					: entityField.id);
 
 				modelData[modelProperty] = modelValue;
 			}

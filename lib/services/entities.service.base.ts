@@ -3,8 +3,9 @@ import {Field} from "../entity/entity-field";
 import {EntityFields} from "../entity/entity-fields";
 import {EntityConfigBase} from "../entity/entity-config.base";
 import {entityFieldsService} from "./entity-fields.service";
+import {EntityId} from "../models/entity-id.type";
 
-export abstract class EntitiesServiceBase<T extends EntityConfigBase>{
+export abstract class EntitiesServiceBase<T extends EntityConfigBase, TRawData = any, TId extends EntityId = string>{
 	protected _allEntities:Map<DataEntityType, T> = new Map;
 	protected _allEntitiesByName:Map<string, T> = new Map;
 
