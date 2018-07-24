@@ -368,8 +368,7 @@ export class Paris{
 	/**
 	 * Gets an item by ID from backend and returns an Observable with the model
 	 *
-	 * @example Get a TodoItem with ID 1
-	 *
+	 * @example <caption>Get a TodoItem with ID 1</caption>
 	 * ```typescript
 	 *
 	 * const toDo$:Observable<TodoItem> = paris.getItemById<TodoItem>(TodoItem, 1);
@@ -396,6 +395,9 @@ export class Paris{
 	 * Query items in a relationship - fetches multiple items that relate to a specified item.
 	 *
 	 * @example <caption>Get all the TodoItem items in a TodoList</caption>
+	 *
+	 * ```typescript
+	 *
 	 * const toDoListId = 1;
 	 * const toDoList$:Observable<TodoList> = paris.getItemById(TodoList, toDoListId);
 	 *
@@ -404,7 +406,7 @@ export class Paris{
 	 * );
 	 *
 	 * toDoListItems$.subscribe((toDoListItems:DataSet<TodoItem>) => console.log(`Items in TodoList #${toDoListId}:`, toDoListItems.items));
-	 *
+	 * ```
 	 * @param {Function} relationshipConstructor
 	 * @param {ModelBase} item
 	 * @param {DataQuery} query
@@ -425,6 +427,9 @@ export class Paris{
 	 * Gets an item that's related to another item, as defined in a relationship.
 	 *
 	 * @example <caption>Get an item for another item</caption>
+	 *
+	 * ```typescript
+	 *
 	 * const toDoListId = 1;
 	 * const toDoList$:Observable<TodoList> = paris.getItemById(TodoList, toDoListId);
 	 *
@@ -434,6 +439,7 @@ export class Paris{
 	 *
 	 * toDoListHistory$.subscribe((toDoListHistory$:ToDoListHistory) => console.log(`History for TodoList #${toDoListId}:`, toDoListHistory));
 	 *
+	 * ```
 	 * @param {Function} relationshipConstructor
 	 * @param {ModelBase} item
 	 * @param {DataQuery} query
@@ -452,10 +458,14 @@ export class Paris{
 	 * Gets an entity value by its ID. The value has to be defined in the Entity's values property
 	 *
 	 * @example <caption>Get the value with id === 'open' from Entity ToDoStatus</caption>
+	 *
+	 * ```typescript
+	 *
 	 * const openStatusId = 'open';
 	 * const toDoStatus = paris.getValue(ToDoStatus, openStatusId);
 	 *
 	 * console.log("TodoItem 'open' status: ", toDoStatus);
+	 * ```
 	 *
 	 * @param {DataEntityConstructor<T extends ModelBase>} entityConstructor
 	 * @param valueId
