@@ -103,12 +103,9 @@ export interface EntityBackendConfig<TEntity extends ModelBase<TRawData>, TRawDa
 	 * `parseItemQuery` allows to specify a different URL. This is useful if your API doesn't follow the REST standard.
 	 *
 	 * @example <caption>Fetching an entity by specifying the ID in a query param rather than as a folder</caption>
-	 *
 	 * ```typescript
-	 *
 	 * parseItemQuery: itemId => `/todo?id=${itemId}`
 	 * ```
-	 *
 	 * @param {EntityId} itemId
 	 * @param {IEntityConfigBase} entity
 	 * @param {ParisConfig} config

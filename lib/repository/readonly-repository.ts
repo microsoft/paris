@@ -146,19 +146,15 @@ export class ReadonlyRepository<TEntity extends ModelBase<TRawData>, TRawData = 
 	 * The backend may add paging information, such as count, page, etc, so a DataSet object is returned rather than just an Array.
 	 *
 	 * @example <caption>Get all Todo items</caption>
-	 *
 	 * ```typescript
-	 *
 	 * repository.query()
 	 * 		.subscribe((todoItems:DataSet<TodoItem>) => console.log('Current items: ', todoItems.items));
 	 * ```
 	 *
 	 * @example <caption>Get all Todo items, sorted by name</caption>
 	 * ```typescript
-	 *
 	 * repository.query({ sortBy: { field: 'name' }})
 	 * 		.subscribe((todoItems:DataSet<TodoItem>) => console.log('Items by name: ', todoItems.items));
-	 *
 	 * ```
 	 * @param {DataQuery} query
 	 * @param {DataOptions} dataOptions

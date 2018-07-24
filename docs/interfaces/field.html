@@ -110,7 +110,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="fieldconfig.html">FieldConfig</a>.<a href="fieldconfig.html#arrayof">arrayOf</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/9ea9a1d/lib/entity/entity-field.config.ts#L100">entity/entity-field.config.ts:100</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-field.config.ts#L90">entity/entity-field.config.ts:90</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -122,8 +122,7 @@
 							<dt>example</dt>
 							<dd><p><caption>Using a model field&#39;s arrayOf configuration for assigning an array sub-model</caption>
 								// Without the arrayOf, addresses won&#39;t be modeled by Paris.</p>
-								<pre><code class="lang-typescript">
-<span class="hljs-meta">@EntityField</span>({ arrayOf: Address })
+								<pre><code class="lang-typescript"><span class="hljs-meta">@EntityField</span>({ arrayOf: Address })
 addresses: <span class="hljs-built_in">Array</span>&lt;Address&gt;
 </code></pre>
 							</dd>
@@ -137,7 +136,7 @@ addresses: <span class="hljs-built_in">Array</span>&lt;Address&gt;
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="fieldconfig.html">FieldConfig</a>.<a href="fieldconfig.html#data">data</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/9ea9a1d/lib/entity/entity-field.config.ts#L81">entity/entity-field.config.ts:81</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-field.config.ts#L72">entity/entity-field.config.ts:72</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -154,19 +153,15 @@ addresses: <span class="hljs-built_in">Array</span>&lt;Address&gt;
 							<dt>example</dt>
 							<dd><p><caption>Mapping from a different raw data property with <code>data</code></caption>
 								If your raw data has properties in snake-case rather than camel-case, you&#39;d need to map the properties:</p>
-								<pre><code class="lang-typescript">
-<span class="hljs-meta">@EntityField</span>({ data: <span class="hljs-string">"creation_date"</span> })
+								<pre><code class="lang-typescript"><span class="hljs-meta">@EntityField</span>({ data: <span class="hljs-string">"creation_date"</span> })
 creationData: <span class="hljs-built_in">Date</span>;
-
 </code></pre>
 							</dd>
 							<dt>example</dt>
 							<dd><p><caption>Using the first available value from the raw data for the model&#39;s property</caption>
 								If an array of strings is provided for <code>data</code>, Paris will assign to the model&#39;s property value the first value from the raw data which isn&#39;t undefined or null:</p>
-								<pre><code class="lang-typescript">
-<span class="hljs-meta">@EntityField</span>({ data: [<span class="hljs-string">'creation_date'</span>, <span class="hljs-string">'init_date'</span>, <span class="hljs-string">'start_date'</span>] })
+								<pre><code class="lang-typescript"><span class="hljs-meta">@EntityField</span>({ data: [<span class="hljs-string">'creation_date'</span>, <span class="hljs-string">'init_date'</span>, <span class="hljs-string">'start_date'</span>] })
 date: <span class="hljs-built_in">Date</span>;
-
 </code></pre>
 								<p>If the raw data is:
 									{
@@ -179,15 +174,13 @@ date: <span class="hljs-built_in">Date</span>;
 							<dd><p><caption>Using &#39;<strong>self&#39; for data to pass the whole raw data</caption>
 									In the case when we want to separate some properties of the raw data to a sub-model, it&#39;s possible to use the special value &#39;</strong>self&#39; for the <code>data</code> field configuration.
 								This passes the whole raw data object to the field&#39;s creation, rather than just the value of a property. e.g:</p>
-								<pre><code class="lang-typescript">
-Person <span class="hljs-keyword">extends</span> EntityModelBase{
+								<pre><code class="lang-typescript">Person <span class="hljs-keyword">extends</span> EntityModelBase{
         <span class="hljs-meta">@EntityField</span>()
         name:<span class="hljs-built_in">string</span>;
 
         <span class="hljs-meta">@EntityField</span>({ data: <span class="hljs-string">'__self'</span> })
         address:Address;
 }
-
 </code></pre>
 								<p>In case we want to separate all address properties from a user into an encapsulated object, for the following raw data:</p>
 								<p>{
@@ -208,7 +201,7 @@ Person <span class="hljs-keyword">extends</span> EntityModelBase{
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="fieldconfig.html">FieldConfig</a>.<a href="fieldconfig.html#defaultvalue">defaultValue</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/9ea9a1d/lib/entity/entity-field.config.ts#L86">entity/entity-field.config.ts:86</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-field.config.ts#L77">entity/entity-field.config.ts:77</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -223,7 +216,7 @@ Person <span class="hljs-keyword">extends</span> EntityModelBase{
 					<div class="tsd-signature tsd-kind-icon">entity<span class="tsd-signature-symbol">:</span> <a href="dataentitytype.html" class="tsd-signature-type">DataEntityType</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/9ea9a1d/lib/entity/entity-field.ts#L5">entity/entity-field.ts:5</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-field.ts#L5">entity/entity-field.ts:5</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -234,7 +227,7 @@ Person <span class="hljs-keyword">extends</span> EntityModelBase{
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="fieldconfig.html">FieldConfig</a>.<a href="fieldconfig.html#id">id</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/9ea9a1d/lib/entity/entity-field.config.ts#L12">entity/entity-field.config.ts:12</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-field.config.ts#L12">entity/entity-field.config.ts:12</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -249,7 +242,7 @@ Person <span class="hljs-keyword">extends</span> EntityModelBase{
 					<div class="tsd-signature tsd-kind-icon">is<wbr>Array<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/9ea9a1d/lib/entity/entity-field.ts#L7">entity/entity-field.ts:7</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-field.ts#L7">entity/entity-field.ts:7</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -260,7 +253,7 @@ Person <span class="hljs-keyword">extends</span> EntityModelBase{
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="fieldconfig.html">FieldConfig</a>.<a href="fieldconfig.html#name">name</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/9ea9a1d/lib/entity/entity-field.config.ts#L17">entity/entity-field.config.ts:17</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-field.config.ts#L17">entity/entity-field.config.ts:17</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -276,7 +269,7 @@ Person <span class="hljs-keyword">extends</span> EntityModelBase{
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="fieldconfig.html">FieldConfig</a>.<a href="fieldconfig.html#parse">parse</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/9ea9a1d/lib/entity/entity-field.config.ts#L154">entity/entity-field.config.ts:154</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-field.config.ts#L139">entity/entity-field.config.ts:139</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -287,9 +280,8 @@ Person <span class="hljs-keyword">extends</span> EntityModelBase{
 						</div>
 						<dl class="tsd-comment-tags">
 							<dt>example</dt>
-							<dd><caption>Parsing a bitwise value into an array</caption>
-								<pre><code class="lang-typescript">
-<span class="hljs-meta">@EntityField</span>({
+							<dd><p><caption>Parsing a bitwise value into an array</caption></p>
+								<pre><code class="lang-typescript"><span class="hljs-meta">@EntityField</span>({
         arrayOf: NotificationFormat,
         parse: <span class="hljs-function">(<span class="hljs-params">formatBitWise: <span class="hljs-built_in">number</span></span>) =&gt;</span> {
             <span class="hljs-keyword">return</span> notificationFormatValues.reduce(<span class="hljs-function">(<span class="hljs-params">formats: <span class="hljs-built_in">Array</span>&lt;<span class="hljs-built_in">number</span>&gt;, notificationFormat</span>) =&gt;</span> {
@@ -349,7 +341,7 @@ formatFlavor: <span class="hljs-built_in">Array</span>&lt;NotificationFormat&gt;
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="fieldconfig.html">FieldConfig</a>.<a href="fieldconfig.html#require">require</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/9ea9a1d/lib/entity/entity-field.config.ts#L127">entity/entity-field.config.ts:127</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-field.config.ts#L115">entity/entity-field.config.ts:115</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -359,13 +351,12 @@ formatFlavor: <span class="hljs-built_in">Array</span>&lt;NotificationFormat&gt;
 						<dl class="tsd-comment-tags">
 							<dt>example</dt>
 							<dd><caption>Assigning ZIP code only if street exists</caption>
-								<pre><code class="lang-typescript">
-<span class="hljs-meta">@EntityField</span>({ <span class="hljs-built_in">require</span>: <span class="hljs-string">"street"</span> })
+								<pre><code class="lang-typescript"><span class="hljs-meta">@EntityField</span>({ <span class="hljs-built_in">require</span>: <span class="hljs-string">"street"</span> })
 zip:<span class="hljs-built_in">string</span>;
 </code></pre>
 							</dd>
 							<dt>example</dt>
-							<dd><caption>Assigning ZIP code only if both street and country exist</caption>
+							<dd><p><caption>Assigning ZIP code only if both street and country exist</caption></p>
 								<pre><code class="lang-typescript"><span class="hljs-meta">@EntityField</span>({ <span class="hljs-built_in">require</span>: <span class="hljs-function">(<span class="hljs-params">data:AddressRawData</span>) =&gt;</span> data.street &amp;&amp; data.country })
 zip:<span class="hljs-built_in">string</span>;
 </code></pre>
@@ -380,7 +371,7 @@ zip:<span class="hljs-built_in">string</span>;
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="fieldconfig.html">FieldConfig</a>.<a href="fieldconfig.html#required">required</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/9ea9a1d/lib/entity/entity-field.config.ts#L107">entity/entity-field.config.ts:107</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-field.config.ts#L97">entity/entity-field.config.ts:97</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -402,7 +393,7 @@ zip:<span class="hljs-built_in">string</span>;
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="fieldconfig.html">FieldConfig</a>.<a href="fieldconfig.html#serialize">serialize</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/9ea9a1d/lib/entity/entity-field.config.ts#L160">entity/entity-field.config.ts:160</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-field.config.ts#L145">entity/entity-field.config.ts:145</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -418,7 +409,7 @@ zip:<span class="hljs-built_in">string</span>;
 					<div class="tsd-signature tsd-kind-icon">type<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/9ea9a1d/lib/entity/entity-field.ts#L6">entity/entity-field.ts:6</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-field.ts#L6">entity/entity-field.ts:6</a></li>
 						</ul>
 					</aside>
 				</section>
