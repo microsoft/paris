@@ -22,8 +22,10 @@ export interface FieldConfig{
 	 *
 	 * If an entity has the following property definition:
 	 *
+	 * ```typescript
 	 * @EntityField()
 	 * name:string;
+	 * ```
 	 *
 	 * Then when creating the model, if the raw data contains a `name` property with value 'Anna', the resulting model will have a `name` property with value 'Anna'.
 	 *
@@ -47,7 +49,7 @@ export interface FieldConfig{
 	 *
 	 * Then the model's `date` property will have a value of Date(1532422166428), since both creation_date and init_date have no value in the data.
 	 *
-	 * @example <caption>Using '__self' for data to pass the whole raw data</caption>
+	 * @example <caption>Using '\_\_self' for data to pass the whole raw data</caption>
 	 * In the case when we want to separate some properties of the raw data to a sub-model, it's possible to use the special value '__self' for the `data` field configuration.
 	 * This passes the whole raw data object to the field's creation, rather than just the value of a property. e.g:
 	 * ```typescript
@@ -61,6 +63,7 @@ export interface FieldConfig{
 	 * ```
 	 * In case we want to separate all address properties from a user into an encapsulated object, for the following raw data:
 	 *
+	 * ```json
 	 * {
 	 * 		"name": "Anna",
 	 * 		"street": "Prinsengracht 263-267",
@@ -68,6 +71,7 @@ export interface FieldConfig{
 	 * 		"city": "Amsterdam",
 	 * 		"country": "Holland"
 	 * }
+	 * ```
 	 */
 	data?:"__self" | string | Array<string>,
 

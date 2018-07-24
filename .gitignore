@@ -65,3 +65,5 @@ package-lock.json
 # Build output
 bundle/
 dist/
+
+.idea

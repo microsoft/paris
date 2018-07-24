@@ -27,6 +27,8 @@ import {catchError, map, mergeMap, switchMap, tap} from "rxjs/operators";
 import {DataTransformersService} from "./data-transformers.service";
 import {DataCache, DataCacheSettings} from "./cache";
 import * as _ from "lodash";
+import {EntityModelBase} from "../models/entity-model.base";
+import {EntityId} from "../models/entity-id.type";
 
 export class Paris{
 	private repositories:Map<DataEntityType, IRepository<ModelBase>> = new Map;
@@ -379,7 +381,7 @@ export class Paris{
 	 * @param {{[p: string]: any}} params
 	 * @returns {Observable<TEntity extends ModelBase>}
 	 */
-	getItemById<TEntity extends ModelBase>(entityConstructor:DataEntityConstructor<TEntity>, itemId: string | number, options?:DataOptions, params?:{ [index:string]:any }): Observable<TEntity>{
+	getItemById<TEntity extends EntityModelBase, TId extends EntityId = string>(entityConstructor:DataEntityConstructor<TEntity>, itemId: TId, options?:DataOptions, params?:{ [index:string]:any }): Observable<TEntity>{
 		options = options || defaultDataOptions;
 
 		let repository:Repository<TEntity> = this.getRepository(entityConstructor);
