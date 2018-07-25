@@ -16,11 +16,6 @@
 		"test": "mocha -r ts-node/register lib/**/*.spec.ts",
 		"docs": "typedoc --options typedocconfig.ts"
 	},
-	"husky": {
-		"hooks": {
-			"pre-push": "npm run docs"
-		}
-	},
 	"author": "Yossi Kolesnicov",
 	"license": "MIT",
 	"devDependencies": {
