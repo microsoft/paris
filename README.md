@@ -20,6 +20,16 @@ Install the Paris NPM package:
 npm install --save @Microsoft/paris
 ```
 
+## Features
+
+- Data API abstraction and standardization - define and use your data easily, in a consistent way.
+- Strong-typed - data models are defined as classes with TypeScript
+- Full-tree modeling - Paris handles the creation of models and sub-models, essentially creating a model tree.
+- Implements Domain-Driven Design - true and tested development methodology that improves collaboration.
+- Reactive - all async code is done with Observables.
+- Caching - easily cache data (including time-based caching). 
+
+
 ## Usage
 
 First, define an Entity:
