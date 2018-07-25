@@ -1,5 +1,3 @@
-import {DataEntityType} from "../entity/data-entity.base";
+import "reflect-metadata";
 
-(<any>global)['Reflect'] = {
-	getMetaData: (type:"design:type", entityPrototype: DataEntityType, propertyKey: string | symbol) => String
-};
+(<any>global)['Reflect'] = Reflect;
