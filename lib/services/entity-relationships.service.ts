@@ -1,27 +1,28 @@
 import {DataEntityType} from "../entity/data-entity.base";
 import {EntityRelationshipConfig} from "../entity/entity-relationship";
+import {ModelBase} from "../models/model.base";
 
 export class EntityRelationshipsService{
-	protected relationships:Map<DataEntityType, Map<DataEntityType, EntityRelationshipConfig>> = new Map;
+	protected relationships:Map<DataEntityType, Map<DataEntityType, EntityRelationshipConfig<ModelBase, ModelBase>>> = new Map;
 
-	addRelationship(relationship:EntityRelationshipConfig):void{
+	addRelationship<TSource extends ModelBase, TData extends ModelBase>(relationship:EntityRelationshipConfig<TSource, TData>):void{
 		let sourceDataEntityType:DataEntityType = relationship.sourceEntity,
-			sourceRelationships:Map<DataEntityType, EntityRelationshipConfig> = this.relationships.get(sourceDataEntityType);
+			sourceRelationships:Map<DataEntityType<TData>, EntityRelationshipConfig<TSource, TData>> =  <Map<DataEntityType<TData>, EntityRelationshipConfig<TSource, TData>>>this.relationships.get(sourceDataEntityType);
 
 		if (!sourceRelationships){
 			sourceRelationships = new Map;
 			this.relationships.set(sourceDataEntityType, sourceRelationships);
 		}
 
-		let mappedRelationship:EntityRelationshipConfig = sourceRelationships.get(relationship.dataEntity);
+		let mappedRelationship:EntityRelationshipConfig<TSource, TData> = sourceRelationships.get(relationship.dataEntity);
 		if (mappedRelationship)
 			throw new Error(`Duplicate relationship: ${sourceDataEntityType.singularName} -> ${relationship.dataEntity.singularName}`);
 
 		sourceRelationships.set(relationship.dataEntity, relationship);
 	}
 
-	getRelationship(sourceDataType:DataEntityType, dataType:DataEntityType):EntityRelationshipConfig{
-		let sourceRelationships:Map<DataEntityType, EntityRelationshipConfig> = this.relationships.get(sourceDataType);
+	getRelationship<TSource extends ModelBase, TData extends ModelBase>(sourceDataType:DataEntityType<TSource>, dataType:DataEntityType<TData>):EntityRelationshipConfig<TSource, TData> {
+		let sourceRelationships:Map<DataEntityType, EntityRelationshipConfig<TSource, TData>> = <Map<DataEntityType<TData>, EntityRelationshipConfig<TSource, TData>>>this.relationships.get(sourceDataType);
 		if (!sourceRelationships)
 			return null;
 

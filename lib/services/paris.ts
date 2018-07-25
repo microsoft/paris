@@ -27,6 +27,8 @@ import {catchError, map, mergeMap, switchMap, tap} from "rxjs/operators";
 import {DataTransformersService} from "./data-transformers.service";
 import {DataCache, DataCacheSettings} from "./cache";
 import * as _ from "lodash";
+import {EntityModelBase} from "../models/entity-model.base";
+import {EntityId} from "../models/entity-id.type";
 
 export class Paris{
 	private repositories:Map<DataEntityType, IRepository<ModelBase>> = new Map;
@@ -66,16 +68,16 @@ export class Paris{
 
 	/**
 	 * Returns the {@link Repository} for the specified class. If no Repository can be found, returns null.
-	 * @param {DataEntityConstructor<T extends ModelBase>} entityConstructor A class, should have a decorator of either @Entity or @ValueObject.
+	 * @param {DataEntityConstructor<TEntity extends ModelBase>} entityConstructor A class, should have a decorator of either @Entity or @ValueObject.
 	 */
-	getRepository<T extends ModelBase>(entityConstructor:DataEntityConstructor<T>):Repository<T> | null{
-		let repository:Repository<T> = <Repository<T>>this.repositories.get(entityConstructor);
+	getRepository<TEntity extends ModelBase>(entityConstructor:DataEntityConstructor<TEntity>):Repository<TEntity> | null{
+		let repository:Repository<TEntity> = <Repository<TEntity>>this.repositories.get(entityConstructor);
 		if (!repository) {
-			let entityConfig:EntityConfig = entitiesService.getEntityByType(entityConstructor) || valueObjectsService.getEntityByType(entityConstructor);
+			let entityConfig:EntityConfig<TEntity> = entitiesService.getEntityByType(entityConstructor) || valueObjectsService.getEntityByType(entityConstructor);
 			if (!entityConfig)
 				return null;
 
-			repository = new Repository<T>(entityConfig, this.config, entityConstructor, this.dataStore, this);
+			repository = new Repository<TEntity>(entityConfig, this.config, entityConstructor, this.dataStore, this);
 			this.repositories.set(entityConstructor, repository);
 
 			// If the entity has an endpoint, it means it connects to the backend, so subscribe to save/delete events to enable global events:
@@ -120,13 +122,13 @@ export class Paris{
 
 	/**
 	 * Fetches multiple item data from backend
-	 * @param {DataEntityConstructor<T extends ModelBase>} entityConstructor The {@link Entity} class for which to fetch data
+	 * @param {DataEntityConstructor<TEntity extends ModelBase>} entityConstructor The {@link Entity} class for which to fetch data
 	 * @param {DataQuery} query {@link DataQuery} object with configuration for the backend API, such as page, page size, order, or any custom data required
 	 * @param {DataOptions} dataOptions General options for the query.
-	 * @returns {Observable<DataSet<T extends ModelBase>>} An Observable of DataSet<T>
+	 * @returns {Observable<DataSet<TEntity extends ModelBase>>} An Observable of DataSet<TEntity>
 	 */
-	query<T extends ModelBase>(entityConstructor:DataEntityConstructor<T>, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<T>>{
-		let repository:Repository<T> = this.getRepository(entityConstructor);
+	query<TEntity extends ModelBase>(entityConstructor:DataEntityConstructor<TEntity>, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<TEntity>>{
+		let repository:Repository<TEntity> = this.getRepository(entityConstructor);
 		if (repository)
 			return repository.query(query, dataOptions);
 		else
@@ -310,13 +312,13 @@ export class Paris{
 
 	/**
 	 * Underlying method for {@link query}. Different in that it accepts an {@link EntityBackendConfig}, to configure the call.
-	 * @param {DataEntityConstructor<T extends ModelBase>} entityConstructor
+	 * @param {DataEntityConstructor<TEntity extends ModelBase>} entityConstructor
 	 * @param {EntityBackendConfig} backendConfig
 	 * @param {DataQuery} query
 	 * @param {DataOptions} dataOptions
-	 * @returns {Observable<DataSet<T extends ModelBase>>}
+	 * @returns {Observable<DataSet<TEntity extends ModelBase>>}
 	 */
-	callQuery<T extends ModelBase>(entityConstructor:DataEntityConstructor<T>, backendConfig:EntityBackendConfig, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions):Observable<DataSet<T>>{
+	callQuery<TEntity extends ModelBase>(entityConstructor:DataEntityConstructor<TEntity>, backendConfig:EntityBackendConfig<TEntity>, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions):Observable<DataSet<TEntity>>{
 		const httpOptions:HttpOptions = backendConfig.parseDataQuery ? { params: backendConfig.parseDataQuery(query) } : queryToHttpOptions(query);
 
 		const endpoint:string = backendConfig.endpoint instanceof Function ? backendConfig.endpoint(this.config, query) : backendConfig.endpoint;
@@ -325,13 +327,13 @@ export class Paris{
 			endpoint: `${endpoint}${backendConfig.allItemsEndpointTrailingSlash !== false && !backendConfig.allItemsEndpoint ? '/' : ''}${backendConfig.allItemsEndpoint || ''}`
 		});
 
-		return this.makeApiCall<T>(apiCallConfig, "GET", httpOptions, query).pipe(
+		return this.makeApiCall<TEntity>(apiCallConfig, "GET", httpOptions, query).pipe(
 			catchError((error: EntityErrorEvent) => {
 					this._errorSubject$.next(Object.assign({}, error, {entity: entityConstructor}));
 					return throwError(error.originalError || error)
 				}),
-			mergeMap((rawDataSet: T) => {
-				return rawDataToDataSet<T>(
+			mergeMap((rawDataSet: TEntity) => {
+				return rawDataToDataSet<TEntity>(
 					rawDataSet,
 					entityConstructor,
 					backendConfig.allItemsProperty || this.config.allItemsProperty,
@@ -356,32 +358,33 @@ export class Paris{
 	/**
 	 * Creates an instance of a model - given an Entity/ValueObject class and data, creates a root model, with full model tree, meaning - all sub-models are modeled as well.
 	 * Sub-models that require being fetched from backend will be fetched.
-	 * @param {DataEntityConstructor<T extends ModelBase>} entityConstructor
+	 * @param {DataEntityConstructor<TEntity extends ModelBase>} entityConstructor
 	 * @param data {TRawData} The raw JSON data for creating the item, as it arrives from backend.
 	 * @param {DataOptions} dataOptions
 	 * @param {DataQuery} query
 	 */
-	createItem<T extends ModelBase<TRawData>, TRawData extends any = object>(entityConstructor:DataEntityConstructor<T>, data:TRawData, dataOptions: DataOptions = defaultDataOptions, query?:DataQuery):Observable<T>{
-		return ReadonlyRepository.getModelData<T, TRawData>(data, entityConstructor.entityConfig || entityConstructor.valueObjectConfig, this.config, this, dataOptions, query);
+	createItem<TEntity extends ModelBase, TRawData extends any = object>(entityConstructor:DataEntityConstructor<TEntity>, data:TRawData, dataOptions: DataOptions = defaultDataOptions, query?:DataQuery):Observable<TEntity>{
+		return ReadonlyRepository.getModelData<TEntity, TRawData>(data, entityConstructor.entityConfig || entityConstructor.valueObjectConfig, this.config, this, dataOptions, query);
 	}
 
 	/**
 	 * Gets an item by ID from backend and returns an Observable with the model
 	 *
 	 * @example <caption>Get a TodoItem with ID 1</caption>
+	 * ```typescript
 	 * const toDo$:Observable<TodoItem> = paris.getItemById<TodoItem>(TodoItem, 1);
 	 * toDo$.subscribe((toDo:TodoItem) => console.log('Found TodoItem item: ', toDo);
-	 *
-	 * @param {DataEntityConstructor<T extends ModelBase>} entityConstructor
+	 * ```
+	 * @param {DataEntityConstructor<TEntity extends ModelBase>} entityConstructor
 	 * @param {string | number} itemId
 	 * @param {DataOptions} options
 	 * @param {{[p: string]: any}} params
-	 * @returns {Observable<T extends ModelBase>}
+	 * @returns {Observable<TEntity extends ModelBase>}
 	 */
-	getItemById<T extends ModelBase>(entityConstructor:DataEntityConstructor<T>, itemId: string | number, options?:DataOptions, params?:{ [index:string]:any }): Observable<T>{
+	getItemById<TEntity extends EntityModelBase, TId extends EntityId = string>(entityConstructor:DataEntityConstructor<TEntity>, itemId: TId, options?:DataOptions, params?:{ [index:string]:any }): Observable<TEntity>{
 		options = options || defaultDataOptions;
 
-		let repository:Repository<T> = this.getRepository(entityConstructor);
+		const repository:Repository<TEntity> = this.getRepository(entityConstructor);
 		if (repository)
 			return repository.getItemById(itemId, options, params);
 		else
@@ -389,9 +392,24 @@ export class Paris{
 	}
 
 	/**
+	 * Gets all the items for an entity type. If all the items are cached, no backend call shall be performed (as in the case the the Entity is configured with `loadAll: true` and has already fetched data).
+	 * @param {DataEntityConstructor<TEntity extends EntityModelBase>} entityConstructor
+	 * @returns {Observable<Array<TEntity extends EntityModelBase>>}
+	 */
+	allItems<TEntity extends EntityModelBase>(entityConstructor:DataEntityConstructor<TEntity>):Observable<Array<TEntity>>{
+		const repository:Repository<TEntity> = this.getRepository(entityConstructor);
+		if (repository)
+			return repository.allItems$;
+		else
+			throw new Error(`Can't get all items, no repository exists for ${entityConstructor}.`);
+	}
+
+	/**
 	 * Query items in a relationship - fetches multiple items that relate to a specified item.
 	 *
 	 * @example <caption>Get all the TodoItem items in a TodoList</caption>
+	 *
+	 * ```typescript
 	 * const toDoListId = 1;
 	 * const toDoList$:Observable<TodoList> = paris.getItemById(TodoList, toDoListId);
 	 *
@@ -400,7 +418,7 @@ export class Paris{
 	 * );
 	 *
 	 * toDoListItems$.subscribe((toDoListItems:DataSet<TodoItem>) => console.log(`Items in TodoList #${toDoListId}:`, toDoListItems.items));
-	 *
+	 * ```
 	 * @param {Function} relationshipConstructor
 	 * @param {ModelBase} item
 	 * @param {DataQuery} query
@@ -421,6 +439,7 @@ export class Paris{
 	 * Gets an item that's related to another item, as defined in a relationship.
 	 *
 	 * @example <caption>Get an item for another item</caption>
+	 * ```typescript
 	 * const toDoListId = 1;
 	 * const toDoList$:Observable<TodoList> = paris.getItemById(TodoList, toDoListId);
 	 *
@@ -429,14 +448,14 @@ export class Paris{
 	 * );
 	 *
 	 * toDoListHistory$.subscribe((toDoListHistory$:ToDoListHistory) => console.log(`History for TodoList #${toDoListId}:`, toDoListHistory));
-	 *
+	 * ```
 	 * @param {Function} relationshipConstructor
 	 * @param {ModelBase} item
 	 * @param {DataQuery} query
 	 * @param {DataOptions} dataOptions
 	 * @returns {Observable<U extends ModelBase>}
 	 */
-	getRelatedItem<TSource extends ModelBase, TResult extends ModelBase>(relationshipConstructor:Function, item:ModelBase, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<TResult>{
+	getRelatedItem<TSource extends ModelBase, TResult extends ModelBase>(relationshipConstructor:Function, item:TSource, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<TResult>{
 		let relationshipRepository:RelationshipRepository<TSource,TResult> = this.getRelationshipRepository<TSource, TResult>(relationshipConstructor);
 		if (relationshipRepository)
 			return relationshipRepository.getRelatedItem(item, query, dataOptions);
@@ -448,21 +467,22 @@ export class Paris{
 	 * Gets an entity value by its ID. The value has to be defined in the Entity's values property
 	 *
 	 * @example <caption>Get the value with id === 'open' from Entity ToDoStatus</caption>
+	 * ```typescript
 	 * const openStatusId = 'open';
 	 * const toDoStatus = paris.getValue(ToDoStatus, openStatusId);
 	 *
 	 * console.log("TodoItem 'open' status: ", toDoStatus);
-	 *
-	 * @param {DataEntityConstructor<T extends ModelBase>} entityConstructor
+	 * ```
+	 * @param {DataEntityConstructor<TEntity extends ModelBase>} entityConstructor
 	 * @param valueId
-	 * @returns {T}
+	 * @returns {TEntity}
 	 */
-	getValue<T extends ModelBase>(entityConstructor:DataEntityConstructor<T>, valueId:any):T{
-		let repository:Repository<T> = this.getRepository(entityConstructor);
+	getValue<TEntity extends ModelBase>(entityConstructor:DataEntityConstructor<TEntity>, valueId:any):TEntity{
+		let repository:Repository<TEntity> = this.getRepository(entityConstructor);
 		if (!repository)
 			return null;
 
-		let values:Array<T> = repository.entity.values;
+		let values:Array<TEntity> = repository.entity.values;
 		if (!values)
 			return null;
 

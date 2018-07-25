@@ -1,0 +1,466 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Paris</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.js" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">Paris</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="globals.html">Globals</a>
+				</li>
+			</ul>
+			<h1> Paris</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<h1 id="paris">Paris</h1>
+				<p>Paris is a data management library for webapps, using TypeScript and RxJS to implement Domain-Driven Design.  </p>
+				<p><em>Paris, fashion capital of the world, where all the <strong>models</strong> want to be</em>.</p>
+				<h2 id="installation">Installation</h2>
+				<p><em>Package size: ~15.8kb (gzipped)</em><br>Paris is a TypeScript library and also requires rxjs, so you&#39;ll need both those packages, if you don&#39;t already use them:</p>
+				<pre><code>npm <span class="hljs-keyword">install</span> <span class="hljs-comment">--save rxjs typescript</span>
+</code></pre><p>Install the Paris NPM package:</p>
+				<pre><code><span class="hljs-built_in">npm</span> install --save @Microsoft/paris
+</code></pre><h2 id="features">Features</h2>
+				<ul>
+					<li>Data API abstraction and standardization - define and use your data easily, in a consistent way.</li>
+					<li>Strong-typed - data models are defined as classes with TypeScript</li>
+					<li>Full-tree modeling - Paris handles the creation of models and sub-models, essentially creating a model tree.</li>
+					<li>Implements Domain-Driven Design - true and tested development methodology that improves collaboration.</li>
+					<li>Reactive - all async code is done with Observables.</li>
+					<li>Caching - easily cache data (including time-based caching). </li>
+				</ul>
+				<h2 id="usage">Usage</h2>
+				<p>First, define an Entity:</p>
+				<pre><code class="lang-typescript"><span class="hljs-comment">// todo-item.entity.ts</span>
+
+<span class="hljs-keyword">import</span> { Entity, EntityModelBase } <span class="hljs-keyword">from</span> <span class="hljs-string">"@microsoft/paris"</span>;
+
+<span class="hljs-meta">@Entity</span>({
+    singularName: <span class="hljs-string">"Todo Item"</span>,
+    pluralName: <span class="hljs-string">"Todo Items"</span>,
+    endpoint: <span class="hljs-string">"todo/items"</span>
+})
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> TodoItem <span class="hljs-keyword">extends</span> EntityModelBase{
+    <span class="hljs-meta">@EntityField</span>()
+    text:<span class="hljs-built_in">string</span>;
+
+    <span class="hljs-meta">@EntityField</span>()
+    time:<span class="hljs-built_in">Date</span>;
+}
+</code></pre>
+				<p>The above defines an Entity, which can be used to query the todo/items server endpoint, like this:</p>
+				<pre><code class="lang-typescript"><span class="hljs-keyword">import</span> { Paris } <span class="hljs-keyword">from</span> <span class="hljs-string">"@microsoft/paris"</span>;
+
+<span class="hljs-keyword">const</span> paris = <span class="hljs-keyword">new</span> Paris();
+paris.getItemById(TodoItem, <span class="hljs-number">1</span>).subscribe(<span class="hljs-function">(<span class="hljs-params">todoItem:TodoItem</span>) =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Todo item with ID 1: "</span>, todoItem);
+});
+</code></pre>
+				<h2 id="advanced">Advanced</h2>
+				<p>Check the <a href="https://github.com/Microsoft/paris/wiki">Wiki</a> for advanced uses and explanations.</p>
+				<p><a href="https://github.com/Microsoft/paris">Github</a></p>
+				<p><img src="https://github.com/Microsoft/paris/blob/master/paris_logo-192x192.png" alt="logo"></p>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="globals.html"><em>Globals</em></a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+					<li class=" tsd-kind-enum">
+						<a href="enums/dataavailability.html" class="tsd-kind-icon">Data<wbr>Availability</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/dataquerysortdirection.html" class="tsd-kind-icon">Data<wbr>Query<wbr>Sort<wbr>Direction</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/entityerrortypes.html" class="tsd-kind-icon">Entity<wbr>Error<wbr>Types</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/entitygetmethod.html" class="tsd-kind-icon">Entity<wbr>Get<wbr>Method</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/relationshiptype.html" class="tsd-kind-icon">Relationship<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-class tsd-has-type-parameter">
+						<a href="classes/apicallmodel.html" class="tsd-kind-icon">Api<wbr>Call<wbr>Model</a>
+					</li>
+					<li class=" tsd-kind-class tsd-has-type-parameter">
+						<a href="classes/datacache.html" class="tsd-kind-icon">Data<wbr>Cache</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/datastoreservice.html" class="tsd-kind-icon">Data<wbr>Store<wbr>Service</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/datatransformersservice.html" class="tsd-kind-icon">Data<wbr>Transformers<wbr>Service</a>
+					</li>
+					<li class=" tsd-kind-class tsd-has-type-parameter">
+						<a href="classes/entitiesservice.html" class="tsd-kind-icon">Entities<wbr>Service</a>
+					</li>
+					<li class=" tsd-kind-class tsd-has-type-parameter">
+						<a href="classes/entitiesservicebase.html" class="tsd-kind-icon">Entities<wbr>Service<wbr>Base</a>
+					</li>
+					<li class=" tsd-kind-class tsd-has-type-parameter">
+						<a href="classes/entityconfigbase.html" class="tsd-kind-icon">Entity<wbr>Config<wbr>Base</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/entityfieldsservice.html" class="tsd-kind-icon">Entity<wbr>Fields<wbr>Service</a>
+					</li>
+					<li class=" tsd-kind-class tsd-has-type-parameter">
+						<a href="classes/entitymodelbase.html" class="tsd-kind-icon">Entity<wbr>Model<wbr>Base</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/entityrelationshipsservice.html" class="tsd-kind-icon">Entity<wbr>Relationships<wbr>Service</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/errorsservice.html" class="tsd-kind-icon">Errors<wbr>Service</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/http.html" class="tsd-kind-icon">Http</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/immutability.html" class="tsd-kind-icon">Immutability</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/modelbase.html" class="tsd-kind-icon">Model<wbr>Base</a>
+					</li>
+					<li class=" tsd-kind-class tsd-has-type-parameter">
+						<a href="classes/modelentity.html" class="tsd-kind-icon">Model<wbr>Entity</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/paris.html" class="tsd-kind-icon">Paris</a>
+					</li>
+					<li class=" tsd-kind-class tsd-has-type-parameter">
+						<a href="classes/readonlyrepository.html" class="tsd-kind-icon">Readonly<wbr>Repository</a>
+					</li>
+					<li class=" tsd-kind-class tsd-has-type-parameter">
+						<a href="classes/relationshiprepository.html" class="tsd-kind-icon">Relationship<wbr>Repository</a>
+					</li>
+					<li class=" tsd-kind-class tsd-has-type-parameter">
+						<a href="classes/repository.html" class="tsd-kind-icon">Repository</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/todo.html" class="tsd-kind-icon">Todo</a>
+					</li>
+					<li class=" tsd-kind-class tsd-has-type-parameter">
+						<a href="classes/valueobjectsservice.html" class="tsd-kind-icon">Value<wbr>Objects<wbr>Service</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/apicallbackendconfiginterface.html" class="tsd-kind-icon">Api<wbr>Call<wbr>Backend<wbr>Config<wbr>Interface</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/apicallconfig.html" class="tsd-kind-icon">Api<wbr>Call<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/apicalltype.html" class="tsd-kind-icon">Api<wbr>Call<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/datacachesettings.html" class="tsd-kind-icon">Data<wbr>Cache<wbr>Settings</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/dataentityconstructor.html" class="tsd-kind-icon">Data<wbr>Entity<wbr>Constructor</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/dataentitytype.html" class="tsd-kind-icon">Data<wbr>Entity<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/dataoptions.html" class="tsd-kind-icon">Data<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/dataquery.html" class="tsd-kind-icon">Data<wbr>Query</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/dataquerysortfield.html" class="tsd-kind-icon">Data<wbr>Query<wbr>Sort<wbr>Field</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/dataset.html" class="tsd-kind-icon">Data<wbr>Set</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/datatransformer.html" class="tsd-kind-icon">Data<wbr>Transformer</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/entitybackendconfig.html" class="tsd-kind-icon">Entity<wbr>Backend<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/entityconfig.html" class="tsd-kind-icon">Entity<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/entityerrorevent.html" class="tsd-kind-icon">Entity<wbr>Error<wbr>Event</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/entityevent.html" class="tsd-kind-icon">Entity<wbr>Event</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/entitymodelconfigbase.html" class="tsd-kind-icon">Entity<wbr>Model<wbr>Config<wbr>Base</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/entityrelationshipconfig.html" class="tsd-kind-icon">Entity<wbr>Relationship<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/entityrelationshiprepositorytype.html" class="tsd-kind-icon">Entity<wbr>Relationship<wbr>Repository<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/field.html" class="tsd-kind-icon">Field</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/fieldconfig.html" class="tsd-kind-icon">Field<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/httpoptions.html" class="tsd-kind-icon">Http<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/ientityconfigbase.html" class="tsd-kind-icon">IEntity<wbr>Config<wbr>Base</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/ientityrelationshiprepositorytype.html" class="tsd-kind-icon">IEntity<wbr>Relationship<wbr>Repository<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/ireadonlyrepository.html" class="tsd-kind-icon">IReadonly<wbr>Repository</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/irelationshiprepository.html" class="tsd-kind-icon">IRelationship<wbr>Repository</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/irepository.html" class="tsd-kind-icon">IRepository</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/modelconfig.html" class="tsd-kind-icon">Model<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/modelentitycacheconfig.html" class="tsd-kind-icon">Model<wbr>Entity<wbr>Cache<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/parisconfig.html" class="tsd-kind-icon">Paris<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/removeentitiesevent.html" class="tsd-kind-icon">Remove<wbr>Entities<wbr>Event</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/requestdata.html" class="tsd-kind-icon">Request<wbr>Data</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/saveentityevent.html" class="tsd-kind-icon">Save<wbr>Entity<wbr>Event</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-is-not-exported">
+						<a href="interfaces/saveitems.html" class="tsd-kind-icon">Save<wbr>Items</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#datasetoptionssort" class="tsd-kind-icon">Data<wbr>Set<wbr>Options<wbr>Sort</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#entityconfigfunctionorvalue" class="tsd-kind-icon">Entity<wbr>Config<wbr>Function<wbr>OrValue</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#entityfieldconfigfunctionorvalue" class="tsd-kind-icon">Entity<wbr>Field<wbr>Config<wbr>Function<wbr>OrValue</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#entityfields" class="tsd-kind-icon">Entity<wbr>Fields</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#entityid" class="tsd-kind-icon">Entity<wbr>Id</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#index" class="tsd-kind-icon">Index</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-is-not-exported">
+						<a href="globals.html#modelpropertyvalue" class="tsd-kind-icon">Model<wbr>Property<wbr>Value</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#requestmethod" class="tsd-kind-icon">Request<wbr>Method</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#urlparams" class="tsd-kind-icon">Url<wbr>Params</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#default_relationship_types" class="tsd-kind-icon">DEFAULT_<wbr>RELATIONSHIP_<wbr>TYPES</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#default_timeout" class="tsd-kind-icon">DEFAULT_<wbr>TIMEOUT</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#default_value_id" class="tsd-kind-icon">DEFAULT_<wbr>VALUE_<wbr>ID</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#field_data_self" class="tsd-kind-icon">FIELD_<wbr>DATA_<wbr>SELF</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#entitiesservice" class="tsd-kind-icon">entities<wbr>Service</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#entityfieldsservice" class="tsd-kind-icon">entity<wbr>Fields<wbr>Service</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#entityrelationshipsservice" class="tsd-kind-icon">entity<wbr>Relationships<wbr>Service</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#expect" class="tsd-kind-icon">expect</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#transformers" class="tsd-kind-icon">transformers</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#transformersmap" class="tsd-kind-icon">transformers<wbr>Map</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#valueobjectsservice" class="tsd-kind-icon">value<wbr>Objects<wbr>Service</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#apicall" class="tsd-kind-icon">Api<wbr>Call</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#entity" class="tsd-kind-icon">Entity</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#entityfield" class="tsd-kind-icon">Entity<wbr>Field</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#entityrelationship" class="tsd-kind-icon">Entity<wbr>Relationship</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#valueobject" class="tsd-kind-icon">Value<wbr>Object</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="globals.html#modelarray" class="tsd-kind-icon">model<wbr>Array</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="globals.html#modelitem" class="tsd-kind-icon">model<wbr>Item</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#querytohttpoptions" class="tsd-kind-icon">query<wbr>ToHttp<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="globals.html#rawdatatodataset" class="tsd-kind-icon">raw<wbr>Data<wbr>ToData<wbr>Set</a>
+					</li>
+					<li class=" tsd-kind-object-literal">
+						<a href="globals.html#defaultconfig" class="tsd-kind-icon">default<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-object-literal">
+						<a href="globals.html#defaultdataoptions" class="tsd-kind-icon">default<wbr>Data<wbr>Options</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-module"><span class="tsd-kind-icon">Module</span></li>
+				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-enum-member"><span class="tsd-kind-icon">Enumeration member</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-enum"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-enum"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-interface"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-class"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+				<li class="tsd-kind-call-signature tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="http://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>

@@ -28,6 +28,7 @@ export {EntityEvent} from "./events/entity.event";
 export {SaveEntityEvent} from "./events/save-entity.event";
 export {RemoveEntitiesEvent} from "./events/remove-entities.event";
 export {EntityErrorEvent, EntityErrorTypes} from "./events/entity-error.event";
+export {FieldConfig} from "./entity/entity-field.config";
 export {Field} from "./entity/entity-field";
 export {ApiCall} from "./entity/api-call.decorator";
 export {ApiCallBackendConfigInterface} from "./models/api-call-backend-config.interface";
