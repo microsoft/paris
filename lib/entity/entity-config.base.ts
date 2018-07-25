@@ -13,7 +13,7 @@ export class EntityConfigBase<TEntity extends ModelBase = any, TRawData = any, T
 	singularName:string;
 	pluralName:string;
 	fields?:EntityFields;
-	idProperty?:string;
+	idProperty?:keyof TRawData;
 	readonly:boolean = false;
 	serializeItem?:(item:Partial<TEntity>, serializedItem?:any, entity?:IEntityConfigBase<TEntity, TRawData, TId>, config?:ParisConfig, serializationData?:any) => any;
 
@@ -73,10 +73,61 @@ export class EntityConfigBase<TEntity extends ModelBase = any, TRawData = any, T
 }
 
 export interface IEntityConfigBase<TEntity extends ModelBase = any, TRawData = any, TId extends EntityId = string>{
+	/**
+	 * Human-readable name for the Entity type, singular. e.g 'User', 'To do item', 'Movie', 'Comment', etc.
+	 * Used internally for error messages, for example, or can be used in reflection.
+	 */
 	singularName:string,
+
+	/**
+	 * Human-readable name for the Entity type, plural. e.g 'Users', 'To do items', 'Movies', 'Comments', etc.
+	 * Used internally for error messages, for example, or can be used in reflection.
+	 */
 	pluralName:string,
-	idProperty?:string,
+
+	/**
+	 * The property in the raw data used for the Entity's ID.
+	 */
+	idProperty?:keyof TRawData,
+
+	/**
+	 * If readonly is set to `true`, all models of this entity type will be immutable - frozen with Object.freeze.
+	 * Readonly models don't have a $parent property.
+	 *
+	 * @default false
+	 */
 	readonly?:boolean,
+
+	/**
+	 * Hard-coded items for this Entity. When values are specified, no endpoint is required, and items are always returned from these values, instead of backend.
+	 *
+	 * @example <caption>Hard-coding values for an Entity</caption>
+	 * ```typescript
+	 * @Entity({
+	 * 		singularName: "Status",
+	 * 		pluralName: "Statuses",
+	 * 		values: [
+	 * 			{ id: 1, name: 'Open' },
+	 * 			{ id: 2, name: 'In progress' },
+	 * 			{ id: 3, name: 'Done' }
+	 * 		]
+	 * })
+	 * export class Status extends EntityModelBase<number>{
+	 * 		@EntityField()
+	 * 		name: string;
+	 * }
+	 * ```
+	 *
+	 * Then when requesting an item for Status, either directly (with getValue or getItemById) or when sub-modeling, the hard-coded values are used:
+	 *
+	 * ```typescript
+	 * // Async way:
+	 * paris.getItemById(Status, 1).subscribe(status => console.log('Status with ID 1: ', status);
+	 *
+	 * // Sync:
+	 * console.log('Status with ID 1: ', paris.getValue(Status, 1));
+	 * ```
+	 */
 	values?:Array<TEntity>,
 	hasValue?: (valueId:EntityId) => boolean,
 	getDefaultValue?: () => TEntity,

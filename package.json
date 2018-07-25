@@ -1,5 +1,5 @@
 {
-	"name": "wcdportal.paris",
+	"name": "@microsoft/paris",
 	"version": "1.0.0",
 	"description": "Library for the implementation of Domain Driven Design in Angular/TypeScript apps",
 	"repository": {

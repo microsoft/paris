@@ -1,13 +1,34 @@
 # Paris
 
-Paris is a TypeScript library for implementing Domain-Driven Design in web apps.
+Paris is a data management library for webapps, using TypeScript and RxJS to implement Domain-Driven Design.  
+
 *Paris, fashion capital of the world, where all the **models** want to be*.
+
+
+## Installation
+
+*Package size: ~15.8kb (gzipped)*  
+Paris is a TypeScript library and also requires rxjs, so you'll need both those packages, if you don't already use them:
+
+```
+npm install --save rxjs typescript
+```
+
+Install the Paris NPM package:
+
+```
+npm install --save @Microsoft/paris
+```
 
 ## Usage
 
 First, define an Entity:
 
 ```typescript
+// todo-item.entity.ts
+
+import { Entity, EntityModelBase } from "@microsoft/paris";
+
 @Entity({
 	singularName: "Todo Item",
 	pluralName: "Todo Items",
@@ -25,6 +46,8 @@ export class TodoItem extends EntityModelBase{
 The above defines an Entity, which can be used to query the todo/items server endpoint, like this:
 
 ```typescript
+import { Paris } from "@microsoft/paris";
+
 const paris = new Paris();
 paris.getItemById(TodoItem, 1).subscribe((todoItem:TodoItem) => {
 	console.log("Todo item with ID 1: ", todoItem);

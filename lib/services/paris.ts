@@ -384,11 +384,24 @@ export class Paris{
 	getItemById<TEntity extends EntityModelBase, TId extends EntityId = string>(entityConstructor:DataEntityConstructor<TEntity>, itemId: TId, options?:DataOptions, params?:{ [index:string]:any }): Observable<TEntity>{
 		options = options || defaultDataOptions;
 
-		let repository:Repository<TEntity> = this.getRepository(entityConstructor);
+		const repository:Repository<TEntity> = this.getRepository(entityConstructor);
 		if (repository)
 			return repository.getItemById(itemId, options, params);
 		else
 			throw new Error(`Can't get item by ID, no repository exists for ${entityConstructor}.`);
+	}
+
+	/**
+	 * Gets all the items for an entity type. If all the items are cached, no backend call shall be performed (as in the case the the Entity is configured with `loadAll: true` and has already fetched data).
+	 * @param {DataEntityConstructor<TEntity extends EntityModelBase>} entityConstructor
+	 * @returns {Observable<Array<TEntity extends EntityModelBase>>}
+	 */
+	allItems<TEntity extends EntityModelBase>(entityConstructor:DataEntityConstructor<TEntity>):Observable<Array<TEntity>>{
+		const repository:Repository<TEntity> = this.getRepository(entityConstructor);
+		if (repository)
+			return repository.allItems$;
+		else
+			throw new Error(`Can't get all items, no repository exists for ${entityConstructor}.`);
 	}
 
 	/**
