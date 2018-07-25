@@ -9,7 +9,7 @@ module.exports = {
 	excludePrivate: true,
 	excludeProtected: true,
 	excludeExternals: true,
-	readme: 'README.md',
+	readme: 'DOCS_README.md',
 	name: 'Paris',
 	ignoreCompilerErrors: true,
 	plugin: 'none',
