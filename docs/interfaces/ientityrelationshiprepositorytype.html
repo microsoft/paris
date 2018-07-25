@@ -57,13 +57,24 @@
 					<a href="ientityrelationshiprepositorytype.html">IEntityRelationshipRepositoryType</a>
 				</li>
 			</ul>
-			<h1>Interface IEntityRelationshipRepositoryType</h1>
+			<h1>Interface IEntityRelationshipRepositoryType&lt;TSource, TData&gt;</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-type-parameters">
+				<h3>Type parameters</h3>
+				<ul class="tsd-type-parameters">
+					<li>
+						<h4>TSource<span class="tsd-signature-symbol">: </span><a href="../classes/modelbase.html" class="tsd-signature-type">ModelBase</a></h4>
+					</li>
+					<li>
+						<h4>TData<span class="tsd-signature-symbol">: </span><a href="../classes/modelbase.html" class="tsd-signature-type">ModelBase</a></h4>
+					</li>
+				</ul>
+			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
@@ -101,37 +112,37 @@
 					<div class="tsd-signature tsd-kind-icon">allowed<wbr>Types<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><a href="../enums/relationshiptype.html" class="tsd-signature-type">RelationshipType</a><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-relationship-repository-type.ts#L16">entity/entity-relationship-repository-type.ts:16</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity-relationship-repository-type.ts#L16">entity/entity-relationship-repository-type.ts:16</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="dataentitytype" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagOptional">Optional</span> data<wbr>Entity<wbr>Type</h3>
-					<div class="tsd-signature tsd-kind-icon">data<wbr>Entity<wbr>Type<span class="tsd-signature-symbol">:</span> <a href="dataentitytype.html" class="tsd-signature-type">DataEntityType</a></div>
+					<div class="tsd-signature tsd-kind-icon">data<wbr>Entity<wbr>Type<span class="tsd-signature-symbol">:</span> <a href="dataentitytype.html" class="tsd-signature-type">DataEntityType</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TData</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-relationship-repository-type.ts#L14">entity/entity-relationship-repository-type.ts:14</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity-relationship-repository-type.ts#L14">entity/entity-relationship-repository-type.ts:14</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="relationshipconfig" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagOptional">Optional</span> relationship<wbr>Config</h3>
-					<div class="tsd-signature tsd-kind-icon">relationship<wbr>Config<span class="tsd-signature-symbol">:</span> <a href="entityrelationshipconfig.html" class="tsd-signature-type">EntityRelationshipConfig</a></div>
+					<div class="tsd-signature tsd-kind-icon">relationship<wbr>Config<span class="tsd-signature-symbol">:</span> <a href="entityrelationshipconfig.html" class="tsd-signature-type">EntityRelationshipConfig</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TSource</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TData</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-relationship-repository-type.ts#L15">entity/entity-relationship-repository-type.ts:15</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity-relationship-repository-type.ts#L15">entity/entity-relationship-repository-type.ts:15</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="sourceentitytype" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagOptional">Optional</span> source<wbr>Entity<wbr>Type</h3>
-					<div class="tsd-signature tsd-kind-icon">source<wbr>Entity<wbr>Type<span class="tsd-signature-symbol">:</span> <a href="dataentitytype.html" class="tsd-signature-type">DataEntityType</a></div>
+					<div class="tsd-signature tsd-kind-icon">source<wbr>Entity<wbr>Type<span class="tsd-signature-symbol">:</span> <a href="dataentitytype.html" class="tsd-signature-type">DataEntityType</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TSource</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-relationship-repository-type.ts#L13">entity/entity-relationship-repository-type.ts:13</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity-relationship-repository-type.ts#L13">entity/entity-relationship-repository-type.ts:13</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -149,7 +160,7 @@
 				<ul class="before-current">
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-interface">
+					<li class="current tsd-kind-interface tsd-has-type-parameter">
 						<a href="ientityrelationshiprepositorytype.html" class="tsd-kind-icon">IEntity<wbr>Relationship<wbr>Repository<wbr>Type</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">

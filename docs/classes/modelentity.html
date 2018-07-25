@@ -57,7 +57,7 @@
 					<a href="modelentity.html">ModelEntity</a>
 				</li>
 			</ul>
-			<h1>Class ModelEntity&lt;TEntity, TRawData, TRawData&gt;</h1>
+			<h1>Class ModelEntity&lt;TEntity, TRawData, TId&gt;</h1>
 		</div>
 	</div>
 </header>
@@ -68,13 +68,13 @@
 				<h3>Type parameters</h3>
 				<ul class="tsd-type-parameters">
 					<li>
-						<h4>TEntity<span class="tsd-signature-symbol">: </span><a href="modelbase.html" class="tsd-signature-type">ModelBase</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						<h4>TEntity<span class="tsd-signature-symbol">: </span><a href="modelbase.html" class="tsd-signature-type">ModelBase</a></h4>
 					</li>
 					<li>
 						<h4>TRawData</h4>
 					</li>
 					<li>
-						<h4>TRawData</h4>
+						<h4>TId<span class="tsd-signature-symbol">: </span><a href="../globals.html#entityid" class="tsd-signature-type">EntityId</a></h4>
 					</li>
 				</ul>
 			</section>
@@ -82,7 +82,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<a href="entityconfigbase.html" class="tsd-signature-type">EntityConfigBase</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">&gt;</span>
+						<a href="entityconfigbase.html" class="tsd-signature-type">EntityConfigBase</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TId</span><span class="tsd-signature-symbol">&gt;</span>
 						<ul class="tsd-hierarchy">
 							<li>
 								<span class="target">ModelEntity</span>
@@ -94,8 +94,8 @@
 			<section class="tsd-panel">
 				<h3>Implements</h3>
 				<ul class="tsd-hierarchy">
-					<li><a href="../interfaces/ientityconfigbase.html" class="tsd-signature-type">IEntityConfigBase</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">&gt;</span></li>
-					<li><a href="../interfaces/entityconfig.html" class="tsd-signature-type">EntityConfig</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">&gt;</span></li>
+					<li><a href="../interfaces/modelconfig.html" class="tsd-signature-type">ModelConfig</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TId</span><span class="tsd-signature-symbol">&gt;</span></li>
+					<li><a href="../interfaces/entityconfig.html" class="tsd-signature-type">EntityConfig</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TId</span><span class="tsd-signature-symbol">&gt;</span></li>
 				</ul>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
@@ -157,23 +157,23 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Model<wbr>Entity<span class="tsd-signature-symbol">(</span>config<span class="tsd-signature-symbol">: </span><a href="../interfaces/entityconfig.html" class="tsd-signature-type">EntityConfig</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">&gt;</span>, entityConstructor<span class="tsd-signature-symbol">: </span><a href="../interfaces/dataentityconstructor.html" class="tsd-signature-type">DataEntityConstructor</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="modelentity.html" class="tsd-signature-type">ModelEntity</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Model<wbr>Entity<span class="tsd-signature-symbol">(</span>config<span class="tsd-signature-symbol">: </span><a href="../interfaces/entityconfig.html" class="tsd-signature-type">EntityConfig</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TId</span><span class="tsd-signature-symbol">&gt;</span>, entityConstructor<span class="tsd-signature-symbol">: </span><a href="../interfaces/dataentityconstructor.html" class="tsd-signature-type">DataEntityConstructor</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TId</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="modelentity.html" class="tsd-signature-type">ModelEntity</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Overrides <a href="entityconfigbase.html">EntityConfigBase</a>.<a href="entityconfigbase.html#constructor">constructor</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity.config.ts#L24">entity/entity.config.ts:24</a></li>
+									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity.config.ts#L24">entity/entity.config.ts:24</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>config: <a href="../interfaces/entityconfig.html" class="tsd-signature-type">EntityConfig</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">&gt;</span></h5>
+									<h5>config: <a href="../interfaces/entityconfig.html" class="tsd-signature-type">EntityConfig</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TId</span><span class="tsd-signature-symbol">&gt;</span></h5>
 								</li>
 								<li>
-									<h5>entityConstructor: <a href="../interfaces/dataentityconstructor.html" class="tsd-signature-type">DataEntityConstructor</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">&gt;</span></h5>
+									<h5>entityConstructor: <a href="../interfaces/dataentityconstructor.html" class="tsd-signature-type">DataEntityConstructor</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TId</span><span class="tsd-signature-symbol">&gt;</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="modelentity.html" class="tsd-signature-type">ModelEntity</a></h4>
@@ -190,7 +190,7 @@
 					<aside class="tsd-sources">
 						<p>Implementation of <a href="../interfaces/entityconfig.html">EntityConfig</a>.<a href="../interfaces/entityconfig.html#allitemsendpoint">allItemsEndpoint</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity.config.ts#L17">entity/entity.config.ts:17</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity.config.ts#L17">entity/entity.config.ts:17</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -201,7 +201,7 @@
 					<aside class="tsd-sources">
 						<p>Implementation of <a href="../interfaces/entityconfig.html">EntityConfig</a>.<a href="../interfaces/entityconfig.html#allitemsendpointtrailingslash">allItemsEndpointTrailingSlash</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity.config.ts#L18">entity/entity.config.ts:18</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity.config.ts#L18">entity/entity.config.ts:18</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -212,7 +212,7 @@
 					<aside class="tsd-sources">
 						<p>Implementation of <a href="../interfaces/entityconfig.html">EntityConfig</a>.<a href="../interfaces/entityconfig.html#allitemsproperty">allItemsProperty</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity.config.ts#L16">entity/entity.config.ts:16</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity.config.ts#L16">entity/entity.config.ts:16</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -223,7 +223,7 @@
 					<aside class="tsd-sources">
 						<p>Implementation of <a href="../interfaces/entityconfig.html">EntityConfig</a>.<a href="../interfaces/entityconfig.html#baseurl">baseUrl</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity.config.ts#L15">entity/entity.config.ts:15</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity.config.ts#L15">entity/entity.config.ts:15</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -234,7 +234,7 @@
 					<aside class="tsd-sources">
 						<p>Implementation of <a href="../interfaces/entityconfig.html">EntityConfig</a>.<a href="../interfaces/entityconfig.html#cache">cache</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity.config.ts#L14">entity/entity.config.ts:14</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity.config.ts#L14">entity/entity.config.ts:14</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -245,19 +245,19 @@
 					<aside class="tsd-sources">
 						<p>Implementation of <a href="../interfaces/entityconfig.html">EntityConfig</a>.<a href="../interfaces/entityconfig.html#endpoint">endpoint</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity.config.ts#L12">entity/entity.config.ts:12</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity.config.ts#L12">entity/entity.config.ts:12</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
 					<a name="entityconstructor" class="tsd-anchor"></a>
 					<h3>entity<wbr>Constructor</h3>
-					<div class="tsd-signature tsd-kind-icon">entity<wbr>Constructor<span class="tsd-signature-symbol">:</span> <a href="../interfaces/dataentityconstructor.html" class="tsd-signature-type">DataEntityConstructor</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<div class="tsd-signature tsd-kind-icon">entity<wbr>Constructor<span class="tsd-signature-symbol">:</span> <a href="../interfaces/dataentityconstructor.html" class="tsd-signature-type">DataEntityConstructor</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TId</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<p>Implementation of <a href="../interfaces/entityconfig.html">EntityConfig</a>.<a href="../interfaces/entityconfig.html#entityconstructor">entityConstructor</a></p>
 						<p>Inherited from <a href="entityconfigbase.html">EntityConfigBase</a>.<a href="entityconfigbase.html#entityconstructor">entityConstructor</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-config.base.ts#L44">entity/entity-config.base.ts:44</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity-config.base.ts#L44">entity/entity-config.base.ts:44</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -266,10 +266,10 @@
 					<h3><span class="tsd-flag ts-flagOptional">Optional</span> fields</h3>
 					<div class="tsd-signature tsd-kind-icon">fields<span class="tsd-signature-symbol">:</span> <a href="../globals.html#entityfields" class="tsd-signature-type">EntityFields</a></div>
 					<aside class="tsd-sources">
-						<p>Implementation of <a href="../interfaces/entityconfig.html">EntityConfig</a>.<a href="../interfaces/entityconfig.html#fields">fields</a></p>
+						<p>Implementation of <a href="../interfaces/modelconfig.html">ModelConfig</a>.<a href="../interfaces/modelconfig.html#fields">fields</a></p>
 						<p>Inherited from <a href="entityconfigbase.html">EntityConfigBase</a>.<a href="entityconfigbase.html#fields">fields</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-config.base.ts#L15">entity/entity-config.base.ts:15</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity-config.base.ts#L15">entity/entity-config.base.ts:15</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -280,7 +280,7 @@
 					<aside class="tsd-sources">
 						<p>Implementation of <a href="../interfaces/entityconfig.html">EntityConfig</a>.<a href="../interfaces/entityconfig.html#getremovedata">getRemoveData</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity.config.ts#L24">entity/entity.config.ts:24</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity.config.ts#L24">entity/entity.config.ts:24</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -308,12 +308,12 @@
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
 					<a name="idproperty" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagOptional">Optional</span> id<wbr>Property</h3>
-					<div class="tsd-signature tsd-kind-icon">id<wbr>Property<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<div class="tsd-signature tsd-kind-icon">id<wbr>Property<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">keyof TRawData</span></div>
 					<aside class="tsd-sources">
 						<p>Implementation of <a href="../interfaces/entityconfig.html">EntityConfig</a>.<a href="../interfaces/entityconfig.html#idproperty">idProperty</a></p>
 						<p>Inherited from <a href="entityconfigbase.html">EntityConfigBase</a>.<a href="entityconfigbase.html#idproperty">idProperty</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-config.base.ts#L16">entity/entity-config.base.ts:16</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity-config.base.ts#L16">entity/entity-config.base.ts:16</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -324,7 +324,7 @@
 					<aside class="tsd-sources">
 						<p>Implementation of <a href="../interfaces/entityconfig.html">EntityConfig</a>.<a href="../interfaces/entityconfig.html#loadall">loadAll</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity.config.ts#L13">entity/entity.config.ts:13</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity.config.ts#L13">entity/entity.config.ts:13</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -335,7 +335,7 @@
 					<aside class="tsd-sources">
 						<p>Implementation of <a href="../interfaces/entityconfig.html">EntityConfig</a>.<a href="../interfaces/entityconfig.html#parsedataquery">parseDataQuery</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity.config.ts#L19">entity/entity.config.ts:19</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity.config.ts#L19">entity/entity.config.ts:19</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -372,7 +372,7 @@
 					<aside class="tsd-sources">
 						<p>Implementation of <a href="../interfaces/entityconfig.html">EntityConfig</a>.<a href="../interfaces/entityconfig.html#parseitemquery">parseItemQuery</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity.config.ts#L20">entity/entity.config.ts:20</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity.config.ts#L20">entity/entity.config.ts:20</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -380,7 +380,7 @@
 						<ul class="tsd-parameters">
 							<li class="tsd-parameter-siganture">
 								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-property tsd-is-not-exported">
-									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>itemId<span class="tsd-signature-symbol">: </span><a href="../globals.html#entityid" class="tsd-signature-type">EntityId</a>, entity<span class="tsd-signature-symbol">?: </span><a href="../interfaces/ientityconfigbase.html" class="tsd-signature-type">IEntityConfigBase</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">&gt;</span>, config<span class="tsd-signature-symbol">?: </span><a href="../interfaces/parisconfig.html" class="tsd-signature-type">ParisConfig</a>, params<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>itemId<span class="tsd-signature-symbol">: </span><a href="../globals.html#entityid" class="tsd-signature-type">EntityId</a>, entity<span class="tsd-signature-symbol">?: </span><a href="../interfaces/ientityconfigbase.html" class="tsd-signature-type">IEntityConfigBase</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TId</span><span class="tsd-signature-symbol">&gt;</span>, config<span class="tsd-signature-symbol">?: </span><a href="../interfaces/parisconfig.html" class="tsd-signature-type">ParisConfig</a>, params<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
 								</ul>
 								<ul class="tsd-descriptions">
 									<li class="tsd-description">
@@ -390,7 +390,7 @@
 												<h5>itemId: <a href="../globals.html#entityid" class="tsd-signature-type">EntityId</a></h5>
 											</li>
 											<li>
-												<h5><span class="tsd-flag ts-flagOptional">Optional</span> entity: <a href="../interfaces/ientityconfigbase.html" class="tsd-signature-type">IEntityConfigBase</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">&gt;</span></h5>
+												<h5><span class="tsd-flag ts-flagOptional">Optional</span> entity: <a href="../interfaces/ientityconfigbase.html" class="tsd-signature-type">IEntityConfigBase</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TId</span><span class="tsd-signature-symbol">&gt;</span></h5>
 											</li>
 											<li>
 												<h5><span class="tsd-flag ts-flagOptional">Optional</span> config: <a href="../interfaces/parisconfig.html" class="tsd-signature-type">ParisConfig</a></h5>
@@ -418,7 +418,7 @@
 					<aside class="tsd-sources">
 						<p>Implementation of <a href="../interfaces/entityconfig.html">EntityConfig</a>.<a href="../interfaces/entityconfig.html#parseremovequery">parseRemoveQuery</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity.config.ts#L22">entity/entity.config.ts:22</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity.config.ts#L22">entity/entity.config.ts:22</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -456,7 +456,7 @@
 					<aside class="tsd-sources">
 						<p>Implementation of <a href="../interfaces/entityconfig.html">EntityConfig</a>.<a href="../interfaces/entityconfig.html#parsesavequery">parseSaveQuery</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity.config.ts#L21">entity/entity.config.ts:21</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity.config.ts#L21">entity/entity.config.ts:21</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -495,7 +495,7 @@
 						<p>Implementation of <a href="../interfaces/entityconfig.html">EntityConfig</a>.<a href="../interfaces/entityconfig.html#pluralname">pluralName</a></p>
 						<p>Inherited from <a href="entityconfigbase.html">EntityConfigBase</a>.<a href="entityconfigbase.html#pluralname">pluralName</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-config.base.ts#L14">entity/entity-config.base.ts:14</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity-config.base.ts#L14">entity/entity-config.base.ts:14</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -507,7 +507,7 @@
 						<p>Implementation of <a href="../interfaces/entityconfig.html">EntityConfig</a>.<a href="../interfaces/entityconfig.html#readonly">readonly</a></p>
 						<p>Inherited from <a href="entityconfigbase.html">EntityConfigBase</a>.<a href="entityconfigbase.html#readonly">readonly</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-config.base.ts#L17">entity/entity-config.base.ts:17</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity-config.base.ts#L17">entity/entity-config.base.ts:17</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -519,7 +519,7 @@
 						<p>Implementation of <a href="../interfaces/entityconfig.html">EntityConfig</a>.<a href="../interfaces/entityconfig.html#serializeitem">serializeItem</a></p>
 						<p>Overrides <a href="entityconfigbase.html">EntityConfigBase</a>.<a href="entityconfigbase.html#serializeitem">serializeItem</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity.config.ts#L23">entity/entity.config.ts:23</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity.config.ts#L23">entity/entity.config.ts:23</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -564,7 +564,7 @@
 						<p>Implementation of <a href="../interfaces/entityconfig.html">EntityConfig</a>.<a href="../interfaces/entityconfig.html#singularname">singularName</a></p>
 						<p>Inherited from <a href="entityconfigbase.html">EntityConfigBase</a>.<a href="entityconfigbase.html#singularname">singularName</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-config.base.ts#L13">entity/entity-config.base.ts:13</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity-config.base.ts#L13">entity/entity-config.base.ts:13</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -576,7 +576,7 @@
 						<p>Implementation of <a href="../interfaces/entityconfig.html">EntityConfig</a>.<a href="../interfaces/entityconfig.html#values">values</a></p>
 						<p>Inherited from <a href="entityconfigbase.html">EntityConfigBase</a>.<a href="entityconfigbase.html#values">values</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-config.base.ts#L24">entity/entity-config.base.ts:24</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity-config.base.ts#L24">entity/entity-config.base.ts:24</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -594,7 +594,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="entityconfigbase.html">EntityConfigBase</a>.<a href="entityconfigbase.html#fieldsarray">fieldsArray</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-config.base.ts#L20">entity/entity-config.base.ts:20</a></li>
+									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity-config.base.ts#L20">entity/entity-config.base.ts:20</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/field.html" class="tsd-signature-type">Field</a><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -615,7 +615,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="entityconfigbase.html">EntityConfigBase</a>.<a href="entityconfigbase.html#getdefaultvalue">getDefaultValue</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-config.base.ts#L62">entity/entity-config.base.ts:62</a></li>
+									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity-config.base.ts#L62">entity/entity-config.base.ts:62</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">TEntity</span></h4>
@@ -633,7 +633,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="entityconfigbase.html">EntityConfigBase</a>.<a href="entityconfigbase.html#getvaluebyid">getValueById</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-config.base.ts#L58">entity/entity-config.base.ts:58</a></li>
+									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity-config.base.ts#L58">entity/entity-config.base.ts:58</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -657,7 +657,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="entityconfigbase.html">EntityConfigBase</a>.<a href="entityconfigbase.html#hasvalue">hasValue</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-config.base.ts#L66">entity/entity-config.base.ts:66</a></li>
+									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity-config.base.ts#L66">entity/entity-config.base.ts:66</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -681,7 +681,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="entityconfigbase.html">EntityConfigBase</a>.<a href="entityconfigbase.html#supportsgetmethod">supportsGetMethod</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-config.base.ts#L70">entity/entity-config.base.ts:70</a></li>
+									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity-config.base.ts#L70">entity/entity-config.base.ts:70</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>

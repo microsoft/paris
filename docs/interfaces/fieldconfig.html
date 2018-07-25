@@ -113,7 +113,7 @@
 					<div class="tsd-signature tsd-kind-icon">array<wbr>Of<span class="tsd-signature-symbol">:</span> <a href="dataentitytype.html" class="tsd-signature-type">DataEntityType</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-field.config.ts#L90">entity/entity-field.config.ts:90</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity-field.config.ts#L94">entity/entity-field.config.ts:94</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -138,7 +138,7 @@ addresses: <span class="hljs-built_in">Array</span>&lt;Address&gt;
 					<div class="tsd-signature tsd-kind-icon">data<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">"__self"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-field.config.ts#L72">entity/entity-field.config.ts:72</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity-field.config.ts#L76">entity/entity-field.config.ts:76</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -147,11 +147,11 @@ addresses: <span class="hljs-built_in">Array</span>&lt;Address&gt;
 							By default, Paris looks for a property of the same name as the property in the model. i.e:</p>
 						</div>
 						<p>If an entity has the following property definition:</p>
+						<pre><code class="lang-typescript"><span class="hljs-meta">@EntityField</span>()
+name:<span class="hljs-built_in">string</span>;
+</code></pre>
+						<p>Then when creating the model, if the raw data contains a <code>name</code> property with value &#39;Anna&#39;, the resulting model will have a <code>name</code> property with value &#39;Anna&#39;.</p>
 						<dl class="tsd-comment-tags">
-							<dt>entityfield()</dt>
-							<dd><p>name:string;</p>
-								<p>Then when creating the model, if the raw data contains a <code>name</code> property with value &#39;Anna&#39;, the resulting model will have a <code>name</code> property with value &#39;Anna&#39;.</p>
-							</dd>
 							<dt>example</dt>
 							<dd><p><caption>Mapping from a different raw data property with <code>data</code></caption>
 								If your raw data has properties in snake-case rather than camel-case, you&#39;d need to map the properties:</p>
@@ -173,8 +173,8 @@ date: <span class="hljs-built_in">Date</span>;
 								<p>Then the model&#39;s <code>date</code> property will have a value of Date(1532422166428), since both creation_date and init_date have no value in the data.</p>
 							</dd>
 							<dt>example</dt>
-							<dd><p><caption>Using &#39;<strong>self&#39; for data to pass the whole raw data</caption>
-									In the case when we want to separate some properties of the raw data to a sub-model, it&#39;s possible to use the special value &#39;</strong>self&#39; for the <code>data</code> field configuration.
+							<dd><p><caption>Using &#39;__self&#39; for data to pass the whole raw data</caption>
+									In the case when we want to separate some properties of the raw data to a sub-model, it&#39;s possible to use the special value &#39;__self&#39; for the <code>data</code> field configuration.
 								This passes the whole raw data object to the field&#39;s creation, rather than just the value of a property. e.g:</p>
 								<pre><code class="lang-typescript">Person <span class="hljs-keyword">extends</span> EntityModelBase{
         <span class="hljs-meta">@EntityField</span>()
@@ -185,14 +185,14 @@ date: <span class="hljs-built_in">Date</span>;
 }
 </code></pre>
 								<p>In case we want to separate all address properties from a user into an encapsulated object, for the following raw data:</p>
-								<p>{
-									&quot;name&quot;: &quot;Anna&quot;,
-									&quot;street&quot;: &quot;Prinsengracht 263-267&quot;,
-									&quot;zip&quot;: &quot;1016 GV&quot;,
-									&quot;city&quot;: &quot;Amsterdam&quot;,
-									&quot;country&quot;: &quot;Holland&quot;
-								}</p>
-							</dd>
+								<pre><code>{
+        <span class="hljs-attr">"name"</span>: <span class="hljs-string">"Anna"</span>,
+        <span class="hljs-attr">"street"</span>: <span class="hljs-string">"Prinsengracht 263-267"</span>,
+        <span class="hljs-attr">"zip"</span>: <span class="hljs-string">"1016 GV"</span>,
+        <span class="hljs-attr">"city"</span>: <span class="hljs-string">"Amsterdam"</span>,
+        <span class="hljs-attr">"country"</span>: <span class="hljs-string">"Holland"</span>
+}
+</code></pre></dd>
 						</dl>
 					</div>
 				</section>
@@ -202,7 +202,7 @@ date: <span class="hljs-built_in">Date</span>;
 					<div class="tsd-signature tsd-kind-icon">default<wbr>Value<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-field.config.ts#L77">entity/entity-field.config.ts:77</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity-field.config.ts#L81">entity/entity-field.config.ts:81</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -217,7 +217,7 @@ date: <span class="hljs-built_in">Date</span>;
 					<div class="tsd-signature tsd-kind-icon">id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-field.config.ts#L12">entity/entity-field.config.ts:12</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity-field.config.ts#L12">entity/entity-field.config.ts:12</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -232,7 +232,7 @@ date: <span class="hljs-built_in">Date</span>;
 					<div class="tsd-signature tsd-kind-icon">name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-field.config.ts#L17">entity/entity-field.config.ts:17</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity-field.config.ts#L17">entity/entity-field.config.ts:17</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -247,7 +247,7 @@ date: <span class="hljs-built_in">Date</span>;
 					<div class="tsd-signature tsd-kind-icon">parse<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-field.config.ts#L139">entity/entity-field.config.ts:139</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity-field.config.ts#L143">entity/entity-field.config.ts:143</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -318,7 +318,7 @@ formatFlavor: <span class="hljs-built_in">Array</span>&lt;NotificationFormat&gt;
 					<div class="tsd-signature tsd-kind-icon">require<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-field.config.ts#L115">entity/entity-field.config.ts:115</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity-field.config.ts#L119">entity/entity-field.config.ts:119</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -347,7 +347,7 @@ zip:<span class="hljs-built_in">string</span>;
 					<div class="tsd-signature tsd-kind-icon">required<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-field.config.ts#L97">entity/entity-field.config.ts:97</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity-field.config.ts#L101">entity/entity-field.config.ts:101</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -368,7 +368,7 @@ zip:<span class="hljs-built_in">string</span>;
 					<div class="tsd-signature tsd-kind-icon">serialize<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">false</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-field.config.ts#L145">entity/entity-field.config.ts:145</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity-field.config.ts#L149">entity/entity-field.config.ts:149</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">

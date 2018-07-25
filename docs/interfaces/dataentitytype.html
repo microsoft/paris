@@ -57,7 +57,7 @@
 					<a href="dataentitytype.html">DataEntityType</a>
 				</li>
 			</ul>
-			<h1>Interface DataEntityType&lt;TEntity, TRawData&gt;</h1>
+			<h1>Interface DataEntityType&lt;TEntity, TRawData, TId&gt;</h1>
 		</div>
 	</div>
 </header>
@@ -68,10 +68,13 @@
 				<h3>Type parameters</h3>
 				<ul class="tsd-type-parameters">
 					<li>
-						<h4>TEntity<span class="tsd-signature-symbol">: </span><a href="../classes/modelbase.html" class="tsd-signature-type">ModelBase</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						<h4>TEntity<span class="tsd-signature-symbol">: </span><a href="../classes/modelbase.html" class="tsd-signature-type">ModelBase</a></h4>
 					</li>
 					<li>
 						<h4>TRawData</h4>
+					</li>
+					<li>
+						<h4>TId<span class="tsd-signature-symbol">: </span><a href="../globals.html#entityid" class="tsd-signature-type">EntityId</a></h4>
 					</li>
 				</ul>
 			</section>
@@ -116,13 +119,13 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Data<wbr>Entity<wbr>Type<span class="tsd-signature-symbol">(</span>data<span class="tsd-signature-symbol">?: </span><a href="entitymodelconfigbase.html" class="tsd-signature-type">EntityModelConfigBase</a>, rawData<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TEntity</span></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Data<wbr>Entity<wbr>Type<span class="tsd-signature-symbol">(</span>data<span class="tsd-signature-symbol">?: </span><a href="entitymodelconfigbase.html" class="tsd-signature-type">EntityModelConfigBase</a>, rawData<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TEntity</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/data-entity.base.ts#L10">entity/data-entity.base.ts:10</a></li>
+									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/data-entity.base.ts#L11">entity/data-entity.base.ts:11</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -131,7 +134,7 @@
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> data: <a href="entitymodelconfigbase.html" class="tsd-signature-type">EntityModelConfigBase</a></h5>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> rawData: <span class="tsd-signature-type">any</span></h5>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> rawData: <span class="tsd-signature-type">TRawData</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">TEntity</span></h4>
@@ -144,10 +147,10 @@
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="entityconfig" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagOptional">Optional</span> entity<wbr>Config</h3>
-					<div class="tsd-signature tsd-kind-icon">entity<wbr>Config<span class="tsd-signature-symbol">:</span> <a href="../classes/modelentity.html" class="tsd-signature-type">ModelEntity</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<div class="tsd-signature tsd-kind-icon">entity<wbr>Config<span class="tsd-signature-symbol">:</span> <a href="../classes/modelentity.html" class="tsd-signature-type">ModelEntity</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TId</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/data-entity.base.ts#L14">entity/data-entity.base.ts:14</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/data-entity.base.ts#L15">entity/data-entity.base.ts:15</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -157,7 +160,7 @@
 					<div class="tsd-signature tsd-kind-icon">plural<wbr>Name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/data-entity.base.ts#L13">entity/data-entity.base.ts:13</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/data-entity.base.ts#L14">entity/data-entity.base.ts:14</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -167,7 +170,7 @@
 					<div class="tsd-signature tsd-kind-icon">singular<wbr>Name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/data-entity.base.ts#L12">entity/data-entity.base.ts:12</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/data-entity.base.ts#L13">entity/data-entity.base.ts:13</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -177,7 +180,7 @@
 					<div class="tsd-signature tsd-kind-icon">value<wbr>Object<wbr>Config<span class="tsd-signature-symbol">:</span> <a href="../classes/entityconfigbase.html" class="tsd-signature-type">EntityConfigBase</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/data-entity.base.ts#L15">entity/data-entity.base.ts:15</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/data-entity.base.ts#L16">entity/data-entity.base.ts:16</a></li>
 						</ul>
 					</aside>
 				</section>

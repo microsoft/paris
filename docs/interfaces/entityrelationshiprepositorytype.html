@@ -57,7 +57,7 @@
 					<a href="entityrelationshiprepositorytype.html">EntityRelationshipRepositoryType</a>
 				</li>
 			</ul>
-			<h1>Interface EntityRelationshipRepositoryType&lt;T, U&gt;</h1>
+			<h1>Interface EntityRelationshipRepositoryType&lt;TSource, TData&gt;</h1>
 		</div>
 	</div>
 </header>
@@ -68,10 +68,10 @@
 				<h3>Type parameters</h3>
 				<ul class="tsd-type-parameters">
 					<li>
-						<h4>T<span class="tsd-signature-symbol">: </span><a href="../classes/modelbase.html" class="tsd-signature-type">ModelBase</a></h4>
+						<h4>TSource<span class="tsd-signature-symbol">: </span><a href="../classes/modelbase.html" class="tsd-signature-type">ModelBase</a></h4>
 					</li>
 					<li>
-						<h4>U<span class="tsd-signature-symbol">: </span><a href="../classes/modelbase.html" class="tsd-signature-type">ModelBase</a></h4>
+						<h4>TData<span class="tsd-signature-symbol">: </span><a href="../classes/modelbase.html" class="tsd-signature-type">ModelBase</a></h4>
 					</li>
 				</ul>
 			</section>
@@ -79,7 +79,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<a href="ientityrelationshiprepositorytype.html" class="tsd-signature-type">IEntityRelationshipRepositoryType</a>
+						<a href="ientityrelationshiprepositorytype.html" class="tsd-signature-type">IEntityRelationshipRepositoryType</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TSource</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TData</span><span class="tsd-signature-symbol">&gt;</span>
 						<ul class="tsd-hierarchy">
 							<li>
 								<span class="target">EntityRelationshipRepositoryType</span>
@@ -113,40 +113,40 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="ientityrelationshiprepositorytype.html">IEntityRelationshipRepositoryType</a>.<a href="ientityrelationshiprepositorytype.html#allowedtypes">allowedTypes</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-relationship-repository-type.ts#L16">entity/entity-relationship-repository-type.ts:16</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity-relationship-repository-type.ts#L16">entity/entity-relationship-repository-type.ts:16</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-overwrite">
 					<a name="dataentitytype" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagOptional">Optional</span> data<wbr>Entity<wbr>Type</h3>
-					<div class="tsd-signature tsd-kind-icon">data<wbr>Entity<wbr>Type<span class="tsd-signature-symbol">:</span> <a href="dataentityconstructor.html" class="tsd-signature-type">DataEntityConstructor</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">U</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<div class="tsd-signature tsd-kind-icon">data<wbr>Entity<wbr>Type<span class="tsd-signature-symbol">:</span> <a href="dataentityconstructor.html" class="tsd-signature-type">DataEntityConstructor</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TData</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<p>Overrides <a href="ientityrelationshiprepositorytype.html">IEntityRelationshipRepositoryType</a>.<a href="ientityrelationshiprepositorytype.html#dataentitytype">dataEntityType</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-relationship-repository-type.ts#L8">entity/entity-relationship-repository-type.ts:8</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity-relationship-repository-type.ts#L8">entity/entity-relationship-repository-type.ts:8</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-overwrite">
 					<a name="relationshipconfig" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagOptional">Optional</span> relationship<wbr>Config</h3>
-					<div class="tsd-signature tsd-kind-icon">relationship<wbr>Config<span class="tsd-signature-symbol">:</span> <a href="entityrelationshipconfig.html" class="tsd-signature-type">EntityRelationshipConfig</a></div>
+					<div class="tsd-signature tsd-kind-icon">relationship<wbr>Config<span class="tsd-signature-symbol">:</span> <a href="entityrelationshipconfig.html" class="tsd-signature-type">EntityRelationshipConfig</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TSource</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TData</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<p>Overrides <a href="ientityrelationshiprepositorytype.html">IEntityRelationshipRepositoryType</a>.<a href="ientityrelationshiprepositorytype.html#relationshipconfig">relationshipConfig</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-relationship-repository-type.ts#L9">entity/entity-relationship-repository-type.ts:9</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity-relationship-repository-type.ts#L9">entity/entity-relationship-repository-type.ts:9</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-overwrite">
 					<a name="sourceentitytype" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagOptional">Optional</span> source<wbr>Entity<wbr>Type</h3>
-					<div class="tsd-signature tsd-kind-icon">source<wbr>Entity<wbr>Type<span class="tsd-signature-symbol">:</span> <a href="dataentityconstructor.html" class="tsd-signature-type">DataEntityConstructor</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<div class="tsd-signature tsd-kind-icon">source<wbr>Entity<wbr>Type<span class="tsd-signature-symbol">:</span> <a href="dataentityconstructor.html" class="tsd-signature-type">DataEntityConstructor</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TSource</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<p>Overrides <a href="ientityrelationshiprepositorytype.html">IEntityRelationshipRepositoryType</a>.<a href="ientityrelationshiprepositorytype.html#sourceentitytype">sourceEntityType</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/entity-relationship-repository-type.ts#L7">entity/entity-relationship-repository-type.ts:7</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/entity-relationship-repository-type.ts#L7">entity/entity-relationship-repository-type.ts:7</a></li>
 						</ul>
 					</aside>
 				</section>

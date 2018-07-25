@@ -57,7 +57,7 @@
 					<a href="irelationshiprepository.html">IRelationshipRepository</a>
 				</li>
 			</ul>
-			<h1>Interface IRelationshipRepository&lt;TSource, TResult&gt;</h1>
+			<h1>Interface IRelationshipRepository&lt;TSource, TData&gt;</h1>
 		</div>
 	</div>
 </header>
@@ -71,7 +71,7 @@
 						<h4>TSource<span class="tsd-signature-symbol">: </span><a href="../classes/modelbase.html" class="tsd-signature-type">ModelBase</a></h4>
 					</li>
 					<li>
-						<h4>TResult<span class="tsd-signature-symbol">: </span><a href="../classes/modelbase.html" class="tsd-signature-type">ModelBase</a></h4>
+						<h4>TData<span class="tsd-signature-symbol">: </span><a href="../classes/modelbase.html" class="tsd-signature-type">ModelBase</a></h4>
 					</li>
 				</ul>
 			</section>
@@ -79,7 +79,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<a href="ireadonlyrepository.html" class="tsd-signature-type">IReadonlyRepository</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TResult</span><span class="tsd-signature-symbol">&gt;</span>
+						<a href="ireadonlyrepository.html" class="tsd-signature-type">IReadonlyRepository</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TData</span><span class="tsd-signature-symbol">&gt;</span>
 						<ul class="tsd-hierarchy">
 							<li>
 								<span class="target">IRelationshipRepository</span>
@@ -126,11 +126,11 @@
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
 					<a name="allitems_" class="tsd-anchor"></a>
 					<h3>all<wbr>Items$</h3>
-					<div class="tsd-signature tsd-kind-icon">all<wbr>Items$<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TResult</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<div class="tsd-signature tsd-kind-icon">all<wbr>Items$<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TData</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="ireadonlyrepository.html">IReadonlyRepository</a>.<a href="ireadonlyrepository.html#allitems_">allItems$</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/repository/repository.interface.ts#L15">repository/repository.interface.ts:15</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/repository/repository.interface.ts#L15">repository/repository.interface.ts:15</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -140,7 +140,7 @@
 					<div class="tsd-signature tsd-kind-icon">allowed<wbr>Types<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Set</span><span class="tsd-signature-symbol">&lt;</span><a href="../enums/relationshiptype.html" class="tsd-signature-type">RelationshipType</a><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/repository/relationship-repository.ts#L173">repository/relationship-repository.ts:173</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/repository/relationship-repository.ts#L173">repository/relationship-repository.ts:173</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -151,7 +151,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="ireadonlyrepository.html">IReadonlyRepository</a>.<a href="ireadonlyrepository.html#createitem">createItem</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/repository/repository.interface.ts#L10">repository/repository.interface.ts:10</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/repository/repository.interface.ts#L10">repository/repository.interface.ts:10</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -159,7 +159,7 @@
 						<ul class="tsd-parameters">
 							<li class="tsd-parameter-siganture">
 								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-property tsd-is-not-exported">
-									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>itemData<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Readonly</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TResult</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></li>
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>itemData<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Readonly</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TData</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></li>
 								</ul>
 								<ul class="tsd-descriptions">
 									<li class="tsd-description">
@@ -169,7 +169,7 @@
 												<h5>itemData: <span class="tsd-signature-type">any</span></h5>
 											</li>
 										</ul>
-										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Readonly</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TResult</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Readonly</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TData</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4>
 									</li>
 								</ul>
 							</li>
@@ -183,7 +183,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="ireadonlyrepository.html">IReadonlyRepository</a>.<a href="ireadonlyrepository.html#createnewitem">createNewItem</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/repository/repository.interface.ts#L11">repository/repository.interface.ts:11</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/repository/repository.interface.ts#L11">repository/repository.interface.ts:11</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -191,11 +191,11 @@
 						<ul class="tsd-parameters">
 							<li class="tsd-parameter-siganture">
 								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-property tsd-is-not-exported">
-									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TResult</span></li>
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TData</span></li>
 								</ul>
 								<ul class="tsd-descriptions">
 									<li class="tsd-description">
-										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">TResult</span></h4>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">TData</span></h4>
 									</li>
 								</ul>
 							</li>
@@ -208,7 +208,7 @@
 					<div class="tsd-signature tsd-kind-icon">data<wbr>Entity<wbr>Type<span class="tsd-signature-symbol">:</span> <a href="dataentitytype.html" class="tsd-signature-type">DataEntityType</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/repository/relationship-repository.ts#L169">repository/relationship-repository.ts:169</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/repository/relationship-repository.ts#L169">repository/relationship-repository.ts:169</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -219,7 +219,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="ireadonlyrepository.html">IReadonlyRepository</a>.<a href="ireadonlyrepository.html#endpointname">endpointName</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/repository/repository.interface.ts#L16">repository/repository.interface.ts:16</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/repository/repository.interface.ts#L16">repository/repository.interface.ts:16</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -230,7 +230,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="ireadonlyrepository.html">IReadonlyRepository</a>.<a href="ireadonlyrepository.html#entity">entity</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/repository/repository.interface.ts#L9">repository/repository.interface.ts:9</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/repository/repository.interface.ts#L9">repository/repository.interface.ts:9</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -241,7 +241,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="ireadonlyrepository.html">IReadonlyRepository</a>.<a href="ireadonlyrepository.html#getendpointurl">getEndpointUrl</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/repository/repository.interface.ts#L17">repository/repository.interface.ts:17</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/repository/repository.interface.ts#L17">repository/repository.interface.ts:17</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -273,7 +273,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="ireadonlyrepository.html">IReadonlyRepository</a>.<a href="ireadonlyrepository.html#getitembyid">getItemById</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/repository/repository.interface.ts#L12">repository/repository.interface.ts:12</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/repository/repository.interface.ts#L12">repository/repository.interface.ts:12</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -281,7 +281,7 @@
 						<ul class="tsd-parameters">
 							<li class="tsd-parameter-siganture">
 								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-property tsd-is-not-exported">
-									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>id<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, options<span class="tsd-signature-symbol">?: </span><a href="dataoptions.html" class="tsd-signature-type">DataOptions</a>, params<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TResult</span><span class="tsd-signature-symbol">&gt;</span></li>
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>id<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, options<span class="tsd-signature-symbol">?: </span><a href="dataoptions.html" class="tsd-signature-type">DataOptions</a>, params<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TData</span><span class="tsd-signature-symbol">&gt;</span></li>
 								</ul>
 								<ul class="tsd-descriptions">
 									<li class="tsd-description">
@@ -302,7 +302,7 @@
 												</ul>
 											</li>
 										</ul>
-										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TResult</span><span class="tsd-signature-symbol">&gt;</span></h4>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TData</span><span class="tsd-signature-symbol">&gt;</span></h4>
 									</li>
 								</ul>
 							</li>
@@ -315,7 +315,7 @@
 					<div class="tsd-signature tsd-kind-icon">get<wbr>Related<wbr>Item<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/repository/relationship-repository.ts#L172">repository/relationship-repository.ts:172</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/repository/relationship-repository.ts#L172">repository/relationship-repository.ts:172</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -323,7 +323,7 @@
 						<ul class="tsd-parameters">
 							<li class="tsd-parameter-siganture">
 								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-property tsd-is-not-exported">
-									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>itemId<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">any</span>, query<span class="tsd-signature-symbol">?: </span><a href="dataquery.html" class="tsd-signature-type">DataQuery</a>, dataOptions<span class="tsd-signature-symbol">?: </span><a href="dataoptions.html" class="tsd-signature-type">DataOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TResult</span><span class="tsd-signature-symbol">&gt;</span></li>
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>itemId<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">any</span>, query<span class="tsd-signature-symbol">?: </span><a href="dataquery.html" class="tsd-signature-type">DataQuery</a>, dataOptions<span class="tsd-signature-symbol">?: </span><a href="dataoptions.html" class="tsd-signature-type">DataOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TData</span><span class="tsd-signature-symbol">&gt;</span></li>
 								</ul>
 								<ul class="tsd-descriptions">
 									<li class="tsd-description">
@@ -339,7 +339,7 @@
 												<h5><span class="tsd-flag ts-flagOptional">Optional</span> dataOptions: <a href="dataoptions.html" class="tsd-signature-type">DataOptions</a></h5>
 											</li>
 										</ul>
-										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TResult</span><span class="tsd-signature-symbol">&gt;</span></h4>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TData</span><span class="tsd-signature-symbol">&gt;</span></h4>
 									</li>
 								</ul>
 							</li>
@@ -353,7 +353,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="ireadonlyrepository.html">IReadonlyRepository</a>.<a href="ireadonlyrepository.html#query">query</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/repository/repository.interface.ts#L13">repository/repository.interface.ts:13</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/repository/repository.interface.ts#L13">repository/repository.interface.ts:13</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -361,7 +361,7 @@
 						<ul class="tsd-parameters">
 							<li class="tsd-parameter-siganture">
 								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-property tsd-is-not-exported">
-									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">?: </span><a href="dataquery.html" class="tsd-signature-type">DataQuery</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><a href="dataset.html" class="tsd-signature-type">DataSet</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TResult</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></li>
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">?: </span><a href="dataquery.html" class="tsd-signature-type">DataQuery</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><a href="dataset.html" class="tsd-signature-type">DataSet</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TData</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></li>
 								</ul>
 								<ul class="tsd-descriptions">
 									<li class="tsd-description">
@@ -371,7 +371,7 @@
 												<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <a href="dataquery.html" class="tsd-signature-type">DataQuery</a></h5>
 											</li>
 										</ul>
-										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><a href="dataset.html" class="tsd-signature-type">DataSet</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TResult</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><a href="dataset.html" class="tsd-signature-type">DataSet</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TData</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4>
 									</li>
 								</ul>
 							</li>
@@ -384,7 +384,7 @@
 					<div class="tsd-signature tsd-kind-icon">query<wbr>For<wbr>Item<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/repository/relationship-repository.ts#L171">repository/relationship-repository.ts:171</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/repository/relationship-repository.ts#L171">repository/relationship-repository.ts:171</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -392,7 +392,7 @@
 						<ul class="tsd-parameters">
 							<li class="tsd-parameter-siganture">
 								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-property tsd-is-not-exported">
-									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>sourceItem<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TSource</span>, query<span class="tsd-signature-symbol">?: </span><a href="dataquery.html" class="tsd-signature-type">DataQuery</a>, dataOptions<span class="tsd-signature-symbol">?: </span><a href="dataoptions.html" class="tsd-signature-type">DataOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><a href="dataset.html" class="tsd-signature-type">DataSet</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TResult</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></li>
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>sourceItem<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TSource</span>, query<span class="tsd-signature-symbol">?: </span><a href="dataquery.html" class="tsd-signature-type">DataQuery</a>, dataOptions<span class="tsd-signature-symbol">?: </span><a href="dataoptions.html" class="tsd-signature-type">DataOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><a href="dataset.html" class="tsd-signature-type">DataSet</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TData</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></li>
 								</ul>
 								<ul class="tsd-descriptions">
 									<li class="tsd-description">
@@ -408,7 +408,7 @@
 												<h5><span class="tsd-flag ts-flagOptional">Optional</span> dataOptions: <a href="dataoptions.html" class="tsd-signature-type">DataOptions</a></h5>
 											</li>
 										</ul>
-										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><a href="dataset.html" class="tsd-signature-type">DataSet</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TResult</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><a href="dataset.html" class="tsd-signature-type">DataSet</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TData</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4>
 									</li>
 								</ul>
 							</li>
@@ -418,10 +418,10 @@
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="relationshipconfig" class="tsd-anchor"></a>
 					<h3>relationship<wbr>Config</h3>
-					<div class="tsd-signature tsd-kind-icon">relationship<wbr>Config<span class="tsd-signature-symbol">:</span> <a href="entityrelationshipconfig.html" class="tsd-signature-type">EntityRelationshipConfig</a></div>
+					<div class="tsd-signature tsd-kind-icon">relationship<wbr>Config<span class="tsd-signature-symbol">:</span> <a href="entityrelationshipconfig.html" class="tsd-signature-type">EntityRelationshipConfig</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TSource</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TData</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/repository/relationship-repository.ts#L170">repository/relationship-repository.ts:170</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/repository/relationship-repository.ts#L170">repository/relationship-repository.ts:170</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -432,7 +432,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="ireadonlyrepository.html">IReadonlyRepository</a>.<a href="ireadonlyrepository.html#serializeitem">serializeItem</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/repository/repository.interface.ts#L14">repository/repository.interface.ts:14</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/repository/repository.interface.ts#L14">repository/repository.interface.ts:14</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -440,14 +440,14 @@
 						<ul class="tsd-parameters">
 							<li class="tsd-parameter-siganture">
 								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-property tsd-is-not-exported">
-									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>item<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TResult</span>, serializationData<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Object</span></li>
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>item<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TData</span>, serializationData<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Object</span></li>
 								</ul>
 								<ul class="tsd-descriptions">
 									<li class="tsd-description">
 										<h4 class="tsd-parameters-title">Parameters</h4>
 										<ul class="tsd-parameters">
 											<li>
-												<h5>item: <span class="tsd-signature-type">TResult</span></h5>
+												<h5>item: <span class="tsd-signature-type">TData</span></h5>
 											</li>
 											<li>
 												<h5><span class="tsd-flag ts-flagOptional">Optional</span> serializationData: <span class="tsd-signature-type">any</span></h5>
@@ -466,7 +466,7 @@
 					<div class="tsd-signature tsd-kind-icon">source<wbr>Entity<wbr>Type<span class="tsd-signature-symbol">:</span> <a href="dataentitytype.html" class="tsd-signature-type">DataEntityType</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/repository/relationship-repository.ts#L168">repository/relationship-repository.ts:168</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/repository/relationship-repository.ts#L168">repository/relationship-repository.ts:168</a></li>
 						</ul>
 					</aside>
 				</section>

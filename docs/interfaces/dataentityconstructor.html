@@ -57,7 +57,7 @@
 					<a href="dataentityconstructor.html">DataEntityConstructor</a>
 				</li>
 			</ul>
-			<h1>Interface DataEntityConstructor&lt;TEntity, TRawData&gt;</h1>
+			<h1>Interface DataEntityConstructor&lt;TEntity, TRawData, TId&gt;</h1>
 		</div>
 	</div>
 </header>
@@ -68,10 +68,13 @@
 				<h3>Type parameters</h3>
 				<ul class="tsd-type-parameters">
 					<li>
-						<h4>TEntity<span class="tsd-signature-symbol">: </span><a href="../classes/modelbase.html" class="tsd-signature-type">ModelBase</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						<h4>TEntity<span class="tsd-signature-symbol">: </span><a href="../classes/modelbase.html" class="tsd-signature-type">ModelBase</a></h4>
 					</li>
 					<li>
 						<h4>TRawData</h4>
+					</li>
+					<li>
+						<h4>TId<span class="tsd-signature-symbol">: </span><a href="../globals.html#entityid" class="tsd-signature-type">EntityId</a></h4>
 					</li>
 				</ul>
 			</section>
@@ -79,7 +82,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<a href="dataentitytype.html" class="tsd-signature-type">DataEntityType</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">&gt;</span>
+						<a href="dataentitytype.html" class="tsd-signature-type">DataEntityType</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TId</span><span class="tsd-signature-symbol">&gt;</span>
 						<ul class="tsd-hierarchy">
 							<li>
 								<span class="target">DataEntityConstructor</span>
@@ -123,7 +126,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="dataentitytype.html">DataEntityType</a>.<a href="dataentitytype.html#constructor">constructor</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/data-entity.base.ts#L6">entity/data-entity.base.ts:6</a></li>
+									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/data-entity.base.ts#L7">entity/data-entity.base.ts:7</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -145,11 +148,11 @@
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
 					<a name="entityconfig" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagOptional">Optional</span> entity<wbr>Config</h3>
-					<div class="tsd-signature tsd-kind-icon">entity<wbr>Config<span class="tsd-signature-symbol">:</span> <a href="../classes/modelentity.html" class="tsd-signature-type">ModelEntity</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<div class="tsd-signature tsd-kind-icon">entity<wbr>Config<span class="tsd-signature-symbol">:</span> <a href="../classes/modelentity.html" class="tsd-signature-type">ModelEntity</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TId</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="dataentitytype.html">DataEntityType</a>.<a href="dataentitytype.html#entityconfig">entityConfig</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/data-entity.base.ts#L14">entity/data-entity.base.ts:14</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/data-entity.base.ts#L15">entity/data-entity.base.ts:15</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -160,7 +163,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="dataentitytype.html">DataEntityType</a>.<a href="dataentitytype.html#pluralname">pluralName</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/data-entity.base.ts#L13">entity/data-entity.base.ts:13</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/data-entity.base.ts#L14">entity/data-entity.base.ts:14</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -171,7 +174,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="dataentitytype.html">DataEntityType</a>.<a href="dataentitytype.html#singularname">singularName</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/data-entity.base.ts#L12">entity/data-entity.base.ts:12</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/data-entity.base.ts#L13">entity/data-entity.base.ts:13</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -182,7 +185,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="dataentitytype.html">DataEntityType</a>.<a href="dataentitytype.html#valueobjectconfig">valueObjectConfig</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/09fb8ad/lib/entity/data-entity.base.ts#L15">entity/data-entity.base.ts:15</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b42bc16/lib/entity/data-entity.base.ts#L16">entity/data-entity.base.ts:16</a></li>
 						</ul>
 					</aside>
 				</section>

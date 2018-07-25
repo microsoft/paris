@@ -63,11 +63,29 @@
 		<div class="col-8 col-content">
 			<div class="tsd-panel tsd-typography">
 				<h1 id="paris">Paris</h1>
-				<p>Paris is a TypeScript library for implementing Domain-Driven Design in web apps.
-				<em>Paris, fashion capital of the world, where all the <strong>models</strong> want to be</em>.</p>
+				<p>Paris is a data management library for webapps, using TypeScript and RxJS to implement Domain-Driven Design.  </p>
+				<p><em>Paris, fashion capital of the world, where all the <strong>models</strong> want to be</em>.</p>
+				<h2 id="installation">Installation</h2>
+				<p><em>Package size: ~15.8kb (gzipped)</em><br>Paris is a TypeScript library and also requires rxjs, so you&#39;ll need both those packages, if you don&#39;t already use them:</p>
+				<pre><code>npm <span class="hljs-keyword">install</span> <span class="hljs-comment">--save rxjs typescript</span>
+</code></pre><p>Install the Paris NPM package:</p>
+				<pre><code><span class="hljs-built_in">npm</span> install --save @Microsoft/paris
+</code></pre><h2 id="features">Features</h2>
+				<ul>
+					<li>Data API abstraction and standardization - define and use your data easily, in a consistent way.</li>
+					<li>Strong-typed - data models are defined as classes with TypeScript</li>
+					<li>Full-tree modeling - Paris handles the creation of models and sub-models, essentially creating a model tree.</li>
+					<li>Implements Domain-Driven Design - true and tested development methodology that improves collaboration.</li>
+					<li>Reactive - all async code is done with Observables.</li>
+					<li>Caching - easily cache data (including time-based caching). </li>
+				</ul>
 				<h2 id="usage">Usage</h2>
 				<p>First, define an Entity:</p>
-				<pre><code class="lang-typescript"><span class="hljs-meta">@Entity</span>({
+				<pre><code class="lang-typescript"><span class="hljs-comment">// todo-item.entity.ts</span>
+
+<span class="hljs-keyword">import</span> { Entity, EntityModelBase } <span class="hljs-keyword">from</span> <span class="hljs-string">"@microsoft/paris"</span>;
+
+<span class="hljs-meta">@Entity</span>({
     singularName: <span class="hljs-string">"Todo Item"</span>,
     pluralName: <span class="hljs-string">"Todo Items"</span>,
     endpoint: <span class="hljs-string">"todo/items"</span>
@@ -81,7 +99,9 @@
 }
 </code></pre>
 				<p>The above defines an Entity, which can be used to query the todo/items server endpoint, like this:</p>
-				<pre><code class="lang-typescript"><span class="hljs-keyword">const</span> paris = <span class="hljs-keyword">new</span> Paris();
+				<pre><code class="lang-typescript"><span class="hljs-keyword">import</span> { Paris } <span class="hljs-keyword">from</span> <span class="hljs-string">"@microsoft/paris"</span>;
+
+<span class="hljs-keyword">const</span> paris = <span class="hljs-keyword">new</span> Paris();
 paris.getItemById(TodoItem, <span class="hljs-number">1</span>).subscribe(<span class="hljs-function">(<span class="hljs-params">todoItem:TodoItem</span>) =&gt;</span> {
     <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Todo item with ID 1: "</span>, todoItem);
 });
@@ -139,7 +159,7 @@ paris.getItemById(TodoItem, <span class="hljs-number">1</span>).subscribe(<span 
 					<li class=" tsd-kind-class">
 						<a href="classes/datatransformersservice.html" class="tsd-kind-icon">Data<wbr>Transformers<wbr>Service</a>
 					</li>
-					<li class=" tsd-kind-class">
+					<li class=" tsd-kind-class tsd-has-type-parameter">
 						<a href="classes/entitiesservice.html" class="tsd-kind-icon">Entities<wbr>Service</a>
 					</li>
 					<li class=" tsd-kind-class tsd-has-type-parameter">
@@ -166,7 +186,7 @@ paris.getItemById(TodoItem, <span class="hljs-number">1</span>).subscribe(<span 
 					<li class=" tsd-kind-class">
 						<a href="classes/immutability.html" class="tsd-kind-icon">Immutability</a>
 					</li>
-					<li class=" tsd-kind-class tsd-has-type-parameter">
+					<li class=" tsd-kind-class">
 						<a href="classes/modelbase.html" class="tsd-kind-icon">Model<wbr>Base</a>
 					</li>
 					<li class=" tsd-kind-class tsd-has-type-parameter">
@@ -184,10 +204,10 @@ paris.getItemById(TodoItem, <span class="hljs-number">1</span>).subscribe(<span 
 					<li class=" tsd-kind-class tsd-has-type-parameter">
 						<a href="classes/repository.html" class="tsd-kind-icon">Repository</a>
 					</li>
-					<li class=" tsd-kind-class tsd-has-type-parameter">
+					<li class=" tsd-kind-class">
 						<a href="classes/todo.html" class="tsd-kind-icon">Todo</a>
 					</li>
-					<li class=" tsd-kind-class">
+					<li class=" tsd-kind-class tsd-has-type-parameter">
 						<a href="classes/valueobjectsservice.html" class="tsd-kind-icon">Value<wbr>Objects<wbr>Service</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-has-type-parameter">
@@ -238,7 +258,7 @@ paris.getItemById(TodoItem, <span class="hljs-number">1</span>).subscribe(<span 
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/entitymodelconfigbase.html" class="tsd-kind-icon">Entity<wbr>Model<wbr>Config<wbr>Base</a>
 					</li>
-					<li class=" tsd-kind-interface">
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
 						<a href="interfaces/entityrelationshipconfig.html" class="tsd-kind-icon">Entity<wbr>Relationship<wbr>Config</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-has-type-parameter">
@@ -256,7 +276,7 @@ paris.getItemById(TodoItem, <span class="hljs-number">1</span>).subscribe(<span 
 					<li class=" tsd-kind-interface tsd-has-type-parameter">
 						<a href="interfaces/ientityconfigbase.html" class="tsd-kind-icon">IEntity<wbr>Config<wbr>Base</a>
 					</li>
-					<li class=" tsd-kind-interface">
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
 						<a href="interfaces/ientityrelationshiprepositorytype.html" class="tsd-kind-icon">IEntity<wbr>Relationship<wbr>Repository<wbr>Type</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-has-type-parameter">
@@ -267,6 +287,9 @@ paris.getItemById(TodoItem, <span class="hljs-number">1</span>).subscribe(<span 
 					</li>
 					<li class=" tsd-kind-interface tsd-has-type-parameter">
 						<a href="interfaces/irepository.html" class="tsd-kind-icon">IRepository</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/modelconfig.html" class="tsd-kind-icon">Model<wbr>Config</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-has-type-parameter">
 						<a href="interfaces/modelentitycacheconfig.html" class="tsd-kind-icon">Model<wbr>Entity<wbr>Cache<wbr>Config</a>
@@ -349,7 +372,7 @@ paris.getItemById(TodoItem, <span class="hljs-number">1</span>).subscribe(<span 
 					<li class=" tsd-kind-function">
 						<a href="globals.html#apicall" class="tsd-kind-icon">Api<wbr>Call</a>
 					</li>
-					<li class=" tsd-kind-function tsd-has-type-parameter">
+					<li class=" tsd-kind-function">
 						<a href="globals.html#entity" class="tsd-kind-icon">Entity</a>
 					</li>
 					<li class=" tsd-kind-function">
