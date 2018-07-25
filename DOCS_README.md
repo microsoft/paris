@@ -70,3 +70,4 @@ Check the [Wiki](https://github.com/Microsoft/paris/wiki) for advanced uses and 
 
 [Github](https://github.com/Microsoft/paris)
 
+![logo](https://github.com/Microsoft/paris/blob/master/paris_logo-192x192.png)
