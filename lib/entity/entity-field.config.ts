@@ -63,7 +63,7 @@ export interface FieldConfig{
 	 * ```
 	 * In case we want to separate all address properties from a user into an encapsulated object, for the following raw data:
 	 *
-	 * ```json
+	 * ```
 	 * {
 	 * 		"name": "Anna",
 	 * 		"street": "Prinsengracht 263-267",

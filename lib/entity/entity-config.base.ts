@@ -129,6 +129,12 @@ export interface IEntityConfigBase<TEntity extends ModelBase = any, TRawData = a
 	 * ```
 	 */
 	values?:Array<TEntity>,
+
+	/**
+	 * Tests whether the entity contains a hard-coded value with the specified ID (in the entities `values` configuration).
+	 * @param {EntityId} valueId
+	 * @returns {boolean}
+	 */
 	hasValue?: (valueId:EntityId) => boolean,
 	getDefaultValue?: () => TEntity,
 	getValueById?: (valueId:EntityId) => TEntity,

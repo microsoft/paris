@@ -63,9 +63,11 @@ export interface EntityBackendConfig<TEntity extends ModelBase, TRawData = any, 
 	 * }
 	 *
 	 * Then Paris will expect the data to be:
+	 * ```
 	 * {
 	 *		"results: [...]
 	 * }
+	 * ```
 	 *
 	 * @default 'items'
 	 */
