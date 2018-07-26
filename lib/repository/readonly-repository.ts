@@ -28,7 +28,8 @@ import {FIELD_DATA_SELF} from "../entity/entity-field.config";
 import {EntityId} from "../models/entity-id.type";
 
 /**
- * A Repository is a service through which all of an Entity's data is fetched, cached and saved back to the backend
+ * A Repository is a service through which all of an Entity's data is fetched, cached and saved back to the backend.
+ *
  * `ReadonlyRepository` is the base class for all Repositories, and the class used for Repositories that are readonly.
  */
 export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> implements IReadonlyRepository<TEntity>{

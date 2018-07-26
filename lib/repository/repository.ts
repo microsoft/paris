@@ -17,6 +17,11 @@ import {AjaxError} from "rxjs/ajax";
 import {catchError, map, mergeMap, tap} from "rxjs/operators";
 import {DataSet} from "../dataset/dataset";
 
+/**
+ * A Repository is a service through which all of an Entity's data is fetched, cached and saved back to the backend.
+ *
+ * This class handles entities that can be added, updated or removed. see {@link "ReadonlyRepository"} base class.
+ */
 export class Repository<TEntity extends ModelBase> extends ReadonlyRepository<TEntity> implements IRepository<TEntity> {
 	save$: Observable<SaveEntityEvent>;
 	remove$: Observable<RemoveEntitiesEvent>;

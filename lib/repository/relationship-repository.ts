@@ -17,6 +17,11 @@ import {EntityId} from "../models/entity-id.type";
 
 const DEFAULT_RELATIONSHIP_TYPES = [RelationshipType.OneToMany, RelationshipType.OneToOne];
 
+/**
+ * A Repository is a service through which all of an Entity's data is fetched, cached and saved back to the backend.
+ *
+ * Relationship repository handles two repositories that are defined using a foreign key
+ */
 export class RelationshipRepository<TSource extends ModelBase, TData extends ModelBase> extends ReadonlyRepository<TData> implements IRelationshipRepository<TSource, TData> {
 	private sourceRepository: ReadonlyRepository<TSource>;
 	readonly relationshipConfig:EntityRelationshipConfig<TSource, TData>;

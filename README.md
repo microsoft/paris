@@ -17,7 +17,7 @@ npm install --save rxjs typescript
 Install the Paris NPM package:
 
 ```
-npm install --save @Microsoft/paris
+npm install --save @microsoft/paris
 ```
 
 ## Features
