@@ -11,8 +11,7 @@
 	"scripts": {
 		"build": "gulp build",
 		"dev": "rollup -c -w",
-		"bundle": "npm run build",
-		"publish": "npm run bundle && npm publish",
+		"prepublishOnly": "npm run build",
 		"test": "mocha -r ts-node/register lib/**/*.spec.ts",
 		"docs": "typedoc --options typedocconfig.ts"
 	},
