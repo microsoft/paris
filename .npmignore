@@ -1,4 +1,6 @@
 .github
-lib
+.idea
+/lib
 docs
 node_modules
+index.ts
