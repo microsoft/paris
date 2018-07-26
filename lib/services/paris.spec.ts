@@ -127,7 +127,7 @@ describe('Paris main', () => {
 		});
 
 		it('should throw error if repo doesn\'t exist', () => {
-			expect(() => paris.query(String)).to.throw()
+			expect(() => paris.query(<any>String)).to.throw()
 		});
 	});
 

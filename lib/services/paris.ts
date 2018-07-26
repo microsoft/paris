@@ -381,7 +381,7 @@ export class Paris{
 	 * @param {{[p: string]: any}} params
 	 * @returns {Observable<TEntity extends ModelBase>}
 	 */
-	getItemById<TEntity extends EntityModelBase, TId extends EntityId = string>(entityConstructor:DataEntityConstructor<TEntity>, itemId: TId, options?:DataOptions, params?:{ [index:string]:any }): Observable<TEntity>{
+	getItemById<TEntity extends EntityModelBase<TId>, TId extends EntityId, TTId extends TId>(entityConstructor:DataEntityConstructor<TEntity, any, TId>, itemId: TTId, options?:DataOptions, params?:{ [index:string]:any }): Observable<TEntity>{
 		options = options || defaultDataOptions;
 
 		const repository:Repository<TEntity> = this.getRepository(entityConstructor);

@@ -312,7 +312,7 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 	 * @returns {Observable<TEntity extends EntityModelBase>}
 	 */
 	static getModelData<TEntity extends ModelBase, TRawData extends any = any>(rawData: TRawData, entity: ModelConfig<TEntity, TRawData>, config: ParisConfig, paris: Paris, options: DataOptions = defaultDataOptions, query?: DataQuery): Observable<TEntity> {
-		let entityIdProperty: string = entity.idProperty || config.entityIdProperty,
+		let entityIdProperty: keyof TRawData = entity.idProperty || config.entityIdProperty,
 			modelData: Index = entity instanceof ModelEntity ? {id: rawData[entityIdProperty]} : {},
 			subModels: Array<Observable<{ [index: string]: ModelBase | Array<ModelBase> }>> = [];
 
