@@ -70,6 +70,8 @@ Check the [Wiki](https://github.com/Microsoft/paris/wiki) for advanced uses and 
 
 Check the [Source Typescript models](https://microsoft.github.io/paris/) for a detailed look under the hood.
 
+[NPM](https://www.npmjs.com/package/@microsoft/paris) [GitHub](https://github.com/Microsoft/paris)
+
 
 ## Contributing
 

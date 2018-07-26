@@ -5,21 +5,6 @@ Paris is a data management library for webapps, using TypeScript and RxJS to imp
 *Paris, fashion capital of the world, where all the **models** want to be*.
 
 
-## Installation
-
-*Package size: ~15.8kb (gzipped)*  
-Paris is a TypeScript library and also requires RxJs and lodash, so you'll need both those packages, if you don't already use them:
-
-```
-npm install --save lodash rxjs typescript
-```
-
-Install the Paris NPM package:
-
-```
-npm install --save @microsoft/paris
-```
-
 ## Features
 
 - Data API abstraction and standardization - define and use your data easily, in a consistent way.
@@ -68,6 +53,6 @@ paris.getItemById(TodoItem, 1).subscribe((todoItem:TodoItem) => {
 
 Check the [Wiki](https://github.com/Microsoft/paris/wiki) for advanced uses and explanations.
 
-[Github](https://github.com/Microsoft/paris)
+[NPM](https://www.npmjs.com/package/@microsoft/paris) [GitHub](https://github.com/Microsoft/paris)
 
 ![logo](https://github.com/Microsoft/paris/blob/master/paris_logo-192x192.png)
