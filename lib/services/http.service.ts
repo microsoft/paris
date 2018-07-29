@@ -1,7 +1,7 @@
 import {Observable} from "rxjs";
 import {ajax, AjaxError, AjaxRequest, AjaxResponse} from "rxjs/ajax";
 import {catchError, map} from "rxjs/operators";
-import * as _ from "lodash";
+import {clone} from "lodash-es";
 
 export type RequestMethod = "GET"|"POST"|"PUT"|"PATCH"|"DELETE";
 const DEFAULT_TIMEOUT = 60000;
@@ -30,7 +30,7 @@ export class Http{
 	static request<T = any>(method:RequestMethod, url:string, options?:HttpOptions, httpConfig?:AjaxRequest):Observable<any> {
 		let fullUrl:string = options && options.params ? Http.addParamsToUrl(url, options.params, options.separateArrayParams) : url;
 
-		let currentHttpConfig: AjaxRequest = _.clone(httpConfig);
+		let currentHttpConfig: AjaxRequest = clone(httpConfig);
 
 		if (options && options.data) {
 			currentHttpConfig = currentHttpConfig || {};

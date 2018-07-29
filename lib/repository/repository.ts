@@ -5,7 +5,6 @@ import {IRepository} from "./repository.interface";
 import {DataStoreService} from "../services/data-store.service";
 import {ParisConfig} from "../config/paris-config";
 import {Index} from "../models/index";
-import * as _ from "lodash";
 import {ModelBase} from "../models/model.base";
 import {EntityModelBase} from "../models/entity-model.base";
 import {Paris} from "../services/paris";
@@ -16,6 +15,7 @@ import {ReadonlyRepository} from "./readonly-repository";
 import {AjaxError} from "rxjs/ajax";
 import {catchError, map, mergeMap, tap} from "rxjs/operators";
 import {DataSet} from "../dataset/dataset";
+import {flatMap, findIndex} from "lodash-es";
 
 /**
  * A Repository is a service through which all of an Entity's data is fetched, cached and saved back to the backend.
@@ -113,12 +113,12 @@ export class Repository<TEntity extends ModelBase> extends ReadonlyRepository<TE
 			.map((saveItems:SaveItems) => this.doSaveItems(saveItems.items, saveItems.method, options));
 
 		return combineLatest.apply(this, saveItemsArray).pipe(
-			map((savedItems:Array<Array<TEntity>>) => _.flatMap(savedItems)),
+			map((savedItems:Array<Array<TEntity>>) => flatMap(savedItems)),
 			tap((savedItems:Array<TEntity>) => {
 				if (savedItems && savedItems.length && this._allValues) {
 					let itemsAdded: Array<TEntity> = [];
 					savedItems.forEach((item:TEntity) => {
-						const originalItemIndex:number = _.findIndex(this._allValues,_item => item.id === _item.id);
+						const originalItemIndex:number = findIndex(this._allValues,_item => item.id === _item.id);
 						if (!!~originalItemIndex)
 							this._allValues[originalItemIndex] = item;
 						else itemsAdded.push(item);
@@ -192,7 +192,7 @@ export class Repository<TEntity extends ModelBase> extends ReadonlyRepository<TE
 					}),
 					tap(() => {
 						if (this._allValues) {
-							let itemIndex:number = _.findIndex(this._allValues, (_item:TEntity) => _item.id === item.id);
+							let itemIndex:number = findIndex(this._allValues, (_item:TEntity) => _item.id === item.id);
 							if (~itemIndex)
 								this._allValues.splice(itemIndex, 1);
 
@@ -249,7 +249,7 @@ export class Repository<TEntity extends ModelBase> extends ReadonlyRepository<TE
 					tap(() => {
 						if (this._allValues) {
 							items.forEach((item:TEntity) => {
-								let itemIndex:number = _.findIndex(this._allValues, (_item:TEntity) => _item.id === item.id);
+								let itemIndex:number = findIndex(this._allValues, (_item:TEntity) => _item.id === item.id);
 								if (~itemIndex)
 									this._allValues.splice(itemIndex, 1);
 							});

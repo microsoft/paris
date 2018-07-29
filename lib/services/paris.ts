@@ -26,9 +26,9 @@ import {modelArray, rawDataToDataSet} from "../repository/data-to-model";
 import {catchError, map, mergeMap, switchMap, tap} from "rxjs/operators";
 import {DataTransformersService} from "./data-transformers.service";
 import {DataCache, DataCacheSettings} from "./cache";
-import * as _ from "lodash";
 import {EntityModelBase} from "../models/entity-model.base";
 import {EntityId} from "../models/entity-id.type";
+import {clone} from "lodash-es";
 
 export class Paris{
 	private repositories:Map<DataEntityType, IRepository<ModelBase>> = new Map;
@@ -262,7 +262,7 @@ export class Paris{
 			throw new Error(`Can't call API, no endpoint specified.`);
 
 		const baseUrl:string = backendConfig.baseUrl instanceof Function ? backendConfig.baseUrl(this.config, dataQuery) : backendConfig.baseUrl;
-		let apiCallHttpOptions:HttpOptions<TData> = _.clone(httpOptions) || {};
+		let apiCallHttpOptions:HttpOptions<TData> = clone(httpOptions) || {};
 
 		if (backendConfig.separateArrayParams) {
 			apiCallHttpOptions.separateArrayParams = true;

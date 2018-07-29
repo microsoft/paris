@@ -1,10 +1,10 @@
 {
 	"compilerOptions": {
-		"lib": ["es2015", "dom"], // we target Node.js(v6)
-		"target": "es5", // we target Node.js(v6)
+		"lib": ["es2015", "dom"],
+		"target": "es5",
 		"module": "es2015",
-		"moduleResolution": "node", // we target Node.js(v6)
-		"declaration": true, // generate TypeScript definitions
+		"moduleResolution": "node",
+		"declaration": true,
 		"rootDir": ".",
 		"outDir": "./dist",
 		"sourceMap": true,
@@ -18,7 +18,7 @@
 			"node_modules/@types",
 			"node_modules"
 		],
-		"types" : ["node"], // only use needed types
+		"types" : ["node", "lodash-es"],
 		"baseUrl": "/"
 	},
 	"include": [

@@ -18,7 +18,6 @@ import {Index} from "../models";
 import {EntityConfigBase, EntityGetMethod, ModelConfig} from "../entity/entity-config.base";
 import {ModelBase} from "../models/model.base";
 import {DataTransformersService} from "../services/data-transformers.service";
-import * as _ from "lodash";
 import {valueObjectsService} from "../services/value-objects.service";
 import {AjaxError} from "rxjs/ajax";
 import {EntityErrorEvent, EntityErrorTypes} from "../events/entity-error.event";
@@ -26,6 +25,7 @@ import {catchError, map, mergeMap, tap} from "rxjs/operators";
 import {IReadonlyRepository} from "./repository.interface";
 import {FIELD_DATA_SELF} from "../entity/entity-field.config";
 import {EntityId} from "../models/entity-id.type";
+import {clone, findIndex, get} from "lodash-es";
 
 /**
  * A Repository is a service through which all of an Entity's data is fetched, cached and saved back to the backend.
@@ -122,7 +122,7 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 		let defaultData:{ [index:string]:any } = {};
 		this.entity.fieldsArray.forEach((field:Field) => {
 			if (field.defaultValue !== undefined)
-				defaultData[field.id] = _.clone(field.defaultValue);
+				defaultData[field.id] = clone(field.defaultValue);
 			else if (field.isArray)
 				defaultData[field.id] = [];
 		});
@@ -238,7 +238,7 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 		if (!this.entityConstructor.entityConfig.supportsGetMethod(EntityGetMethod.getItem))
 			throw new Error(`Can't get ${this.entityConstructor.singularName}, getItem isn't supported.`);
 
-		let idFieldIndex:number = _.findIndex(this.entity.fieldsArray, field => field.id === "id");
+		let idFieldIndex:number = findIndex(this.entity.fieldsArray, field => field.id === "id");
 		if (~idFieldIndex){
 			let idField:Field = this.entity.fieldsArray[idFieldIndex];
 			if (idField.type === Number && typeof(itemId) === "string") {
@@ -341,13 +341,13 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 				if (entityField.data instanceof Array) {
 					for (let i = 0, path:string; i < entityField.data.length && propertyValue === undefined; i++) {
 						path = entityField.data[i];
-						let value:any = path === FIELD_DATA_SELF ? rawData : _.get(rawData, path);
+						let value:any = path === FIELD_DATA_SELF ? rawData : get(rawData, path);
 						if (value !== undefined && value !== null)
 							propertyValue = value;
 					}
 				}
 				else
-					propertyValue = entityField.data === FIELD_DATA_SELF ? rawData : _.get(rawData, entityField.data);
+					propertyValue = entityField.data === FIELD_DATA_SELF ? rawData : get(rawData, entityField.data);
 			}
 			else
 				propertyValue = rawData[entityField.id];
