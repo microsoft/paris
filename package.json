@@ -4,7 +4,7 @@
 	"description": "Library for the implementation of Domain Driven Design in Angular/TypeScript apps",
 	"repository": {
 		"type": "git",
-		"url": "https://microsoft.visualstudio.com/DefaultCollection/WDATP/_git/Paris"
+		"url": "https://github.com/Microsoft/paris"
 	},
 	"main": "dist/index.js",
 	"typings": "dist/index.d.ts",
