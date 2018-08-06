@@ -8,46 +8,53 @@ import {DataSet} from "../dataset/dataset";
 import {ReadonlyRepository} from "./readonly-repository";
 import {map} from "rxjs/operators";
 
-export function rawDataToDataSet<T extends ModelBase, R = any>(
-		rawDataSet:any,
-		entityConstructor:DataEntityConstructor<T>,
+const DEFAULT_ALL_ITEMS_PROPERTY = 'items';
+
+export function rawDataToDataSet<TEntity extends ModelBase, TRawData = any, TDataSet extends any = any>(
+		rawDataSet:TDataSet,
+		entityConstructor:DataEntityConstructor<TEntity>,
 		allItemsProperty:string,
 		paris:Paris,
 		dataOptions:DataOptions = defaultDataOptions,
-		query?:DataQuery):Observable<DataSet<T>>{
-		let rawItems: Array<R> = rawDataSet instanceof Array ? rawDataSet : rawDataSet[allItemsProperty];
+		query?:DataQuery):Observable<DataSet<TEntity>>{
+	let dataSet:DataSet<TRawData> = parseDataSet(rawDataSet, allItemsProperty, entityConstructor.entityConfig.parseDataSet);
 
-		if (!rawItems || !rawItems.length)
-			return of({ count: 0, items: [] });
+	if (!dataSet.items || !dataSet.items.length)
+		return of({ count: 0, items: [] });
 
-		return modelArray<T, R>(rawItems, entityConstructor, paris, dataOptions, query).pipe(
-			map((items:Array<T>) => {
-				return Object.freeze({
-					count: rawDataSet.count,
-					items: items,
-					next: rawDataSet.next,
-					previous: rawDataSet.previous
-				});
-			})
-		);
-	}
+	return modelArray<TEntity, TRawData>(dataSet.items, entityConstructor, paris, dataOptions, query).pipe(
+		map((items:Array<TEntity>) => {
+			return Object.freeze(Object.assign(dataSet, {
+				items: items,
+			}));
+		})
+	);
+}
 
-export function modelArray<T extends ModelBase, R = any>(
-	data:Array<any>,
-	entityConstructor:DataEntityConstructor<T>,
+export function parseDataSet<TRawData = any, TDataSet extends any = any>(rawDataSet:TDataSet, allItemsProperty:string = DEFAULT_ALL_ITEMS_PROPERTY, parseDataSet?:(rawDataSet:TDataSet) => DataSet<TRawData>):DataSet<TRawData>{
+	return rawDataSet instanceof Array
+			? { count: 0, items: rawDataSet }
+			: parseDataSet
+				? parseDataSet(rawDataSet) || { count: 0, items: [] }
+				: { count: rawDataSet.count, items: rawDataSet[allItemsProperty] };
+}
+
+export function modelArray<TEntity extends ModelBase, TRawData = any>(
+	rawData:Array<TRawData>,
+	entityConstructor:DataEntityConstructor<TEntity>,
 	paris:Paris,
 	dataOptions:DataOptions = defaultDataOptions,
-	query?:DataQuery):Observable<Array<T>>{
-	if (!data.length)
+	query?:DataQuery):Observable<Array<TEntity>>{
+	if (!rawData.length)
 		return of([]);
 	else {
-		const itemCreators: Array<Observable<T>> = data.map((itemData: R) =>
-			modelItem<T, R>(entityConstructor, itemData, paris, dataOptions, query));
+		const itemCreators: Array<Observable<TEntity>> = rawData.map((itemData: TRawData) =>
+			modelItem<TEntity, TRawData>(entityConstructor, itemData, paris, dataOptions, query));
 
 		return combineLatest.apply(this, itemCreators);
 	}
 }
 
-export function modelItem<T extends ModelBase, R = any>(entityConstructor:DataEntityConstructor<T>, data:R, paris:Paris, dataOptions: DataOptions = defaultDataOptions, query?:DataQuery):Observable<T>{
-	return ReadonlyRepository.getModelData(data, entityConstructor.entityConfig || entityConstructor.valueObjectConfig, paris.config, paris, dataOptions, query);
+export function modelItem<TEntity extends ModelBase, TRawData = any>(entityConstructor:DataEntityConstructor<TEntity>, rawData:TRawData, paris:Paris, dataOptions: DataOptions = defaultDataOptions, query?:DataQuery):Observable<TEntity>{
+	return ReadonlyRepository.getModelData(rawData, entityConstructor.entityConfig || entityConstructor.valueObjectConfig, paris.config, paris, dataOptions, query);
 }
