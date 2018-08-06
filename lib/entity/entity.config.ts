@@ -5,10 +5,10 @@ import {DataQuery} from "../dataset/data-query";
 import {HttpOptions, RequestMethod} from "../services/http.service";
 import {ModelBase} from "../models/model.base";
 import {ApiCallBackendConfigInterface} from "../models/api-call-backend-config.interface";
-import {EntityModelBase} from "../models/entity-model.base";
 import {EntityId} from "../models/entity-id.type";
+import {DataSet} from "../dataset/dataset";
 
-export class ModelEntity<TEntity extends ModelBase = any, TRawData = any, TId extends EntityId = string> extends EntityConfigBase<TEntity, TRawData, TId> implements EntityConfig<TEntity, TRawData, TId> {
+export class ModelEntity<TEntity extends ModelBase = any, TRawData = any, TId extends EntityId = string, TDataSet = any> extends EntityConfigBase<TEntity, TRawData, TId> implements EntityConfig<TEntity, TRawData, TId> {
 	endpoint:EntityConfigFunctionOrValue;
 	loadAll?:boolean = false;
 	cache?:boolean | ModelEntityCacheConfig<TEntity>;
@@ -17,6 +17,7 @@ export class ModelEntity<TEntity extends ModelBase = any, TRawData = any, TId ex
 	allItemsEndpoint?:string;
 	allItemsEndpointTrailingSlash?:boolean;
 	parseDataQuery?:(dataQuery:DataQuery) => { [index:string]:any };
+	parseDataSet?:(dataSet:TDataSet) => DataSet<TRawData>;
 	parseItemQuery?:(itemId:EntityId, entity?:IEntityConfigBase<TEntity, TRawData, TId>, config?:ParisConfig, params?:{ [index:string]:any }) => string;
 	parseSaveQuery?:(item:TEntity, entity?:IEntityConfigBase, config?:ParisConfig) => string;
 	parseRemoveQuery?:(items:Array<TEntity>, entity?:IEntityConfigBase, config?:ParisConfig) => string;
@@ -35,11 +36,12 @@ export class ModelEntity<TEntity extends ModelBase = any, TRawData = any, TId ex
 export interface EntityConfig<
 	TEntity extends ModelBase,
 	TRawData = any,
-	TId extends EntityId = string>
-	extends IEntityConfigBase<TEntity, TRawData, TId>, EntityBackendConfig<TEntity, TRawData, TId>
+	TId extends EntityId = string,
+	TDataSet = any>
+	extends IEntityConfigBase<TEntity, TRawData, TId>, EntityBackendConfig<TEntity, TRawData, TId, TDataSet>
 { }
 
-export interface EntityBackendConfig<TEntity extends ModelBase, TRawData = any, TId extends EntityId = string> extends ApiCallBackendConfigInterface{
+export interface EntityBackendConfig<TEntity extends ModelBase, TRawData = any, TId extends EntityId = string, TDataSet = any> extends ApiCallBackendConfigInterface{
 	/**
 	 * If true, all the Entity's items are fetched whenever any is needed, and then cached so subsequent requests are retrieved from cache rather than backend.
 	 * This makes sense to use for Entities whose values are few and not expected to change, such as enums.
@@ -100,6 +102,18 @@ export interface EntityBackendConfig<TEntity extends ModelBase, TRawData = any, 
 	 * @param {DataQuery} dataQuery
 	 */
 	parseDataQuery?:(dataQuery:DataQuery) => { [index:string]:any },
+
+	/**
+	 * For query results, Paris accepts either an array of items or an object. That object may contain properties such as 'count', 'next' and 'previous'.
+	 * `parseDataSet`, if available, receives the object as it was returned from the API and parses it to a DataSet interface, so the original properties are available in the DataSet.
+	 *
+	 * @example <caption>Parsing a DataSet from a raw object returned by the backend</caption>
+	 * ```typescript
+ *     parseDataSet: (rawDataSet:TodoRawDataSet) => ({ items: rawDataSet.todoItems, next: rawDataSet.$nextPage, count: rawDataSet.total })
+	 * ```
+	 * @param dataSet
+	 */
+	parseDataSet?:(dataSet:TDataSet) => DataSet<TRawData>;
 
 	/**
 	 * When getting an Entity from backend (when calling repository.getItemById), Paris follows the REST standard and fetches it by GET from /{the Entity's endpoint}/{ID}.

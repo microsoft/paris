@@ -1,0 +1,2 @@
+--ui mocha-typescript
+lib/**/*.spec.ts
