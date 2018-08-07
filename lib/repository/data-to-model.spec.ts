@@ -1,4 +1,3 @@
-import { suite, test, slow, timeout } from "mocha-typescript";
 import "reflect-metadata"
 import * as chai from 'chai';
 import '../services/paris.init.spec';

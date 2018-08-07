@@ -29,6 +29,9 @@ export class DataStoreService{
 	}
 
 	private getEndpointUrl(endpoint:string, baseUrl?:string):string{
+		if (baseUrl === '')
+			return endpoint;
+
 		return `${baseUrl || this.config.apiRoot || ""}/${endpoint}`;
 	}
 
