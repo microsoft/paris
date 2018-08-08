@@ -17,7 +17,7 @@ export function rawDataToDataSet<TEntity extends ModelBase, TRawData = any, TDat
 		paris:Paris,
 		dataOptions:DataOptions = defaultDataOptions,
 		query?:DataQuery):Observable<DataSet<TEntity>>{
-	let dataSet:DataSet<TRawData> = parseDataSet(rawDataSet, allItemsProperty, entityConstructor.entityConfig.parseDataSet);
+	let dataSet:DataSet<TRawData> = parseDataSet(rawDataSet, allItemsProperty, entityConstructor.entityConfig && entityConstructor.entityConfig.parseDataSet);
 
 	if (!dataSet.items || !dataSet.items.length)
 		return of({ count: 0, items: [] });
