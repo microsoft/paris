@@ -16,7 +16,20 @@
 		"test:watch": "jest --watch",
 		"docs": "typedoc --options typedocconfig.ts"
 	},
-	"author": "Yossi Kolesnicov",
+	"author": {
+		"name": "Yossi Kolesnicov",
+		"email": "Yossi.Kolesnicov@microsoft.com"
+	},
+	"contributors": [
+		{
+			"name": "Shai Rose",
+			"email": "Shai.Rose@microsoft.com"
+		},
+		{
+			"name": "Ben Grynhaus",
+			"email": "bengr@microsoft.com"
+		}
+	],
 	"license": "MIT",
 	"devDependencies": {
 		"@compodoc/compodoc": "^1.0.0-beta.7",
