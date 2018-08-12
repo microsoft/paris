@@ -9,23 +9,16 @@
 		"outDir": "./bundle",
 		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true,
+		"allowJs": true,
 		"noImplicitAny": true,
 		"noImplicitReturns": true,
 		"noImplicitUseStrict": false,
 		"noFallthroughCasesInSwitch": true,
-		"typeRoots": [
-			"node_modules/@types",
-			"node_modules"
-		],
-		"types" : ["node", "lodash-es"],
+		"typeRoots": ["node_modules/@types", "node_modules"],
+		"types": ["node", "lodash-es", "jest"],
 		"baseUrl": "/",
 		"paths": {
-			"@angular/*": [
-				"../node_modules/@angular/*"
-			],
-			"rxjs/*": [
-				"../node_modules/rxjs/*"
-			]
+			"rxjs/*": ["../node_modules/rxjs/*"]
 		}
 	}
 }
