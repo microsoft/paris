@@ -149,7 +149,15 @@ console.log('Status with ID 1: ', paris.getValue(Status, 1));
 	 * Useful for APIs that can return multiple entity types, with a common discriminator to differentiate them.
 	 *
 	 * @example
-	 * ```typescript
+```json
+GET /things
+[
+	{ "kind": "one", "id": 1 },
+	{ "kind": "two", "id": 2 },
+]
+```
+
+```typescript
 @Entity(
 	modelWith: rawData => rawData.kind === 'one' : One ? Two
 )
@@ -160,6 +168,18 @@ class One extends Base {}
 
 @Entity()
 class Two extends Base {}
+
+paris.getItemById<One | Two>(Base, 1)
+	 .subscribe(item =>
+		console.log(item instanceof One) // true
+	 )
+
+paris.getRepository(Base).query().subscribe(dataSet => {
+	const [ one, two ] = dataSet.items;
+
+	console.log(one instanceof One) // true
+	console.log(two instanceof Two) // true
+});
 ```
 	 */
 	modelWith?: (data: TRawData) => DataEntityConstructor<any>;
