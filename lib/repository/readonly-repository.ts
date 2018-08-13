@@ -1,31 +1,31 @@
-import {EntityModelBase} from "../models/entity-model.base";
-import {queryToHttpOptions} from "../dataset/query-to-http";
-import {ErrorsService} from "../services/errors.service";
-import {DataSet} from "../dataset/dataset";
-import {DataQuery} from "../dataset/data-query";
-import {DataOptions, defaultDataOptions} from "../dataset/data.options";
-import {combineLatest, merge, Observable, of, Subject} from "rxjs";
-import {HttpOptions} from "../services/http.service";
-import {DataStoreService} from "../services/data-store.service";
-import {ParisConfig} from "../config/paris-config";
-import {EntityBackendConfig, ModelEntity} from "../entity/entity.config";
-import {DataEntityConstructor, DataEntityType} from "../entity/data-entity.base";
-import {Paris} from "../services/paris";
-import {DataAvailability} from "../dataset/data-availability.enum";
-import {Field} from "../entity/entity-field";
-import {DataCache} from "../services/cache";
-import {Index} from "../models";
-import {EntityConfigBase, EntityGetMethod, ModelConfig} from "../entity/entity-config.base";
-import {ModelBase} from "../models/model.base";
-import {DataTransformersService} from "../services/data-transformers.service";
-import {valueObjectsService} from "../services/value-objects.service";
-import {AjaxError} from "rxjs/ajax";
-import {EntityErrorEvent, EntityErrorTypes} from "../events/entity-error.event";
-import {catchError, map, mergeMap, tap} from "rxjs/operators";
-import {IReadonlyRepository} from "./repository.interface";
-import {FIELD_DATA_SELF} from "../entity/entity-field.config";
-import {EntityId} from "../models/entity-id.type";
-import {clone, findIndex, get} from "lodash-es";
+import { clone, findIndex, get } from "lodash-es";
+import { combineLatest, merge, Observable, of, Subject } from "rxjs";
+import { AjaxError } from "rxjs/ajax";
+import { catchError, map, mergeMap, tap } from "rxjs/operators";
+import { ParisConfig } from "../config/paris-config";
+import { DataAvailability } from "../dataset/data-availability.enum";
+import { DataQuery } from "../dataset/data-query";
+import { DataOptions, defaultDataOptions } from "../dataset/data.options";
+import { DataSet } from "../dataset/dataset";
+import { queryToHttpOptions } from "../dataset/query-to-http";
+import { DataEntityConstructor, DataEntityType } from "../entity/data-entity.base";
+import { EntityConfigBase, EntityGetMethod, ModelConfig } from "../entity/entity-config.base";
+import { Field } from "../entity/entity-field";
+import { FIELD_DATA_SELF } from "../entity/entity-field.config";
+import { EntityBackendConfig, ModelEntity } from "../entity/entity.config";
+import { EntityErrorEvent, EntityErrorTypes } from "../events/entity-error.event";
+import { Index } from "../models";
+import { EntityId } from "../models/entity-id.type";
+import { EntityModelBase } from "../models/entity-model.base";
+import { ModelBase } from "../models/model.base";
+import { DataCache } from "../services/cache";
+import { DataStoreService } from "../services/data-store.service";
+import { DataTransformersService } from "../services/data-transformers.service";
+import { ErrorsService } from "../services/errors.service";
+import { HttpOptions } from "../services/http.service";
+import { Paris } from "../services/paris";
+import { valueObjectsService } from "../services/value-objects.service";
+import { IReadonlyRepository } from "./repository.interface";
 
 /**
  * A Repository is a service through which all of an Entity's data is fetched, cached and saved back to the backend.
@@ -304,19 +304,35 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 	 * Populates the item dataset with any sub-model. For example, if an ID is found for a property whose type is an entity,
 	 * the property's value will be an instance of that entity, for the ID, not the ID.
 	 * This method does the actual heavy lifting required for modeling an Entity or ValueObject - parses the fields, models sub-models, etc.
-	 * @param {Index} rawData
-	 * @param {EntityConfigBase} entity
+	 *
+	 * @template TEntity The entity to model
+	 * @template TRawData The raw data
+	 * @template TConcreteEntity An optional entity derived from `TEntity` that will be used if `TEntity` uses `modelWith`
+	 * @param {TRawData} rawData
+	 * @param {ModelConfig<TEntity, TRawData>} entity
 	 * @param {ParisConfig} config
 	 * @param {Paris} paris
-	 * @param {DataOptions} options
-	 * @returns {Observable<TEntity extends EntityModelBase>}
+	 * @param {DataOptions} [options=defaultDataOptions]
+	 * @param {DataQuery} [query]
+	 * @returns {Observable<TEntity> | Observable<TConcreteEntity>}
 	 */
-	static getModelData<TEntity extends ModelBase, TRawData extends any = any>(rawData: TRawData, entity: ModelConfig<TEntity, TRawData>, config: ParisConfig, paris: Paris, options: DataOptions = defaultDataOptions, query?: DataQuery): Observable<TEntity> {
+	static getModelData<TEntity extends ModelBase, TRawData extends any = any, TConcreteEntity extends TEntity = TEntity>(rawData: TRawData, entity: ModelConfig<TEntity, TRawData>, config: ParisConfig, paris: Paris, options: DataOptions = defaultDataOptions, query?: DataQuery) : TEntity extends TConcreteEntity ? Observable<TEntity> : Observable<TConcreteEntity> {
 		let entityIdProperty: keyof TRawData = entity.idProperty || config.entityIdProperty,
 			modelData: Index = entity instanceof ModelEntity ? {id: rawData[entityIdProperty]} : {},
 			subModels: Array<Observable<{ [index: string]: ModelBase | Array<ModelBase> }>> = [];
 
 		let getModelDataError:Error = new Error(`Failed to create ${entity.singularName}.`);
+
+		if (typeof entity.modelWith === 'function') {
+			const { entityConfig, valueObjectConfig } = entity.modelWith(rawData);
+			return ReadonlyRepository.getModelData<TConcreteEntity, TRawData>(
+				rawData,
+				entityConfig || valueObjectConfig,
+				config,
+				paris,
+				options
+			);
+		}
 
 		entity.fields.forEach((entityField: Field) => {
 			if (entityField.require){

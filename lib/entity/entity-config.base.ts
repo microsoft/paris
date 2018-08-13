@@ -1,11 +1,11 @@
-import {EntityFields} from "./entity-fields";
-import {Immutability} from "../services/immutability";
-import {DataEntityConstructor} from "./data-entity.base";
-import {ParisConfig} from "../config/paris-config";
-import {ModelBase} from "../models/model.base";
-import {HttpOptions} from "../services/http.service";
-import {EntityId} from "../models/entity-id.type";
-import {Field} from "./entity-field";
+import { ParisConfig } from "../config/paris-config";
+import { EntityId } from "../models/entity-id.type";
+import { ModelBase } from "../models/model.base";
+import { HttpOptions } from "../services/http.service";
+import { Immutability } from "../services/immutability";
+import { DataEntityConstructor } from "./data-entity.base";
+import { Field } from "./entity-field";
+import { EntityFields } from "./entity-fields";
 
 const DEFAULT_VALUE_ID = "__default";
 
@@ -101,32 +101,33 @@ export interface IEntityConfigBase<TEntity extends ModelBase = any, TRawData = a
 	/**
 	 * Hard-coded items for this Entity. When values are specified, no endpoint is required, and items are always returned from these values, instead of backend.
 	 *
-	 * @example <caption>Hard-coding values for an Entity</caption>
-	 * ```typescript
-	 * @Entity({
-	 * 		singularName: "Status",
-	 * 		pluralName: "Statuses",
-	 * 		values: [
-	 * 			{ id: 1, name: 'Open' },
-	 * 			{ id: 2, name: 'In progress' },
-	 * 			{ id: 3, name: 'Done' }
-	 * 		]
-	 * })
-	 * export class Status extends EntityModelBase<number>{
-	 * 		@EntityField()
-	 * 		name: string;
-	 * }
-	 * ```
+	 * Hard-coding values for an Entity:
+	 * @example
+```typescript
+@Entity({
+	singularName: "Status",
+	pluralName: "Statuses",
+	values: [
+		{ id: 1, name: 'Open' },
+		{ id: 2, name: 'In progress' },
+		{ id: 3, name: 'Done' }
+	]
+})
+export class Status extends EntityModelBase<number>{
+	@EntityField()
+	name: string;
+}
+```
 	 *
 	 * Then when requesting an item for Status, either directly (with getValue or getItemById) or when sub-modeling, the hard-coded values are used:
 	 *
-	 * ```typescript
-	 * // Async way:
-	 * paris.getItemById(Status, 1).subscribe(status => console.log('Status with ID 1: ', status);
-	 *
-	 * // Sync:
-	 * console.log('Status with ID 1: ', paris.getValue(Status, 1));
-	 * ```
+```typescript
+// Async:
+paris.getItemById(Status, 1).subscribe(status => console.log('Status with ID 1: ', status);
+
+// Sync:
+console.log('Status with ID 1: ', paris.getValue(Status, 1));
+```
 	 */
 	values?:Array<TEntity>,
 
@@ -141,10 +142,50 @@ export interface IEntityConfigBase<TEntity extends ModelBase = any, TRawData = a
 	entityConstructor?:DataEntityConstructor<TEntity, TRawData, TId>,
 	serializeItem?:(item:Partial<TEntity>, serializedItem?:any, entity?:IEntityConfigBase<TEntity, TRawData, TId>, config?:ParisConfig, serializationData?:any) => TRawData,
 	supportedEntityGetMethods?:Array<EntityGetMethod>,
-	parseSaveItemsQuery?: (items:Array<TEntity>, options?:HttpOptions, entity?:IEntityConfigBase<TEntity, TRawData, TId>, config?:ParisConfig) => HttpOptions
+	parseSaveItemsQuery?: (items:Array<TEntity>, options?:HttpOptions, entity?:IEntityConfigBase<TEntity, TRawData, TId>, config?:ParisConfig) => HttpOptions,
+
+	/**
+	 * _Optional_ function to supply the model type to construct, given the raw data.
+	 * Useful for APIs that can return multiple entity types, with a common discriminator to differentiate them.
+	 *
+	 * @example
+```json
+GET /things
+[
+	{ "kind": "one", "id": 1 },
+	{ "kind": "two", "id": 2 },
+]
+```
+
+```typescript
+@Entity(
+	modelWith: rawData => rawData.kind === 'one' : One ? Two
+)
+class Base { }
+
+@Entity()
+class One extends Base {}
+
+@Entity()
+class Two extends Base {}
+
+paris.getItemById<One | Two>(Base, 1)
+	 .subscribe(item =>
+		console.log(item instanceof One) // true
+	 )
+
+paris.getRepository(Base).query().subscribe(dataSet => {
+	const [ one, two ] = dataSet.items;
+
+	console.log(one instanceof One) // true
+	console.log(two instanceof Two) // true
+});
+```
+	 */
+	modelWith?: (data: TRawData) => DataEntityConstructor<any>;
 }
 
-export interface ModelConfig<TEntity extends ModelBase, TRawData = any, TId extends EntityId = string> extends IEntityConfigBase<TEntity, TRawData, TId>{
+export interface ModelConfig<TEntity extends ModelBase, TRawData = any, TId extends EntityId = string> extends IEntityConfigBase<TEntity, TRawData, TId> {
 	fields?:EntityFields,
 	fieldsArray?:Array<Field>,
 }
