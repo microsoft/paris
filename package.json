@@ -73,7 +73,8 @@
 			"^.+\\.(js|ts)$": "ts-jest"
 		},
 		"testPathIgnorePatterns": [
-			"/node_modules/"
+			"/node_modules/",
+			"/dist/"
 		],
 		"setupTestFrameworkScriptFile": "<rootDir>/jest-setup.ts",
 		"testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|js)$",
