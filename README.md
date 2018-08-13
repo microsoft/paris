@@ -1,22 +1,22 @@
 # Paris
 
-Paris is a data management library for webapps, using TypeScript and RxJS to implement Domain-Driven Design.  
+Paris is a data management library for webapps, using TypeScript and RxJS to implement Domain-Driven Design.
 
 *Paris, fashion capital of the world, where all the **models** want to be*.
 
 
 ## Installation
 
-*Package size: ~15.8kb (gzipped)*  
+*Package size: ~15.8kb (gzipped)*
 
 1. Paris is a TypeScript library and also requires RxJs and lodash, so you'll need both those packages, if you don't already use them:
-	
+
 	```
-	npm install --save lodash rxjs typescript
+	npm install --save lodash-es rxjs typescript
 	```
 
 2. Install the Paris NPM package:
-	
+
 	```
 	npm install --save @microsoft/paris
 	```
@@ -27,8 +27,8 @@ Paris is a data management library for webapps, using TypeScript and RxJS to imp
 - Strong-typed - data models are defined as classes with TypeScript
 - Full-tree modeling - Paris handles the creation of models and sub-models, essentially creating a model tree.
 - Implements Domain-Driven Design - true and tested development methodology that improves collaboration.
-- Reactive - all async code is done with Observables.
-- Caching - easily cache data (including time-based caching). 
+- Reactive - all async code is done with RxJS Observables.
+- Caching - easily cache data (including time-based caching).
 
 
 ## Usage
@@ -47,10 +47,10 @@ import { Entity, EntityModelBase } from "@microsoft/paris";
 })
 export class TodoItem extends EntityModelBase{
 	@EntityField()
-	text:string;
-	
+	text: string;
+
 	@EntityField()
-	time:Date;
+	time: Date;
 }
 ```
 
