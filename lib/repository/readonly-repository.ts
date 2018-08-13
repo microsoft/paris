@@ -304,14 +304,19 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 	 * Populates the item dataset with any sub-model. For example, if an ID is found for a property whose type is an entity,
 	 * the property's value will be an instance of that entity, for the ID, not the ID.
 	 * This method does the actual heavy lifting required for modeling an Entity or ValueObject - parses the fields, models sub-models, etc.
-	 * @param {Index} rawData
-	 * @param {EntityConfigBase} entity
+	 *
+	 * @template TEntity The entity to model
+	 * @template TRawData The raw data
+	 * @template TConcreteEntity An optional entity derived from `TEntity` that will be used if `TEntity` uses `modelWith`
+	 * @param {TRawData} rawData
+	 * @param {ModelConfig<TEntity, TRawData>} entity
 	 * @param {ParisConfig} config
 	 * @param {Paris} paris
-	 * @param {DataOptions} options
-	 * @returns {Observable<TEntity extends EntityModelBase>}
+	 * @param {DataOptions} [options=defaultDataOptions]
+	 * @param {DataQuery} [query]
+	 * @returns {Observable<TEntity> | Observable<TConcreteEntity>}
 	 */
-	static getModelData<TEntity extends ModelBase, TRawData extends any = any, SEntity extends TEntity = TEntity>(rawData: TRawData, entity: ModelConfig<TEntity, TRawData>, config: ParisConfig, paris: Paris, options: DataOptions = defaultDataOptions, query?: DataQuery): Observable<TEntity> {
+	static getModelData<TEntity extends ModelBase, TRawData extends any = any, TConcreteEntity extends TEntity = TEntity>(rawData: TRawData, entity: ModelConfig<TEntity, TRawData>, config: ParisConfig, paris: Paris, options: DataOptions = defaultDataOptions, query?: DataQuery) : TEntity extends TConcreteEntity ? Observable<TEntity> : Observable<TConcreteEntity> {
 		let entityIdProperty: keyof TRawData = entity.idProperty || config.entityIdProperty,
 			modelData: Index = entity instanceof ModelEntity ? {id: rawData[entityIdProperty]} : {},
 			subModels: Array<Observable<{ [index: string]: ModelBase | Array<ModelBase> }>> = [];
@@ -320,7 +325,7 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 
 		if (typeof entity.modelWith === 'function') {
 			const { entityConfig, valueObjectConfig } = entity.modelWith(rawData);
-			return ReadonlyRepository.getModelData<SEntity, TRawData>(
+			return ReadonlyRepository.getModelData<TConcreteEntity, TRawData>(
 				rawData,
 				entityConfig || valueObjectConfig,
 				config,
