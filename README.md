@@ -9,10 +9,15 @@ Paris is a data management library for webapps, using TypeScript and RxJS to imp
 
 *Package size: ~15.8kb (gzipped)*
 
-1. Paris is a TypeScript library and also requires RxJs and lodash, so you'll need both those packages, if you don't already use them:
+1. Paris is a TypeScript library and also requires RxJS and lodash-es, so you'll need both those packages, if you don't already use them:
 
 	```
-	npm install --save lodash-es rxjs typescript
+	npm install --save lodash-es rxjs typescript object-hash
+	```
+
+    1.1. If you plan to use caching, you'll also need to install `object-hash`:
+	```
+	npm install --save object-hash
 	```
 
 2. Install the Paris NPM package:
