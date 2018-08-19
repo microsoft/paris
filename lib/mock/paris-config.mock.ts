@@ -1,0 +1,3 @@
+interface MockConfigData {
+	version: number
+}

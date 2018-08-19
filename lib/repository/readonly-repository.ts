@@ -26,6 +26,7 @@ import { HttpOptions } from "../services/http.service";
 import { Paris } from "../services/paris";
 import { valueObjectsService } from "../services/value-objects.service";
 import { IReadonlyRepository } from "./repository.interface";
+import {ApiCallBackendConfigInterface} from "../models/api-call-backend-config.interface";
 
 /**
  * A Repository is a service through which all of an Entity's data is fetched, cached and saved back to the backend.
@@ -36,14 +37,14 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 	protected _errorSubject$: Subject<EntityErrorEvent>;
 	error$: Observable<EntityErrorEvent>;
 
+	protected entityBackendConfig:EntityBackendConfig<TEntity, TRawData>;
+
 	constructor(public readonly entity: ModelConfig<TEntity, TRawData>,
-				public entityBackendConfig: EntityBackendConfig<TEntity, TRawData>,
-				protected config: ParisConfig,
 				public entityConstructor: DataEntityConstructor<TEntity>,
-				protected dataStore: DataStoreService,
 				protected paris: Paris) {
 		this._errorSubject$ = new Subject();
 		this.error$ = this._errorSubject$.asObservable();
+		this.entityBackendConfig = entity.entityConstructor.entityConfig;
 	}
 
 	protected _allItems$: Observable<Array<TEntity>>;
@@ -52,11 +53,12 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 	protected _cache: DataCache<TEntity>;
 	protected _allItemsSubject$: Subject<Array<TEntity>>;
 
+
 	protected getBaseUrl(query?: DataQuery): string {
-		if (!this.entityBackendConfig.baseUrl)
+		if (!this.entity.entityConstructor.entityConfig.baseUrl)
 			return null;
 
-		return this.entityBackendConfig.baseUrl instanceof Function ? this.entityBackendConfig.baseUrl(this.config, query) : this.entityBackendConfig.baseUrl;
+		return this.entityBackendConfig.baseUrl instanceof Function ? this.entityBackendConfig.baseUrl(this.paris.config, query) : this.entityBackendConfig.baseUrl;
 	}
 
 	/**
@@ -87,7 +89,7 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 	 * @returns {string}
 	 */
 	get endpointName():string{
-		return this.entityBackendConfig.endpoint instanceof Function ? this.entityBackendConfig.endpoint(this.config) : this.entityBackendConfig.endpoint;
+		return this.entityBackendConfig.endpoint instanceof Function ? this.entityBackendConfig.endpoint(this.paris.config) : this.entityBackendConfig.endpoint;
 	}
 
 	/**
@@ -139,7 +141,7 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 	 * @returns {Observable<TEntity extends ModelBase>}
 	 */
 	createItem(rawData: TRawData, options: DataOptions = { allowCache: true, availability: DataAvailability.available }, query?: DataQuery): Observable<TEntity> {
-		return ReadonlyRepository.getModelData<TEntity>(rawData, this.entity, this.config, this.paris, options, query);
+		return this.paris.modeler.modelEntity<TEntity, TRawData>(rawData, this.entity, options, query);
 	}
 
 	/**
@@ -191,11 +193,11 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 		let endpoint:string;
 
 		if (this.entityBackendConfig.endpoint instanceof Function)
-			endpoint = this.entityBackendConfig.endpoint(this.config, query);
+			endpoint = this.entityBackendConfig.endpoint(this.paris.config, query);
 		else
 			endpoint = `${this.endpointName}${this.entityBackendConfig.allItemsEndpointTrailingSlash !== false && !this.entityBackendConfig.allItemsEndpoint ? '/' : ''}${this.entityBackendConfig.allItemsEndpoint || ''}`;
 
-		const getItem$:Observable<TEntity> = this.dataStore.get(
+		const getItem$:Observable<TEntity> = this.paris.dataStore.get(
 			endpoint,
 			httpOptions,
 			this.getBaseUrl(query),
@@ -267,9 +269,9 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 			);
 		}
 		else {
-			const endpoint:string = this.entityBackendConfig.parseItemQuery ? this.entityBackendConfig.parseItemQuery(itemId, this.entity, this.config, params) : `${this.endpointName}/${itemId}`;
+			const endpoint:string = this.entityBackendConfig.parseItemQuery ? this.entityBackendConfig.parseItemQuery(itemId, this.entity, this.paris.config, params) : `${this.endpointName}/${itemId}`;
 
-			const getItem$:Observable<TEntity> = this.dataStore.get(
+			const getItem$:Observable<TEntity> = this.paris.dataStore.get(
 				endpoint,
 				params && {params: params},
 				this.getBaseUrl({where: params}),
@@ -297,213 +299,7 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 	serializeItem(item:Partial<TEntity>, serializationData?:any): TRawData {
 		ReadonlyRepository.validateItem(item, this.entity);
 
-		return ReadonlyRepository.serializeItem<TEntity, TRawData>(item, this.entity, this.paris, serializationData);
-	}
-
-	/**
-	 * Populates the item dataset with any sub-model. For example, if an ID is found for a property whose type is an entity,
-	 * the property's value will be an instance of that entity, for the ID, not the ID.
-	 * This method does the actual heavy lifting required for modeling an Entity or ValueObject - parses the fields, models sub-models, etc.
-	 *
-	 * @template TEntity The entity to model
-	 * @template TRawData The raw data
-	 * @template TConcreteEntity An optional entity derived from `TEntity` that will be used if `TEntity` uses `modelWith`
-	 * @param {TRawData} rawData
-	 * @param {ModelConfig<TEntity, TRawData>} entity
-	 * @param {ParisConfig} config
-	 * @param {Paris} paris
-	 * @param {DataOptions} [options=defaultDataOptions]
-	 * @param {DataQuery} [query]
-	 * @returns {Observable<TEntity> | Observable<TConcreteEntity>}
-	 */
-	static getModelData<TEntity extends ModelBase, TRawData extends any = any, TConcreteEntity extends TEntity = TEntity>(rawData: TRawData, entity: ModelConfig<TEntity, TRawData>, config: ParisConfig, paris: Paris, options: DataOptions = defaultDataOptions, query?: DataQuery) : TEntity extends TConcreteEntity ? Observable<TEntity> : Observable<TConcreteEntity> {
-		let entityIdProperty: keyof TRawData = entity.idProperty || config.entityIdProperty,
-			modelData: Index = entity instanceof ModelEntity ? {id: rawData[entityIdProperty]} : {},
-			subModels: Array<Observable<{ [index: string]: ModelBase | Array<ModelBase> }>> = [];
-
-		let getModelDataError:Error = new Error(`Failed to create ${entity.singularName}.`);
-
-		if (typeof entity.modelWith === 'function') {
-			const { entityConfig, valueObjectConfig } = entity.modelWith(rawData);
-			return ReadonlyRepository.getModelData<TConcreteEntity, TRawData>(
-				rawData,
-				entityConfig || valueObjectConfig,
-				config,
-				paris,
-				options
-			);
-		}
-
-		entity.fields.forEach((entityField: Field) => {
-			if (entityField.require){
-				let failed:boolean = false;
-
-				if (entityField.require instanceof Function && !entityField.require(rawData, paris.config))
-					failed = true;
-				else if (typeof(entityField.require) === "string") {
-					let rawDataPropertyValue: any = rawData[entityField.require];
-					if (rawDataPropertyValue === undefined || rawDataPropertyValue === null)
-						failed = true;
-				}
-
-				if (failed){
-					modelData[entityField.id] = null;
-					return;
-				}
-			}
-
-			let propertyValue: any;
-			if (entityField.data) {
-				if (entityField.data instanceof Array) {
-					for (let i = 0, path:string; i < entityField.data.length && propertyValue === undefined; i++) {
-						path = entityField.data[i];
-						let value:any = path === FIELD_DATA_SELF ? rawData : get(rawData, path);
-						if (value !== undefined && value !== null)
-							propertyValue = value;
-					}
-				}
-				else
-					propertyValue = entityField.data === FIELD_DATA_SELF ? rawData : get(rawData, entityField.data);
-			}
-			else
-				propertyValue = rawData[entityField.id];
-
-			if (entityField.parse) {
-				try {
-					propertyValue = entityField.parse(propertyValue, rawData, query);
-				}
-				catch(e){
-					getModelDataError.message = getModelDataError.message + ` Error parsing field ${entityField.id}: ` + e.message;
-					throw getModelDataError;
-				}
-			}
-			if (propertyValue === undefined || propertyValue === null) {
-				let fieldRepository:ReadonlyRepository<EntityModelBase> = paris.getRepository(<DataEntityType>entityField.type);
-				let fieldValueObjectType:EntityConfigBase = !fieldRepository && valueObjectsService.getEntityByType(<DataEntityType>entityField.type);
-
-				let defaultValue:any = fieldRepository && fieldRepository.entity.getDefaultValue()
-					|| fieldValueObjectType && fieldValueObjectType.getDefaultValue()
-					|| (entityField.isArray ? [] : entityField.defaultValue !== undefined && entityField.defaultValue !== null ? entityField.defaultValue : null);
-
-				if ((defaultValue === undefined || defaultValue === null) && entityField.required) {
-					getModelDataError.message = getModelDataError.message + ` Field ${entityField.id} is required but it's ${propertyValue}.`;
-					throw getModelDataError;
-				}
-				modelData[entityField.id] = defaultValue;
-			}
-			else {
-				const getPropertyEntityValue$ = ReadonlyRepository.getSubModel(entityField, propertyValue, paris, config, options);
-				if (getPropertyEntityValue$)
-					subModels.push(getPropertyEntityValue$);
-				else {
-					modelData[entityField.id] = entityField.isArray
-						? propertyValue
-							? propertyValue.map((elementValue: any) => DataTransformersService.parse(entityField.type, elementValue))
-							: []
-						:  DataTransformersService.parse(entityField.type, propertyValue);
-				}
-			}
-		});
-
-		let model$:Observable<TEntity>;
-
-		if (subModels.length) {
-			model$ = combineLatest(subModels).pipe(
-				map((propertyEntityValues: Array<ModelPropertyValue>) => {
-					propertyEntityValues.forEach((propertyEntityValue: { [index: string]: any }) => Object.assign(modelData, propertyEntityValue));
-
-					let model: TEntity;
-
-					try {
-						model = new entity.entityConstructor(modelData, rawData);
-					} catch (e) {
-						getModelDataError.message = getModelDataError.message + " Error: " + e.message;
-						throw getModelDataError;
-					}
-
-					propertyEntityValues.forEach((modelPropertyValue: ModelPropertyValue) => {
-						for (let p in modelPropertyValue) {
-							let modelValue: ModelBase | Array<ModelBase> = modelPropertyValue[p];
-
-							if (modelValue instanceof Array)
-								modelValue.forEach((modelValueItem: ModelBase) => {
-									if (!Object.isFrozen(modelValueItem))
-										modelValueItem.$parent = model;
-								});
-							else if (!Object.isFrozen(modelValue))
-								modelValue.$parent = model;
-						}
-					});
-
-					return model;
-				})
-			);
-		}
-		else {
-			let model: TEntity;
-
-			try {
-				model = new entity.entityConstructor(modelData, rawData);
-			} catch (e) {
-				getModelDataError.message = getModelDataError.message + " Error: " + e.message;
-				throw getModelDataError;
-			}
-
-			model$ = of(model);
-		}
-
-		return entity.readonly ? model$.pipe(map(model => Object.freeze(model))) : model$;
-	}
-
-	private static getSubModel(entityField:Field, value:any, paris:Paris, config:ParisConfig, options: DataOptions = defaultDataOptions):Observable<ModelPropertyValue>{
-		let getPropertyEntityValue$: Observable<ModelPropertyValue>;
-		let mapValueToEntityFieldIndex: (value: ModelBase | Array<ModelBase>) => ModelPropertyValue = ReadonlyRepository.mapToEntityFieldIndex.bind(null, entityField.id);
-
-		let repository:ReadonlyRepository<EntityModelBase> = paris.getRepository(<DataEntityType>entityField.type);
-		let valueObjectType:EntityConfigBase = !repository && valueObjectsService.getEntityByType(<DataEntityType>entityField.type);
-
-		if (!repository && !valueObjectType)
-			return null;
-
-		let tempGetPropertyEntityValue$:Observable<ModelBase | Array<ModelBase>>;
-
-		const getItem = repository
-			? ReadonlyRepository.getEntityItem.bind(null, repository)
-			: ReadonlyRepository.getValueObjectItem.bind(null, valueObjectType);
-
-		if (entityField.isArray) {
-			if (value.length) {
-				let propertyMembers$: Array<Observable<ModelPropertyValue>> = value.map((memberData: any) => getItem(memberData, options, paris, config));
-				tempGetPropertyEntityValue$ = combineLatest(propertyMembers$);
-			}
-			else
-				tempGetPropertyEntityValue$ = of([]);
-		}
-		else {
-			tempGetPropertyEntityValue$ = getItem(value, options, paris, config);
-		}
-
-		getPropertyEntityValue$ = tempGetPropertyEntityValue$.pipe(map(mapValueToEntityFieldIndex));
-
-		return getPropertyEntityValue$;
-	}
-
-	private static mapToEntityFieldIndex(entityFieldId: string, value: ModelBase | Array<ModelBase>): ModelPropertyValue {
-		let data: ModelPropertyValue = {};
-		data[entityFieldId] = value;
-		return data;
-	}
-
-	private static getEntityItem<U extends EntityModelBase>(repository: ReadonlyRepository<U>, data: any, options: DataOptions = defaultDataOptions): Observable<U> {
-		return Object(data) === data ? repository.createItem(data, options) : repository.getItemById(data, options);
-	}
-
-	private static getValueObjectItem<U extends ModelBase>(valueObjectType: EntityConfigBase, data: any, options: DataOptions = defaultDataOptions, paris: Paris, config?: ParisConfig): Observable<U> {
-		// If the value object is one of a list of values, just set it to the model
-		if (valueObjectType.values)
-			return of(valueObjectType.getValueById(data) || valueObjectType.getDefaultValue() || null);
-
-		return ReadonlyRepository.getModelData(data, valueObjectType, config, paris, options);
+		return this.paris.modeler.serializeModel<TEntity, TRawData>(item, this.entity, serializationData);
 	}
 
 	/**
@@ -524,55 +320,6 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 		return true;
 	}
 
-	/**
-	 * Serializes an an entity into raw data, so it can be sent back to backend.
-	 * @param item
-	 * @returns {Index}
-	 */
-	static serializeItem<TEntity extends ModelBase, TRawData = object>(item:Partial<TEntity>, entity:ModelConfig<TEntity, TRawData>, paris:Paris, serializationData?:any):TRawData {
-		ReadonlyRepository.validateItem(item, entity);
-
-		let modelData: TRawData = <TRawData>{};
-
-		entity.fields.forEach((entityField:Field) => {
-			if (entityField.serialize !== false) {
-				let itemFieldValue: any = (<any>item)[entityField.id],
-					fieldRepository = paris.getRepository(<DataEntityType>entityField.type),
-					fieldValueObjectType: EntityConfigBase = !fieldRepository && valueObjectsService.getEntityByType(<DataEntityType>entityField.type),
-					isNilValue = itemFieldValue === undefined || itemFieldValue === null;
-
-				let modelValue: any;
-
-				if (entityField.serialize)
-					modelValue = entityField.serialize(itemFieldValue, serializationData);
-				else if (entityField.isArray) {
-					if (itemFieldValue) {
-						if (fieldRepository || fieldValueObjectType)
-							modelValue = itemFieldValue.map((element: any) => ReadonlyRepository.serializeItem(element, fieldRepository ? fieldRepository.entity : fieldValueObjectType, paris, serializationData));
-						else modelValue = itemFieldValue.map((item: any) => DataTransformersService.serialize(entityField.arrayOf, item));
-					} else modelValue = null;
-				}
-				else if (fieldRepository)
-					modelValue = isNilValue ? fieldRepository.entity.getDefaultValue() || null : itemFieldValue.id;
-				else if (fieldValueObjectType)
-					modelValue = isNilValue ? fieldValueObjectType.getDefaultValue() || null : ReadonlyRepository.serializeItem(itemFieldValue, fieldValueObjectType, paris, serializationData);
-				else
-					modelValue = DataTransformersService.serialize(entityField.type, itemFieldValue);
-
-				let modelProperty: keyof TRawData = <keyof TRawData>(entityField.data
-					? entityField.data instanceof Array ? entityField.data[0] : entityField.data
-					: entityField.id);
-
-				modelData[modelProperty] = modelValue;
-			}
-		});
-
-		if (entity.serializeItem)
-			modelData = entity.serializeItem(item, modelData, entity, paris.config, serializationData);
-
-		return modelData;
-	}
-
 	protected emitEntityHttpErrorEvent(err: AjaxError) {
 		this._errorSubject$.next({
 			entity: this.entityConstructor,
@@ -581,5 +328,3 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 		});
 	}
 }
-
-type ModelPropertyValue = { [property: string]: ModelBase | Array<ModelBase> };

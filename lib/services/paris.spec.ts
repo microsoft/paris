@@ -224,15 +224,24 @@ describe('Paris main', () => {
 		it('should call Http.request with correct params', () => {});
 	});
 
-	xdescribe('createItem', () => {
+	describe('createItem', () => {
+		let createItem$:Observable<Todo>;
+
 		beforeEach(() => {
 			paris = new Paris();
+			createItem$ = paris.createItem<Todo>(Todo, { id: 1, text: 'test' });
 		});
-		it('should call ReadonlyRepository.getModelData with correct params', () => {});
 
-		it('should call ReadonlyRepository.getModelData with correct default params', () => {});
+		it('should return an Observable', () => {
+			expect(createItem$).toBeInstanceOf(Observable);
+		});
 
-		it('should return an Observable', () => {});
+		it('should create a Todo item', done => {
+			createItem$.subscribe(todo => {
+				expect(todo).toBeInstanceOf(Todo);
+				done();
+			});
+		});
 	});
 
 	xdescribe('queryForItem', () => {

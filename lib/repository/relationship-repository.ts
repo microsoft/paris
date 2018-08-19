@@ -32,10 +32,8 @@ export class RelationshipRepository<TSource extends ModelBase, TData extends Mod
 	constructor(public sourceEntityType: DataEntityConstructor<TSource>,
 				public dataEntityType: DataEntityConstructor<TData>,
 				relationTypes:Array<RelationshipType>,
-				config: ParisConfig,
-				dataStore: DataStoreService,
 				paris: Paris) {
-		super((dataEntityType.entityConfig || dataEntityType.valueObjectConfig), dataEntityType.entityConfig, config, dataEntityType, dataStore, paris);
+		super((dataEntityType.entityConfig || dataEntityType.valueObjectConfig), dataEntityType, paris);
 
 		if (<Function>sourceEntityType === <Function>dataEntityType)
 			throw new Error("RelationshipRepository doesn't support a single entity type.");

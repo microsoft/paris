@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import { DataSet } from '../dataset/dataset';
-import { parseDataSet } from './data-to-model';
+import { Modeler } from './modeler';
 
 const rawDataSet: RawDataSet = {
 	results: [
@@ -22,7 +22,7 @@ describe('Raw data -> model', () => {
 		let dataSet: DataSet<SimpleEntity>;
 
 		beforeAll(() => {
-			dataSet = parseDataSet<SimpleEntity, RawDataSet>(
+			dataSet = Modeler.parseDataSet<SimpleEntity, RawDataSet>(
 				rawDataSet,
 				'results',
 				parseRawDataSet

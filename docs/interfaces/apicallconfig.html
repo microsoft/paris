@@ -124,9 +124,16 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="apicallbackendconfiginterface.html">ApiCallBackendConfigInterface</a>.<a href="apicallbackendconfiginterface.html#baseurl">baseUrl</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/models/api-call-backend-config.interface.ts#L9">models/api-call-backend-config.interface.ts:9</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/c462eb3/lib/models/api-call-backend-config.interface.ts#L23">models/api-call-backend-config.interface.ts:23</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The domain to use for all calls for this Entity/ApiCall. Used as a prefix for all HTTP requests.
+								Set to an empty string to avoid this altogether (in case the data arrives from an external URL, for example).
+							If not set and not an empty string, Paris will use config.apiRoot instead.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
 					<a name="cache" class="tsd-anchor"></a>
@@ -135,9 +142,15 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="apicallbackendconfiginterface.html">ApiCallBackendConfigInterface</a>.<a href="apicallbackendconfiginterface.html#cache">cache</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/models/api-call-backend-config.interface.ts#L8">models/api-call-backend-config.interface.ts:8</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/c462eb3/lib/models/api-call-backend-config.interface.ts#L16">models/api-call-backend-config.interface.ts:16</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>If <code>cache</code> is specified, entities will be cached according to the cache settings.
+							Note: cache refers to individual items (such as received from <code>getItemById</code> or with an ApiCall), not queries.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
 					<a name="endpoint" class="tsd-anchor"></a>
@@ -146,9 +159,14 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="apicallbackendconfiginterface.html">ApiCallBackendConfigInterface</a>.<a href="apicallbackendconfiginterface.html#endpoint">endpoint</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/models/api-call-backend-config.interface.ts#L7">models/api-call-backend-config.interface.ts:7</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/c462eb3/lib/models/api-call-backend-config.interface.ts#L10">models/api-call-backend-config.interface.ts:10</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The URL to use for HTTP requests.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
 					<a name="fixeddata" class="tsd-anchor"></a>
@@ -157,9 +175,14 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="apicallbackendconfiginterface.html">ApiCallBackendConfigInterface</a>.<a href="apicallbackendconfiginterface.html#fixeddata">fixedData</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/models/api-call-backend-config.interface.ts#L10">models/api-call-backend-config.interface.ts:10</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/c462eb3/lib/models/api-call-backend-config.interface.ts#L28">models/api-call-backend-config.interface.ts:28</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Query params to always send when requesting data.</p>
+						</div>
+					</div>
 					<div class="tsd-type-declaration">
 						<h4>Type declaration</h4>
 						<ul class="tsd-parameters">
@@ -175,7 +198,7 @@
 					<div class="tsd-signature tsd-kind-icon">method<span class="tsd-signature-symbol">:</span> <a href="../globals.html#requestmethod" class="tsd-signature-type">RequestMethod</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/models/api-call.model.ts#L17">models/api-call.model.ts:17</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/c462eb3/lib/models/api-call.model.ts#L17">models/api-call.model.ts:17</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -185,7 +208,7 @@
 					<div class="tsd-signature tsd-kind-icon">name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/models/api-call.model.ts#L14">models/api-call.model.ts:14</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/c462eb3/lib/models/api-call.model.ts#L14">models/api-call.model.ts:14</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -195,7 +218,7 @@
 					<div class="tsd-signature tsd-kind-icon">parse<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/models/api-call.model.ts#L16">models/api-call.model.ts:16</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/c462eb3/lib/models/api-call.model.ts#L16">models/api-call.model.ts:16</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -230,9 +253,22 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="apicallbackendconfiginterface.html">ApiCallBackendConfigInterface</a>.<a href="apicallbackendconfiginterface.html#parsedata">parseData</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/models/api-call-backend-config.interface.ts#L12">models/api-call-backend-config.interface.ts:12</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/c462eb3/lib/models/api-call-backend-config.interface.ts#L58">models/api-call-backend-config.interface.ts:58</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>A function that if specifies, parses whatever is received from the API call, before Paris starts handling it.</p>
+						</div>
+						<dl class="tsd-comment-tags">
+							<dt>param</dt>
+							<dd></dd>
+							<dt>param</dt>
+							<dd></dd>
+							<dt>param</dt>
+							<dd></dd>
+						</dl>
+					</div>
 					<div class="tsd-type-declaration">
 						<h4>Type declaration</h4>
 						<ul class="tsd-parameters">
@@ -267,7 +303,7 @@
 					<div class="tsd-signature tsd-kind-icon">parse<wbr>Query<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/models/api-call.model.ts#L15">models/api-call.model.ts:15</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/c462eb3/lib/models/api-call.model.ts#L15">models/api-call.model.ts:15</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -299,9 +335,33 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="apicallbackendconfiginterface.html">ApiCallBackendConfigInterface</a>.<a href="apicallbackendconfiginterface.html#separatearrayparams">separateArrayParams</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/models/api-call-backend-config.interface.ts#L11">models/api-call-backend-config.interface.ts:11</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/c462eb3/lib/models/api-call-backend-config.interface.ts#L50">models/api-call-backend-config.interface.ts:50</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>If <code>true</code>, a value that&#39;s specified in DataQuery.params and is an array will result in multiple params in the HTTP request</p>
+						</div>
+						<dl class="tsd-comment-tags">
+							<dt>example</dt>
+							<dd><p><caption>Using separateArrayParams</caption></p>
+								<pre><code class="lang-typescript"><span class="hljs-meta">@Entity</span>({
+    singularName: <span class="hljs-string">'My entity'</span>,
+    pluralName: <span class="hljs-string">'My entities'</span>,
+    endpoint: <span class="hljs-string">'myentity'</span>,
+    separateArrayParams: <span class="hljs-literal">true</span>
+})
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> MyEntity <span class="hljs-keyword">extends</span> EntityModelBase{}
+
+paris.query(MyEntity, { where: { foo: [<span class="hljs-string">'bar'</span>, <span class="hljs-string">'lish'</span>] }})
+    .subscribe(<span class="hljs-function">(<span class="hljs-params">dataSet:DataSet&lt;MyEntity&gt;</span>) =&gt;</span> <span class="hljs-built_in">console</span>.log(dataSet));
+</code></pre>
+								<p>In this example, the API call will be to (config.apiRoot)/myentity?foo=bar&amp;foo=lish.
+									If separateArrayParams wasn&#39;t specified as <code>true</code>, the api call would have been to:
+								(config.apiRoot)/myentity?foo=bar,lish</p>
+							</dd>
+						</dl>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="timeout" class="tsd-anchor"></a>
@@ -309,7 +369,7 @@
 					<div class="tsd-signature tsd-kind-icon">timeout<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/models/api-call.model.ts#L18">models/api-call.model.ts:18</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/c462eb3/lib/models/api-call.model.ts#L18">models/api-call.model.ts:18</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -319,7 +379,7 @@
 					<div class="tsd-signature tsd-kind-icon">type<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/models/api-call.model.ts#L19">models/api-call.model.ts:19</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/c462eb3/lib/models/api-call.model.ts#L19">models/api-call.model.ts:19</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -334,7 +394,7 @@
 									<li class="tsd-description">
 										<aside class="tsd-sources">
 											<ul>
-												<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/models/api-call.model.ts#L19">models/api-call.model.ts:19</a></li>
+												<li>Defined in <a href="https://github.com/Microsoft/paris/blob/c462eb3/lib/models/api-call.model.ts#L19">models/api-call.model.ts:19</a></li>
 											</ul>
 										</aside>
 										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">TResult</span></h4>

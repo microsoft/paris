@@ -30,11 +30,9 @@ export class Repository<TEntity extends ModelBase> extends ReadonlyRepository<TE
 	private _removeSubject$: Subject<RemoveEntitiesEvent>;
 
 	constructor(entity: EntityConfig<TEntity>,
-				config: ParisConfig,
 				entityConstructor: DataEntityConstructor<TEntity>,
-				dataStore: DataStoreService,
 				paris: Paris) {
-		super(entity, entity, config, entityConstructor, dataStore, paris);
+		super(entity, entityConstructor, paris);
 
 		const getAllItems$: Observable<Array<TEntity>> = defer(() => this.query().pipe(map((dataSet:DataSet<TEntity>) => dataSet.items)));
 
@@ -60,9 +58,9 @@ export class Repository<TEntity extends ModelBase> extends ReadonlyRepository<TE
 		try {
 			let isNewItem:boolean = item.id === undefined;
 			let saveData: Index = this.serializeItem(item, serializationData);
-			let endpoint:string = this.entityBackendConfig.parseSaveQuery ? this.entityBackendConfig.parseSaveQuery(item, this.entity, this.config, options) : `${this.endpointName}/${item.id || ''}`;
+			let endpoint:string = this.entityBackendConfig.parseSaveQuery ? this.entityBackendConfig.parseSaveQuery(item, this.entity, this.paris.config, options) : `${this.endpointName}/${item.id || ''}`;
 
-			return this.dataStore.save(endpoint, this.getSaveMethod(item), Object.assign({}, options, {data: saveData}), this.getBaseUrl(options && {where: options.params}))
+			return this.paris.dataStore.save(endpoint, this.getSaveMethod(item), Object.assign({}, options, {data: saveData}), this.getBaseUrl(options && {where: options.params}))
 				.pipe(
 					catchError((err: AjaxError) => {
 						this.emitEntityHttpErrorEvent(err);
@@ -87,7 +85,7 @@ export class Repository<TEntity extends ModelBase> extends ReadonlyRepository<TE
 
 	private getSaveMethod(item:Partial<TEntity>):RequestMethod{
 		return this.entityBackendConfig.saveMethod
-			? this.entityBackendConfig.saveMethod instanceof Function ? this.entityBackendConfig.saveMethod(item, this.config) : this.entityBackendConfig.saveMethod
+			? this.entityBackendConfig.saveMethod instanceof Function ? this.entityBackendConfig.saveMethod(item, this.paris.config) : this.entityBackendConfig.saveMethod
 			: item.id === undefined ? "POST" : "PUT";
 	}
 
@@ -141,10 +139,10 @@ export class Repository<TEntity extends ModelBase> extends ReadonlyRepository<TE
 	 */
 	private doSaveItems(itemsData:Array<any>, method:"PUT" | "POST", options?:HttpOptions):Observable<Array<TEntity>>{
 		const saveHttpOptions:HttpOptions = this.entity.parseSaveItemsQuery
-			? this.entity.parseSaveItemsQuery(itemsData, options, this.entity, this.config)
+			? this.entity.parseSaveItemsQuery(itemsData, options, this.entity, this.paris.config)
 			: Object.assign({}, options, {data: {items: itemsData}});
 
-		return this.dataStore.save(`${this.endpointName}/`, method, saveHttpOptions, this.getBaseUrl(options && {where: options.params}))
+		return this.paris.dataStore.save(`${this.endpointName}/`, method, saveHttpOptions, this.getBaseUrl(options && {where: options.params}))
 			.pipe(
 				catchError((err: AjaxError) => {
 					this.emitEntityHttpErrorEvent(err);
@@ -182,9 +180,9 @@ export class Repository<TEntity extends ModelBase> extends ReadonlyRepository<TE
 			if (this.entityBackendConfig.getRemoveData)
 				Object.assign(httpOptions.data, this.entityBackendConfig.getRemoveData([item]));
 
-			let endpoint:string = this.entityBackendConfig.parseRemoveQuery ? this.entityBackendConfig.parseRemoveQuery([item], this.entity, this.config) : `${this.endpointName}/${item.id || ''}`;
+			let endpoint:string = this.entityBackendConfig.parseRemoveQuery ? this.entityBackendConfig.parseRemoveQuery([item], this.entity, this.paris.config) : `${this.endpointName}/${item.id || ''}`;
 
-			return this.dataStore.delete(endpoint, httpOptions, this.getBaseUrl(options && {where: options.params}))
+			return this.paris.dataStore.delete(endpoint, httpOptions, this.getBaseUrl(options && {where: options.params}))
 				.pipe(
 					catchError((err: AjaxError) => {
 						this.emitEntityHttpErrorEvent(err);
@@ -238,9 +236,9 @@ export class Repository<TEntity extends ModelBase> extends ReadonlyRepository<TE
 				: { ids: items.map(item => item.id) }
 			);
 
-			let endpoint:string = this.entityBackendConfig.parseRemoveQuery ? this.entityBackendConfig.parseRemoveQuery(items, this.entity, this.config) : this.endpointName;
+			let endpoint:string = this.entityBackendConfig.parseRemoveQuery ? this.entityBackendConfig.parseRemoveQuery(items, this.entity, this.paris.config) : this.endpointName;
 
-			return this.dataStore.delete(endpoint, httpOptions, this.getBaseUrl(options && {where: options.params}))
+			return this.paris.dataStore.delete(endpoint, httpOptions, this.getBaseUrl(options && {where: options.params}))
 				.pipe(
 					catchError((err: AjaxError) => {
 						this.emitEntityHttpErrorEvent(err);

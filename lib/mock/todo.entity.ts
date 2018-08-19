@@ -1,6 +1,7 @@
 import {EntityModelBase} from "../models/entity-model.base";
 import {Entity} from "../entity/entity.decorator";
 import {EntityField} from "../entity/entity-field.decorator";
+import {Tag} from "./tag.value-object";
 
 @Entity({
 	singularName: "Todo item",
@@ -14,4 +15,7 @@ export class Todo extends EntityModelBase<number>{
 
 	@EntityField()
 	time:Date;
+
+	@EntityField({ arrayOf: Tag })
+	tags:Array<Tag>;
 }

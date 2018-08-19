@@ -22,7 +22,7 @@ import {HttpOptions, RequestMethod, UrlParams} from "./http.service";
 import {EntityErrorEvent, EntityErrorTypes} from "../events/entity-error.event";
 import {ApiCallType} from "../models/api-call.model";
 import {ApiCallBackendConfigInterface} from "../models/api-call-backend-config.interface";
-import {modelArray, rawDataToDataSet} from "../repository/data-to-model";
+import {Modeler} from "../repository/modeler";
 import {catchError, map, mergeMap, switchMap, tap} from "rxjs/operators";
 import {DataTransformersService} from "./data-transformers.service";
 import {DataCache, DataCacheSettings} from "./cache";
@@ -30,36 +30,39 @@ import {EntityModelBase} from "../models/entity-model.base";
 import {EntityId} from "../models/entity-id.type";
 import {clone} from "lodash-es";
 
-export class Paris{
-	private repositories:Map<DataEntityType, IRepository<ModelBase>> = new Map;
-	private relationshipRepositories:Map<string, IRelationshipRepository<ModelBase>> = new Map;
+export class Paris<TConfigData = any> {
+	private readonly repositories:Map<DataEntityType, IRepository<ModelBase>> = new Map;
+	private readonly relationshipRepositories:Map<string, IRelationshipRepository<ModelBase>> = new Map;
+	readonly modeler:Modeler;
+
 	readonly dataStore:DataStoreService;
-	readonly config:ParisConfig;
+	readonly config:ParisConfig<TConfigData>;
 
 	/**
 	 * Observable that fires whenever an {@link Entity} is saved
 	 */
-	save$:Observable<SaveEntityEvent>;
-	private _saveSubject$:Subject<SaveEntityEvent> = new Subject;
+	readonly save$:Observable<SaveEntityEvent>;
+	private readonly _saveSubject$:Subject<SaveEntityEvent> = new Subject;
 
 	/**
 	 * Observable that fires whenever an {@link Entity} is removed
 	 */
-	remove$:Observable<RemoveEntitiesEvent>;
-	private _removeSubject$:Subject<RemoveEntitiesEvent> = new Subject;
+	readonly remove$:Observable<RemoveEntitiesEvent>;
+	private readonly _removeSubject$:Subject<RemoveEntitiesEvent> = new Subject;
 
 	/**
 	 * Observable that fires whenever there is an error in Paris.
 	 * Relevant both to errors parsing data and to HTTP errors
 	 */
-	error$:Observable<EntityErrorEvent>;
-	private _errorSubject$:Subject<EntityErrorEvent> = new Subject;
+	readonly error$:Observable<EntityErrorEvent>;
+	private readonly _errorSubject$:Subject<EntityErrorEvent> = new Subject;
 
-	private apiCallsCache:Map<ApiCallType, DataCache> = new Map<ApiCallType, DataCache>();
+	private readonly apiCallsCache:Map<ApiCallType, DataCache> = new Map<ApiCallType, DataCache>();
 
-	constructor(config?:ParisConfig){
+	constructor(config?:ParisConfig<TConfigData>){
 		this.config = Object.freeze(Object.assign({}, defaultConfig, config));
 		this.dataStore = new DataStoreService(this.config);
+		this.modeler = new Modeler(this);
 
 		this.save$ = this._saveSubject$.asObservable();
 		this.remove$ = this._removeSubject$.asObservable();
@@ -77,7 +80,7 @@ export class Paris{
 			if (!entityConfig)
 				return null;
 
-			repository = new Repository<TEntity>(entityConfig, this.config, entityConstructor, this.dataStore, this);
+			repository = new Repository<TEntity>(entityConfig, entityConstructor, this);
 			this.repositories.set(entityConstructor, repository);
 
 			// If the entity has an endpoint, it means it connects to the backend, so subscribe to save/delete events to enable global events:
@@ -105,7 +108,7 @@ export class Paris{
 
 		let repository:RelationshipRepository<T, U> = <RelationshipRepository<T, U>>this.relationshipRepositories.get(relationshipId);
 		if (!repository) {
-			repository = new RelationshipRepository<T, U>(relationship.sourceEntityType, relationship.dataEntityType, relationship.allowedTypes, this.config, this.dataStore, this);
+			repository = new RelationshipRepository<T, U>(relationship.sourceEntityType, relationship.dataEntityType, relationship.allowedTypes, this);
 			this.relationshipRepositories.set(relationshipId, repository);
 		}
 
@@ -178,7 +181,7 @@ export class Paris{
 			apiCall$ = apiCall$.pipe(
 				mergeMap<any, TResult | Array<TResult>>((data: any) => {
 						const createItem$: Observable<TResult | Array<TResult>> = data instanceof Array
-							? modelArray<TResult>(data, apiCallType.config.type, this, dataOptions)
+							? this.modeler.modelArray<TResult>(data, apiCallType.config.type, dataOptions)
 							: this.createItem<TResult>(apiCallType.config.type, data, dataOptions);
 						return createItem$.pipe(
 							tap(null,
@@ -333,11 +336,10 @@ export class Paris{
 					return throwError(error.originalError || error)
 				}),
 			mergeMap((rawDataSet: TEntity) => {
-				return rawDataToDataSet<TEntity>(
+				return this.modeler.rawDataToDataSet<TEntity>(
 					rawDataSet,
 					entityConstructor,
 					backendConfig.allItemsProperty || this.config.allItemsProperty,
-					this,
 					dataOptions,
 					query
 				).pipe(
@@ -364,7 +366,7 @@ export class Paris{
 	 * @param {DataQuery} query
 	 */
 	createItem<TEntity extends ModelBase, TRawData extends any = object>(entityConstructor:DataEntityConstructor<TEntity>, data:TRawData, dataOptions: DataOptions = defaultDataOptions, query?:DataQuery):Observable<TEntity>{
-		return ReadonlyRepository.getModelData<TEntity, TRawData>(data, entityConstructor.entityConfig || entityConstructor.valueObjectConfig, this.config, this, dataOptions, query);
+		return this.modeler.modelEntity<TEntity, TRawData>(data, entityConstructor.entityConfig || entityConstructor.valueObjectConfig, dataOptions, query);
 	}
 
 	/**
