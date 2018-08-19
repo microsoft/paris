@@ -1,6 +1,6 @@
 import 'reflect-metadata';
-import { DataSet } from '../dataset/dataset';
-import { Modeler } from './modeler';
+import {DataSet} from '../dataset/dataset';
+import {Modeler} from './modeler';
 
 const rawDataSet: RawDataSet = {
 	results: [

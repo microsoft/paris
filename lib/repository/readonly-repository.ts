@@ -1,32 +1,26 @@
-import { clone, findIndex, get } from "lodash-es";
-import { combineLatest, merge, Observable, of, Subject } from "rxjs";
-import { AjaxError } from "rxjs/ajax";
-import { catchError, map, mergeMap, tap } from "rxjs/operators";
-import { ParisConfig } from "../config/paris-config";
-import { DataAvailability } from "../dataset/data-availability.enum";
-import { DataQuery } from "../dataset/data-query";
-import { DataOptions, defaultDataOptions } from "../dataset/data.options";
-import { DataSet } from "../dataset/dataset";
-import { queryToHttpOptions } from "../dataset/query-to-http";
-import { DataEntityConstructor, DataEntityType } from "../entity/data-entity.base";
-import { EntityConfigBase, EntityGetMethod, ModelConfig } from "../entity/entity-config.base";
-import { Field } from "../entity/entity-field";
-import { FIELD_DATA_SELF } from "../entity/entity-field.config";
-import { EntityBackendConfig, ModelEntity } from "../entity/entity.config";
-import { EntityErrorEvent, EntityErrorTypes } from "../events/entity-error.event";
-import { Index } from "../models";
-import { EntityId } from "../models/entity-id.type";
-import { EntityModelBase } from "../models/entity-model.base";
-import { ModelBase } from "../models/model.base";
-import { DataCache } from "../services/cache";
-import { DataStoreService } from "../services/data-store.service";
-import { DataTransformersService } from "../services/data-transformers.service";
-import { ErrorsService } from "../services/errors.service";
-import { HttpOptions } from "../services/http.service";
-import { Paris } from "../services/paris";
-import { valueObjectsService } from "../services/value-objects.service";
-import { IReadonlyRepository } from "./repository.interface";
-import {ApiCallBackendConfigInterface} from "../models/api-call-backend-config.interface";
+import {clone, findIndex} from "lodash-es";
+import {merge, Observable, of, Subject} from "rxjs";
+import {AjaxError} from "rxjs/ajax";
+import {catchError, map, mergeMap, tap} from "rxjs/operators";
+import {DataAvailability} from "../dataset/data-availability.enum";
+import {DataQuery} from "../dataset/data-query";
+import {DataOptions, defaultDataOptions} from "../dataset/data.options";
+import {DataSet} from "../dataset/dataset";
+import {queryToHttpOptions} from "../dataset/query-to-http";
+import {DataEntityConstructor} from "../entity/data-entity.base";
+import {EntityConfigBase, EntityGetMethod, ModelConfig} from "../entity/entity-config.base";
+import {Field} from "../entity/entity-field";
+import {EntityBackendConfig} from "../entity/entity.config";
+import {EntityErrorEvent, EntityErrorTypes} from "../events/entity-error.event";
+import {Index} from "../models";
+import {EntityId} from "../models/entity-id.type";
+import {EntityModelBase} from "../models/entity-model.base";
+import {ModelBase} from "../models/model.base";
+import {DataCache} from "../services/cache";
+import {ErrorsService} from "../services/errors.service";
+import {HttpOptions} from "../services/http.service";
+import {Paris} from "../services/paris";
+import {IReadonlyRepository} from "./repository.interface";
 
 /**
  * A Repository is a service through which all of an Entity's data is fetched, cached and saved back to the backend.
@@ -44,7 +38,7 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 				protected paris: Paris) {
 		this._errorSubject$ = new Subject();
 		this.error$ = this._errorSubject$.asObservable();
-		this.entityBackendConfig = entity.entityConstructor.entityConfig;
+		this.entityBackendConfig = entity.entityConstructor.entityConfig || entity.entityConstructor.valueObjectConfig;
 	}
 
 	protected _allItems$: Observable<Array<TEntity>>;

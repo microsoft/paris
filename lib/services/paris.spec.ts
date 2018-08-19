@@ -1,11 +1,11 @@
-import { Observable, of } from 'rxjs';
-import { DataOptions, defaultDataOptions } from '../dataset/data.options';
-import { DataEntityType, DataQuery } from '../main';
-import { CreateTodoListApiCall } from '../mock/create-new-list.api-call';
-import { Todo } from '../mock/todo.entity';
-import { Repository } from '../repository/repository';
-import { Http } from './http.service';
-import { Paris } from './paris';
+import {Observable, of} from 'rxjs';
+import {DataOptions, defaultDataOptions} from '../dataset/data.options';
+import {DataEntityType, DataQuery} from '../main';
+import {CreateTodoListApiCall} from '../mock/create-new-list.api-call';
+import {Todo} from '../mock/todo.entity';
+import {Repository} from '../repository/repository';
+import {Http} from './http.service';
+import {Paris} from './paris';
 
 describe('Paris main', () => {
 	let paris: Paris;

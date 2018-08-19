@@ -4,6 +4,9 @@ import {EntityConfigBase} from "./entity-config.base";
 import {ModelBase} from "../models/model.base";
 import {EntityId} from "../models/entity-id.type";
 
+/**
+ *
+ */
 export interface DataEntityConstructor<TEntity extends ModelBase, TRawData = any, TId extends EntityId = string, TDataSet = any> extends DataEntityType<TEntity, TRawData, TId, TDataSet>{
 	new(data?:any, rawData?:TRawData): TEntity
 }

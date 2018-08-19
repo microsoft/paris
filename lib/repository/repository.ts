@@ -2,8 +2,6 @@ import {EntityConfig} from "../entity/entity.config";
 import {DataEntityConstructor} from "../entity/data-entity.base";
 import {combineLatest, defer, merge, Observable, of, Subject, throwError} from "rxjs";
 import {IRepository} from "./repository.interface";
-import {DataStoreService} from "../services/data-store.service";
-import {ParisConfig} from "../config/paris-config";
 import {Index} from "../models/index";
 import {ModelBase} from "../models/model.base";
 import {EntityModelBase} from "../models/entity-model.base";
@@ -15,7 +13,7 @@ import {ReadonlyRepository} from "./readonly-repository";
 import {AjaxError} from "rxjs/ajax";
 import {catchError, map, mergeMap, tap} from "rxjs/operators";
 import {DataSet} from "../dataset/dataset";
-import {flatMap, findIndex} from "lodash-es";
+import {findIndex, flatMap} from "lodash-es";
 
 /**
  * A Repository is a service through which all of an Entity's data is fetched, cached and saved back to the backend.

@@ -1,11 +1,11 @@
-import { ParisConfig } from "../config/paris-config";
-import { EntityId } from "../models/entity-id.type";
-import { ModelBase } from "../models/model.base";
-import { HttpOptions } from "../services/http.service";
-import { Immutability } from "../services/immutability";
-import { DataEntityConstructor } from "./data-entity.base";
-import { Field } from "./entity-field";
-import { EntityFields } from "./entity-fields";
+import {ParisConfig} from "../config/paris-config";
+import {EntityId} from "../models/entity-id.type";
+import {ModelBase} from "../models/model.base";
+import {HttpOptions} from "../services/http.service";
+import {Immutability} from "../services/immutability";
+import {DataEntityConstructor} from "./data-entity.base";
+import {Field} from "./entity-field";
+import {EntityFields} from "./entity-fields";
 
 const DEFAULT_VALUE_ID = "__default";
 

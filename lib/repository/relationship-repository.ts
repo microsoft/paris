@@ -4,8 +4,6 @@ import {DataSet} from "../dataset/dataset";
 import {DataQuery} from "../dataset/data-query";
 import {DataOptions, defaultDataOptions} from "../dataset/data.options";
 import {Observable} from "rxjs";
-import {DataStoreService} from "../services/data-store.service";
-import {ParisConfig} from "../config/paris-config";
 import {Paris} from "../services/paris";
 import {ReadonlyRepository} from "./readonly-repository";
 import {IReadonlyRepository} from "./repository.interface";

@@ -1,6 +1,6 @@
-import { EntityField } from '../entity/entity-field.decorator';
-import { Entity } from '../entity/entity.decorator';
-import { EntityModelBase } from '../models/entity-model.base';
+import {EntityField} from '../entity/entity-field.decorator';
+import {Entity} from '../entity/entity.decorator';
+import {EntityModelBase} from '../models/entity-model.base';
 
 @Entity({
 	singularName: 'Thing',
