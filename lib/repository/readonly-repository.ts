@@ -452,7 +452,8 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 			model$ = of(model);
 		}
 
-		return entity.readonly ? model$.pipe(map(model => Object.freeze(model))) : model$;
+		// typecasting is used here until bug in TS is fixed (https://github.com/Microsoft/TypeScript/issues/26495)
+		return (entity.readonly ? model$.pipe(map(model => Object.freeze(model))) : model$) as TEntity extends TConcreteEntity ? Observable<TEntity> : Observable<TConcreteEntity>;
 	}
 
 	private static getSubModel(entityField:Field, value:any, paris:Paris, config:ParisConfig, options: DataOptions = defaultDataOptions):Observable<ModelPropertyValue>{
