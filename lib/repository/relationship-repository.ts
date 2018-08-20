@@ -1,4 +1,4 @@
-import {DataEntityConstructor, DataEntityType} from "../entity/data-entity.base";
+import {DataEntityType} from "../entity/data-entity.base";
 import {EntityModelBase} from "../models/entity-model.base";
 import {DataSet} from "../dataset/dataset";
 import {DataQuery} from "../dataset/data-query";
@@ -27,11 +27,11 @@ export class RelationshipRepository<TSource extends ModelBase, TData extends Mod
 	sourceItem:TSource;
 	readonly allowedTypes:Set<RelationshipType>;
 
-	constructor(public sourceEntityType: DataEntityConstructor<TSource>,
-				public dataEntityType: DataEntityConstructor<TData>,
+	constructor(public sourceEntityType: DataEntityType<TSource>,
+				public dataEntityType: DataEntityType<TData>,
 				relationTypes:Array<RelationshipType>,
 				paris: Paris) {
-		super((dataEntityType.entityConfig || dataEntityType.valueObjectConfig), dataEntityType, paris);
+		super(dataEntityType, paris);
 
 		if (<Function>sourceEntityType === <Function>dataEntityType)
 			throw new Error("RelationshipRepository doesn't support a single entity type.");

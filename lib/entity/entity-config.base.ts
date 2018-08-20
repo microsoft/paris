@@ -3,10 +3,11 @@ import {EntityId} from "../models/entity-id.type";
 import {ModelBase} from "../models/model.base";
 import {HttpOptions} from "../services/http.service";
 import {Immutability} from "../services/immutability";
-import {DataEntityConstructor} from "./data-entity.base";
+import {DataEntityType} from "./data-entity.base";
 import {Field} from "./entity-field";
 import {EntityFields} from "./entity-fields";
 
+const DEFAULT_ID_PROPERTY = 'id';
 const DEFAULT_VALUE_ID = "__default";
 
 export class EntityConfigBase<TEntity extends ModelBase = any, TRawData = any, TId extends EntityId = string> implements ModelConfig<TEntity, TRawData, TId>{
@@ -19,6 +20,22 @@ export class EntityConfigBase<TEntity extends ModelBase = any, TRawData = any, T
 
 	get fieldsArray():Array<Field>{
 		return this.fields ? Array.from(this.fields.values()) : [];
+	}
+
+	private _idField:Field;
+	get idField():Field {
+		if (this._idField === undefined){
+			const { fieldsArray }  = this;
+			for(let i=0, field; (field = fieldsArray[i]) && !this._idField; i++){
+				if (this.idProperty && field.id === this.idProperty || !this.idProperty && field.id === DEFAULT_ID_PROPERTY)
+					this._idField = field;
+			}
+
+			if (!this._idField)
+				this._idField = null;
+		}
+
+		return this._idField;
 	}
 
 	values:Array<TEntity>;
@@ -41,7 +58,7 @@ export class EntityConfigBase<TEntity extends ModelBase = any, TRawData = any, T
 
 	private _supportedEntityGetMethodsSet:Readonly<Set<EntityGetMethod>>;
 
-	constructor(config:IEntityConfigBase<TEntity, TRawData, TId>, public entityConstructor:DataEntityConstructor<TEntity, TRawData, TId>){
+	constructor(config:IEntityConfigBase<TEntity, TRawData, TId>, public entityConstructor:DataEntityType<TEntity, TRawData, TId>){
 		if (config.values) {
 			config.values = config.values.map(valueConfig => new entityConstructor(valueConfig));
 			Immutability.freeze(config.values);
@@ -139,7 +156,7 @@ console.log('Status with ID 1: ', paris.getValue(Status, 1));
 	hasValue?: (valueId:EntityId) => boolean,
 	getDefaultValue?: () => TEntity,
 	getValueById?: (valueId:EntityId) => TEntity,
-	entityConstructor?:DataEntityConstructor<TEntity, TRawData, TId>,
+	entityConstructor?:DataEntityType<TEntity, TRawData, TId>,
 	serializeItem?:(item:Partial<TEntity>, serializedItem?:any, entity?:IEntityConfigBase<TEntity, TRawData, TId>, config?:ParisConfig, serializationData?:any) => TRawData,
 	supportedEntityGetMethods?:Array<EntityGetMethod>,
 	parseSaveItemsQuery?: (items:Array<TEntity>, options?:HttpOptions, entity?:IEntityConfigBase<TEntity, TRawData, TId>, config?:ParisConfig) => HttpOptions,
@@ -182,12 +199,17 @@ paris.getRepository(Base).query().subscribe(dataSet => {
 });
 ```
 	 */
-	modelWith?: (data: TRawData) => DataEntityConstructor<any>;
+	modelWith?: (data: TRawData) => DataEntityType<any>;
 }
 
 export interface ModelConfig<TEntity extends ModelBase, TRawData = any, TId extends EntityId = string> extends IEntityConfigBase<TEntity, TRawData, TId> {
 	fields?:EntityFields,
 	fieldsArray?:Array<Field>,
+
+	/**
+	 * The field in the model that's used as key (for getItemById, for example).
+	 */
+	idField?:Field
 }
 
 export enum EntityGetMethod{

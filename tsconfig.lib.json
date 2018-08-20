@@ -19,5 +19,5 @@
 		"baseUrl": "/"
 	},
 	"include": ["index.ts", "lib/**/*"],
-	"exclude": ["lib/**/*.spec.ts"]
+	"exclude": ["lib/**/*.spec.ts", "lib/mock/*"]
 }

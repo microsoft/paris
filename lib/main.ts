@@ -2,7 +2,7 @@ export {DataCache} from "./services/cache";
 export {EntityRelationshipRepositoryType} from "./entity/entity-relationship-repository-type";
 export {EntityRelationship} from "./entity/entity-relationship.decorator";
 export {RelationshipType} from "./models/relationship-type.enum";
-export {DataEntityType, DataEntityConstructor} from "./entity/data-entity.base";
+export {DataEntityType} from "./entity/data-entity.base";
 export {Paris} from "./services/paris";
 export {DataStoreService} from "./services/data-store.service";
 export {EntityModelBase} from "./models/entity-model.base";

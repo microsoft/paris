@@ -1,5 +1,5 @@
 import {EntityConfig} from "../entity/entity.config";
-import {DataEntityConstructor} from "../entity/data-entity.base";
+import {DataEntityType} from "../entity/data-entity.base";
 import {combineLatest, defer, merge, Observable, of, Subject, throwError} from "rxjs";
 import {IRepository} from "./repository.interface";
 import {Index} from "../models/index";
@@ -14,23 +14,23 @@ import {AjaxError} from "rxjs/ajax";
 import {catchError, map, mergeMap, tap} from "rxjs/operators";
 import {DataSet} from "../dataset/dataset";
 import {findIndex, flatMap} from "lodash-es";
+import {IEntityConfigBase} from "../entity/entity-config.base";
 
 /**
  * A Repository is a service through which all of an Entity's data is fetched, cached and saved back to the backend.
  *
  * This class handles entities that can be added, updated or removed. see `ReadonlyRepository` base class.
  */
-export class Repository<TEntity extends ModelBase> extends ReadonlyRepository<TEntity> implements IRepository<TEntity> {
+export class Repository<TEntity extends ModelBase, TRawData = any> extends ReadonlyRepository<TEntity, TRawData> implements IRepository<TEntity> {
 	save$: Observable<SaveEntityEvent>;
 	remove$: Observable<RemoveEntitiesEvent>;
 
 	private _saveSubject$: Subject<SaveEntityEvent>;
 	private _removeSubject$: Subject<RemoveEntitiesEvent>;
 
-	constructor(entity: EntityConfig<TEntity>,
-				entityConstructor: DataEntityConstructor<TEntity>,
+	constructor(entityConstructor: DataEntityType<TEntity>,
 				paris: Paris) {
-		super(entity, entityConstructor, paris);
+		super(entityConstructor, paris);
 
 		const getAllItems$: Observable<Array<TEntity>> = defer(() => this.query().pipe(map((dataSet:DataSet<TEntity>) => dataSet.items)));
 
@@ -41,6 +41,10 @@ export class Repository<TEntity extends ModelBase> extends ReadonlyRepository<TE
 		this._removeSubject$ = new Subject();
 		this.save$ = this._saveSubject$.asObservable();
 		this.remove$ = this._removeSubject$.asObservable();
+	}
+
+	get entity():EntityConfig<TEntity, TRawData> {
+		return <EntityConfig<TEntity>>this.entityConstructor.entityConfig;
 	}
 
 	/**
@@ -64,7 +68,7 @@ export class Repository<TEntity extends ModelBase> extends ReadonlyRepository<TE
 						this.emitEntityHttpErrorEvent(err);
 						throw err;
 					}),
-					mergeMap((savedItemData: Index) =>
+					mergeMap((savedItemData: TRawData) =>
 						savedItemData ? this.createItem(savedItemData) : of(null)),
 					tap((savedItem: TEntity) => {
 						if (savedItem && this._allValues) {

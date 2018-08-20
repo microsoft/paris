@@ -7,10 +7,10 @@ import {DataQuery} from "../dataset/data-query";
 import {DataOptions, defaultDataOptions} from "../dataset/data.options";
 import {DataSet} from "../dataset/dataset";
 import {queryToHttpOptions} from "../dataset/query-to-http";
-import {DataEntityConstructor} from "../entity/data-entity.base";
+import {DataEntityType} from "../entity/data-entity.base";
 import {EntityConfigBase, EntityGetMethod, ModelConfig} from "../entity/entity-config.base";
 import {Field} from "../entity/entity-field";
-import {EntityBackendConfig} from "../entity/entity.config";
+import {EntityBackendConfig, EntityConfig, ModelEntity} from "../entity/entity.config";
 import {EntityErrorEvent, EntityErrorTypes} from "../events/entity-error.event";
 import {Index} from "../models";
 import {EntityId} from "../models/entity-id.type";
@@ -33,12 +33,11 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 
 	protected entityBackendConfig:EntityBackendConfig<TEntity, TRawData>;
 
-	constructor(public readonly entity: ModelConfig<TEntity, TRawData>,
-				public entityConstructor: DataEntityConstructor<TEntity>,
+	constructor(public entityConstructor: DataEntityType<TEntity, TRawData>,
 				protected paris: Paris) {
 		this._errorSubject$ = new Subject();
 		this.error$ = this._errorSubject$.asObservable();
-		this.entityBackendConfig = entity.entityConstructor.entityConfig || entity.entityConstructor.valueObjectConfig;
+		this.entityBackendConfig = entityConstructor.entityConfig;
 	}
 
 	protected _allItems$: Observable<Array<TEntity>>;
@@ -49,10 +48,18 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 
 
 	protected getBaseUrl(query?: DataQuery): string {
-		if (!this.entity.entityConstructor.entityConfig.baseUrl)
+		if (!this.entity.baseUrl)
 			return null;
 
 		return this.entityBackendConfig.baseUrl instanceof Function ? this.entityBackendConfig.baseUrl(this.paris.config, query) : this.entityBackendConfig.baseUrl;
+	}
+
+	get entity():EntityConfig<TEntity, TRawData>{
+		return this.entityConstructor.entityConfig;
+	}
+
+	get modelConfig():EntityConfigBase<TEntity, TRawData> {
+		return this.entityConstructor.entityConfig || this.entityConstructor.valueObjectConfig;
 	}
 
 	/**
@@ -115,12 +122,12 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 	 * @returns {TEntity}
 	 */
 	createNewItem(): TEntity {
-		let defaultData:{ [index:string]:any } = {};
-		this.entity.fieldsArray.forEach((field:Field) => {
+		let defaultData:Partial<TEntity> = {};
+		this.modelConfig.fieldsArray.forEach((field:Field) => {
 			if (field.defaultValue !== undefined)
-				defaultData[field.id] = clone(field.defaultValue);
+				defaultData[<keyof TEntity>field.id] = clone(field.defaultValue);
 			else if (field.isArray)
-				defaultData[field.id] = [];
+				defaultData[<keyof TEntity>field.id] = <any>[];
 		});
 
 		return new this.entityConstructor(defaultData);
@@ -135,7 +142,7 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 	 * @returns {Observable<TEntity extends ModelBase>}
 	 */
 	createItem(rawData: TRawData, options: DataOptions = { allowCache: true, availability: DataAvailability.available }, query?: DataQuery): Observable<TEntity> {
-		return this.paris.modeler.modelEntity<TEntity, TRawData>(rawData, this.entity, options, query);
+		return this.paris.modeler.modelEntity<TEntity, TRawData>(rawData, this.modelConfig, options, query);
 	}
 
 	/**
@@ -172,17 +179,7 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 	 * @returns {Observable<TEntity extends ModelBase>}
 	 */
 	queryItem(query: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<TEntity> {
-		let httpOptions:HttpOptions = this.entityBackendConfig.parseDataQuery ? { params: this.entityBackendConfig.parseDataQuery(query) } : queryToHttpOptions(query);
-
-		if (this.entityBackendConfig.fixedData){
-			if (!httpOptions)
-				httpOptions = {};
-
-			if (!httpOptions.params)
-				httpOptions.params = {};
-
-			Object.assign(httpOptions.params, this.entityBackendConfig.fixedData);
-		}
+		let httpOptions:HttpOptions = this.getQueryHttpOptions(query);
 
 		let endpoint:string;
 
@@ -210,6 +207,29 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 	}
 
 	/**
+	 * Returns the HttpOptions for the specified DataQuery.
+	 * Uses the entity config's `parseDataQuery` configuration, if available, or otherwise the `queryToHttpOptions` function.
+	 * If the entity config has `fixedData` set, the fixed data will be added to the HttpOptions params.
+	 * @param {DataQuery} query
+	 * @returns {HttpOptions}
+	 */
+	getQueryHttpOptions(query:DataQuery):HttpOptions {
+		let httpOptions:HttpOptions = this.entityBackendConfig.parseDataQuery ? { params: this.entityBackendConfig.parseDataQuery(query) } : queryToHttpOptions(query);
+
+		if (this.entityBackendConfig.fixedData){
+			if (!httpOptions)
+				httpOptions = {};
+
+			if (!httpOptions.params)
+				httpOptions.params = {};
+
+			Object.assign(httpOptions.params, this.entityBackendConfig.fixedData);
+		}
+
+		return httpOptions;
+	}
+
+	/**
 	 * Clears all cached data in this Repository
 	 */
 	clearCache():void {
@@ -234,15 +254,11 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 		if (!this.entityConstructor.entityConfig.supportsGetMethod(EntityGetMethod.getItem))
 			throw new Error(`Can't get ${this.entityConstructor.singularName}, getItem isn't supported.`);
 
-		let idFieldIndex:number = findIndex(this.entity.fieldsArray, field => field.id === "id");
-		if (~idFieldIndex){
-			let idField:Field = this.entity.fieldsArray[idFieldIndex];
-			if (idField.type === Number && typeof(itemId) === "string") {
-				let originalItemId = itemId;
-				itemId = parseInt(itemId, 10);
-				if (isNaN(itemId))
-					throw new Error(`Invalid ID for ${this.entity.singularName}. Expected a number but got: ${originalItemId}.`);
-			}
+		if (this.modelConfig.idField && this.modelConfig.idField.type === Number && typeof(itemId) === "string"){
+			let originalItemId = itemId;
+			itemId = parseInt(itemId, 10);
+			if (isNaN(itemId))
+				throw new Error(`Invalid ID for ${this.entity.singularName}. Expected a number but got: ${originalItemId}.`);
 		}
 
 		if (this.entity.values) {

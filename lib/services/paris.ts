@@ -71,16 +71,16 @@ export class Paris<TConfigData = any> {
 
 	/**
 	 * Returns the {@link Repository} for the specified class. If no Repository can be found, returns null.
-	 * @param {DataEntityConstructor<TEntity extends ModelBase>} entityConstructor A class, should have a decorator of either @Entity or @ValueObject.
+	 * @param {DataEntityType<TEntity extends ModelBase>} entityConstructor A class, should have a decorator of either @Entity or @ValueObject.
 	 */
-	getRepository<TEntity extends ModelBase>(entityConstructor:DataEntityConstructor<TEntity>):Repository<TEntity> | null{
+	getRepository<TEntity extends ModelBase>(entityConstructor:DataEntityType<TEntity>):Repository<TEntity> | null{
 		let repository:Repository<TEntity> = <Repository<TEntity>>this.repositories.get(entityConstructor);
 		if (!repository) {
 			let entityConfig:EntityConfig<TEntity> = entitiesService.getEntityByType(entityConstructor) || valueObjectsService.getEntityByType(entityConstructor);
 			if (!entityConfig)
 				return null;
 
-			repository = new Repository<TEntity>(entityConfig, entityConstructor, this);
+			repository = new Repository<TEntity>(entityConstructor, this);
 			this.repositories.set(entityConstructor, repository);
 
 			// If the entity has an endpoint, it means it connects to the backend, so subscribe to save/delete events to enable global events:
@@ -125,12 +125,12 @@ export class Paris<TConfigData = any> {
 
 	/**
 	 * Fetches multiple item data from backend
-	 * @param {DataEntityConstructor<TEntity extends ModelBase>} entityConstructor The {@link Entity} class for which to fetch data
+	 * @param {DataEntityType<TEntity extends ModelBase>} entityConstructor The {@link Entity} class for which to fetch data
 	 * @param {DataQuery} query {@link DataQuery} object with configuration for the backend API, such as page, page size, order, or any custom data required
 	 * @param {DataOptions} dataOptions General options for the query.
 	 * @returns {Observable<DataSet<TEntity extends ModelBase>>} An Observable of DataSet<TEntity>
 	 */
-	query<TEntity extends ModelBase>(entityConstructor:DataEntityConstructor<TEntity>, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<TEntity>>{
+	query<TEntity extends ModelBase>(entityConstructor:DataEntityType<TEntity>, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<DataSet<TEntity>>{
 		let repository:Repository<TEntity> = this.getRepository(entityConstructor);
 		if (repository)
 			return repository.query(query, dataOptions);
@@ -315,13 +315,13 @@ export class Paris<TConfigData = any> {
 
 	/**
 	 * Underlying method for {@link query}. Different in that it accepts an {@link EntityBackendConfig}, to configure the call.
-	 * @param {DataEntityConstructor<TEntity extends ModelBase>} entityConstructor
+	 * @param {DataEntityType<TEntity extends ModelBase>} entityConstructor
 	 * @param {EntityBackendConfig} backendConfig
 	 * @param {DataQuery} query
 	 * @param {DataOptions} dataOptions
 	 * @returns {Observable<DataSet<TEntity extends ModelBase>>}
 	 */
-	callQuery<TEntity extends ModelBase>(entityConstructor:DataEntityConstructor<TEntity>, backendConfig:EntityBackendConfig<TEntity>, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions):Observable<DataSet<TEntity>>{
+	callQuery<TEntity extends ModelBase>(entityConstructor:DataEntityType<TEntity>, backendConfig:EntityBackendConfig<TEntity>, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions):Observable<DataSet<TEntity>>{
 		const httpOptions:HttpOptions = backendConfig.parseDataQuery ? { params: backendConfig.parseDataQuery(query) } : queryToHttpOptions(query);
 
 		const endpoint:string = backendConfig.endpoint instanceof Function ? backendConfig.endpoint(this.config, query) : backendConfig.endpoint;
@@ -360,12 +360,12 @@ export class Paris<TConfigData = any> {
 	/**
 	 * Creates an instance of a model - given an Entity/ValueObject class and data, creates a root model, with full model tree, meaning - all sub-models are modeled as well.
 	 * Sub-models that require being fetched from backend will be fetched.
-	 * @param {DataEntityConstructor<TEntity extends ModelBase>} entityConstructor
+	 * @param {DataEntityType<TEntity extends ModelBase>} entityConstructor
 	 * @param data {TRawData} The raw JSON data for creating the item, as it arrives from backend.
 	 * @param {DataOptions} dataOptions
 	 * @param {DataQuery} query
 	 */
-	createItem<TEntity extends ModelBase, TRawData extends any = object>(entityConstructor:DataEntityConstructor<TEntity>, data:TRawData, dataOptions: DataOptions = defaultDataOptions, query?:DataQuery):Observable<TEntity>{
+	createItem<TEntity extends ModelBase, TRawData extends any = object>(entityConstructor:DataEntityType<TEntity>, data:TRawData, dataOptions: DataOptions = defaultDataOptions, query?:DataQuery):Observable<TEntity>{
 		return this.modeler.modelEntity<TEntity, TRawData>(data, entityConstructor.entityConfig || entityConstructor.valueObjectConfig, dataOptions, query);
 	}
 
@@ -377,13 +377,13 @@ export class Paris<TConfigData = any> {
 	 * const toDo$:Observable<TodoItem> = paris.getItemById<TodoItem>(TodoItem, 1);
 	 * toDo$.subscribe((toDo:TodoItem) => console.log('Found TodoItem item: ', toDo);
 	 * ```
-	 * @param {DataEntityConstructor<TEntity extends ModelBase>} entityConstructor
+	 * @param {DataEntityType<TEntity extends ModelBase>} entityConstructor
 	 * @param {string | number} itemId
 	 * @param {DataOptions} options
 	 * @param {{[p: string]: any}} params
 	 * @returns {Observable<TEntity extends ModelBase>}
 	 */
-	getItemById<TEntity extends EntityModelBase<TId>, TId extends EntityId, TTId extends TId>(entityConstructor:DataEntityConstructor<TEntity, any, TId>, itemId: TTId, options?:DataOptions, params?:{ [index:string]:any }): Observable<TEntity>{
+	getItemById<TEntity extends EntityModelBase<TId>, TId extends EntityId, TTId extends TId>(entityConstructor:DataEntityType<TEntity, any, TId>, itemId: TTId, options?:DataOptions, params?:{ [index:string]:any }): Observable<TEntity>{
 		options = options || defaultDataOptions;
 
 		const repository:Repository<TEntity> = this.getRepository(entityConstructor);
@@ -395,10 +395,10 @@ export class Paris<TConfigData = any> {
 
 	/**
 	 * Gets all the items for an entity type. If all the items are cached, no backend call shall be performed (as in the case the the Entity is configured with `loadAll: true` and has already fetched data).
-	 * @param {DataEntityConstructor<TEntity extends EntityModelBase>} entityConstructor
+	 * @param {DataEntityType<TEntity extends EntityModelBase>} entityConstructor
 	 * @returns {Observable<Array<TEntity extends EntityModelBase>>}
 	 */
-	allItems<TEntity extends EntityModelBase>(entityConstructor:DataEntityConstructor<TEntity>):Observable<Array<TEntity>>{
+	allItems<TEntity extends EntityModelBase>(entityConstructor:DataEntityType<TEntity>):Observable<Array<TEntity>>{
 		const repository:Repository<TEntity> = this.getRepository(entityConstructor);
 		if (repository)
 			return repository.allItems$;
@@ -475,11 +475,11 @@ export class Paris<TConfigData = any> {
 	 *
 	 * console.log("TodoItem 'open' status: ", toDoStatus);
 	 * ```
-	 * @param {DataEntityConstructor<TEntity extends ModelBase>} entityConstructor
+	 * @param {DataEntityType<TEntity extends ModelBase>} entityConstructor
 	 * @param valueId
 	 * @returns {TEntity}
 	 */
-	getValue<TEntity extends ModelBase>(entityConstructor:DataEntityConstructor<TEntity>, valueId:any):TEntity{
+	getValue<TEntity extends ModelBase>(entityConstructor:DataEntityType<TEntity>, valueId:any):TEntity{
 		let repository:Repository<TEntity> = this.getRepository(entityConstructor);
 		if (!repository)
 			return null;

@@ -1,5 +1,5 @@
 import {ModelBase} from "../models/model.base";
-import {DataEntityConstructor, DataEntityType} from "../entity/data-entity.base";
+import {DataEntityType} from "../entity/data-entity.base";
 import {Paris} from "../services/paris";
 import {DataOptions, defaultDataOptions} from "../dataset/data.options";
 import {DataQuery} from "../dataset/data-query";
@@ -23,9 +23,9 @@ export class Modeler {
 	constructor(private paris:Paris){}
 
 	/**
-	 * Populates the item dataset with any sub-model. For example, if an ID is found for a property whose type is an entity,
-	 * the property's value will be an instance of that entity, for the ID, not the ID.
-	 * This method does the actual heavy lifting required for modeling an Entity or ValueObject - parses the fields, models sub-models, etc.
+	 * Models an Entity or ValueObject, according to raw data and configuration.
+	 * In Domain-Driven Design terms, this method creates an Aggregate Root. It does the actual heavy lifting required for modeling
+	 * an Entity or ValueObject - parses the fields, models sub-models, etc.
 	 *
 	 * @template TEntity The entity to model
 	 * @template TRawData The raw data
@@ -38,8 +38,11 @@ export class Modeler {
 	 */
 	modelEntity<TEntity extends ModelBase, TRawData extends any = any, TConcreteEntity extends TEntity = TEntity>(rawData: TRawData, entity: ModelConfig<TEntity, TRawData>, options: DataOptions = defaultDataOptions, query?: DataQuery) : Observable<TEntity> {
 		let entityIdProperty: keyof TRawData = entity.idProperty || this.paris.config.entityIdProperty,
-			modelData: Index = entity instanceof ModelEntity ? {id: rawData[entityIdProperty]} : {},
-			subModels: Array<Observable<{ [index: string]: ModelBase | Array<ModelBase> }>> = [];
+			modelData: Partial<TEntity> = {},
+			subModels: Array<Observable<ModelPropertyValue<TEntity>>> = [];
+
+		if (entity instanceof ModelEntity)
+			modelData.id = rawData[entityIdProperty];
 
 		let getModelDataError:Error = new Error(`Failed to create ${entity.singularName}.`);
 
@@ -54,7 +57,7 @@ export class Modeler {
 
 		entity.fields.forEach((entityField: Field) => {
 			if (!this.validateFieldData(entityField, rawData)){
-				modelData[entityField.id] = null;
+				modelData[<keyof TEntity>entityField.id] = null;
 				return;
 			}
 
@@ -69,31 +72,24 @@ export class Modeler {
 					throw getModelDataError;
 				}
 			}
-			if (entityFieldRawData === undefined || entityFieldRawData === null) {
-				let fieldRepository:ReadonlyRepository<EntityModelBase> = this.paris.getRepository(<DataEntityType>entityField.type);
-				let fieldValueObjectType:EntityConfigBase = !fieldRepository && valueObjectsService.getEntityByType(<DataEntityType>entityField.type);
 
-				let defaultValue:any = fieldRepository && fieldRepository.entity.getDefaultValue()
-					|| fieldValueObjectType && fieldValueObjectType.getDefaultValue()
-					|| (entityField.isArray ? [] : entityField.defaultValue !== undefined && entityField.defaultValue !== null ? entityField.defaultValue : null);
-
-				if ((defaultValue === undefined || defaultValue === null) && entityField.required) {
-					getModelDataError.message = getModelDataError.message + ` Field ${entityField.id} is required but it's ${entityFieldRawData}.`;
-					throw getModelDataError;
+			try {
+				const fieldData = this.getFieldData(entityField, entityFieldRawData, options);
+				if (fieldData instanceof Observable) {
+					subModels.push(fieldData.pipe(
+						map((fieldData: ModelBase | Array<ModelBase>) => {
+								let subModelIndex: ModelPropertyValue<TEntity> = <ModelPropertyValue<TEntity>>{};
+								subModelIndex[<keyof TEntity>entityField.id] = fieldData;
+								return subModelIndex;
+							}
+						)));
 				}
-				modelData[entityField.id] = defaultValue;
+				else
+					modelData[<keyof TEntity>entityField.id] = fieldData;
 			}
-			else {
-				const getPropertyEntityValue$ = this.getSubModel(entityField, entityFieldRawData, options);
-				if (getPropertyEntityValue$)
-					subModels.push(getPropertyEntityValue$);
-				else {
-					modelData[entityField.id] = entityField.isArray
-						? entityFieldRawData
-							? entityFieldRawData.map((elementValue: any) => DataTransformersService.parse(entityField.type, elementValue))
-							: []
-						:  DataTransformersService.parse(entityField.type, entityFieldRawData);
-				}
+			catch(e){
+				getModelDataError.message = getModelDataError.message + ' ' + e.message;
+				throw getModelDataError;
 			}
 		});
 
@@ -101,8 +97,8 @@ export class Modeler {
 
 		if (subModels.length) {
 			model$ = combineLatest(subModels).pipe(
-				map((propertyEntityValues: Array<ModelPropertyValue>) => {
-					propertyEntityValues.forEach((propertyEntityValue: { [index: string]: any }) => Object.assign(modelData, propertyEntityValue));
+				map((propertyEntityValues: Array<ModelPropertyValue<TEntity>>) => {
+					propertyEntityValues.forEach((propertyEntityValue: ModelPropertyValue<TEntity>) => Object.assign(modelData, propertyEntityValue));
 
 					let model: TEntity;
 
@@ -113,7 +109,7 @@ export class Modeler {
 						throw getModelDataError;
 					}
 
-					propertyEntityValues.forEach((modelPropertyValue: ModelPropertyValue) => {
+					propertyEntityValues.forEach((modelPropertyValue: ModelPropertyValue<TEntity>) => {
 						for (let p in modelPropertyValue) {
 							let modelValue: ModelBase | Array<ModelBase> = modelPropertyValue[p];
 
@@ -186,17 +182,47 @@ export class Modeler {
 		return fieldRawData;
 	}
 
-	private getSubModel(entityField:Field, value:any, options: DataOptions = defaultDataOptions):Observable<ModelPropertyValue>{
-		let getPropertyEntityValue$: Observable<ModelPropertyValue>;
-		let mapValueToEntityFieldIndex: (value: ModelBase | Array<ModelBase>) => ModelPropertyValue = Modeler.mapToEntityFieldIndex.bind(null, entityField.id);
+	/**
+	 * Gets the data to be assigned in a model to the specified field.
+	 * If no data is available in the raw data, a default value is assigned, if specified.
+	 * If the field's type is of another model, it'll be modeled as well. Otherwise, the data is parsed according to the DataTransformersService parsers.
+	 */
+	private getFieldData<TData = any>(entityField:Field, entityFieldRawData:any, options: DataOptions = defaultDataOptions):TData | Observable<TData | Array<TData>> {
+		if (entityFieldRawData === undefined || entityFieldRawData === null) {
+			let fieldRepository:ReadonlyRepository<EntityModelBase> = this.paris.getRepository(<DataEntityType>entityField.type);
+			let fieldValueObjectType:EntityConfigBase = !fieldRepository && valueObjectsService.getEntityByType(<DataEntityType>entityField.type);
 
+			let defaultValue:any = fieldRepository && fieldRepository.modelConfig.getDefaultValue()
+				|| fieldValueObjectType && fieldValueObjectType.getDefaultValue()
+				|| (entityField.isArray ? [] : entityField.defaultValue !== undefined && entityField.defaultValue !== null ? entityField.defaultValue : null);
+
+			if ((defaultValue === undefined || defaultValue === null) && entityField.required)
+				throw new Error(` Field ${entityField.id} is required but it's ${entityFieldRawData}.`);
+
+			return defaultValue;
+		}
+		else {
+			const fieldData$ = this.getSubModel<TData>(entityField, entityFieldRawData, options);
+			if (fieldData$)
+				return fieldData$;
+			else {
+				return entityField.isArray
+					? entityFieldRawData
+						? entityFieldRawData.map((elementValue: any) => DataTransformersService.parse(entityField.type, elementValue))
+						: []
+					:  DataTransformersService.parse(entityField.type, entityFieldRawData);
+			}
+		}
+	}
+
+	private getSubModel<TData extends ModelBase = ModelBase>(entityField:Field, value:any, options: DataOptions = defaultDataOptions):Observable<TData | Array<TData>>{
 		let repository:ReadonlyRepository<EntityModelBase> = this.paris.getRepository(<DataEntityType>entityField.type);
 		let valueObjectType:EntityConfigBase = !repository && valueObjectsService.getEntityByType(<DataEntityType>entityField.type);
 
 		if (!repository && !valueObjectType)
 			return null;
 
-		let tempGetPropertyEntityValue$:Observable<ModelBase | Array<ModelBase>>;
+		let data$:Observable<TData | Array<TData>>;
 
 		const getItem = repository
 			? Modeler.getEntityItem.bind(null, repository)
@@ -204,25 +230,16 @@ export class Modeler {
 
 		if (entityField.isArray) {
 			if (value.length) {
-				let propertyMembers$: Array<Observable<ModelPropertyValue>> = value.map((memberData: any) => getItem(memberData, options));
-				tempGetPropertyEntityValue$ = combineLatest(propertyMembers$);
+				let propertyMembers$: Array<Observable<TData>> = value.map((memberData: any) => getItem(memberData, options));
+				data$ = combineLatest(propertyMembers$);
 			}
 			else
-				tempGetPropertyEntityValue$ = of([]);
+				data$ = of([]);
 		}
-		else {
-			tempGetPropertyEntityValue$ = getItem(value, options);
-		}
+		else
+			data$ = getItem(value, options);
 
-		getPropertyEntityValue$ = tempGetPropertyEntityValue$.pipe(map(mapValueToEntityFieldIndex));
-
-		return getPropertyEntityValue$;
-	}
-
-	private static mapToEntityFieldIndex(entityFieldId: string, value: ModelBase | Array<ModelBase>): ModelPropertyValue {
-		let data: ModelPropertyValue = {};
-		data[entityFieldId] = value;
-		return data;
+		return data$;
 	}
 
 	private static getEntityItem<U extends EntityModelBase>(repository: ReadonlyRepository<U>, data: any, options: DataOptions = defaultDataOptions): Observable<U> {
@@ -241,7 +258,7 @@ export class Modeler {
 
 	rawDataToDataSet<TEntity extends ModelBase, TRawData = any, TDataSet extends any = any>(
 		rawDataSet:TDataSet,
-		entityConstructor:DataEntityConstructor<TEntity>,
+		entityConstructor:DataEntityType<TEntity>,
 		allItemsProperty:string,
 		dataOptions:DataOptions = defaultDataOptions,
 		query?:DataQuery):Observable<DataSet<TEntity>>{
@@ -269,7 +286,7 @@ export class Modeler {
 
 	modelArray<TEntity extends ModelBase, TRawData = any>(
 		rawData:Array<TRawData>,
-		entityConstructor:DataEntityConstructor<TEntity>,
+		entityConstructor:DataEntityType<TEntity>,
 		dataOptions:DataOptions = defaultDataOptions,
 		query?:DataQuery):Observable<Array<TEntity>>{
 		if (!rawData.length)
@@ -282,7 +299,7 @@ export class Modeler {
 		}
 	}
 
-	private modelItem<TEntity extends ModelBase, TRawData = any>(entityConstructor:DataEntityConstructor<TEntity>, rawData:TRawData, dataOptions: DataOptions = defaultDataOptions, query?:DataQuery):Observable<TEntity>{
+	private modelItem<TEntity extends ModelBase, TRawData = any>(entityConstructor:DataEntityType<TEntity>, rawData:TRawData, dataOptions: DataOptions = defaultDataOptions, query?:DataQuery):Observable<TEntity>{
 		return this.modelEntity(rawData, entityConstructor.entityConfig || entityConstructor.valueObjectConfig, dataOptions, query);
 	}
 
@@ -337,5 +354,5 @@ export class Modeler {
 	}
 }
 
-type ModelPropertyValue = { [property: string]: ModelBase | Array<ModelBase> };
+type ModelPropertyValue<TEntity> = { [P in keyof TEntity]: ModelBase | Array<ModelBase> };
 

@@ -1,6 +1,6 @@
 import {EntityConfigBase, IEntityConfigBase} from "./entity-config.base";
 import {ParisConfig} from "../config/paris-config";
-import {DataEntityConstructor} from "./data-entity.base";
+import {DataEntityType} from "./data-entity.base";
 import {DataQuery} from "../dataset/data-query";
 import {HttpOptions, RequestMethod} from "../services/http.service";
 import {ModelBase} from "../models/model.base";
@@ -24,7 +24,7 @@ export class ModelEntity<TEntity extends ModelBase = any, TRawData = any, TId ex
 	serializeItem?:(item:TEntity, serializedItem?:any, entity?:IEntityConfigBase, config?:ParisConfig, serializationData?:any) => any;
 	getRemoveData?:(items:Array<TEntity>) => any;
 
-	constructor(config:EntityConfig<TEntity, TRawData, TId>, entityConstructor:DataEntityConstructor<TEntity, TRawData, TId>){
+	constructor(config:EntityConfig<TEntity, TRawData, TId>, entityConstructor:DataEntityType<TEntity, TRawData, TId>){
 		super(config, entityConstructor);
 
 		this.loadAll = config.loadAll === true;
