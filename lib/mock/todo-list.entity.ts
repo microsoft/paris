@@ -2,6 +2,7 @@ import {EntityModelBase} from "../models/entity-model.base";
 import {Entity} from "../entity/entity.decorator";
 import {EntityField} from "../entity/entity-field.decorator";
 import {ParisConfig} from "../config/paris-config";
+import {TodoListState} from "./todo-list-state.value-object";
 
 @Entity({
 	singularName: "Todo list",
@@ -14,11 +15,17 @@ import {ParisConfig} from "../config/paris-config";
 		meta: {
 			lastUpdate: new Date(rawDataSet.lastUpdate)
 		}
-	})
+	}),
+	cache: {
+		time: 200
+	}
 })
 export class TodoList extends EntityModelBase<number>{
 	@EntityField()
 	name:string;
+
+	@EntityField({ defaultValue: { isDone: false, isShared: true } })
+	state:TodoListState;
 }
 
 interface TodoListRawDataSet {

@@ -109,19 +109,7 @@ export class Modeler {
 						throw getModelDataError;
 					}
 
-					propertyEntityValues.forEach((modelPropertyValue: ModelPropertyValue<TEntity>) => {
-						for (let p in modelPropertyValue) {
-							let modelValue: ModelBase | Array<ModelBase> = modelPropertyValue[p];
-
-							if (modelValue instanceof Array)
-								modelValue.forEach((modelValueItem: ModelBase) => {
-									if (!Object.isFrozen(modelValueItem))
-										modelValueItem.$parent = model;
-								});
-							else if (!Object.isFrozen(modelValue))
-								modelValue.$parent = model;
-						}
-					});
+					this.setModelLinks(model);
 
 					return model;
 				})
@@ -157,6 +145,27 @@ export class Modeler {
 		}
 
 		return isValid;
+	}
+
+	/**
+	 * For all the sub models in a model that are not readonly, add a $parent property, which points to the model
+	 * @param {TEntity} model
+	 */
+	private setModelLinks<TEntity extends ModelBase>(model:TEntity):void{
+		(<DataEntityType<TEntity>>model.constructor).entityConfig.fieldsArray.forEach((field:Field) => {
+			const modelValue = model[<keyof TEntity>field.id];
+
+			if (modelValue && modelValue instanceof Object){
+				if (modelValue instanceof ModelBase && !Object.isFrozen(modelValue))
+					(<ModelBase>modelValue).$parent = model;
+				else if (modelValue instanceof Array && modelValue.length && modelValue[0] instanceof ModelBase){
+					modelValue.forEach((modelValueItem: ModelBase) => {
+						if (!Object.isFrozen(modelValueItem))
+							modelValueItem.$parent = model;
+					});
+				}
+			}
+		});
 	}
 
 	/**
@@ -199,9 +208,10 @@ export class Modeler {
 			if ((defaultValue === undefined || defaultValue === null) && entityField.required)
 				throw new Error(` Field ${entityField.id} is required but it's ${entityFieldRawData}.`);
 
-			return defaultValue;
+			entityFieldRawData = defaultValue;
 		}
-		else {
+
+		if (entityFieldRawData && !(entityFieldRawData instanceof ModelBase)) {
 			const fieldData$ = this.getSubModel<TData>(entityField, entityFieldRawData, options);
 			if (fieldData$)
 				return fieldData$;
@@ -210,9 +220,11 @@ export class Modeler {
 					? entityFieldRawData
 						? entityFieldRawData.map((elementValue: any) => DataTransformersService.parse(entityField.type, elementValue))
 						: []
-					:  DataTransformersService.parse(entityField.type, entityFieldRawData);
+					: DataTransformersService.parse(entityField.type, entityFieldRawData);
 			}
 		}
+		else
+			return entityFieldRawData;
 	}
 
 	private getSubModel<TData extends ModelBase = ModelBase>(entityField:Field, value:any, options: DataOptions = defaultDataOptions):Observable<TData | Array<TData>>{

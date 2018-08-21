@@ -4,6 +4,10 @@ import {Todo} from "../mock/todo.entity";
 import {TodoList} from "../mock/todo-list.entity";
 import {setMockData} from "../mock/mock-data.service";
 import {DataQuery} from "../dataset/data-query";
+import {DataStoreService} from "../services/data-store.service";
+import Mock = jest.Mock;
+import {DataEntityType} from "../entity/data-entity.base";
+import {ModelEntityCacheConfig} from "../entity/entity.config";
 
 describe('ReadonlyRepository', () => {
 	let paris: Paris<MockConfigData>,
@@ -54,6 +58,33 @@ describe('ReadonlyRepository', () => {
 			expect(jestGetQueryHttpOptionsSpy).toHaveBeenCalledWith(query);
 			jestGetQueryHttpOptionsSpy.mockRestore();
 			done();
+		});
+	});
+
+	describe('caching', () => {
+		setMockData({
+			id: 1,
+			name: "First list"
+		});
+
+		it('returns an item from cache if available', done => {
+			todoListRepo.getItemById(1).subscribe(firstTodoList => {
+				todoListRepo.getItemById(1).subscribe(secondTodoList => {
+					expect(firstTodoList).toBe(secondTodoList);
+					done();
+				});
+			});
+		});
+
+		it('returns a new item once cache is expired', done => {
+			todoListRepo.getItemById(1).subscribe(firstTodoList => {
+				setTimeout(() => {
+					todoListRepo.getItemById(1).subscribe(secondTodoList => {
+						expect(firstTodoList).not.toBe(secondTodoList);
+						done();
+					});
+				}, (<number>(<ModelEntityCacheConfig>(<DataEntityType<TodoList>>TodoList).entityConfig.cache).time) + 100);
+			});
 		});
 	});
 });

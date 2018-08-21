@@ -18,4 +18,7 @@ export class Todo extends EntityModelBase<number>{
 
 	@EntityField({ arrayOf: Tag })
 	tags:Array<Tag>;
+
+	@EntityField({ defaultValue: false })
+	isDone:boolean;
 }

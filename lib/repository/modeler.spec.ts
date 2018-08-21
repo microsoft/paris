@@ -8,6 +8,7 @@ import {Tag} from "../mock/tag.value-object";
 import {Modeler} from "./modeler";
 import {Field} from "../entity/entity-field";
 import {FIELD_DATA_SELF} from "../entity/entity-field.config";
+import {TodoList} from "../mock/todo-list.entity";
 
 describe('Modeler', () => {
 	let paris: Paris;
@@ -35,6 +36,7 @@ describe('Modeler', () => {
 		beforeEach(() => {
 			todoItem$ = paris.modeler.modelEntity(todoItemRawData, todoEntityConfig);
 		});
+
 		afterEach(() => {
 			jest.restoreAllMocks();
 		});
@@ -65,6 +67,20 @@ describe('Modeler', () => {
 		it('freezes a model marked as readonly', done => {
 			todoItem$.subscribe((todoItem:Todo) => {
 				expect(todoItem.tags.every(tag => Object.isFrozen(tag))).toBe(true);
+				done();
+			});
+		});
+
+		it('adds a `$parent` property to submodels that are not frozen', done => {
+			paris.modeler.modelEntity({ id: 1, name: 'First', state: { isDone: true } }, (<DataEntityType<TodoList>>TodoList).entityConfig).subscribe(todoList => {
+				expect(todoList.state.$parent).toBe(todoList);
+				done();
+			});
+		});
+
+		it("doesn't add a `$parent` property to readonly sub models", done => {
+			todoItem$.subscribe((todoItem:Todo) => {
+				expect(todoItem.tags.every(tag => tag.$parent === undefined));
 				done();
 			});
 		});
@@ -115,6 +131,42 @@ describe('Modeler', () => {
 				const fieldConfig = Object.assign({ data: FIELD_DATA_SELF }, baseField);
 				expect(Modeler.getFieldRawData(fieldConfig, rawData)).toEqual(rawData);
 			})
+		});
+
+		describe('defaultValue', () => {
+			it("doesn't set default value to a field that has value", done => {
+				const todoRawData = { id: 1, text: 'First', isDone: true };
+				const defaultIsDoneValue = (<DataEntityType<Todo>>Todo).entityConfig.fields.get('isDone').defaultValue;
+
+				paris.modeler.modelEntity(todoRawData, (<DataEntityType<Todo>>Todo).entityConfig).subscribe(todo => {
+					if (todoRawData.isDone !== defaultIsDoneValue)
+						expect(todo.isDone).toBe(todoRawData.isDone);
+					done();
+				});
+			});
+
+			it('sets the default value to a field that has no value', done => {
+				paris.modeler.modelEntity({ id: 1, text: 'First' }, (<DataEntityType<Todo>>Todo).entityConfig).subscribe(todo => {
+					expect(todo.isDone).toBe((<DataEntityType<Todo>>Todo).entityConfig.fields.get('isDone').defaultValue);
+					done();
+				});
+			});
+
+			it('sets the default value to a field that has no value and models it', done => {
+				paris.modeler.modelEntity({ id: 1, name: 'First' }, (<DataEntityType<TodoList>>TodoList).entityConfig).subscribe(todoList => {
+					delete todoList.state.$parent;
+					expect(todoList.state).toEqual((<DataEntityType<TodoList>>TodoList).entityConfig.fields.get('state').defaultValue);
+					done();
+				});
+			});
+
+			it('sets the default value to a field that has no value and models it', done => {
+				paris.modeler.modelEntity({ id: 1, name: 'First' }, (<DataEntityType<TodoList>>TodoList).entityConfig).subscribe(todoList => {
+					expect(todoList.state).toBeInstanceOf((<DataEntityType<TodoList>>TodoList).entityConfig.fields.get('state').type);
+					console.log(todoList.state);
+					done();
+				});
+			});
 		});
 	});
 

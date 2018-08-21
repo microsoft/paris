@@ -11,6 +11,6 @@ import {ParisConfig} from "../config/paris-config";
 	dataEntity: Todo,
 	endpoint: (config: ParisConfig<MockConfigData>, query: DataQuery) => `lists/${(<any>query.where).todoListId}/items`,
 	foreignKey: 'listId',
-	allowedTypes: [RelationshipType.OneToMany]
+	allowedTypes: [RelationshipType.OneToMany],
 })
 export class TodoListItemsRelationship implements EntityRelationshipRepositoryType<TodoList, Todo> {}
