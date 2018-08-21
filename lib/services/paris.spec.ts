@@ -6,6 +6,7 @@ import {Todo} from '../mock/todo.entity';
 import {Repository} from '../repository/repository';
 import {Http} from './http.service';
 import {Paris} from './paris';
+import {Tag} from "../mock/tag.value-object";
 
 describe('Paris main', () => {
 	let paris: Paris;
@@ -91,10 +92,12 @@ describe('Paris main', () => {
 		});
 
 		it('should return the entityConfig for Todo', () => {
-			expect(paris.getModelBaseConfig(Todo)).toEqual((<DataEntityType>Todo).entityConfig);
+			expect(paris.getModelBaseConfig(Todo)).toBe((<DataEntityType>Todo).entityConfig);
 		});
 
-		it.skip('should return the valueObjectConfig for a value-object', () => {});
+		it('should return the valueObjectConfig for a ValueObject', () => {
+			expect(paris.getModelBaseConfig(Tag)).toBe((<DataEntityType>Tag).valueObjectConfig);
+		});
 	});
 
 	describe('query', () => {

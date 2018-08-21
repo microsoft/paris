@@ -1,5 +1,5 @@
 import {defaultConfig, ParisConfig} from "../config/paris-config";
-import {DataEntityConstructor, DataEntityType} from "../entity/data-entity.base";
+import {DataEntityType} from "../entity/data-entity.base";
 import {Repository} from "../repository/repository";
 import {EntityBackendConfig, EntityConfig} from "../entity/entity.config";
 import {entitiesService} from "./entities.service";
