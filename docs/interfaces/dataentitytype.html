@@ -64,6 +64,13 @@
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>This is the interface for the <em>constructor</em> of any models - Entity or ValueObject.</p>
+					</div>
+				</div>
+			</section>
 			<section class="tsd-panel tsd-type-parameters">
 				<h3>Type parameters</h3>
 				<ul class="tsd-type-parameters">
@@ -86,11 +93,6 @@
 				<ul class="tsd-hierarchy">
 					<li>
 						<span class="target">DataEntityType</span>
-						<ul class="tsd-hierarchy">
-							<li>
-								<a href="dataentityconstructor.html" class="tsd-signature-type">DataEntityConstructor</a>
-							</li>
-						</ul>
 					</li>
 				</ul>
 			</section>
@@ -122,22 +124,35 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Data<wbr>Entity<wbr>Type<span class="tsd-signature-symbol">(</span>data<span class="tsd-signature-symbol">?: </span><a href="entitymodelconfigbase.html" class="tsd-signature-type">EntityModelConfigBase</a>, rawData<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TEntity</span></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Data<wbr>Entity<wbr>Type<span class="tsd-signature-symbol">(</span>entityData<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">any</span>, rawData<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TEntity</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/c462eb3/lib/entity/data-entity.base.ts#L11">entity/data-entity.base.ts:11</a></li>
+									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/317a64d/lib/api/entity/data-entity.base.ts#L9">api/entity/data-entity.base.ts:9</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> data: <a href="entitymodelconfigbase.html" class="tsd-signature-type">EntityModelConfigBase</a></h5>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> entityData: <span class="tsd-signature-type">any</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>an object containing the same properties as TEntity.
+											TODO: make entityData something like Partial<TEntity>. This is a problem at the moment, since it doesn&#39;t work well with ModelBase.</p>
+										</div>
+									</div>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> rawData: <span class="tsd-signature-type">TRawData</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>The raw data used to create the model</p>
+										</div>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">TEntity</span></h4>
@@ -153,7 +168,7 @@
 					<div class="tsd-signature tsd-kind-icon">entity<wbr>Config<span class="tsd-signature-symbol">:</span> <a href="../classes/modelentity.html" class="tsd-signature-type">ModelEntity</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TId</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/c462eb3/lib/entity/data-entity.base.ts#L15">entity/data-entity.base.ts:15</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/317a64d/lib/api/entity/data-entity.base.ts#L18">api/entity/data-entity.base.ts:18</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -163,7 +178,7 @@
 					<div class="tsd-signature tsd-kind-icon">plural<wbr>Name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/c462eb3/lib/entity/data-entity.base.ts#L14">entity/data-entity.base.ts:14</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/317a64d/lib/api/entity/data-entity.base.ts#L17">api/entity/data-entity.base.ts:17</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -173,7 +188,7 @@
 					<div class="tsd-signature tsd-kind-icon">singular<wbr>Name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/c462eb3/lib/entity/data-entity.base.ts#L13">entity/data-entity.base.ts:13</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/317a64d/lib/api/entity/data-entity.base.ts#L16">api/entity/data-entity.base.ts:16</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -183,7 +198,7 @@
 					<div class="tsd-signature tsd-kind-icon">value<wbr>Object<wbr>Config<span class="tsd-signature-symbol">:</span> <a href="../classes/entityconfigbase.html" class="tsd-signature-type">EntityConfigBase</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/c462eb3/lib/entity/data-entity.base.ts#L16">entity/data-entity.base.ts:16</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/317a64d/lib/api/entity/data-entity.base.ts#L19">api/entity/data-entity.base.ts:19</a></li>
 						</ul>
 					</aside>
 				</section>
