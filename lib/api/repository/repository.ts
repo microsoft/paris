@@ -5,7 +5,7 @@ import {IRepository} from "./repository.interface";
 import {ModelBase} from "../../config/model.base";
 import {EntityModelBase} from "../../config/entity-model.base";
 import {Paris} from "../../paris";
-import {HttpOptions, RequestMethod} from "../../data_access/http.service";
+import {HttpOptions, RequestMethod, SaveRequestMethod} from "../../data_access/http.service";
 import {SaveEntityEvent} from "../events/save-entity.event";
 import {RemoveEntitiesEvent} from "../events/remove-entities.event";
 import {ReadonlyRepository} from "./readonly-repository";
@@ -83,7 +83,7 @@ export class Repository<TEntity extends ModelBase, TRawData = any> extends Reado
 		}
 	}
 
-	private getSaveMethod(item:Partial<TEntity>):RequestMethod{
+	private getSaveMethod(item:Partial<TEntity>):SaveRequestMethod{
 		return this.entityBackendConfig.saveMethod
 			? this.entityBackendConfig.saveMethod instanceof Function ? this.entityBackendConfig.saveMethod(item, this.paris.config) : this.entityBackendConfig.saveMethod
 			: item.id === undefined ? "POST" : "PUT";

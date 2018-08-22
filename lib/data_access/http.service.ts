@@ -3,7 +3,8 @@ import {ajax, AjaxError, AjaxRequest, AjaxResponse} from "rxjs/ajax";
 import {catchError, map} from "rxjs/operators";
 import {clone} from "lodash-es";
 
-export type RequestMethod = "GET"|"POST"|"PUT"|"PATCH"|"DELETE";
+export type SaveRequestMethod = "POST"|"PUT"|"PATCH";
+export type RequestMethod = "GET"|"DELETE"|SaveRequestMethod;
 const DEFAULT_TIMEOUT = 60000;
 
 export class Http{

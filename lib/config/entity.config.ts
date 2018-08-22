@@ -1,6 +1,6 @@
 import {EntityConfigBase, IEntityConfigBase} from "./model-config";
 import {ParisConfig} from "../config/paris-config";
-import {HttpOptions, RequestMethod} from "../data_access/http.service";
+import {HttpOptions, RequestMethod, SaveRequestMethod} from "../data_access/http.service";
 import {ModelBase} from "./model.base";
 import {ApiCallBackendConfigInterface} from "./api-call-backend-config.interface";
 import {EntityId} from "../modeling/entity-id.type";
@@ -155,7 +155,7 @@ export interface EntityBackendConfig<TEntity extends ModelBase, TRawData = any, 
 	 * Since this can be either a function or one of the `RequestMethod`s, the method can be either hardcoded for all `save` calls of this Entity, or determined at runtime for each call.
 	 * For example, you might want to use POST instead of Paris' default PUT when updating an existing entity, or you might want to use PATCH instead.
 	 */
-	saveMethod?:((item:Partial<TEntity>, config?:ParisConfig) => RequestMethod) | RequestMethod,
+	saveMethod?:((item:Partial<TEntity>, config?:ParisConfig) => SaveRequestMethod) | SaveRequestMethod,
 
 	/**
 	 * If the HTTP request takes longer than this number (milliseconds), the request will fail with status 0.

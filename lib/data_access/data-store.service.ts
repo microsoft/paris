@@ -1,5 +1,5 @@
 import {ParisConfig} from "../config/paris-config";
-import {Http, HttpOptions, RequestMethod} from "./http.service";
+import {Http, HttpOptions, RequestMethod, SaveRequestMethod} from "./http.service";
 import {Observable} from "rxjs";
 import {finalize, share, tap} from "rxjs/operators";
 import {AjaxRequest} from "rxjs/ajax";
@@ -13,7 +13,7 @@ export class DataStoreService{
 		return this.request<T>("GET", endpoint, data, baseUrl, httpConfig);
 	}
 
-	save<T = any>(endpoint:string, method:RequestMethod = "POST", data?:HttpOptions, baseUrl?:string, httpConfig?:AjaxRequest):Observable<T>{
+	save<T = any>(endpoint:string, method:SaveRequestMethod = "POST", data?:HttpOptions, baseUrl?:string, httpConfig?:AjaxRequest):Observable<T>{
 		return this.request(method, endpoint, data, baseUrl, httpConfig);
 	}
 
@@ -25,7 +25,7 @@ export class DataStoreService{
 		const fullHttpConfig:AjaxRequest = Object.assign({}, this.config.http, httpConfig);
 		const endpointUrl = this.getEndpointUrl(endpoint, baseUrl);
 
-		return  this.setActiveRequest(Http.request(method, endpointUrl, data, fullHttpConfig), method, endpointUrl, data);
+		return this.setActiveRequest(Http.request(method, endpointUrl, data, fullHttpConfig), method, endpointUrl, data);
 	}
 
 	private getEndpointUrl(endpoint:string, baseUrl?:string):string{
