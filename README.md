@@ -89,4 +89,4 @@ For more information see the [Code of Conduct FAQ](https://opensource.microsoft.
 contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
 ## Testing
-* Unit tests are written using [Jest](https://jestjs.io/), and executed with [ts-jest](https://github.com/kulshekhar/ts-jest).
+Unit tests are written using [Jest](https://jestjs.io/), and executed with [ts-jest](https://github.com/kulshekhar/ts-jest).
