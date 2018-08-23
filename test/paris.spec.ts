@@ -279,8 +279,12 @@ describe('Paris main', () => {
 			expect(() => paris.getRelatedItem(TodoList, new Todo({ id: 1 }))).toThrow();
 		});
 
-		it('should return an Observable', () => {
-			expect(paris.getRelatedItem(TodoListItemsRelationship, new TodoList({ id: 1 }))).toBeInstanceOf(Observable);
+		it("should throw an error if the relationship doesn't support OneToMany", () => {
+			expect(() => paris.getRelatedItem(TodoListItemsRelationship, new TodoList({ id: 1 }))).toThrow();
+		});
+
+		it("should return an Observable", () => {
+			expect(paris.queryForItem(TodoListItemsRelationship, new TodoList({ id: 1 }))).toBeInstanceOf(Observable);
 		});
 	});
 
