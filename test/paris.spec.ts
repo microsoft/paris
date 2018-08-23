@@ -284,7 +284,8 @@ describe('Paris main', () => {
 		});
 
 		it("should return an Observable", () => {
-			expect(paris.queryForItem(TodoListItemsRelationship, new TodoList({ id: 1 }))).toBeInstanceOf(Observable);
+			expect(
+				paris.queryForItem(TodoListItemsRelationship, new TodoList({ id: 1 }))).toBeInstanceOf(Observable);
 		});
 	});
 
