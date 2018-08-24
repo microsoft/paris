@@ -151,7 +151,10 @@ export class Modeler {
 	 * @param {TEntity} model
 	 */
 	private setModelLinks<TEntity extends ModelBase>(model:TEntity):void{
-		(<DataEntityType<TEntity>>model.constructor).entityConfig.fieldsArray.forEach((field:Field) => {
+		const modelDataType = <DataEntityType<TEntity>>model.constructor;
+
+		const { fieldsArray } = modelDataType.entityConfig || modelDataType.valueObjectConfig;
+		fieldsArray.forEach((field:Field) => {
 			const modelValue = model[<keyof TEntity>field.id];
 
 			if (modelValue && modelValue instanceof Object){

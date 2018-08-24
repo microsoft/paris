@@ -9,6 +9,7 @@ import {Modeler} from "../../lib/modeling/modeler";
 import {Field} from "../../lib/api/entity/entity-field";
 import {FIELD_DATA_SELF} from "../../lib/config/entity-field.config";
 import {TodoList} from "../mock/todo-list.entity";
+import {TodoListState} from "../mock/todo-list-state.value-object";
 
 describe('Modeler', () => {
 	let paris: Paris;
@@ -74,6 +75,13 @@ describe('Modeler', () => {
 		it('adds a `$parent` property to submodels that are not frozen', done => {
 			paris.modeler.modelEntity({ id: 1, name: 'First', state: { isDone: true } }, (<DataEntityType<TodoList>>TodoList).entityConfig).subscribe(todoList => {
 				expect(todoList.state.$parent).toBe(todoList);
+				done();
+			});
+		});
+
+		it('adds a `$parent` property to value object sub models', done => {
+			paris.modeler.modelEntity<TodoListState>({ isDone: true, isShared: false, previousState: { isDone: false, isShared: false }  }, (<DataEntityType<TodoListState>>TodoListState).valueObjectConfig).subscribe(todoListState => {
+				expect(todoListState.previousState.$parent).toBe(todoListState);
 				done();
 			});
 		});
@@ -155,7 +163,8 @@ describe('Modeler', () => {
 			it('sets the default value to a field that has no value and models it', done => {
 				paris.modeler.modelEntity({ id: 1, name: 'First' }, (<DataEntityType<TodoList>>TodoList).entityConfig).subscribe(todoList => {
 					delete todoList.state.$parent;
-					expect(todoList.state).toEqual((<DataEntityType<TodoList>>TodoList).entityConfig.fields.get('state').defaultValue);
+					const defaultState = (<DataEntityType<TodoList>>TodoList).entityConfig.fields.get('state').defaultValue;
+					expect(todoList.state).toEqual(defaultState);
 					done();
 				});
 			});

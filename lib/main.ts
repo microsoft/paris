@@ -1,3 +1,5 @@
+export {DataQuery} from "./data_access/data-query";
+export {DataQuerySortDirection, DataQuerySortField} from "./data_access/data-query-sort";
 export {DataAvailability} from "./data_access/data-availability.enum";
 export {DataSet} from "./data_access/dataset";
 export {queryToHttpOptions} from "./data_access/query-to-http";

@@ -13,4 +13,6 @@ export class TodoListState extends ModelBase{
 	@EntityField({ defaultValue: false })
 	isShared:boolean;
 
+	@EntityField()
+	previousState:TodoListState;
 }

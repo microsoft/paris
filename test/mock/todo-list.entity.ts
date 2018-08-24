@@ -24,7 +24,7 @@ export class TodoList extends EntityModelBase<number>{
 	@EntityField()
 	name:string;
 
-	@EntityField({ defaultValue: { isDone: false, isShared: true } })
+	@EntityField({ defaultValue: { isDone: false, isShared: true, previousState: null } })
 	state:TodoListState;
 }
 
