@@ -13,8 +13,8 @@ export interface IReadonlyRepository<T extends ModelBase = ModelBase>{
 	query:(options?:DataQuery) => Observable<DataSet<T>>,
 	serializeItem:(item:T, serializationData?:any) => Object,
 	allItems$:Observable<Array<T>>,
-	endpointName:string,
 	getEndpointUrl: (query?: DataQuery) => string,
+	getEndpointName: (query?: DataQuery) => string
 }
 
 export interface IRepository<T extends ModelBase = ModelBase> extends IReadonlyRepository<T>{

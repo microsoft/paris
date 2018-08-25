@@ -56,9 +56,10 @@ export class Repository<TEntity extends ModelBase, TRawData = any> extends Reado
 			throw new Error(`Entity ${this.entityConstructor.entityConfig.singularName || this.entityConstructor.name} can't be saved - it doesn't specify an endpoint.`);
 
 		try {
-			let isNewItem:boolean = item.id === undefined;
-			let saveData: TRawData = this.serializeItem(item, serializationData);
-			let endpoint:string = this.entityBackendConfig.parseSaveQuery ? this.entityBackendConfig.parseSaveQuery(item, this.entity, this.paris.config, options) : `${this.endpointName}/${item.id || ''}`;
+			const isNewItem:boolean = item.id === undefined;
+			const saveData: TRawData = this.serializeItem(item, serializationData);
+			const endpointName:string = this.getEndpointName(options && options.params ? { where: options.params } : null);
+			const endpoint:string = this.entityBackendConfig.parseSaveQuery ? this.entityBackendConfig.parseSaveQuery(item, this.entity, this.paris.config, options) : `${endpointName}/${item.id || ''}`;
 
 			return this.paris.dataStore.save(endpoint, this.getSaveMethod(item), Object.assign({}, options, {data: saveData}), this.getBaseUrl(options && {where: options.params}))
 				.pipe(
@@ -142,7 +143,9 @@ export class Repository<TEntity extends ModelBase, TRawData = any> extends Reado
 			? this.entity.parseSaveItemsQuery(itemsData, options, this.entity, this.paris.config)
 			: Object.assign({}, options, {data: {items: itemsData}});
 
-		return this.paris.dataStore.save(`${this.endpointName}/`, method, saveHttpOptions, this.getBaseUrl(options && {where: options.params}))
+		const endpointName:string = this.getEndpointName(options && options.params ? { where: options.params } : null);
+
+		return this.paris.dataStore.save(`${endpointName}/`, method, saveHttpOptions, this.getBaseUrl(options && {where: options.params}))
 			.pipe(
 				catchError((err: AjaxError) => {
 					this.emitEntityHttpErrorEvent(err);
@@ -180,7 +183,8 @@ export class Repository<TEntity extends ModelBase, TRawData = any> extends Reado
 			if (this.entityBackendConfig.getRemoveData)
 				Object.assign(httpOptions.data, this.entityBackendConfig.getRemoveData([item]));
 
-			let endpoint:string = this.entityBackendConfig.parseRemoveQuery ? this.entityBackendConfig.parseRemoveQuery([item], this.entity, this.paris.config) : `${this.endpointName}/${item.id || ''}`;
+			const endpointName:string = this.getEndpointName(options && options.params ? { where: options.params } : null);
+			const endpoint:string = this.entityBackendConfig.parseRemoveQuery ? this.entityBackendConfig.parseRemoveQuery([item], this.entity, this.paris.config) : `${endpointName}/${item.id || ''}`;
 
 			return this.paris.dataStore.delete(endpoint, httpOptions, this.getBaseUrl(options && {where: options.params}))
 				.pipe(
@@ -236,7 +240,8 @@ export class Repository<TEntity extends ModelBase, TRawData = any> extends Reado
 				: { ids: items.map(item => item.id) }
 			);
 
-			let endpoint:string = this.entityBackendConfig.parseRemoveQuery ? this.entityBackendConfig.parseRemoveQuery(items, this.entity, this.paris.config) : this.endpointName;
+			const endpointName:string = this.getEndpointName(options && options.params ? { where: options.params } : null);
+			const endpoint:string = this.entityBackendConfig.parseRemoveQuery ? this.entityBackendConfig.parseRemoveQuery(items, this.entity, this.paris.config) : endpointName;
 
 			return this.paris.dataStore.delete(endpoint, httpOptions, this.getBaseUrl(options && {where: options.params}))
 				.pipe(

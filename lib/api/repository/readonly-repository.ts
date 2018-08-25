@@ -47,7 +47,7 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 
 
 	protected getBaseUrl(query?: DataQuery): string {
-		if (!this.entity.baseUrl)
+		if (!this.entityBackendConfig.baseUrl)
 			return null;
 
 		return this.entityBackendConfig.baseUrl instanceof Function ? this.entityBackendConfig.baseUrl(this.paris.config, query) : this.entityBackendConfig.baseUrl;
@@ -93,11 +93,11 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 	}
 
 	/**
-	 * The base URL for this Repository's API calls (not including base URL - the domain)
+	 * Returns the base URL for this Repository's API calls (not including base URL - the domain)
 	 * @returns {string}
 	 */
-	get endpointName():string{
-		return this.entityBackendConfig.endpoint instanceof Function ? this.entityBackendConfig.endpoint(this.paris.config) : this.entityBackendConfig.endpoint;
+	getEndpointName(query?: DataQuery):string{
+		return this.entityBackendConfig.endpoint instanceof Function ? this.entityBackendConfig.endpoint(this.paris.config, query) : this.entityBackendConfig.endpoint;
 	}
 
 	/**
@@ -105,8 +105,8 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 	 * @param {DataQuery} query
 	 * @returns {string}
 	 */
-	getEndpointUrl(query?: DataQuery): string{
-		return `${this.getBaseUrl(query)}/${this.endpointName}`;
+	getEndpointUrl(query?: DataQuery): string {
+		return `${this.getBaseUrl(query) || ''}/${this.getEndpointName(query)}`;
 	}
 
 	protected setAllItems(): Observable<Array<TEntity>> {
@@ -193,7 +193,7 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 		if (this.entityBackendConfig.endpoint instanceof Function)
 			endpoint = this.entityBackendConfig.endpoint(this.paris.config, query);
 		else
-			endpoint = `${this.endpointName}${this.entityBackendConfig.allItemsEndpointTrailingSlash !== false && !this.entityBackendConfig.allItemsEndpoint ? '/' : ''}${this.entityBackendConfig.allItemsEndpoint || ''}`;
+			endpoint = `${this.getEndpointName(query)}${this.entityBackendConfig.allItemsEndpointTrailingSlash !== false && !this.entityBackendConfig.allItemsEndpoint ? '/' : ''}${this.entityBackendConfig.allItemsEndpoint || ''}`;
 
 		const getItem$:Observable<TEntity> = this.paris.dataStore.get(
 			endpoint,
@@ -286,7 +286,7 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 			);
 		}
 		else {
-			const endpoint:string = this.entityBackendConfig.parseItemQuery ? this.entityBackendConfig.parseItemQuery(itemId, this.entity, this.paris.config, params) : `${this.endpointName}/${itemId}`;
+			const endpoint:string = this.entityBackendConfig.parseItemQuery ? this.entityBackendConfig.parseItemQuery(itemId, this.entity, this.paris.config, params) : `${this.getEndpointName({ where: params })}/${itemId}`;
 
 			const getItem$:Observable<TEntity> = this.paris.dataStore.get(
 				endpoint,
@@ -313,9 +313,9 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 	 * @param {TEntity} item
 	 */
 	serializeItem(item:Partial<TEntity>, serializationData?:any): TRawData {
-		ReadonlyRepository.validateItem(item, this.entity);
+		ReadonlyRepository.validateItem(item, this.modelConfig);
 
-		return this.paris.modeler.serializeModel<TEntity, TRawData>(item, this.entity, serializationData);
+		return this.paris.modeler.serializeModel<TEntity, TRawData>(item, this.modelConfig, serializationData);
 	}
 
 	/**

@@ -21,13 +21,13 @@ describe('ReadonlyRepository', () => {
 		todoListRepo = paris.getRepository(TodoList);
 	});
 
-	describe('endpointName', () => {
-		it('should have the correct endpointName', () => {
-			expect(todoRepo.endpointName).toEqual('todo');
+	describe('getEndpointUrl', () => {
+		it('should return the endpoint URL when no baseUrl was defined', () => {
+			expect(todoRepo.getEndpointUrl()).toBe('/todo');
 		});
 
 		it('should have the correct endpointName (by function)', () => {
-			expect(todoListRepo.endpointName).toEqual('v2/list');
+			expect(todoListRepo.getEndpointUrl()).toEqual('/v2/list');
 		});
 	});
 
