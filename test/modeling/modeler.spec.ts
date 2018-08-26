@@ -10,6 +10,10 @@ import {Field} from "../../lib/api/entity/entity-field";
 import {FIELD_DATA_SELF} from "../../lib/config/entity-field.config";
 import {TodoList} from "../mock/todo-list.entity";
 import {TodoListState} from "../mock/todo-list-state.value-object";
+import {Entity} from "../../lib/config/decorators/entity.decorator";
+import {EntityModelBase} from "../../lib/config/entity-model.base";
+import {Repository} from "../../lib/api/repository/repository";
+import {EntityField} from "../../lib/config/decorators/entity-field.decorator";
 
 describe('Modeler', () => {
 	let paris: Paris;
@@ -220,6 +224,37 @@ describe('Modeler', () => {
 
 				done();
 			});
+		});
+	});
+
+	describe("serializeItem", () => {
+		let serializedEntity:{ new(data:any):any };
+		let serializeItem:jest.Mock;
+		let serializedItemRepo:Repository<any>;
+
+		beforeEach(() => {
+			serializeItem = jest.fn();
+
+			@Entity({
+				singularName: "Serialized entity",
+				pluralName: "Serialized entities",
+				endpoint: "serialized",
+				serializeItem: serializeItem
+			})
+			class SerializedEntity extends EntityModelBase {
+				@EntityField() name:string;
+			}
+
+			serializedEntity = SerializedEntity;
+			serializedItemRepo = paris.getRepository(SerializedEntity);
+		});
+
+		it("calls the entity's `serializeItem` method with the proper params", () => {
+			const newSerializedItem = new serializedEntity({ id: undefined, name: 'test' });
+			const serializationData = { test: 1 };
+
+			serializedItemRepo.save(newSerializedItem, null, serializationData);
+			expect(serializeItem).toBeCalledWith(newSerializedItem, newSerializedItem, (<DataEntityType<any>>serializedEntity).entityConfig, paris.config, serializationData);
 		});
 	});
 });

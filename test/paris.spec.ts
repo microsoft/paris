@@ -16,7 +16,7 @@ import {TodoList} from "./mock/todo-list.entity";
 describe('Paris main', () => {
 	let paris: Paris;
 
-	describe('Get Todo repository', () => {
+	describe('Get repository', () => {
 		let repo: Repository<Todo>;
 
 		beforeEach(() => {
@@ -30,6 +30,10 @@ describe('Paris main', () => {
 
 		it('should return a Repository from getRepository', () => {
 			expect(repo).toBeInstanceOf(Repository);
+		});
+
+		it('should return a repository for a ValueObject', () => {
+			expect(paris.getRepository(Tag)).toBeDefined();
 		});
 
 		it.skip("should return null if entity doesn't exist", () => {});

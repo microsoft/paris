@@ -66,7 +66,7 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 	 * @returns {Array<TEntity extends ModelBase>}
 	 */
 	get values():Array<TEntity>{
-		return this.entity.values || null;
+		return this.modelConfig.values || null;
 	}
 
 	/**

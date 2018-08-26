@@ -47,9 +47,9 @@ export class Repository<TEntity extends ModelBase, TRawData = any> extends Reado
 
 	/**
 	 * Saves an entity to the server
-	 * @param {T} item
+	 * @param item
+	 * @param {HttpOptions} options
 	 * @param {any} serializationData Any data to pass to serialize or serializeItem
-	 * @returns {Observable<T extends EntityModelBase>}
 	 */
 	save(item: Partial<TEntity>, options?:HttpOptions, serializationData?:any): Observable<TEntity> {
 		if (!this.entityBackendConfig.endpoint)
@@ -164,9 +164,6 @@ export class Repository<TEntity extends ModelBase, TRawData = any> extends Reado
 
 	/**
 	 * Sends a DELETE request to the backend for deleting an item.
-	 * @param {TEntity} item
-	 * @param {HttpOptions} options
-	 * @returns {Observable<TEntity extends ModelBase>}
 	 */
 	removeItem(item:TEntity, options?:HttpOptions):Observable<TEntity>{
 		if (!item)

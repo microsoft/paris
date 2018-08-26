@@ -342,12 +342,12 @@ export class Modeler {
 				else if (entityField.isArray) {
 					if (itemFieldValue) {
 						if (fieldRepository || fieldValueObjectType)
-							modelValue = itemFieldValue.map((element: any) => this.serializeModel(element, fieldRepository ? fieldRepository.entity : fieldValueObjectType, serializationData));
+							modelValue = itemFieldValue.map((element: any) => this.serializeModel(element, fieldRepository ? fieldRepository.modelConfig : fieldValueObjectType, serializationData));
 						else modelValue = itemFieldValue.map((item: any) => DataTransformersService.serialize(entityField.arrayOf, item));
 					} else modelValue = null;
 				}
 				else if (fieldRepository)
-					modelValue = isNilValue ? fieldRepository.entity.getDefaultValue() || null : itemFieldValue.id;
+					modelValue = isNilValue ? fieldRepository.modelConfig.getDefaultValue() || null : itemFieldValue.id;
 				else if (fieldValueObjectType)
 					modelValue = isNilValue ? fieldValueObjectType.getDefaultValue() || null : this.serializeModel(itemFieldValue, fieldValueObjectType, serializationData);
 				else
@@ -362,7 +362,7 @@ export class Modeler {
 		});
 
 		if (entity.serializeItem)
-			modelData = entity.serializeItem(model, modelData, entity, serializationData);
+			modelData = entity.serializeItem(model, modelData, entity, this.paris.config, serializationData);
 
 		return modelData;
 	}
