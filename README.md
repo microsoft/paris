@@ -6,7 +6,7 @@
 Paris is a data management library for webapps, using TypeScript and RxJS to implement Domain-Driven Design.
 
 *Paris, fashion capital of the world, where all the **models** want to be*.
-
+ 
 
 ## Installation
 
