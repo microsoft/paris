@@ -1,8 +1,7 @@
 # Paris
 
 [![Build Status](https://travis-ci.org/Microsoft/paris.svg?branch=master)](https://travis-ci.org/Microsoft/paris)
-[![codecov](https://codecov.io/gh/Microsoft/paris/branch/master/graph/badge.svg)](https://codecov.io/gh/Microsoft/paris)
-
+[![npm version](https://badge.fury.io/js/%40microsoft%2Fparis.svg)](https://badge.fury.io/js/%40microsoft%2Fparis)
 
 Paris is a data management library for webapps, using TypeScript and RxJS to implement Domain-Driven Design.
 
