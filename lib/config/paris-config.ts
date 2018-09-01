@@ -1,14 +1,14 @@
 import {AjaxRequest} from "rxjs/ajax";
 
-export interface ParisConfig{
+export interface ParisConfig<TConfigData = any>{
 	apiRoot?:string,
 	allItemsProperty?:string,
 	entityIdProperty?:string,
-	data?:any,
+	data?:TConfigData,
 	http?:AjaxRequest
 }
 
-export const defaultConfig:ParisConfig = {
+export const defaultConfig:Partial<ParisConfig> = {
 	allItemsProperty: "items",
 	entityIdProperty: "id"
 };

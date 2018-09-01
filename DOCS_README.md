@@ -54,5 +54,3 @@ paris.getItemById(TodoItem, 1).subscribe((todoItem:TodoItem) => {
 Check the [Wiki](https://github.com/Microsoft/paris/wiki) for advanced uses and explanations.
 
 [NPM](https://www.npmjs.com/package/@microsoft/paris) [GitHub](https://github.com/Microsoft/paris)
-
-![logo](https://github.com/Microsoft/paris/blob/master/paris_logo-192x192.png)

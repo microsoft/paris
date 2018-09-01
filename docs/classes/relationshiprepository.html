@@ -121,8 +121,6 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="relationshiprepository.html#allowedtypes" class="tsd-kind-icon">allowed<wbr>Types</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="relationshiprepository.html#dataentitytype" class="tsd-kind-icon">data<wbr>Entity<wbr>Type</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="relationshiprepository.html#entity" class="tsd-kind-icon">entity</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="relationshiprepository.html#entitybackendconfig" class="tsd-kind-icon">entity<wbr>Backend<wbr>Config</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="relationshiprepository.html#entityconstructor" class="tsd-kind-icon">entity<wbr>Constructor</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="relationshiprepository.html#error_" class="tsd-kind-icon">error$</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="relationshiprepository.html#relationshipconfig" class="tsd-kind-icon">relationship<wbr>Config</a></li>
@@ -135,6 +133,9 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited"><a href="relationshiprepository.html#allitems_" class="tsd-kind-icon">all<wbr>Items$</a></li>
 								<li class="tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited"><a href="relationshiprepository.html#endpointname" class="tsd-kind-icon">endpoint<wbr>Name</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited"><a href="relationshiprepository.html#entity" class="tsd-kind-icon">entity</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited"><a href="relationshiprepository.html#modelconfig" class="tsd-kind-icon">model<wbr>Config</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited"><a href="relationshiprepository.html#values" class="tsd-kind-icon">values</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
@@ -146,6 +147,7 @@
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="relationshiprepository.html#createnewitem" class="tsd-kind-icon">create<wbr>New<wbr>Item</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="relationshiprepository.html#getendpointurl" class="tsd-kind-icon">get<wbr>Endpoint<wbr>Url</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="relationshiprepository.html#getitembyid" class="tsd-kind-icon">get<wbr>Item<wbr>ById</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="relationshiprepository.html#getqueryhttpoptions" class="tsd-kind-icon">get<wbr>Query<wbr>Http<wbr>Options</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="relationshiprepository.html#getrelateditem" class="tsd-kind-icon">get<wbr>Related<wbr>Item</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="relationshiprepository.html#getrelateditembyid" class="tsd-kind-icon">get<wbr>Related<wbr>Item<wbr>ById</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="relationshiprepository.html#query" class="tsd-kind-icon">query</a></li>
@@ -153,8 +155,6 @@
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="relationshiprepository.html#queryforitemid" class="tsd-kind-icon">query<wbr>For<wbr>Item<wbr>Id</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="relationshiprepository.html#queryitem" class="tsd-kind-icon">query<wbr>Item</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="relationshiprepository.html#serializeitem" class="tsd-kind-icon">serialize<wbr>Item</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-static"><a href="relationshiprepository.html#getmodeldata" class="tsd-kind-icon">get<wbr>Model<wbr>Data</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-static"><a href="relationshiprepository.html#serializeitem-1" class="tsd-kind-icon">serialize<wbr>Item</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-static"><a href="relationshiprepository.html#validateitem" class="tsd-kind-icon">validate<wbr>Item</a></li>
 							</ul>
 						</section>
@@ -167,32 +167,26 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Relationship<wbr>Repository<span class="tsd-signature-symbol">(</span>sourceEntityType<span class="tsd-signature-symbol">: </span><a href="../interfaces/dataentityconstructor.html" class="tsd-signature-type">DataEntityConstructor</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TSource</span><span class="tsd-signature-symbol">&gt;</span>, dataEntityType<span class="tsd-signature-symbol">: </span><a href="../interfaces/dataentityconstructor.html" class="tsd-signature-type">DataEntityConstructor</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TData</span><span class="tsd-signature-symbol">&gt;</span>, relationTypes<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><a href="../enums/relationshiptype.html" class="tsd-signature-type">RelationshipType</a><span class="tsd-signature-symbol">&gt;</span>, config<span class="tsd-signature-symbol">: </span><a href="../interfaces/parisconfig.html" class="tsd-signature-type">ParisConfig</a>, dataStore<span class="tsd-signature-symbol">: </span><a href="datastoreservice.html" class="tsd-signature-type">DataStoreService</a>, paris<span class="tsd-signature-symbol">: </span><a href="paris.html" class="tsd-signature-type">Paris</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="relationshiprepository.html" class="tsd-signature-type">RelationshipRepository</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Relationship<wbr>Repository<span class="tsd-signature-symbol">(</span>sourceEntityType<span class="tsd-signature-symbol">: </span><a href="../interfaces/dataentitytype.html" class="tsd-signature-type">DataEntityType</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TSource</span><span class="tsd-signature-symbol">&gt;</span>, dataEntityType<span class="tsd-signature-symbol">: </span><a href="../interfaces/dataentitytype.html" class="tsd-signature-type">DataEntityType</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TData</span><span class="tsd-signature-symbol">&gt;</span>, relationTypes<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><a href="../enums/relationshiptype.html" class="tsd-signature-type">RelationshipType</a><span class="tsd-signature-symbol">&gt;</span>, paris<span class="tsd-signature-symbol">: </span><a href="paris.html" class="tsd-signature-type">Paris</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="relationshiprepository.html" class="tsd-signature-type">RelationshipRepository</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Overrides <a href="readonlyrepository.html">ReadonlyRepository</a>.<a href="readonlyrepository.html#constructor">constructor</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/repository/relationship-repository.ts#L30">repository/relationship-repository.ts:30</a></li>
+									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/api/repository/relationship-repository.ts#L28">api/repository/relationship-repository.ts:28</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>sourceEntityType: <a href="../interfaces/dataentityconstructor.html" class="tsd-signature-type">DataEntityConstructor</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TSource</span><span class="tsd-signature-symbol">&gt;</span></h5>
+									<h5>sourceEntityType: <a href="../interfaces/dataentitytype.html" class="tsd-signature-type">DataEntityType</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TSource</span><span class="tsd-signature-symbol">&gt;</span></h5>
 								</li>
 								<li>
-									<h5>dataEntityType: <a href="../interfaces/dataentityconstructor.html" class="tsd-signature-type">DataEntityConstructor</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TData</span><span class="tsd-signature-symbol">&gt;</span></h5>
+									<h5>dataEntityType: <a href="../interfaces/dataentitytype.html" class="tsd-signature-type">DataEntityType</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TData</span><span class="tsd-signature-symbol">&gt;</span></h5>
 								</li>
 								<li>
 									<h5>relationTypes: <span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><a href="../enums/relationshiptype.html" class="tsd-signature-type">RelationshipType</a><span class="tsd-signature-symbol">&gt;</span></h5>
-								</li>
-								<li>
-									<h5>config: <a href="../interfaces/parisconfig.html" class="tsd-signature-type">ParisConfig</a></h5>
-								</li>
-								<li>
-									<h5>dataStore: <a href="datastoreservice.html" class="tsd-signature-type">DataStoreService</a></h5>
 								</li>
 								<li>
 									<h5>paris: <a href="paris.html" class="tsd-signature-type">Paris</a></h5>
@@ -212,52 +206,29 @@
 					<aside class="tsd-sources">
 						<p>Implementation of <a href="../interfaces/irelationshiprepository.html">IRelationshipRepository</a>.<a href="../interfaces/irelationshiprepository.html#allowedtypes">allowedTypes</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/repository/relationship-repository.ts#L30">repository/relationship-repository.ts:30</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/api/repository/relationship-repository.ts#L28">api/repository/relationship-repository.ts:28</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="dataentitytype" class="tsd-anchor"></a>
 					<h3>data<wbr>Entity<wbr>Type</h3>
-					<div class="tsd-signature tsd-kind-icon">data<wbr>Entity<wbr>Type<span class="tsd-signature-symbol">:</span> <a href="../interfaces/dataentityconstructor.html" class="tsd-signature-type">DataEntityConstructor</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TData</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<div class="tsd-signature tsd-kind-icon">data<wbr>Entity<wbr>Type<span class="tsd-signature-symbol">:</span> <a href="../interfaces/dataentitytype.html" class="tsd-signature-type">DataEntityType</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TData</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<p>Implementation of <a href="../interfaces/irelationshiprepository.html">IRelationshipRepository</a>.<a href="../interfaces/irelationshiprepository.html#dataentitytype">dataEntityType</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/repository/relationship-repository.ts#L33">repository/relationship-repository.ts:33</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
-					<a name="entity" class="tsd-anchor"></a>
-					<h3>entity</h3>
-					<div class="tsd-signature tsd-kind-icon">entity<span class="tsd-signature-symbol">:</span> <a href="../interfaces/modelconfig.html" class="tsd-signature-type">ModelConfig</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TData</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">&gt;</span></div>
-					<aside class="tsd-sources">
-						<p>Implementation of <a href="../interfaces/irelationshiprepository.html">IRelationshipRepository</a>.<a href="../interfaces/irelationshiprepository.html#entity">entity</a></p>
-						<p>Inherited from <a href="readonlyrepository.html">ReadonlyRepository</a>.<a href="readonlyrepository.html#entity">entity</a></p>
-						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/repository/readonly-repository.ts#L39">repository/readonly-repository.ts:39</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
-					<a name="entitybackendconfig" class="tsd-anchor"></a>
-					<h3>entity<wbr>Backend<wbr>Config</h3>
-					<div class="tsd-signature tsd-kind-icon">entity<wbr>Backend<wbr>Config<span class="tsd-signature-symbol">:</span> <a href="../interfaces/entitybackendconfig.html" class="tsd-signature-type">EntityBackendConfig</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TData</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">&gt;</span></div>
-					<aside class="tsd-sources">
-						<p>Inherited from <a href="readonlyrepository.html">ReadonlyRepository</a>.<a href="readonlyrepository.html#entitybackendconfig">entityBackendConfig</a></p>
-						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/repository/readonly-repository.ts#L40">repository/readonly-repository.ts:40</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/api/repository/relationship-repository.ts#L31">api/repository/relationship-repository.ts:31</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
 					<a name="entityconstructor" class="tsd-anchor"></a>
 					<h3>entity<wbr>Constructor</h3>
-					<div class="tsd-signature tsd-kind-icon">entity<wbr>Constructor<span class="tsd-signature-symbol">:</span> <a href="../interfaces/dataentityconstructor.html" class="tsd-signature-type">DataEntityConstructor</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TData</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<div class="tsd-signature tsd-kind-icon">entity<wbr>Constructor<span class="tsd-signature-symbol">:</span> <a href="../interfaces/dataentitytype.html" class="tsd-signature-type">DataEntityType</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TData</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="readonlyrepository.html">ReadonlyRepository</a>.<a href="readonlyrepository.html#entityconstructor">entityConstructor</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/repository/readonly-repository.ts#L42">repository/readonly-repository.ts:42</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/api/repository/readonly-repository.ts#L35">api/repository/readonly-repository.ts:35</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -268,7 +239,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="readonlyrepository.html">ReadonlyRepository</a>.<a href="readonlyrepository.html#error_">error$</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/repository/readonly-repository.ts#L37">repository/readonly-repository.ts:37</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/api/repository/readonly-repository.ts#L31">api/repository/readonly-repository.ts:31</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -279,18 +250,18 @@
 					<aside class="tsd-sources">
 						<p>Implementation of <a href="../interfaces/irelationshiprepository.html">IRelationshipRepository</a>.<a href="../interfaces/irelationshiprepository.html#relationshipconfig">relationshipConfig</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/repository/relationship-repository.ts#L27">repository/relationship-repository.ts:27</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/api/repository/relationship-repository.ts#L25">api/repository/relationship-repository.ts:25</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="sourceentitytype" class="tsd-anchor"></a>
 					<h3>source<wbr>Entity<wbr>Type</h3>
-					<div class="tsd-signature tsd-kind-icon">source<wbr>Entity<wbr>Type<span class="tsd-signature-symbol">:</span> <a href="../interfaces/dataentityconstructor.html" class="tsd-signature-type">DataEntityConstructor</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TSource</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<div class="tsd-signature tsd-kind-icon">source<wbr>Entity<wbr>Type<span class="tsd-signature-symbol">:</span> <a href="../interfaces/dataentitytype.html" class="tsd-signature-type">DataEntityType</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TSource</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<p>Implementation of <a href="../interfaces/irelationshiprepository.html">IRelationshipRepository</a>.<a href="../interfaces/irelationshiprepository.html#sourceentitytype">sourceEntityType</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/repository/relationship-repository.ts#L32">repository/relationship-repository.ts:32</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/api/repository/relationship-repository.ts#L30">api/repository/relationship-repository.ts:30</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -300,7 +271,7 @@
 					<div class="tsd-signature tsd-kind-icon">source<wbr>Item<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">TSource</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/repository/relationship-repository.ts#L29">repository/relationship-repository.ts:29</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/api/repository/relationship-repository.ts#L27">api/repository/relationship-repository.ts:27</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -318,7 +289,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="readonlyrepository.html">ReadonlyRepository</a>.<a href="readonlyrepository.html#allitems_">allItems$</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/repository/readonly-repository.ts#L67">repository/readonly-repository.ts:67</a></li>
+									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/api/repository/readonly-repository.ts#L77">api/repository/readonly-repository.ts:77</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -342,7 +313,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="readonlyrepository.html">ReadonlyRepository</a>.<a href="readonlyrepository.html#endpointname">endpointName</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/repository/readonly-repository.ts#L89">repository/readonly-repository.ts:89</a></li>
+									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/api/repository/readonly-repository.ts#L99">api/repository/readonly-repository.ts:99</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -351,6 +322,65 @@
 								</div>
 							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+					<a name="entity" class="tsd-anchor"></a>
+					<h3>entity</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> entity<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/entityconfig.html" class="tsd-signature-type">EntityConfig</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TData</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="readonlyrepository.html">ReadonlyRepository</a>.<a href="readonlyrepository.html#entity">entity</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/api/repository/readonly-repository.ts#L56">api/repository/readonly-repository.ts:56</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/entityconfig.html" class="tsd-signature-type">EntityConfig</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TData</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+					<a name="modelconfig" class="tsd-anchor"></a>
+					<h3>model<wbr>Config</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> modelConfig<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="entityconfigbase.html" class="tsd-signature-type">EntityConfigBase</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TData</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="readonlyrepository.html">ReadonlyRepository</a>.<a href="readonlyrepository.html#modelconfig">modelConfig</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/api/repository/readonly-repository.ts#L60">api/repository/readonly-repository.ts:60</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <a href="entityconfigbase.html" class="tsd-signature-type">EntityConfigBase</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TData</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+					<a name="values" class="tsd-anchor"></a>
+					<h3>values</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> values<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TData</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="readonlyrepository.html">ReadonlyRepository</a>.<a href="readonlyrepository.html#values">values</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/api/repository/readonly-repository.ts#L68">api/repository/readonly-repository.ts:68</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>All the hard-coded values of an Entity, as specified through the <code>values</code> configuration.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TData</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -368,7 +398,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="readonlyrepository.html">ReadonlyRepository</a>.<a href="readonlyrepository.html#clearallvalues">clearAllValues</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/repository/readonly-repository.ts#L226">repository/readonly-repository.ts:226</a></li>
+									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/api/repository/readonly-repository.ts#L249">api/repository/readonly-repository.ts:249</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -391,7 +421,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="readonlyrepository.html">ReadonlyRepository</a>.<a href="readonlyrepository.html#clearcache">clearCache</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/repository/readonly-repository.ts#L219">repository/readonly-repository.ts:219</a></li>
+									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/api/repository/readonly-repository.ts#L242">api/repository/readonly-repository.ts:242</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -414,7 +444,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="readonlyrepository.html">ReadonlyRepository</a>.<a href="readonlyrepository.html#createitem">createItem</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/repository/readonly-repository.ts#L141">repository/readonly-repository.ts:141</a></li>
+									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/api/repository/readonly-repository.ts#L151">api/repository/readonly-repository.ts:151</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -453,7 +483,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="readonlyrepository.html">ReadonlyRepository</a>.<a href="readonlyrepository.html#createnewitem">createNewItem</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/repository/readonly-repository.ts#L121">repository/readonly-repository.ts:121</a></li>
+									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/api/repository/readonly-repository.ts#L131">api/repository/readonly-repository.ts:131</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -477,7 +507,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="readonlyrepository.html">ReadonlyRepository</a>.<a href="readonlyrepository.html#getendpointurl">getEndpointUrl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/repository/readonly-repository.ts#L98">repository/readonly-repository.ts:98</a></li>
+									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/api/repository/readonly-repository.ts#L108">api/repository/readonly-repository.ts:108</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -506,7 +536,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="readonlyrepository.html">ReadonlyRepository</a>.<a href="readonlyrepository.html#getitembyid">getItemById</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/repository/readonly-repository.ts#L237">repository/readonly-repository.ts:237</a></li>
+									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/api/repository/readonly-repository.ts#L260">api/repository/readonly-repository.ts:260</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -535,6 +565,37 @@
 						</li>
 					</ul>
 				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="getqueryhttpoptions" class="tsd-anchor"></a>
+					<h3>get<wbr>Query<wbr>Http<wbr>Options</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Query<wbr>Http<wbr>Options<span class="tsd-signature-symbol">(</span>query<span class="tsd-signature-symbol">: </span><a href="../interfaces/dataquery.html" class="tsd-signature-type">DataQuery</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/httpoptions.html" class="tsd-signature-type">HttpOptions</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="readonlyrepository.html">ReadonlyRepository</a>.<a href="readonlyrepository.html#getqueryhttpoptions">getQueryHttpOptions</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/api/repository/readonly-repository.ts#L223">api/repository/readonly-repository.ts:223</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns the HttpOptions for the specified DataQuery.
+										Uses the entity config&#39;s <code>parseDataQuery</code> configuration, if available, or otherwise the <code>queryToHttpOptions</code> function.
+									If the entity config has <code>fixedData</code> set, the fixed data will be added to the HttpOptions params.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>query: <a href="../interfaces/dataquery.html" class="tsd-signature-type">DataQuery</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/httpoptions.html" class="tsd-signature-type">HttpOptions</a></h4>
+						</li>
+					</ul>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
 					<a name="getrelateditem" class="tsd-anchor"></a>
 					<h3>get<wbr>Related<wbr>Item</h3>
@@ -545,7 +606,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/repository/relationship-repository.ts#L108">repository/relationship-repository.ts:108</a></li>
+									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/api/repository/relationship-repository.ts#L104">api/repository/relationship-repository.ts:104</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -574,7 +635,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/repository/relationship-repository.ts#L132">repository/relationship-repository.ts:132</a></li>
+									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/api/repository/relationship-repository.ts#L128">api/repository/relationship-repository.ts:128</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -610,7 +671,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="readonlyrepository.html">ReadonlyRepository</a>.<a href="readonlyrepository.html#query">query</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/repository/relationship-repository.ts#L57">repository/relationship-repository.ts:57</a></li>
+									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/api/repository/relationship-repository.ts#L53">api/repository/relationship-repository.ts:53</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -636,7 +697,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/repository/relationship-repository.ts#L72">repository/relationship-repository.ts:72</a></li>
+									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/api/repository/relationship-repository.ts#L68">api/repository/relationship-repository.ts:68</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -665,7 +726,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/repository/relationship-repository.ts#L94">repository/relationship-repository.ts:94</a></li>
+									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/api/repository/relationship-repository.ts#L90">api/repository/relationship-repository.ts:90</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -701,7 +762,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="readonlyrepository.html">ReadonlyRepository</a>.<a href="readonlyrepository.html#queryitem">queryItem</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/repository/relationship-repository.ts#L65">repository/relationship-repository.ts:65</a></li>
+									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/api/repository/relationship-repository.ts#L61">api/repository/relationship-repository.ts:61</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -728,7 +789,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="readonlyrepository.html">ReadonlyRepository</a>.<a href="readonlyrepository.html#serializeitem">serializeItem</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/repository/readonly-repository.ts#L297">repository/readonly-repository.ts:297</a></li>
+									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/api/repository/readonly-repository.ts#L315">api/repository/readonly-repository.ts:315</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -740,108 +801,8 @@
 							<ul class="tsd-parameters">
 								<li>
 									<h5>item: <span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TData</span><span class="tsd-signature-symbol">&gt;</span></h5>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> serializationData: <span class="tsd-signature-type">any</span></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">TRawData</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-static">
-					<a name="getmodeldata" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagStatic">Static</span> get<wbr>Model<wbr>Data</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-static">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Model<wbr>Data&lt;TEntity, TRawData&gt;<span class="tsd-signature-symbol">(</span>rawData<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TRawData</span>, entity<span class="tsd-signature-symbol">: </span><a href="../interfaces/modelconfig.html" class="tsd-signature-type">ModelConfig</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">&gt;</span>, config<span class="tsd-signature-symbol">: </span><a href="../interfaces/parisconfig.html" class="tsd-signature-type">ParisConfig</a>, paris<span class="tsd-signature-symbol">: </span><a href="paris.html" class="tsd-signature-type">Paris</a>, options<span class="tsd-signature-symbol">?: </span><a href="../interfaces/dataoptions.html" class="tsd-signature-type">DataOptions</a>, query<span class="tsd-signature-symbol">?: </span><a href="../interfaces/dataquery.html" class="tsd-signature-type">DataQuery</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">&gt;</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<p>Inherited from <a href="readonlyrepository.html">ReadonlyRepository</a>.<a href="readonlyrepository.html#getmodeldata">getModelData</a></p>
-								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/repository/readonly-repository.ts#L314">repository/readonly-repository.ts:314</a></li>
-								</ul>
-							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>Populates the item dataset with any sub-model. For example, if an ID is found for a property whose type is an entity,
-										the property&#39;s value will be an instance of that entity, for the ID, not the ID.
-									This method does the actual heavy lifting required for modeling an Entity or ValueObject - parses the fields, models sub-models, etc.</p>
-								</div>
-							</div>
-							<h4 class="tsd-type-parameters-title">Type parameters</h4>
-							<ul class="tsd-type-parameters">
-								<li>
-									<h4>TEntity<span class="tsd-signature-symbol">: </span><a href="modelbase.html" class="tsd-signature-type">ModelBase</a></h4>
-								</li>
-								<li>
-									<h4>TRawData<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></h4>
-								</li>
-							</ul>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>rawData: <span class="tsd-signature-type">TRawData</span></h5>
-								</li>
-								<li>
-									<h5>entity: <a href="../interfaces/modelconfig.html" class="tsd-signature-type">ModelConfig</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">&gt;</span></h5>
-								</li>
-								<li>
-									<h5>config: <a href="../interfaces/parisconfig.html" class="tsd-signature-type">ParisConfig</a></h5>
-								</li>
-								<li>
-									<h5>paris: <a href="paris.html" class="tsd-signature-type">Paris</a></h5>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> options: <a href="../interfaces/dataoptions.html" class="tsd-signature-type">DataOptions</a><span class="tsd-signature-symbol"> =&nbsp;defaultDataOptions</span></h5>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> query: <a href="../interfaces/dataquery.html" class="tsd-signature-type">DataQuery</a></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">&gt;</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-static">
-					<a name="serializeitem-1" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagStatic">Static</span> serialize<wbr>Item</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-static">
-						<li class="tsd-signature tsd-kind-icon">serialize<wbr>Item&lt;TEntity, TRawData&gt;<span class="tsd-signature-symbol">(</span>item<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">&gt;</span>, entity<span class="tsd-signature-symbol">: </span><a href="../interfaces/modelconfig.html" class="tsd-signature-type">ModelConfig</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">&gt;</span>, paris<span class="tsd-signature-symbol">: </span><a href="paris.html" class="tsd-signature-type">Paris</a>, serializationData<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TRawData</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<p>Inherited from <a href="readonlyrepository.html">ReadonlyRepository</a>.<a href="readonlyrepository.html#serializeitem-1">serializeItem</a></p>
-								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/repository/readonly-repository.ts#L516">repository/readonly-repository.ts:516</a></li>
-								</ul>
-							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>Serializes an an entity into raw data, so it can be sent back to backend.</p>
-								</div>
-							</div>
-							<h4 class="tsd-type-parameters-title">Type parameters</h4>
-							<ul class="tsd-type-parameters">
-								<li>
-									<h4>TEntity<span class="tsd-signature-symbol">: </span><a href="modelbase.html" class="tsd-signature-type">ModelBase</a></h4>
-								</li>
-								<li>
-									<h4>TRawData</h4>
-								</li>
-							</ul>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>item: <span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">&gt;</span></h5>
-								</li>
-								<li>
-									<h5>entity: <a href="../interfaces/modelconfig.html" class="tsd-signature-type">ModelConfig</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">&gt;</span></h5>
-								</li>
-								<li>
-									<h5>paris: <a href="paris.html" class="tsd-signature-type">Paris</a></h5>
+									<div class="tsd-comment tsd-typography">
+									</div>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> serializationData: <span class="tsd-signature-type">any</span></h5>
@@ -862,7 +823,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="readonlyrepository.html">ReadonlyRepository</a>.<a href="readonlyrepository.html#validateitem">validateItem</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/repository/readonly-repository.ts#L500">repository/readonly-repository.ts:500</a></li>
+									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/api/repository/readonly-repository.ts#L328">api/repository/readonly-repository.ts:328</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -920,12 +881,6 @@
 								<a href="relationshiprepository.html#dataentitytype" class="tsd-kind-icon">data<wbr>Entity<wbr>Type</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
-								<a href="relationshiprepository.html#entity" class="tsd-kind-icon">entity</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
-								<a href="relationshiprepository.html#entitybackendconfig" class="tsd-kind-icon">entity<wbr>Backend<wbr>Config</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
 								<a href="relationshiprepository.html#entityconstructor" class="tsd-kind-icon">entity<wbr>Constructor</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
@@ -946,6 +901,15 @@
 							<li class=" tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
 								<a href="relationshiprepository.html#endpointname" class="tsd-kind-icon">endpoint<wbr>Name</a>
 							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+								<a href="relationshiprepository.html#entity" class="tsd-kind-icon">entity</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+								<a href="relationshiprepository.html#modelconfig" class="tsd-kind-icon">model<wbr>Config</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+								<a href="relationshiprepository.html#values" class="tsd-kind-icon">values</a>
+							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
 								<a href="relationshiprepository.html#clearallvalues" class="tsd-kind-icon">clear<wbr>All<wbr>Values</a>
 							</li>
@@ -963,6 +927,9 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
 								<a href="relationshiprepository.html#getitembyid" class="tsd-kind-icon">get<wbr>Item<wbr>ById</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="relationshiprepository.html#getqueryhttpoptions" class="tsd-kind-icon">get<wbr>Query<wbr>Http<wbr>Options</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="relationshiprepository.html#getrelateditem" class="tsd-kind-icon">get<wbr>Related<wbr>Item</a>
@@ -984,12 +951,6 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
 								<a href="relationshiprepository.html#serializeitem" class="tsd-kind-icon">serialize<wbr>Item</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-static">
-								<a href="relationshiprepository.html#getmodeldata" class="tsd-kind-icon">get<wbr>Model<wbr>Data</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-static">
-								<a href="relationshiprepository.html#serializeitem-1" class="tsd-kind-icon">serialize<wbr>Item</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-static">
 								<a href="relationshiprepository.html#validateitem" class="tsd-kind-icon">validate<wbr>Item</a>

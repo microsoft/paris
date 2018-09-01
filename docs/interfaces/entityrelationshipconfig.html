@@ -57,7 +57,7 @@
 					<a href="entityrelationshipconfig.html">EntityRelationshipConfig</a>
 				</li>
 			</ul>
-			<h1>Interface EntityRelationshipConfig&lt;TSource, TData, TRawData, TId, T, TRawData&gt;</h1>
+			<h1>Interface EntityRelationshipConfig&lt;TSource, TData, TRawData, TId, TDataSet, T, TRawData&gt;</h1>
 		</div>
 	</div>
 </header>
@@ -78,6 +78,9 @@
 					</li>
 					<li>
 						<h4>TId<span class="tsd-signature-symbol">: </span><a href="../globals.html#entityid" class="tsd-signature-type">EntityId</a></h4>
+					</li>
+					<li>
+						<h4>TDataSet</h4>
 					</li>
 					<li>
 						<h4>T</h4>
@@ -122,6 +125,7 @@
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="entityrelationshipconfig.html#loadall" class="tsd-kind-icon">load<wbr>All</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="entityrelationshipconfig.html#parsedata" class="tsd-kind-icon">parse<wbr>Data</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="entityrelationshipconfig.html#parsedataquery" class="tsd-kind-icon">parse<wbr>Data<wbr>Query</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="entityrelationshipconfig.html#parsedataset" class="tsd-kind-icon">parse<wbr>Data<wbr>Set</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="entityrelationshipconfig.html#parseitemquery" class="tsd-kind-icon">parse<wbr>Item<wbr>Query</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="entityrelationshipconfig.html#parseremovequery" class="tsd-kind-icon">parse<wbr>Remove<wbr>Query</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="entityrelationshipconfig.html#parsesavequery" class="tsd-kind-icon">parse<wbr>Save<wbr>Query</a></li>
@@ -143,7 +147,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="entitybackendconfig.html">EntityBackendConfig</a>.<a href="entitybackendconfig.html#allitemsendpoint">allItemsEndpoint</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/entity/entity.config.ts#L81">entity/entity.config.ts:81</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/config/entity.config.ts#L83">config/entity.config.ts:83</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -161,7 +165,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="entitybackendconfig.html">EntityBackendConfig</a>.<a href="entitybackendconfig.html#allitemsendpointtrailingslash">allItemsEndpointTrailingSlash</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/entity/entity.config.ts#L89">entity/entity.config.ts:89</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/config/entity.config.ts#L91">config/entity.config.ts:91</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -184,7 +188,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="entitybackendconfig.html">EntityBackendConfig</a>.<a href="entitybackendconfig.html#allitemsproperty">allItemsProperty</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/entity/entity.config.ts#L74">entity/entity.config.ts:74</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/config/entity.config.ts#L76">config/entity.config.ts:76</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -219,7 +223,7 @@
 					<div class="tsd-signature tsd-kind-icon">allowed<wbr>Types<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><a href="../enums/relationshiptype.html" class="tsd-signature-type">RelationshipType</a><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/entity/entity-relationship.ts#L11">entity/entity-relationship.ts:11</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/api/entity/entity-relationship.ts#L11">api/entity/entity-relationship.ts:11</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -230,9 +234,16 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="apicallbackendconfiginterface.html">ApiCallBackendConfigInterface</a>.<a href="apicallbackendconfiginterface.html#baseurl">baseUrl</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/models/api-call-backend-config.interface.ts#L9">models/api-call-backend-config.interface.ts:9</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/config/api-call-backend-config.interface.ts#L23">config/api-call-backend-config.interface.ts:23</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The domain to use for all calls for this Entity/ApiCall. Used as a prefix for all HTTP requests.
+								Set to an empty string to avoid this altogether (in case the data arrives from an external URL, for example).
+							If not set and not an empty string, Paris will use config.apiRoot instead.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
 					<a name="cache" class="tsd-anchor"></a>
@@ -241,9 +252,15 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="apicallbackendconfiginterface.html">ApiCallBackendConfigInterface</a>.<a href="apicallbackendconfiginterface.html#cache">cache</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/models/api-call-backend-config.interface.ts#L8">models/api-call-backend-config.interface.ts:8</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/config/api-call-backend-config.interface.ts#L16">config/api-call-backend-config.interface.ts:16</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>If <code>cache</code> is specified, entities will be cached according to the cache settings.
+							Note: cache refers to individual items (such as received from <code>getItemById</code> or with an ApiCall), not queries.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="dataentity" class="tsd-anchor"></a>
@@ -251,7 +268,7 @@
 					<div class="tsd-signature tsd-kind-icon">data<wbr>Entity<span class="tsd-signature-symbol">:</span> <a href="dataentitytype.html" class="tsd-signature-type">DataEntityType</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TData</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/entity/entity-relationship.ts#L8">entity/entity-relationship.ts:8</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/api/entity/entity-relationship.ts#L8">api/entity/entity-relationship.ts:8</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -262,9 +279,14 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="apicallbackendconfiginterface.html">ApiCallBackendConfigInterface</a>.<a href="apicallbackendconfiginterface.html#endpoint">endpoint</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/models/api-call-backend-config.interface.ts#L7">models/api-call-backend-config.interface.ts:7</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/config/api-call-backend-config.interface.ts#L10">config/api-call-backend-config.interface.ts:10</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The URL to use for HTTP requests.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
 					<a name="fixeddata" class="tsd-anchor"></a>
@@ -273,9 +295,14 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="apicallbackendconfiginterface.html">ApiCallBackendConfigInterface</a>.<a href="apicallbackendconfiginterface.html#fixeddata">fixedData</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/models/api-call-backend-config.interface.ts#L10">models/api-call-backend-config.interface.ts:10</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/config/api-call-backend-config.interface.ts#L28">config/api-call-backend-config.interface.ts:28</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Query params to always send when requesting data.</p>
+						</div>
+					</div>
 					<div class="tsd-type-declaration">
 						<h4>Type declaration</h4>
 						<ul class="tsd-parameters">
@@ -291,7 +318,7 @@
 					<div class="tsd-signature tsd-kind-icon">foreign<wbr>Key<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/entity/entity-relationship.ts#L9">entity/entity-relationship.ts:9</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/api/entity/entity-relationship.ts#L9">api/entity/entity-relationship.ts:9</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -301,7 +328,7 @@
 					<div class="tsd-signature tsd-kind-icon">get<wbr>Relationship<wbr>Data<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/entity/entity-relationship.ts#L10">entity/entity-relationship.ts:10</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/api/entity/entity-relationship.ts#L10">api/entity/entity-relationship.ts:10</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -338,7 +365,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="entitybackendconfig.html">EntityBackendConfig</a>.<a href="entitybackendconfig.html#getremovedata">getRemoveData</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/entity/entity.config.ts#L95">entity/entity.config.ts:95</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/config/entity.config.ts#L97">config/entity.config.ts:97</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -380,7 +407,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="entitybackendconfig.html">EntityBackendConfig</a>.<a href="entitybackendconfig.html#loadall">loadAll</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/entity/entity.config.ts#L48">entity/entity.config.ts:48</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/config/entity.config.ts#L50">config/entity.config.ts:50</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -402,9 +429,22 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="apicallbackendconfiginterface.html">ApiCallBackendConfigInterface</a>.<a href="apicallbackendconfiginterface.html#parsedata">parseData</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/models/api-call-backend-config.interface.ts#L12">models/api-call-backend-config.interface.ts:12</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/config/api-call-backend-config.interface.ts#L58">config/api-call-backend-config.interface.ts:58</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>A function that if specifies, parses whatever is received from the API call, before Paris starts handling it.</p>
+						</div>
+						<dl class="tsd-comment-tags">
+							<dt>param</dt>
+							<dd></dd>
+							<dt>param</dt>
+							<dd></dd>
+							<dt>param</dt>
+							<dd></dd>
+						</dl>
+					</div>
 					<div class="tsd-type-declaration">
 						<h4>Type declaration</h4>
 						<ul class="tsd-parameters">
@@ -440,7 +480,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="entitybackendconfig.html">EntityBackendConfig</a>.<a href="entitybackendconfig.html#parsedataquery">parseDataQuery</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/entity/entity.config.ts#L102">entity/entity.config.ts:102</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/config/entity.config.ts#L104">config/entity.config.ts:104</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -481,13 +521,60 @@
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
+					<a name="parsedataset" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> parse<wbr>Data<wbr>Set</h3>
+					<div class="tsd-signature tsd-kind-icon">parse<wbr>Data<wbr>Set<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from <a href="entitybackendconfig.html">EntityBackendConfig</a>.<a href="entitybackendconfig.html#parsedataset">parseDataSet</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/config/entity.config.ts#L116">config/entity.config.ts:116</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>For query results, Paris accepts either an array of items or an object. That object may contain properties such as &#39;count&#39;, &#39;next&#39; and &#39;previous&#39;.
+							<code>parseDataSet</code>, if available, receives the object as it was returned from the API and parses it to a DataSet interface, so the original properties are available in the DataSet.</p>
+						</div>
+						<dl class="tsd-comment-tags">
+							<dt>example</dt>
+							<dd><p><caption>Parsing a DataSet from a raw object returned by the backend</caption></p>
+								<pre><code class="lang-typescript">    parseDataSet: <span class="hljs-function">(<span class="hljs-params">rawDataSet:TodoRawDataSet</span>) =&gt;</span> ({ items: rawDataSet.todoItems, next: rawDataSet.$nextPage, count: rawDataSet.total })
+</code></pre>
+							</dd>
+							<dt>param</dt>
+							<dd></dd>
+						</dl>
+					</div>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-siganture">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-property tsd-is-not-exported">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>dataSet<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TDataSet</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="dataset.html" class="tsd-signature-type">DataSet</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">&gt;</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>dataSet: <span class="tsd-signature-type">TDataSet</span></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <a href="dataset.html" class="tsd-signature-type">DataSet</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TRawData</span><span class="tsd-signature-symbol">&gt;</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
 					<a name="parseitemquery" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagOptional">Optional</span> parse<wbr>Item<wbr>Query</h3>
 					<div class="tsd-signature tsd-kind-icon">parse<wbr>Item<wbr>Query<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="entitybackendconfig.html">EntityBackendConfig</a>.<a href="entitybackendconfig.html#parseitemquery">parseItemQuery</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/entity/entity.config.ts#L118">entity/entity.config.ts:118</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/config/entity.config.ts#L132">config/entity.config.ts:132</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -556,7 +643,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="entitybackendconfig.html">EntityBackendConfig</a>.<a href="entitybackendconfig.html#parseremovequery">parseRemoveQuery</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/entity/entity.config.ts#L137">entity/entity.config.ts:137</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/config/entity.config.ts#L151">config/entity.config.ts:151</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -609,7 +696,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="entitybackendconfig.html">EntityBackendConfig</a>.<a href="entitybackendconfig.html#parsesavequery">parseSaveQuery</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/entity/entity.config.ts#L128">entity/entity.config.ts:128</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/config/entity.config.ts#L142">config/entity.config.ts:142</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -663,11 +750,11 @@
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
 					<a name="savemethod" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagOptional">Optional</span> save<wbr>Method</h3>
-					<div class="tsd-signature tsd-kind-icon">save<wbr>Method<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span><span class="tsd-signature-symbol"> | </span><a href="../globals.html#requestmethod" class="tsd-signature-type">RequestMethod</a></div>
+					<div class="tsd-signature tsd-kind-icon">save<wbr>Method<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span><span class="tsd-signature-symbol"> | </span><a href="../globals.html#saverequestmethod" class="tsd-signature-type">SaveRequestMethod</a></div>
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="entitybackendconfig.html">EntityBackendConfig</a>.<a href="entitybackendconfig.html#savemethod">saveMethod</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/entity/entity.config.ts#L144">entity/entity.config.ts:144</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/config/entity.config.ts#L158">config/entity.config.ts:158</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -685,9 +772,33 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="apicallbackendconfiginterface.html">ApiCallBackendConfigInterface</a>.<a href="apicallbackendconfiginterface.html#separatearrayparams">separateArrayParams</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/models/api-call-backend-config.interface.ts#L11">models/api-call-backend-config.interface.ts:11</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/config/api-call-backend-config.interface.ts#L50">config/api-call-backend-config.interface.ts:50</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>If <code>true</code>, a value that&#39;s specified in DataQuery.params and is an array will result in multiple params in the HTTP request</p>
+						</div>
+						<dl class="tsd-comment-tags">
+							<dt>example</dt>
+							<dd><p><caption>Using separateArrayParams</caption></p>
+								<pre><code class="lang-typescript"><span class="hljs-meta">@Entity</span>({
+    singularName: <span class="hljs-string">'My entity'</span>,
+    pluralName: <span class="hljs-string">'My entities'</span>,
+    endpoint: <span class="hljs-string">'myentity'</span>,
+    separateArrayParams: <span class="hljs-literal">true</span>
+})
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> MyEntity <span class="hljs-keyword">extends</span> EntityModelBase{}
+
+paris.query(MyEntity, { where: { foo: [<span class="hljs-string">'bar'</span>, <span class="hljs-string">'lish'</span>] }})
+    .subscribe(<span class="hljs-function">(<span class="hljs-params">dataSet:DataSet&lt;MyEntity&gt;</span>) =&gt;</span> <span class="hljs-built_in">console</span>.log(dataSet));
+</code></pre>
+								<p>In this example, the API call will be to (config.apiRoot)/myentity?foo=bar&amp;foo=lish.
+									If separateArrayParams wasn&#39;t specified as <code>true</code>, the api call would have been to:
+								(config.apiRoot)/myentity?foo=bar,lish</p>
+							</dd>
+						</dl>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="sourceentity" class="tsd-anchor"></a>
@@ -695,7 +806,7 @@
 					<div class="tsd-signature tsd-kind-icon">source<wbr>Entity<span class="tsd-signature-symbol">:</span> <a href="dataentitytype.html" class="tsd-signature-type">DataEntityType</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TSource</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/entity/entity-relationship.ts#L7">entity/entity-relationship.ts:7</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/api/entity/entity-relationship.ts#L7">api/entity/entity-relationship.ts:7</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -706,7 +817,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="entitybackendconfig.html">EntityBackendConfig</a>.<a href="entitybackendconfig.html#timeout">timeout</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/5f90230/lib/entity/entity.config.ts#L150">entity/entity.config.ts:150</a></li>
+							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/config/entity.config.ts#L164">config/entity.config.ts:164</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -781,6 +892,9 @@
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
 								<a href="entityrelationshipconfig.html#parsedataquery" class="tsd-kind-icon">parse<wbr>Data<wbr>Query</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
+								<a href="entityrelationshipconfig.html#parsedataset" class="tsd-kind-icon">parse<wbr>Data<wbr>Set</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
 								<a href="entityrelationshipconfig.html#parseitemquery" class="tsd-kind-icon">parse<wbr>Item<wbr>Query</a>

@@ -1,9 +1,12 @@
 # Paris
 
+[![Build Status](https://travis-ci.org/Microsoft/paris.svg?branch=master)](https://travis-ci.org/Microsoft/paris)
+[![npm version](https://badge.fury.io/js/%40microsoft%2Fparis.svg)](https://badge.fury.io/js/%40microsoft%2Fparis)
+
 Paris is a data management library for webapps, using TypeScript and RxJS to implement Domain-Driven Design.
 
 *Paris, fashion capital of the world, where all the **models** want to be*.
-
+ 
 
 ## Installation
 
@@ -89,4 +92,4 @@ For more information see the [Code of Conduct FAQ](https://opensource.microsoft.
 contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
 ## Testing
-* Unit tests are written using [Jest](https://jestjs.io/), and executed with [ts-jest](https://github.com/kulshekhar/ts-jest).
+Unit tests are written using [Jest](https://jestjs.io/), and executed with [ts-jest](https://github.com/kulshekhar/ts-jest).
