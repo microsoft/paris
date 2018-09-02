@@ -213,7 +213,7 @@ export class Modeler {
 			entityFieldRawData = defaultValue;
 		}
 
-		if (entityFieldRawData && !(entityFieldRawData instanceof ModelBase)) {
+		if (entityFieldRawData !== undefined && entityFieldRawData !== null && !(entityFieldRawData instanceof ModelBase)) {
 			const fieldData$ = this.getSubModel<TData>(entityField, entityFieldRawData, options);
 			if (fieldData$)
 				return fieldData$;

@@ -14,6 +14,7 @@ import {Entity} from "../../lib/config/decorators/entity.decorator";
 import {EntityModelBase} from "../../lib/config/entity-model.base";
 import {Repository} from "../../lib/api/repository/repository";
 import {EntityField} from "../../lib/config/decorators/entity-field.decorator";
+import {TodoStatus} from "../mock/todo-status.entity";
 
 describe('Modeler', () => {
 	let paris: Paris;
@@ -93,6 +94,20 @@ describe('Modeler', () => {
 		it("doesn't add a `$parent` property to readonly sub models", done => {
 			todoItem$.subscribe((todoItem:Todo) => {
 				expect(todoItem.tags.every(tag => tag.$parent === undefined));
+				done();
+			});
+		});
+
+		it("assigns a sub-model that has id === 0 from values", done => {
+			const todoRawData = {
+				id: 6,
+				text: 'Pending...',
+				time: 1534433193347,
+				status: 0
+			};
+
+			paris.modeler.modelEntity(todoRawData, todoEntityConfig).subscribe(todoItem => {
+				expect(todoItem.status).toBeInstanceOf(TodoStatus);
 				done();
 			});
 		});

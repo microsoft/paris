@@ -3,6 +3,7 @@ import {EntityModelBase} from "../../lib/config/entity-model.base";
 import {EntityField} from "../../lib/config/decorators/entity-field.decorator";
 
 export const todoStatusValues = [
+	{ id: 0, name: 'Pending' },
 	{ id: 1, name: "Open" },
 	{ id: 2, name: "In progress" },
 	{ id: 3, name: "Done" },
