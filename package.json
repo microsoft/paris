@@ -49,6 +49,7 @@
 		"@types/gulp-sass": "^0.0.30",
 		"@types/gulp-util": "^3.0.29",
 		"@types/jest": "^23.3.1",
+		"@types/json-stringify-safe": "^5.0.0",
 		"@types/lodash-es": "4.17.1",
 		"@types/node": "^8.0.25",
 		"@types/rimraf": "2.0.2",
@@ -63,6 +64,7 @@
 		"husky": "^1.0.0-rc.13",
 		"intl": "^1.2.5",
 		"jest": "^23.5.0",
+		"json-stringify-safe": "^5.0.1",
 		"lodash-es": "4.17.10",
 		"merge2": "^1.0.2",
 		"reflect-metadata": "^0.1.12",
@@ -85,6 +87,9 @@
 		"rxjs": ">=6.0.0",
 		"lodash-es": "4.5.0"
 	},
+	"bundledDependencies": [
+		"json-stringify-safe"
+	],
 	"jest": {
 		"transform": {
 			"^.+\\.(js|ts)$": "ts-jest"
