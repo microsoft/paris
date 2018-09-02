@@ -1,8 +1,9 @@
-import {ParisConfig} from "../config/paris-config";
-import {Http, HttpOptions, RequestMethod, SaveRequestMethod} from "./http.service";
-import {Observable} from "rxjs";
-import {finalize, share, tap} from "rxjs/operators";
-import {AjaxRequest} from "rxjs/ajax";
+import * as jsonStringify from 'json-stringify-safe';
+import { Observable } from "rxjs";
+import { AjaxRequest } from "rxjs/ajax";
+import { finalize, share, tap } from "rxjs/operators";
+import { ParisConfig } from "../config/paris-config";
+import { Http, HttpOptions, RequestMethod, SaveRequestMethod } from "./http.service";
 
 export class DataStoreService{
 	private activeRequests:Map<string, Observable<any>> = new Map();
@@ -55,7 +56,7 @@ export class DataStoreService{
 	}
 
 	private static getActiveRequestId(method:RequestMethod, endpoint:string, data?:RequestData):string{
-		return `${method}__${endpoint}__${data ? JSON.stringify(data) : '|'}`;
+		return `${method}__${endpoint}__${data ? jsonStringify(data) : '|'}`;
 	}
 }
 

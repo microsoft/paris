@@ -1,5 +1,6 @@
-import {from, Observable, of} from "rxjs";
-import {finalize, share, tap} from "rxjs/operators";
+import * as jsonStringify from 'json-stringify-safe';
+import { from, Observable, of } from "rxjs";
+import { finalize, share, tap } from "rxjs/operators";
 
 export class DataCache<T = any>{
 	time:((item:T) => number) | number;
@@ -137,7 +138,7 @@ export class DataCache<T = any>{
 	}
 
 	private getCacheKey(key:string, params?:{ [index:string]: any }):string{
-		return key + (params !== undefined && params !== null ? "_" + JSON.stringify(params) : "");
+		return key + (params !== undefined && params !== null ? "_" + jsonStringify(params) : "");
 	}
 
 	/**
