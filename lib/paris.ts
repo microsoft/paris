@@ -1,34 +1,35 @@
-import {defaultConfig, ParisConfig} from "./config/paris-config";
-import {DataEntityType} from "./api/entity/data-entity.base";
-import {Repository} from "./api/repository/repository";
-import {EntityBackendConfig, EntityConfig} from "./config/entity.config";
-import {entitiesService} from "./config/services/entities.service";
-import {IRepository} from "./api/repository/repository.interface";
-import {DataStoreService} from "./data_access/data-store.service";
-import {EntityConfigBase} from "./config/model-config";
-import {Observable, of, Subject, throwError} from "rxjs";
-import {SaveEntityEvent} from "./api/events/save-entity.event";
-import {RemoveEntitiesEvent} from "./api/events/remove-entities.event";
-import {IRelationshipRepository, RelationshipRepository} from "./api/repository/relationship-repository";
-import {ModelBase} from "./config/model.base";
-import {valueObjectsService} from "./config/services/value-objects.service";
-import {EntityRelationshipRepositoryType} from "./api/entity/entity-relationship-repository-type";
-import {ReadonlyRepository} from "./api/repository/readonly-repository";
-import {HttpOptions, RequestMethod, UrlParams} from "./data_access/http.service";
-import {EntityErrorEvent, EntityErrorTypes} from "./api/events/entity-error.event";
-import {ApiCallType} from "./api/api-calls/api-call.model";
-import {ApiCallBackendConfigInterface} from "./config/api-call-backend-config.interface";
-import {Modeler} from "./modeling/modeler";
-import {catchError, map, mergeMap, switchMap, tap} from "rxjs/operators";
-import {DataTransformersService} from "./modeling/data-transformers.service";
-import {DataCache, DataCacheSettings} from "./data_access/cache";
-import {EntityModelBase} from "./config/entity-model.base";
-import {EntityId} from "./modeling/entity-id.type";
-import {clone} from "lodash-es";
-import {DataQuery} from "./data_access/data-query";
-import {DataOptions, defaultDataOptions} from "./data_access/data.options";
-import {DataSet} from "./data_access/dataset";
-import {queryToHttpOptions} from "./data_access/query-to-http";
+import * as jsonStringify from 'json-stringify-safe';
+import { clone } from "lodash-es";
+import { Observable, of, Subject, throwError } from "rxjs";
+import { catchError, map, mergeMap, switchMap, tap } from "rxjs/operators";
+import { ApiCallType } from "./api/api-calls/api-call.model";
+import { DataEntityType } from "./api/entity/data-entity.base";
+import { EntityRelationshipRepositoryType } from "./api/entity/entity-relationship-repository-type";
+import { EntityErrorEvent, EntityErrorTypes } from "./api/events/entity-error.event";
+import { RemoveEntitiesEvent } from "./api/events/remove-entities.event";
+import { SaveEntityEvent } from "./api/events/save-entity.event";
+import { ReadonlyRepository } from "./api/repository/readonly-repository";
+import { IRelationshipRepository, RelationshipRepository } from "./api/repository/relationship-repository";
+import { Repository } from "./api/repository/repository";
+import { IRepository } from "./api/repository/repository.interface";
+import { ApiCallBackendConfigInterface } from "./config/api-call-backend-config.interface";
+import { EntityModelBase } from "./config/entity-model.base";
+import { EntityBackendConfig, EntityConfig } from "./config/entity.config";
+import { EntityConfigBase } from "./config/model-config";
+import { ModelBase } from "./config/model.base";
+import { defaultConfig, ParisConfig } from "./config/paris-config";
+import { entitiesService } from "./config/services/entities.service";
+import { valueObjectsService } from "./config/services/value-objects.service";
+import { DataCache, DataCacheSettings } from "./data_access/cache";
+import { DataQuery } from "./data_access/data-query";
+import { DataStoreService } from "./data_access/data-store.service";
+import { DataOptions, defaultDataOptions } from "./data_access/data.options";
+import { DataSet } from "./data_access/dataset";
+import { HttpOptions, RequestMethod, UrlParams } from "./data_access/http.service";
+import { queryToHttpOptions } from "./data_access/query-to-http";
+import { DataTransformersService } from "./modeling/data-transformers.service";
+import { EntityId } from "./modeling/entity-id.type";
+import { Modeler } from "./modeling/modeler";
 
 export class Paris<TConfigData = any> {
 	private readonly repositories:Map<DataEntityType, IRepository<ModelBase>> = new Map;
@@ -146,7 +147,7 @@ export class Paris<TConfigData = any> {
 	 * @returns {Observable<TResult>} An Observable of the api call's result data type
 	 */
 	apiCall<TResult = any, TInput = any>(apiCallType:ApiCallType<TResult, TInput>, input?:TInput, dataOptions:DataOptions = defaultDataOptions):Observable<TResult>{
-		const cacheKey:string = JSON.stringify(input) || "{}";
+		const cacheKey:string = jsonStringify(input || {});
 
 		if (dataOptions.allowCache) {
 			const apiCallTypeCache: DataCache<TResult> = this.getApiCallCache<TResult, TInput>(apiCallType);

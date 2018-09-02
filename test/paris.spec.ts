@@ -1,17 +1,19 @@
-import {Observable, of} from 'rxjs';
-import {CreateTodoListApiCall} from './mock/create-new-list.api-call';
-import {Todo} from './mock/todo.entity';
-import {Repository} from '../lib/api/repository/repository';
-import {Http} from '../lib/data_access/http.service';
-import {Paris} from '../lib/paris';
-import {Tag} from "./mock/tag.value-object";
-import {DataOptions, defaultDataOptions} from "../lib/data_access/data.options";
-import {DataEntityType} from "../lib/api/entity/data-entity.base";
-import {DataQuery} from "../lib/data_access/data-query";
-import {TodoStatus} from "./mock/todo-status.entity";
-import {TodoListItemsRelationship} from "./mock/todo-list.relationships";
-import {RelationshipRepository} from "../lib/api/repository/relationship-repository";
-import {TodoList} from "./mock/todo-list.entity";
+import { Observable, of } from 'rxjs';
+import { DataEntityType } from '../lib/api/entity/data-entity.base';
+import { RelationshipRepository } from '../lib/api/repository/relationship-repository';
+import { Repository } from '../lib/api/repository/repository';
+import { DataQuery } from '../lib/data_access/data-query';
+import { DataOptions, defaultDataOptions } from '../lib/data_access/data.options';
+import { Http } from '../lib/data_access/http.service';
+import { Paris } from '../lib/paris';
+import { mergeMap } from '../node_modules/rxjs/operators';
+import { CreateTodoListApiCall } from './mock/create-new-list.api-call';
+import { Tag } from './mock/tag.value-object';
+import { TodoList } from './mock/todo-list.entity';
+import { TodoListItemsRelationship } from './mock/todo-list.relationships';
+import { TodoStatus } from './mock/todo-status.entity';
+import { Todo } from './mock/todo.entity';
+import { UpdateTodoApiCall } from './mock/update-todo.api-call';
 
 describe('Paris main', () => {
 	let paris: Paris;
@@ -180,6 +182,25 @@ describe('Paris main', () => {
 			expect((<any>paris).getApiCallCache).not.toHaveBeenCalled();
 		});
 
+		it('should be able to serialize complex objects with circular dependencies', done => {
+			jestMakeApiCallSpy.mockReturnValue(of(null));
+
+
+			const todoItem = paris.createItem(Todo, {
+				id: 1,
+				text: 'myTodo',
+				time: new Date(),
+				tags: [],
+				status: { name: 'Open' },
+			});
+
+			todoItem
+				.pipe(mergeMap(todoItem => paris.apiCall(UpdateTodoApiCall, todoItem)))
+				.subscribe(() => {
+					done();
+				});
+		});
+
 		it('should always add newer data to cache if cache exists', () => {});
 
 		it('should not cache null/undefined values', () => {});
@@ -237,7 +258,7 @@ describe('Paris main', () => {
 	});
 
 	describe('createItem', () => {
-		let createItem$:Observable<Todo>;
+		let createItem$: Observable<Todo>;
 
 		beforeEach(() => {
 			paris = new Paris();
@@ -284,12 +305,15 @@ describe('Paris main', () => {
 		});
 
 		it("should throw an error if the relationship doesn't support OneToMany", () => {
-			expect(() => paris.getRelatedItem(TodoListItemsRelationship, new TodoList({ id: 1 }))).toThrow();
+			expect(() =>
+				paris.getRelatedItem(TodoListItemsRelationship, new TodoList({ id: 1 }))
+			).toThrow();
 		});
 
-		it("should return an Observable", () => {
+		it('should return an Observable', () => {
 			expect(
-				paris.queryForItem(TodoListItemsRelationship, new TodoList({ id: 1 }))).toBeInstanceOf(Observable);
+				paris.queryForItem(TodoListItemsRelationship, new TodoList({ id: 1 }))
+			).toBeInstanceOf(Observable);
 		});
 	});
 
@@ -299,7 +323,7 @@ describe('Paris main', () => {
 		});
 
 		it("should return null if repo doesn't exist", () => {
-			class SomeClass{}
+			class SomeClass {}
 			expect(paris.getValue(SomeClass, 1)).toBe(null);
 		});
 
@@ -308,7 +332,9 @@ describe('Paris main', () => {
 		});
 
 		it("should call valueId if it's a function (predicate)", () => {
-			expect(paris.getValue(TodoStatus, status => /done/i.test(status.name)).name).toBe('Done');
+			expect(paris.getValue(TodoStatus, status => /done/i.test(status.name)).name).toBe(
+				'Done'
+			);
 		});
 
 		it('should call getValueById if valueId is not a function', () => {
@@ -330,7 +356,9 @@ describe('Paris main', () => {
 		});
 
 		it('should return a RelationshipRepository', () => {
-			expect(paris.getRelationshipRepository(TodoListItemsRelationship)).toBeInstanceOf(RelationshipRepository);
+			expect(paris.getRelationshipRepository(TodoListItemsRelationship)).toBeInstanceOf(
+				RelationshipRepository
+			);
 		});
 	});
 });
