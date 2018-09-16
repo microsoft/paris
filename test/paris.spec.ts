@@ -14,6 +14,8 @@ import { TodoListItemsRelationship } from './mock/todo-list.relationships';
 import { TodoStatus } from './mock/todo-status.entity';
 import { Todo } from './mock/todo.entity';
 import { UpdateTodoApiCall } from './mock/update-todo.api-call';
+import {setMockData} from "./mock/mock-data.service";
+import {DataSet} from "../lib/data_access/dataset";
 
 describe('Paris main', () => {
 	let paris: Paris;
@@ -114,6 +116,23 @@ describe('Paris main', () => {
 	describe('query', () => {
 		let repo: Repository<Todo>;
 
+
+		const next = 'https://localhost:666/api/todo?p=2';
+
+		setMockData({
+			items: [
+				{
+					id: 1,
+					text: 'First'
+				},
+				{
+					id: 2,
+					text: 'Second'
+				}
+			],
+			next: next
+		});
+
 		beforeEach(() => {
 			paris = new Paris();
 			repo = paris.getRepository(Todo);
@@ -138,6 +157,13 @@ describe('Paris main', () => {
 
 		it("should throw error if repo doesn't exist", () => {
 			expect(() => paris.query(<any>String)).toThrow();
+		});
+
+		it("should have a 'next' property in the DataSet", done => {
+			paris.query(Todo).subscribe((dataSet:DataSet<Todo>) => {
+				expect (dataSet.next).toEqual(next);
+				done();
+			});
 		});
 	});
 

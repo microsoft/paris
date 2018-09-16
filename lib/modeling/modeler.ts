@@ -295,7 +295,7 @@ export class Modeler {
 			? { count: 0, items: rawDataSet }
 			: parseDataSet
 				? parseDataSet(rawDataSet) || { count: 0, items: [] }
-				: { count: rawDataSet.count, items: rawDataSet[allItemsProperty] };
+				: { count: rawDataSet.count, items: rawDataSet[allItemsProperty], next: rawDataSet.next };
 	}
 
 	modelArray<TEntity extends ModelBase, TRawData = any>(
