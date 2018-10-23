@@ -1,16 +1,17 @@
-import {TodoList} from "./todo-list.entity";
 import {Todo} from "./todo.entity";
 import {EntityRelationship} from "../../lib/config/decorators/entity-relationship.decorator";
 import {ParisConfig} from "../../lib/config/paris-config";
 import {DataQuery} from "../../lib/data_access/data-query";
 import {RelationshipType} from "../../lib/config/relationship-type.enum";
 import {EntityRelationshipRepositoryType} from "../../lib/api/entity/entity-relationship-repository-type";
+import {Tag} from "./tag.value-object";
 
 @EntityRelationship({
-	sourceEntity: TodoList,
-	dataEntity: Todo,
-	endpoint: (config: ParisConfig<MockConfigData>, query: DataQuery) => `lists/${(<any>query.where).todoListId}/items`,
-	foreignKey: 'listId',
-	allowedTypes: [RelationshipType.OneToMany]
+	sourceEntity: Todo,
+	dataEntity: Tag,
+	endpoint: (config: ParisConfig<MockConfigData>, query: DataQuery) => `todo/tag/${(<any>query.where).todo}`,
+	foreignKey: 'todo',
+	allowedTypes: [RelationshipType.OneToOne],
+	parseData: data => ({ ...data, colorName: 'Purple' })
 })
-export class TodoListItemsRelationship implements EntityRelationshipRepositoryType<TodoList, Todo> {}
+export class TodoTagRelationship implements EntityRelationshipRepositoryType<Todo, Tag> {}

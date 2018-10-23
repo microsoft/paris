@@ -204,6 +204,7 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 				this.emitEntityHttpErrorEvent(err);
 				throw err
 			}),
+			map(data => this.entityBackendConfig.parseData ? this.entityBackendConfig.parseData(data) : data),
 			mergeMap(data => this.createItem(data, dataOptions, query))
 		);
 

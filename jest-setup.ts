@@ -1,3 +1,3 @@
 import 'reflect-metadata';
 
-global['Reflect'] = Reflect;
+(<any>global)['Reflect'] = Reflect;
