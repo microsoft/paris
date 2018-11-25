@@ -15,6 +15,9 @@ import {EntityModelBase} from "../../lib/config/entity-model.base";
 import {Repository} from "../../lib/api/repository/repository";
 import {EntityField} from "../../lib/config/decorators/entity-field.decorator";
 import {TodoStatus} from "../mock/todo-status.entity";
+import {ModelBase} from "../../lib/config/model.base";
+import {ValueObject} from "../../lib/config/decorators/value-object.decorator";
+import {ModelConfig} from "../../lib/config/model-config";
 
 describe('Modeler', () => {
 	let paris: Paris;
@@ -247,8 +250,23 @@ describe('Modeler', () => {
 		let serializeItem:jest.Mock;
 		let serializedItemRepo:Repository<any>;
 
+		let serializedEntityWithValueObject:{ new(data:any):any };
+		let serializedEntityWithValueObjectRepo:Repository<any>;
+
 		beforeEach(() => {
 			serializeItem = jest.fn();
+
+			@ValueObject({
+				singularName: 'property',
+				pluralName: 'property'
+			})
+			class SerializedEntityPropertyValueObject extends ModelBase {
+				@EntityField()
+				prop1: string;
+
+				@EntityField()
+				prop2: string;
+			}
 
 			@Entity({
 				singularName: "Serialized entity",
@@ -260,8 +278,21 @@ describe('Modeler', () => {
 				@EntityField() name:string;
 			}
 
+			@Entity({
+				singularName: "Serialized entity2",
+				pluralName: "Serialized entities2",
+				endpoint: "serialized2",
+			})
+			class SerializedEntityWithValueObject extends EntityModelBase {
+				@EntityField() name:string;
+				@EntityField() val: SerializedEntityPropertyValueObject;
+			}
+
 			serializedEntity = SerializedEntity;
 			serializedItemRepo = paris.getRepository(SerializedEntity);
+
+			serializedEntityWithValueObject = SerializedEntityWithValueObject;
+			serializedEntityWithValueObjectRepo = paris.getRepository(SerializedEntityWithValueObject);
 		});
 
 		it("calls the entity's `serializeItem` method with the proper params", () => {
@@ -270,6 +301,12 @@ describe('Modeler', () => {
 
 			serializedItemRepo.save(newSerializedItem, null, serializationData);
 			expect(serializeItem).toBeCalledWith(newSerializedItem, newSerializedItem, (<DataEntityType<any>>serializedEntity).entityConfig, paris.config, serializationData);
+		});
+
+		it ("serializes the entity with the nested value object intact", () => {
+			const newSerializedItem = { name: 'test', val: { prop1: 'test', prop2: 'test2' } };
+			const serializedModel:Record<string, any> = paris.modeler.serializeModel<any>(newSerializedItem, serializedEntityWithValueObjectRepo.modelConfig as ModelConfig<any>);
+			expect(serializedModel['val']).toBeDefined();
 		});
 	});
 });

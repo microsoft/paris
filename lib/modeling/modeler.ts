@@ -348,7 +348,7 @@ export class Modeler {
 						else modelValue = itemFieldValue.map((item: any) => DataTransformersService.serialize(entityField.arrayOf, item));
 					} else modelValue = null;
 				}
-				else if (fieldRepository)
+				else if (fieldRepository && fieldRepository.entity)
 					modelValue = isNilValue ? fieldRepository.modelConfig.getDefaultValue() || null : itemFieldValue.id;
 				else if (fieldValueObjectType)
 					modelValue = isNilValue ? fieldValueObjectType.getDefaultValue() || null : this.serializeModel(itemFieldValue, fieldValueObjectType, serializationData);
