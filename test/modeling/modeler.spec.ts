@@ -276,6 +276,9 @@ describe('Modeler', () => {
 			})
 			class SerializedEntity extends EntityModelBase {
 				@EntityField() name:string;
+
+				@EntityField()
+				someArray:Array<Record<string, any>>;
 			}
 
 			@Entity({
@@ -308,5 +311,17 @@ describe('Modeler', () => {
 			const serializedModel:Record<string, any> = paris.modeler.serializeModel<any>(newSerializedItem, serializedEntityWithValueObjectRepo.modelConfig as ModelConfig<any>);
 			expect(serializedModel['val']).toBeDefined();
 		});
+
+		it("models an item with a non-entity array field", (done) => {
+			const data = {
+				name: "test",
+				someArray: [ { hello: "Ben" }, { Hello: "Yossi" }]
+			};
+
+			paris.modeler.modelEntity(data, serializedItemRepo.modelConfig).subscribe((entity) => {
+				expect(entity.someArray).toBeInstanceOf(Array);
+				done();
+			});
+		})
 	});
 });
