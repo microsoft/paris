@@ -399,7 +399,7 @@ export class Paris<TConfigData = any> {
 	 * @param {DataEntityType<TEntity extends EntityModelBase>} entityConstructor
 	 * @returns {Observable<Array<TEntity extends EntityModelBase>>}
 	 */
-	allItems<TEntity extends EntityModelBase>(entityConstructor:DataEntityType<TEntity>):Observable<Array<TEntity>>{
+	allItems<TEntity extends EntityModelBase<TId>, TId extends EntityId>(entityConstructor:DataEntityType<TEntity, any, TId>):Observable<Array<TEntity>>{
 		const repository:Repository<TEntity> = this.getRepository(entityConstructor);
 		if (repository)
 			return repository.allItems$;
