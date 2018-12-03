@@ -299,7 +299,7 @@ describe('Modeler', () => {
 		});
 
 		it("calls the entity's `serializeItem` method with the proper params", () => {
-			const newSerializedItem = new serializedEntity({ id: undefined, name: 'test' });
+			const newSerializedItem = new serializedEntity({ id: undefined, name: 'test', someArray: null });
 			const serializationData = { test: 1 };
 
 			serializedItemRepo.save(newSerializedItem, null, serializationData);
