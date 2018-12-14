@@ -41,12 +41,12 @@ describe('DataStore', () => {
 	describe('Request', () => {
 		it ('calls Http.request with the correct parameters (baseUrl)', () => {
 			dataStore.request(getMethod, endpoint, httpOptions, baseUrl, localHttpConfig);
-			expect(Http.request).toBeCalledWith(getMethod, `${baseUrl}/${endpoint}`, httpOptions, { ...parisConfig.http, ...localHttpConfig });
+			expect(Http.request).toBeCalledWith(getMethod, `${baseUrl}/${endpoint}`, httpOptions, { ...parisConfig.http, ...localHttpConfig }, parisConfig.ajaxService);
 		});
 
 		it ('calls Http.request with the correct parameters (apiRoot)', () => {
 			dataStore.request(getMethod, endpoint, httpOptions, null, localHttpConfig);
-			expect(Http.request).toBeCalledWith(getMethod, `${apiRoot}/${endpoint}`, httpOptions, { ...parisConfig.http, ...localHttpConfig });
+			expect(Http.request).toBeCalledWith(getMethod, `${apiRoot}/${endpoint}`, httpOptions, { ...parisConfig.http, ...localHttpConfig }, parisConfig.ajaxService);
 		});
 	});
 

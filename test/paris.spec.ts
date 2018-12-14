@@ -69,9 +69,13 @@ describe('Paris main', () => {
 		});
 
 		it('should call Http.request with correct default params', () => {
-			expect(Http.request).toHaveBeenCalledWith('GET', '/todo/1', undefined, {
-				timeout: 20000,
-			});
+			expect(Http.request).toHaveBeenCalledWith(
+				'GET',
+				'/todo/1',
+				undefined,
+				{ timeout: 20000 },
+				undefined
+			);
 		});
 
 		it('should call Repository.getItemById with correct params', () => {
@@ -84,7 +88,8 @@ describe('Paris main', () => {
 				'GET',
 				'/todo/1',
 				{ params: { test: 1 } },
-				{ timeout: 20000 }
+				{ timeout: 20000 },
+				undefined
 			);
 		});
 
