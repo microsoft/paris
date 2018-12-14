@@ -26,7 +26,7 @@ export class DataStoreService{
 		const fullHttpConfig:AjaxRequest = Object.assign({}, this.config.http, httpConfig);
 		const endpointUrl = this.getEndpointUrl(endpoint, baseUrl);
 
-		return this.setActiveRequest(Http.request(method, endpointUrl, data, fullHttpConfig), method, endpointUrl, data);
+		return this.setActiveRequest(Http.request(method, endpointUrl, data, fullHttpConfig, this.config.ajaxService), method, endpointUrl, data);
 	}
 
 	private getEndpointUrl(endpoint:string, baseUrl?:string):string{

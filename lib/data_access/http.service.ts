@@ -8,27 +8,27 @@ export type RequestMethod = "GET"|"DELETE"|SaveRequestMethod;
 const DEFAULT_TIMEOUT = 60000;
 
 export class Http{
-	static get(url:string, options?:HttpOptions, httpConfig?:AjaxRequest):Observable<any>{
-		return Http.request("GET", url, options, httpConfig);
+	static get(url:string, options?:HttpOptions, httpConfig?:AjaxRequest, ajaxService?: typeof ajax):Observable<any>{
+		return Http.request("GET", url, options, httpConfig, ajaxService);
 	}
 
-	static post(url:string, options?:HttpOptions, httpConfig?:AjaxRequest):Observable<any>{
-		return Http.request("POST", url, options, httpConfig);
+	static post(url:string, options?:HttpOptions, httpConfig?:AjaxRequest, ajaxService?: typeof ajax):Observable<any>{
+		return Http.request("POST", url, options, httpConfig, ajaxService);
 	}
 
-	static put(url:string, options?:HttpOptions, httpConfig?:AjaxRequest):Observable<any>{
-		return Http.request("PUT", url, options, httpConfig);
+	static put(url:string, options?:HttpOptions, httpConfig?:AjaxRequest, ajaxService?: typeof ajax):Observable<any>{
+		return Http.request("PUT", url, options, httpConfig, ajaxService);
 	}
 
-	static delete(url:string, options?:HttpOptions, httpConfig?:AjaxRequest):Observable<any>{
-		return Http.request("DELETE", url, options, httpConfig);
+	static delete(url:string, options?:HttpOptions, httpConfig?:AjaxRequest, ajaxService?: typeof ajax):Observable<any>{
+		return Http.request("DELETE", url, options, httpConfig, ajaxService);
 	}
 
-	static patch(url:string, options?:HttpOptions, httpConfig?:AjaxRequest):Observable<any>{
-		return Http.request("PATCH", url, options, httpConfig);
+	static patch(url:string, options?:HttpOptions, httpConfig?:AjaxRequest, ajaxService?: typeof ajax):Observable<any>{
+		return Http.request("PATCH", url, options, httpConfig, ajaxService);
 	}
 
-	static request<T = any>(method:RequestMethod, url:string, options?:HttpOptions, httpConfig?:AjaxRequest):Observable<any> {
+	static request<T = any>(method:RequestMethod, url:string, options?:HttpOptions, httpConfig?:AjaxRequest, ajaxService?: typeof ajax):Observable<any> {
 		let fullUrl:string = options && options.params ? Http.addParamsToUrl(url, options.params, options.separateArrayParams) : url;
 
 		let currentHttpConfig: AjaxRequest = clone(httpConfig);
@@ -45,7 +45,7 @@ export class Http{
 				(<any>currentHttpConfig.headers)["Content-Type"] = "application/json";
 		}
 
-		return ajax(Object.assign({
+		return (ajaxService || ajax)(Object.assign({
 			method: method,
 			url: fullUrl,
 			body: options && options.data,
