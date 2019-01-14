@@ -30,6 +30,7 @@ import { queryToHttpOptions } from "./data_access/query-to-http";
 import { DataTransformersService } from "./modeling/data-transformers.service";
 import { EntityId } from "./modeling/entity-id.type";
 import { Modeler } from "./modeling/modeler";
+import {AjaxRequest} from "rxjs/ajax";
 
 export class Paris<TConfigData = any> {
 	private readonly repositories:Map<DataEntityType, IRepository<ModelBase>> = new Map;
@@ -161,20 +162,27 @@ export class Paris<TConfigData = any> {
 			}
 		}
 
-		const httpOptions:HttpOptions = input
+		const httpOptions: HttpOptions = ((input !== undefined) && (input !== null))
 			? apiCallType.config.parseQuery
 				? apiCallType.config.parseQuery(input)
-				: apiCallType.config.method !== "GET" ? { data: input } : { params: input }
+				: apiCallType.config.method !== "GET" ? {data: input} : {params: input}
 			: null;
 
-		let apiCall$: Observable<any> = this.makeApiCall(apiCallType.config, apiCallType.config.method || "GET", httpOptions)
+		const requestOptions: AjaxRequest = apiCallType.config.responseType ? {responseType: apiCallType.config.responseType} : null;
+
+		let apiCall$: Observable<any> = this.makeApiCall(
+			apiCallType.config,
+			apiCallType.config.method || "GET",
+			httpOptions,
+			undefined,
+			requestOptions)
 			.pipe(
 				catchError((err: EntityErrorEvent) => {
 					this._errorSubject$.next(err);
 					return throwError(err.originalError || err)
 				}));
 
-		let typeRepository:ReadonlyRepository<TResult> = apiCallType.config.type
+		let typeRepository: ReadonlyRepository<TResult> = apiCallType.config.type
 			? this.getRepository(apiCallType.config.type)
 			: null;
 
@@ -255,7 +263,7 @@ export class Paris<TConfigData = any> {
 		return apiCallCache;
 	}
 
-	private makeApiCall<TResult, TParams = UrlParams, TData = any, TRawDataResult = TResult>(backendConfig:ApiCallBackendConfigInterface<TResult, TRawDataResult>, method:RequestMethod, httpOptions:Readonly<HttpOptions<TData, TParams>>, query?: DataQuery):Observable<TResult>{
+	private makeApiCall<TResult, TParams = UrlParams, TData = any, TRawDataResult = TResult>(backendConfig:ApiCallBackendConfigInterface<TResult, TRawDataResult>, method:RequestMethod, httpOptions:Readonly<HttpOptions<TData, TParams>>, query?: DataQuery, requestOptions?: AjaxRequest):Observable<TResult>{
 		const dataQuery: DataQuery = query || { where: httpOptions && httpOptions.params };
 		let endpoint:string;
 		if (backendConfig.endpoint instanceof Function)
@@ -279,20 +287,24 @@ export class Paris<TConfigData = any> {
 			Object.assign(apiCallHttpOptions.params, backendConfig.fixedData);
 		}
 
-		if (backendConfig.parseData) {
-			return this.dataStore.request<TRawDataResult>(method || "GET", endpoint, apiCallHttpOptions, baseUrl).pipe(
+		const self = this;
+		function makeRequest$<T>(): Observable<T> {
+			return self.dataStore.request<T>(method || "GET", endpoint, apiCallHttpOptions, baseUrl, requestOptions).pipe(
 				catchError(err => {
 					return throwError({
 						originalError: err,
 						type: EntityErrorTypes.HttpError,
 						entity: null
 					})
-				}),
+				}))
+		}
+
+		if (backendConfig.parseData) {
+			return makeRequest$<TRawDataResult>().pipe(
 				map((rawData: TRawDataResult) => {
 					try {
 						return backendConfig.parseData(rawData, this.config, dataQuery)
-					}
-					catch (err) {
+					} catch (err) {
 						throw {
 							originalError: err,
 							type: EntityErrorTypes.DataParseError,
@@ -303,15 +315,7 @@ export class Paris<TConfigData = any> {
 			);
 		}
 
-		return this.dataStore.request<TResult>(method || "GET", endpoint, apiCallHttpOptions, baseUrl).pipe(
-			catchError(err => {
-				return throwError({
-					originalError: err,
-					type: EntityErrorTypes.HttpError,
-					entity: null
-				})
-			}),
-		)
+		return makeRequest$<TResult>()
 	}
 
 	/**
