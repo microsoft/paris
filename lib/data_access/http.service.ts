@@ -1,35 +1,39 @@
-import {Observable} from "rxjs";
-import {ajax, AjaxError, AjaxRequest, AjaxResponse} from "rxjs/ajax";
-import {catchError, map} from "rxjs/operators";
-import {clone} from "lodash-es";
+import { Observable } from "rxjs";
+import { ajax, AjaxError, AjaxRequest, AjaxResponse } from "rxjs/ajax";
+import { catchError, map } from "rxjs/operators";
+import { clone } from "lodash-es";
+import { AjaxService } from "../config/paris-config";
 
-export type SaveRequestMethod = "POST"|"PUT"|"PATCH";
-export type RequestMethod = "GET"|"DELETE"|SaveRequestMethod;
+export type SaveRequestMethod = "POST" | "PUT" | "PATCH";
+export type RequestMethod = "GET" | "DELETE" | SaveRequestMethod;
 const DEFAULT_TIMEOUT = 60000;
 
-export class Http{
-	static get(url:string, options?:HttpOptions, httpConfig?:AjaxRequest, ajaxService?: typeof ajax):Observable<any>{
-		return Http.request("GET", url, options, httpConfig, ajaxService);
+export class Http {
+	constructor(private ajaxService?: AjaxService) {
 	}
 
-	static post(url:string, options?:HttpOptions, httpConfig?:AjaxRequest, ajaxService?: typeof ajax):Observable<any>{
-		return Http.request("POST", url, options, httpConfig, ajaxService);
+	get(url: string, options?: HttpOptions, httpConfig?: AjaxRequest): Observable<any> {
+		return this.request("GET", url, options, httpConfig);
 	}
 
-	static put(url:string, options?:HttpOptions, httpConfig?:AjaxRequest, ajaxService?: typeof ajax):Observable<any>{
-		return Http.request("PUT", url, options, httpConfig, ajaxService);
+	post(url: string, options?: HttpOptions, httpConfig?: AjaxRequest): Observable<any> {
+		return this.request("POST", url, options, httpConfig);
 	}
 
-	static delete(url:string, options?:HttpOptions, httpConfig?:AjaxRequest, ajaxService?: typeof ajax):Observable<any>{
-		return Http.request("DELETE", url, options, httpConfig, ajaxService);
+	put(url: string, options?: HttpOptions, httpConfig?: AjaxRequest): Observable<any> {
+		return this.request("PUT", url, options, httpConfig);
 	}
 
-	static patch(url:string, options?:HttpOptions, httpConfig?:AjaxRequest, ajaxService?: typeof ajax):Observable<any>{
-		return Http.request("PATCH", url, options, httpConfig, ajaxService);
+	delete(url: string, options?: HttpOptions, httpConfig?: AjaxRequest): Observable<any> {
+		return this.request("DELETE", url, options, httpConfig);
 	}
 
-	static request<T = any>(method:RequestMethod, url:string, options?:HttpOptions, httpConfig?:AjaxRequest, ajaxService?: typeof ajax):Observable<any> {
-		let fullUrl:string = options && options.params ? Http.addParamsToUrl(url, options.params, options.separateArrayParams) : url;
+	patch(url: string, options?: HttpOptions, httpConfig?: AjaxRequest): Observable<any> {
+		return this.request("PATCH", url, options, httpConfig);
+	}
+
+	request<T = any>(method: RequestMethod, url: string, options?: HttpOptions, httpConfig?: AjaxRequest): Observable<any> {
+		let fullUrl: string = options && options.params ? this.addParamsToUrl(url, options.params, options.separateArrayParams) : url;
 
 		let currentHttpConfig: AjaxRequest = clone(httpConfig);
 
@@ -45,7 +49,7 @@ export class Http{
 				(<any>currentHttpConfig.headers)["Content-Type"] = "application/json";
 		}
 
-		return (ajaxService || ajax)(Object.assign({
+		return (this.ajaxService || ajax)(Object.assign({
 			method: method,
 			url: fullUrl,
 			body: options && options.data,
@@ -57,17 +61,24 @@ export class Http{
 						err.message = err.response;
 					else
 						err.message = `Failed to ${method} from ${url}. Status code: ${err.status}`;
-					throw err
+					throw err;
 				}),
 				map((e: AjaxResponse) => e.response)
 			)
 	}
 
-	static httpOptionsToRequestInit(options?:HttpOptions, httpConfig?:AjaxRequest):AjaxRequest{
+	addParamsToUrl(url: string, params?: UrlParams, separateArrayParams: boolean = false): string {
+		if (params && !/\?/.test(url))
+			return `${url}?${Http.getParamsQuery(params, separateArrayParams)}`;
+
+		return params && !/\?/.test(url) ? `${url}?${Http.getParamsQuery(params, separateArrayParams)}` : url;
+	}
+
+	static httpOptionsToRequestInit(options?: HttpOptions, httpConfig?: AjaxRequest): AjaxRequest {
 		if (!options && !httpConfig)
 			return null;
 
-		let requestOptions:AjaxRequest = Object.assign({}, httpConfig);
+		let requestOptions: AjaxRequest = Object.assign({}, httpConfig);
 
 		if (options && options.data)
 			requestOptions.body = options.data;
@@ -75,22 +86,15 @@ export class Http{
 		return requestOptions;
 	}
 
-	static addParamsToUrl(url:string, params?:UrlParams, separateArrayParams:boolean = false):string{
-		if (params && !/\?/.test(url))
-			return `${url}?${Http.getParamsQuery(params, separateArrayParams)}`;
+	static getParamsQuery(params: UrlParams, separateArrayParams: boolean = false): string {
+		let paramsArray: Array<string> = [];
 
-		return params && !/\?/.test(url) ? `${url}?${Http.getParamsQuery(params, separateArrayParams)}` : url;
-	}
-
-	static getParamsQuery(params:UrlParams, separateArrayParams:boolean = false):string{
-		let paramsArray:Array<string> = [];
-
-		for(let param in params){
-			let paramValue:any = params[param];
+		for (let param in params) {
+			let paramValue: any = params[param];
 			if (separateArrayParams && paramValue instanceof Array)
 				paramsArray = paramsArray.concat(paramValue.map(value => `${param}=${encodeURIComponent(String(value))}`));
-			else{
-				let value:string = encodeURIComponent(String(params[param]));
+			else {
+				let value: string = encodeURIComponent(String(params[param]));
 				paramsArray.push(`${param}=${value}`);
 			}
 		}
@@ -99,11 +103,11 @@ export class Http{
 	}
 }
 
-export interface HttpOptions<T = any, U = UrlParams>{
-	data?:T,
-	params?:U,
-	separateArrayParams?:boolean,
-	timeout?:number
+export interface HttpOptions<T = any, U = UrlParams> {
+	data?: T,
+	params?: U,
+	separateArrayParams?: boolean,
+	timeout?: number
 }
 
-export type UrlParams = { [index:string]:any };
+export type UrlParams = { [index: string]: any };

@@ -1,11 +1,10 @@
-import {DataStoreService} from "../../lib/data_access/data-store.service";
-import {Http} from "../../lib/data_access/http.service";
-import {of} from "rxjs";
-import {ParisConfig} from "../../lib/config/paris-config";
+import { DataStoreService } from "../../lib/data_access/data-store.service";
+import { of } from "rxjs";
+import { ParisConfig } from "../../lib/config/paris-config";
 
 describe('DataStore', () => {
-	let dataStore:DataStoreService;
-	let request:jest.Mock;
+	let dataStore: DataStoreService;
+	let request: jest.Mock;
 
 	const endpoint = 'todo';
 	const apiRoot = '/api';
@@ -23,7 +22,7 @@ describe('DataStore', () => {
 	const localHttpConfig = { timeout: 1000 };
 	const getMethod = 'GET';
 
-	const parisConfig:ParisConfig = {
+	const parisConfig: ParisConfig = {
 		apiRoot: apiRoot,
 		http: {
 			headers: {
@@ -35,18 +34,18 @@ describe('DataStore', () => {
 	beforeEach(() => {
 		request = jest.fn(() => of({ result: true }));
 		dataStore = new DataStoreService(parisConfig);
-		Http.request = request;
+		dataStore.httpService.request = request;
 	});
 
 	describe('Request', () => {
-		it ('calls Http.request with the correct parameters (baseUrl)', () => {
+		it('calls Http.request with the correct parameters (baseUrl)', () => {
 			dataStore.request(getMethod, endpoint, httpOptions, baseUrl, localHttpConfig);
-			expect(Http.request).toBeCalledWith(getMethod, `${baseUrl}/${endpoint}`, httpOptions, { ...parisConfig.http, ...localHttpConfig }, parisConfig.ajaxService);
+			expect(dataStore.httpService.request).toBeCalledWith(getMethod, `${baseUrl}/${endpoint}`, httpOptions, { ...parisConfig.http, ...localHttpConfig });
 		});
 
-		it ('calls Http.request with the correct parameters (apiRoot)', () => {
+		it('calls Http.request with the correct parameters (apiRoot)', () => {
 			dataStore.request(getMethod, endpoint, httpOptions, null, localHttpConfig);
-			expect(Http.request).toBeCalledWith(getMethod, `${apiRoot}/${endpoint}`, httpOptions, { ...parisConfig.http, ...localHttpConfig }, parisConfig.ajaxService);
+			expect(dataStore.httpService.request).toBeCalledWith(getMethod, `${apiRoot}/${endpoint}`, httpOptions, { ...parisConfig.http, ...localHttpConfig });
 		});
 	});
 

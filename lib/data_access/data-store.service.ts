@@ -5,39 +5,42 @@ import { finalize, share, tap } from "rxjs/operators";
 import { ParisConfig } from "../config/paris-config";
 import { Http, HttpOptions, RequestMethod, SaveRequestMethod } from "./http.service";
 
-export class DataStoreService{
-	private activeRequests:Map<string, Observable<any>> = new Map();
+export class DataStoreService {
+	private activeRequests: Map<string, Observable<any>> = new Map();
+	readonly httpService: Http;
 
-	constructor(private config:ParisConfig){}
+	constructor(private config: ParisConfig) {
+		this.httpService = new Http(config.ajaxService);
+	}
 
-	get<T = any>(endpoint:string, data?:HttpOptions, baseUrl?:string, httpConfig?:AjaxRequest):Observable<T>{
+	get<T = any>(endpoint: string, data?: HttpOptions, baseUrl?: string, httpConfig?: AjaxRequest): Observable<T> {
 		return this.request<T>("GET", endpoint, data, baseUrl, httpConfig);
 	}
 
-	save<T = any>(endpoint:string, method:SaveRequestMethod = "POST", data?:HttpOptions, baseUrl?:string, httpConfig?:AjaxRequest):Observable<T>{
+	save<T = any>(endpoint: string, method: SaveRequestMethod = "POST", data?: HttpOptions, baseUrl?: string, httpConfig?: AjaxRequest): Observable<T> {
 		return this.request(method, endpoint, data, baseUrl, httpConfig);
 	}
 
-	delete(endpoint:string, data?:HttpOptions, baseUrl?:string, httpConfig?:AjaxRequest):Observable<any>{
+	delete(endpoint: string, data?: HttpOptions, baseUrl?: string, httpConfig?: AjaxRequest): Observable<any> {
 		return this.request("DELETE", endpoint, data, baseUrl, httpConfig);
 	}
 
-	request<T = any>(method:RequestMethod, endpoint:string, data?:HttpOptions, baseUrl?:string, httpConfig?:AjaxRequest):Observable<T>{
-		const fullHttpConfig:AjaxRequest = Object.assign({}, this.config.http, httpConfig);
+	request<T = any>(method: RequestMethod, endpoint: string, data?: HttpOptions, baseUrl?: string, httpConfig?: AjaxRequest): Observable<T> {
+		const fullHttpConfig: AjaxRequest = Object.assign({}, this.config.http, httpConfig);
 		const endpointUrl = this.getEndpointUrl(endpoint, baseUrl);
 
-		return this.setActiveRequest(Http.request(method, endpointUrl, data, fullHttpConfig, this.config.ajaxService), method, endpointUrl, data);
+		return this.setActiveRequest(this.httpService.request(method, endpointUrl, data, fullHttpConfig), method, endpointUrl, data);
 	}
 
-	private getEndpointUrl(endpoint:string, baseUrl?:string):string{
+	private getEndpointUrl(endpoint: string, baseUrl?: string): string {
 		if (baseUrl === '')
 			return endpoint;
 
 		return `${baseUrl || this.config.apiRoot || ""}/${endpoint}`;
 	}
 
-	private setActiveRequest(obs:Observable<any>, method:RequestMethod, endpoint:string, data?:RequestData):Observable<any>{
-		let activeRequestId:string = DataStoreService.getActiveRequestId(method, endpoint, data),
+	private setActiveRequest(obs: Observable<any>, method: RequestMethod, endpoint: string, data?: RequestData): Observable<any> {
+		let activeRequestId: string = DataStoreService.getActiveRequestId(method, endpoint, data),
 			existingActiveRequest = this.activeRequests.get(activeRequestId);
 
 		if (existingActiveRequest)
@@ -55,11 +58,11 @@ export class DataStoreService{
 		}
 	}
 
-	private static getActiveRequestId(method:RequestMethod, endpoint:string, data?:RequestData):string{
+	private static getActiveRequestId(method: RequestMethod, endpoint: string, data?: RequestData): string {
 		return `${method}__${endpoint}__${data ? jsonStringify(data) : '|'}`;
 	}
 }
 
-export interface RequestData{
-	[index:string]:any
+export interface RequestData {
+	[index: string]: any
 }
