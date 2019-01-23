@@ -33,7 +33,7 @@ export class Http {
 	}
 
 	request<T = any>(method: RequestMethod, url: string, options?: HttpOptions, httpConfig?: AjaxRequest): Observable<any> {
-		let fullUrl: string = options && options.params ? this.addParamsToUrl(url, options.params, options.separateArrayParams) : url;
+		let fullUrl: string = options && options.params ? Http.addParamsToUrl(url, options.params, options.separateArrayParams) : url;
 
 		let currentHttpConfig: AjaxRequest = clone(httpConfig);
 
@@ -67,13 +67,6 @@ export class Http {
 			)
 	}
 
-	addParamsToUrl(url: string, params?: UrlParams, separateArrayParams: boolean = false): string {
-		if (params && !/\?/.test(url))
-			return `${url}?${Http.getParamsQuery(params, separateArrayParams)}`;
-
-		return params && !/\?/.test(url) ? `${url}?${Http.getParamsQuery(params, separateArrayParams)}` : url;
-	}
-
 	static httpOptionsToRequestInit(options?: HttpOptions, httpConfig?: AjaxRequest): AjaxRequest {
 		if (!options && !httpConfig)
 			return null;
@@ -84,6 +77,13 @@ export class Http {
 			requestOptions.body = options.data;
 
 		return requestOptions;
+	}
+
+	static addParamsToUrl(url: string, params?: UrlParams, separateArrayParams: boolean = false): string {
+		if (params && !/\?/.test(url))
+			return `${url}?${Http.getParamsQuery(params, separateArrayParams)}`;
+
+		return params && !/\?/.test(url) ? `${url}?${Http.getParamsQuery(params, separateArrayParams)}` : url;
 	}
 
 	static getParamsQuery(params: UrlParams, separateArrayParams: boolean = false): string {
