@@ -4,7 +4,6 @@ import { RelationshipRepository } from '../lib/api/repository/relationship-repos
 import { Repository } from '../lib/api/repository/repository';
 import { DataQuery } from '../lib/data_access/data-query';
 import { DataOptions, defaultDataOptions } from '../lib/data_access/data.options';
-import { Http } from '../lib/data_access/http.service';
 import { Paris } from '../lib/paris';
 import { mergeMap } from '../node_modules/rxjs/operators';
 import { CreateTodoListApiCall } from './mock/create-new-list.api-call';
@@ -14,8 +13,8 @@ import { TodoListItemsRelationship } from './mock/todo-list.relationships';
 import { TodoStatus } from './mock/todo-status.entity';
 import { Todo } from './mock/todo.entity';
 import { UpdateTodoApiCall } from './mock/update-todo.api-call';
-import {setMockData} from "./mock/mock-data.service";
-import {DataSet} from "../lib/data_access/dataset";
+import { setMockData } from "./mock/mock-data.service";
+import { DataSet } from "../lib/data_access/dataset";
 
 describe('Paris main', () => {
 	let paris: Paris;
@@ -40,25 +39,17 @@ describe('Paris main', () => {
 			expect(paris.getRepository(Tag)).toBeDefined();
 		});
 
-		it.skip("should return null if entity doesn't exist", () => {});
+		it.skip("should return null if entity doesn't exist", () => { });
 	});
 
 	describe('Get Todo item by ID', () => {
 		let repo: Repository<Todo>, item$: Observable<Todo>;
-		let httpRequestSpy: jest.SpyInstance<Http>;
-
-		beforeAll(() => {
-			httpRequestSpy = jest.spyOn(Http, 'request');
-		});
-
-		afterAll(() => {
-			httpRequestSpy.mockRestore();
-		});
 
 		beforeEach(() => {
 			paris = new Paris();
 			repo = paris.getRepository(Todo);
 
+			jest.spyOn(paris.dataStore.httpService, 'request');
 			jest.spyOn(repo, 'getItemById');
 			jest.spyOn(paris.dataStore, 'request');
 			item$ = paris.getItemById(Todo, 1);
@@ -69,9 +60,12 @@ describe('Paris main', () => {
 		});
 
 		it('should call Http.request with correct default params', () => {
-			expect(Http.request).toHaveBeenCalledWith('GET', '/todo/1', undefined, {
-				timeout: 20000,
-			});
+			expect(paris.dataStore.httpService.request).toHaveBeenCalledWith(
+				'GET',
+				'/todo/1',
+				undefined,
+				{ timeout: 20000 }
+			);
 		});
 
 		it('should call Repository.getItemById with correct params', () => {
@@ -80,7 +74,8 @@ describe('Paris main', () => {
 		});
 
 		it('should call Http.request with correct params', () => {
-			expect(Http.request).toHaveBeenCalledWith(
+			paris.getItemById(Todo, 1, null, { test: 1 });
+			expect(paris.dataStore.httpService.request).toHaveBeenCalledWith(
 				'GET',
 				'/todo/1',
 				{ params: { test: 1 } },
@@ -92,7 +87,7 @@ describe('Paris main', () => {
 			expect(item$).toBeInstanceOf(Observable);
 		});
 
-		it.skip('should throw error if getItem is not supported', () => {});
+		it.skip('should throw error if getItem is not supported', () => { });
 
 		it('should call datastore.request', () => {
 			expect(paris.dataStore.request).toHaveBeenCalled();
@@ -160,29 +155,21 @@ describe('Paris main', () => {
 		});
 
 		it("should have a 'next' property in the DataSet", done => {
-			paris.query(Todo).subscribe((dataSet:DataSet<Todo>) => {
-				expect (dataSet.next).toEqual(next);
+			paris.query(Todo).subscribe((dataSet: DataSet<Todo>) => {
+				expect(dataSet.next).toEqual(next);
 				done();
 			});
 		});
 	});
 
 	describe('apiCall', () => {
-		let httpRequestSpy: jest.SpyInstance<Http>;
 		let jestGetApiCallCacheSpy: jest.SpyInstance<Paris>;
 		let jestMakeApiCallSpy: jest.SpyInstance<Paris>;
-
-		beforeAll(() => {
-			httpRequestSpy = jest.spyOn(Http, 'request');
-		});
-
-		afterAll(() => {
-			httpRequestSpy.mockRestore();
-		});
 
 		beforeEach(() => {
 			paris = new Paris();
 
+			jest.spyOn(paris.dataStore.httpService, 'request');
 			jestGetApiCallCacheSpy = jest.spyOn(paris, 'getApiCallCache' as any);
 			jestMakeApiCallSpy = jest.spyOn(paris, 'makeApiCall' as any);
 		});
@@ -199,7 +186,7 @@ describe('Paris main', () => {
 
 			paris.apiCall(CreateTodoListApiCall);
 			expect((<any>paris).makeApiCall).not.toHaveBeenCalled();
-			expect(Http.request).not.toHaveBeenCalled();
+			expect(paris.dataStore.httpService.request).not.toHaveBeenCalled();
 			expect(fakeCache.get).toHaveBeenCalled();
 		});
 
@@ -227,60 +214,60 @@ describe('Paris main', () => {
 				});
 		});
 
-		it('should always add newer data to cache if cache exists', () => {});
+		it('should always add newer data to cache if cache exists', () => { });
 
-		it('should not cache null/undefined values', () => {});
+		it('should not cache null/undefined values', () => { });
 
-		it('should call makeApiCall with correct params', () => {});
+		it('should call makeApiCall with correct params', () => { });
 
-		it('should call makeApiCall with correct default params', () => {});
+		it('should call makeApiCall with correct default params', () => { });
 
-		it('should emit from error$ if encountered an error', () => {});
+		it('should emit from error$ if encountered an error', () => { });
 
-		it('should call modelArray if repo exists data is array', () => {});
+		it('should call modelArray if repo exists data is array', () => { });
 
-		it('should call createItem if repo exists and data is not an array', () => {});
+		it('should call createItem if repo exists and data is not an array', () => { });
 
-		it("should call DataTransformersService.parse if repo doesn't exist and data type is defined", () => {});
+		it("should call DataTransformersService.parse if repo doesn't exist and data type is defined", () => { });
 
-		it('should call parse if defined', () => {});
+		it('should call parse if defined', () => { });
 
-		it('should return an Observable', () => {});
+		it('should return an Observable', () => { });
 
-		it('should throw an error if no endpoint is configured', () => {});
+		it('should throw an error if no endpoint is configured', () => { });
 
-		it('should throw an error if no endpoint is configured', () => {});
+		it('should throw an error if no endpoint is configured', () => { });
 
 		it.skip('should call datastore.request', () => {
 			expect(paris.dataStore.request).toHaveBeenCalled();
 		});
 
-		it('should call Http.request with correct default params', () => {});
+		it('should call Http.request with correct default params', () => { });
 
-		it('should call Http.request with correct params', () => {});
+		it('should call Http.request with correct params', () => { });
 	});
 
 	describe('callQuery', () => {
 		beforeEach(() => {
 			paris = new Paris();
 		});
-		it('should call makeApiCall with correct params', () => {});
+		it('should call makeApiCall with correct params', () => { });
 
-		it('should call makeApiCall with correct default params', () => {});
+		it('should call makeApiCall with correct default params', () => { });
 
-		it('should call rawDataToDataSet with correct params', () => {});
+		it('should call rawDataToDataSet with correct params', () => { });
 
-		it('should emit from error$ if encountered an error', () => {});
+		it('should emit from error$ if encountered an error', () => { });
 
-		it('should return an Observable', () => {});
+		it('should return an Observable', () => { });
 
 		it.skip('should call datastore.request', () => {
 			expect(paris.dataStore.request).toHaveBeenCalled();
 		});
 
-		it('should call Http.request with correct default params', () => {});
+		it('should call Http.request with correct default params', () => { });
 
-		it('should call Http.request with correct params', () => {});
+		it('should call Http.request with correct params', () => { });
 	});
 
 	describe('createItem', () => {
@@ -307,24 +294,24 @@ describe('Paris main', () => {
 		beforeEach(() => {
 			paris = new Paris();
 		});
-		it('should call RelationshipRepository.queryForItem with correct params', () => {});
+		it('should call RelationshipRepository.queryForItem with correct params', () => { });
 
-		it('should call RelationshipRepository.queryForItem with correct default params', () => {});
+		it('should call RelationshipRepository.queryForItem with correct default params', () => { });
 
 		it("should throw error if repo doesn't exist", () => {
 			expect(() => paris.queryForItem(TodoList, new Todo({ id: 1 }))).toThrow();
 		});
 
-		it('should return an Observable', () => {});
+		it('should return an Observable', () => { });
 	});
 
 	describe('getRelatedItem', () => {
 		beforeEach(() => {
 			paris = new Paris();
 		});
-		it('should call RelationshipRepository.getRelatedItem with correct params', () => {});
+		it('should call RelationshipRepository.getRelatedItem with correct params', () => { });
 
-		it('should call RelationshipRepository.getRelatedItem with correct default params', () => {});
+		it('should call RelationshipRepository.getRelatedItem with correct default params', () => { });
 
 		it("should throw error if the relationship repository doesn't exist", () => {
 			expect(() => paris.getRelatedItem(TodoList, new Todo({ id: 1 }))).toThrow();
@@ -349,7 +336,7 @@ describe('Paris main', () => {
 		});
 
 		it("should return null if repo doesn't exist", () => {
-			class SomeClass {}
+			class SomeClass { }
 			expect(paris.getValue(SomeClass, 1)).toBe(null);
 		});
 

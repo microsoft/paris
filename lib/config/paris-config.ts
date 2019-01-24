@@ -1,14 +1,20 @@
-import {AjaxRequest} from "rxjs/ajax";
+import { AjaxRequest, AjaxResponse } from "rxjs/ajax";
+import { Observable } from "rxjs";
 
-export interface ParisConfig<TConfigData = any>{
-	apiRoot?:string,
-	allItemsProperty?:string,
-	entityIdProperty?:string,
-	data?:TConfigData,
-	http?:AjaxRequest
+export interface AjaxService {
+	(urlOrRequest: string | AjaxRequest): Observable<AjaxResponse>;
 }
 
-export const defaultConfig:Partial<ParisConfig> = {
+export interface ParisConfig<TConfigData = any> {
+	apiRoot?: string,
+	allItemsProperty?: string,
+	entityIdProperty?: string,
+	data?: TConfigData,
+	http?: AjaxRequest,
+	ajaxService?: AjaxService
+}
+
+export const defaultConfig: Partial<ParisConfig> = {
 	allItemsProperty: "items",
 	entityIdProperty: "id"
 };
