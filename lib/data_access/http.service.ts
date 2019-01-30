@@ -3,6 +3,7 @@ import { ajax, AjaxError, AjaxRequest, AjaxResponse } from "rxjs/ajax";
 import { catchError, map } from "rxjs/operators";
 import { clone } from "lodash-es";
 import { AjaxService } from "../config/paris-config";
+import { Dictionary } from "lodash";
 
 export type SaveRequestMethod = "POST" | "PUT" | "PATCH";
 export type RequestMethod = "GET" | "DELETE" | SaveRequestMethod;
@@ -36,18 +37,27 @@ export class Http {
 		let fullUrl: string = options && options.params ? Http.addParamsToUrl(url, options.params, options.separateArrayParams) : url;
 
 		let currentHttpConfig: AjaxRequest = clone(httpConfig);
+		currentHttpConfig = currentHttpConfig || {};
+		if (!currentHttpConfig.headers)
+		currentHttpConfig.headers = {};
+
+		//handle custom headers
+		if (options && options.customHeaders){
+			Object.keys(options.customHeaders).forEach(key => {
+				(<any>currentHttpConfig.headers)[key] = options.customHeaders[key];
+			})
+		}
 
 		if (options && options.data) {
-			currentHttpConfig = currentHttpConfig || {};
-			if (!currentHttpConfig.headers)
-				currentHttpConfig.headers = {};
-
 			// remove content type so the browser sets it automatically. this is required for multipart forms
 			if (options.data instanceof FormData)
 				delete (<any>currentHttpConfig.headers)["Content-Type"];
 			else
 				(<any>currentHttpConfig.headers)["Content-Type"] = "application/json";
 		}
+
+		//define api version
+		(<any>currentHttpConfig.headers)["api-version"] == null ? "1.0" : (<any>currentHttpConfig.headers)["api-version"];
 
 		return (this.ajaxService || ajax)(Object.assign({
 			method: method,
@@ -105,6 +115,7 @@ export class Http {
 
 export interface HttpOptions<T = any, U = UrlParams> {
 	data?: T,
+	customHeaders?: Dictionary<string>,
 	params?: U,
 	separateArrayParams?: boolean,
 	timeout?: number

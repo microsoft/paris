@@ -279,6 +279,7 @@ export class Paris<TConfigData = any> {
 		if (backendConfig.separateArrayParams) {
 			apiCallHttpOptions.separateArrayParams = true;
 		}
+		apiCallHttpOptions.customHeaders = backendConfig.customHeaders;
 
 		if (backendConfig.fixedData){
 			if (!apiCallHttpOptions.params)
