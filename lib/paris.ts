@@ -188,7 +188,7 @@ export class Paris<TConfigData = any> {
 
 		if (typeRepository) {
 			apiCall$ = apiCall$.pipe(
-				mergeMap<any, TResult | Array<TResult>>((data: any) => {
+				mergeMap((data: any) => {
 						const createItem$: Observable<TResult | Array<TResult>> = data instanceof Array
 							? this.modeler.modelArray<TResult>(data, apiCallType.config.type, dataOptions)
 							: this.createItem<TResult>(apiCallType.config.type, data, dataOptions);
