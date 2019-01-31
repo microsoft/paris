@@ -51,10 +51,10 @@ export interface ApiCallBackendConfigInterface<T = any, TRawData = any>{
 	separateArrayParams?:boolean,
 
 	/**
-	 * Custom headers for API call.
-	 * Those should include the API version which should be used. If not set, Paris will use version "1.0".
+	 * API version which will be used as an header in the API call to the backend.
+	 * If not set, Paris will use version "1.0".
 	 */
-    customHeaders?: Dictionary<string>,
+    apiVersion?: string,
 
 	/**
 	 * A function that if specifies, parses whatever is received from the API call, before Paris starts handling it.

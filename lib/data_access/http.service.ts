@@ -41,13 +41,6 @@ export class Http {
 		if (!currentHttpConfig.headers)
 		currentHttpConfig.headers = {};
 
-		//handle custom headers
-		if (options && options.customHeaders){
-			Object.keys(options.customHeaders).forEach(key => {
-				(<any>currentHttpConfig.headers)[key] = options.customHeaders[key];
-			})
-		}
-
 		if (options && options.data) {
 			// remove content type so the browser sets it automatically. this is required for multipart forms
 			if (options.data instanceof FormData)
@@ -57,7 +50,12 @@ export class Http {
 		}
 
 		//define api version
-		(<any>currentHttpConfig.headers)["api-version"] == null ? "1.0" : (<any>currentHttpConfig.headers)["api-version"];
+		if (options && options.apiVersion){
+			(<any>currentHttpConfig.headers)["api-version"] = options.apiVersion;
+		}
+		else {
+			(<any>currentHttpConfig.headers)["api-version"] = "1.0";
+		}
 
 		return (this.ajaxService || ajax)(Object.assign({
 			method: method,
@@ -115,7 +113,7 @@ export class Http {
 
 export interface HttpOptions<T = any, U = UrlParams> {
 	data?: T,
-	customHeaders?: Dictionary<string>,
+	apiVersion?: string,
 	params?: U,
 	separateArrayParams?: boolean,
 	timeout?: number
