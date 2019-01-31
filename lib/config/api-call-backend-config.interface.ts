@@ -2,7 +2,6 @@ import {EntityConfigFunctionOrValue} from "./entity.config";
 import {ParisConfig} from "./paris-config";
 import {DataCacheSettings} from "../data_access/cache";
 import {DataQuery} from "../data_access/data-query";
-import { Dictionary } from "lodash";
 
 export interface ApiCallBackendConfigInterface<T = any, TRawData = any>{
 	/**

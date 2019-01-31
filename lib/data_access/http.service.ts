@@ -3,7 +3,6 @@ import { ajax, AjaxError, AjaxRequest, AjaxResponse } from "rxjs/ajax";
 import { catchError, map } from "rxjs/operators";
 import { clone } from "lodash-es";
 import { AjaxService } from "../config/paris-config";
-import { Dictionary } from "lodash";
 
 export type SaveRequestMethod = "POST" | "PUT" | "PATCH";
 export type RequestMethod = "GET" | "DELETE" | SaveRequestMethod;
