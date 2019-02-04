@@ -2,6 +2,7 @@ import {EntityConfigFunctionOrValue} from "./entity.config";
 import {ParisConfig} from "./paris-config";
 import {DataCacheSettings} from "../data_access/cache";
 import {DataQuery} from "../data_access/data-query";
+import { Dictionary } from "lodash";
 
 export interface ApiCallBackendConfigInterface<T = any, TRawData = any>{
 	/**
@@ -48,12 +49,6 @@ export interface ApiCallBackendConfigInterface<T = any, TRawData = any>{
 	 * (config.apiRoot)/myentity?foo=bar,lish
 	 */
 	separateArrayParams?:boolean,
-
-	/**
-	 * API version which will be used as an header in the API call to the backend.
-	 * If not set, Paris will use version "1.0".
-	 */
-    apiVersion?: string,
 
 	/**
 	 * A function that if specifies, parses whatever is received from the API call, before Paris starts handling it.

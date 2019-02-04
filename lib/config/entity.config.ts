@@ -7,6 +7,7 @@ import {EntityId} from "../modeling/entity-id.type";
 import {DataQuery} from "../data_access/data-query";
 import {DataSet} from "../data_access/dataset";
 import {DataEntityType} from "../api/entity/data-entity.base";
+import { Dictionary } from "lodash";
 
 export class ModelEntity<TEntity extends ModelBase = any, TRawData = any, TId extends EntityId = string, TDataSet = any> extends EntityConfigBase<TEntity, TRawData, TId> implements EntityConfig<TEntity, TRawData, TId> {
 	endpoint:EntityConfigFunctionOrValue;
@@ -89,6 +90,15 @@ export interface EntityBackendConfig<TEntity extends ModelBase, TRawData = any, 
 	 * @default true
 	 */
 	allItemsEndpointTrailingSlash?:boolean,
+
+	/**
+	 * Custom headers for API call.
+	 * It can be either a dictionary of string, with header names as the keys,
+	 * or a function (which be applied by Paris) which receives data and config, and returns the headers for the API call.
+	 * @param {DataEntityType<TEntity>} data
+	 * @param {ParisConfig} config
+	 */
+    customHeaders?: ((data: DataEntityType<TEntity>, config?:ParisConfig) => Dictionary<string>) | Dictionary<string>,
 
 	/**
 	 * A function that returns data to send in the request body when `DELETE`ing entities (by using repository.remove).

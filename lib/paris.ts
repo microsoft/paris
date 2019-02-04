@@ -279,7 +279,6 @@ export class Paris<TConfigData = any> {
 		if (backendConfig.separateArrayParams) {
 			apiCallHttpOptions.separateArrayParams = true;
 		}
-		apiCallHttpOptions.apiVersion = backendConfig.apiVersion;
 
 		if (backendConfig.fixedData){
 			if (!apiCallHttpOptions.params)
@@ -328,12 +327,15 @@ export class Paris<TConfigData = any> {
 	 * @returns {Observable<DataSet<TEntity extends ModelBase>>}
 	 */
 	callQuery<TEntity extends ModelBase>(entityConstructor:DataEntityType<TEntity>, backendConfig:EntityBackendConfig<TEntity>, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions):Observable<DataSet<TEntity>>{
-		const httpOptions:HttpOptions = backendConfig.parseDataQuery ? { params: backendConfig.parseDataQuery(query) } : queryToHttpOptions(query);
-
+		let httpOptions:HttpOptions = backendConfig.parseDataQuery ? { params: backendConfig.parseDataQuery(query) } : queryToHttpOptions(query);
+		if (!httpOptions){
+			httpOptions = {};
+		}
+		httpOptions.customHeaders =  backendConfig.customHeaders instanceof Function ? backendConfig.customHeaders(entityConstructor, this.config) : backendConfig.customHeaders;
 		const endpoint:string = backendConfig.endpoint instanceof Function ? backendConfig.endpoint(this.config, query) : backendConfig.endpoint;
 
 		const apiCallConfig:ApiCallBackendConfigInterface = Object.assign({}, backendConfig, {
-			endpoint: `${endpoint}${backendConfig.allItemsEndpointTrailingSlash !== false && !backendConfig.allItemsEndpoint ? '/' : ''}${backendConfig.allItemsEndpoint || ''}`
+			endpoint: `${endpoint}${backendConfig.allItemsEndpointTrailingSlash !== false && !backendConfig.allItemsEndpoint ? '/' : ''}${backendConfig.allItemsEndpoint || ''}`,
 		});
 
 		return this.makeApiCall<TEntity>(apiCallConfig, "GET", httpOptions, query).pipe(
