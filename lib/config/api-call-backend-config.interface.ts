@@ -4,7 +4,6 @@ import {DataCacheSettings} from "../data_access/cache";
 import {DataQuery} from "../data_access/data-query";
 
 export interface ApiCallBackendConfigInterface<T = any, TRawData = any>{
-
 	/**
 	 * The URL to use for HTTP requests.
 	 */
