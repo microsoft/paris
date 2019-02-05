@@ -339,7 +339,7 @@ export class Paris<TConfigData = any> {
 		const endpoint:string = backendConfig.endpoint instanceof Function ? backendConfig.endpoint(this.config, query) : backendConfig.endpoint;
 
 		const apiCallConfig:ApiCallBackendConfigInterface = Object.assign({}, backendConfig, {
-			endpoint: `${endpoint}${backendConfig.allItemsEndpointTrailingSlash !== false && !backendConfig.allItemsEndpoint ? '/' : ''}${backendConfig.allItemsEndpoint || ''}`,
+			endpoint: `${endpoint}${backendConfig.allItemsEndpointTrailingSlash !== false && !backendConfig.allItemsEndpoint ? '/' : ''}${backendConfig.allItemsEndpoint || ''}`
 		});
 
 		return this.makeApiCall<TEntity>(apiCallConfig, "GET", httpOptions, query).pipe(
