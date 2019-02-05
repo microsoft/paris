@@ -18,7 +18,6 @@ export interface ApiCallConfig<TResult = any, TInput = any> extends ApiCallBacke
 	 * Custom headers for API call.
 	 * It can be either a dictionary of string, with header names as the keys,
 	 * or a function (which be applied by Paris) which receives config, and returns the headers for the API call.
-	 * @param {DataEntityType<TEntity>} data
 	 * @param {ParisConfig} config
 	 */
 	customHeaders?: ((config?:ParisConfig) => Dictionary<string>) | Dictionary<string>,
