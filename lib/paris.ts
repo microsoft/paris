@@ -162,11 +162,15 @@ export class Paris<TConfigData = any> {
 			}
 		}
 
-		const httpOptions: HttpOptions = ((input !== undefined) && (input !== null))
+		let httpOptions: HttpOptions = ((input !== undefined) && (input !== null))
 			? apiCallType.config.parseQuery
 				? apiCallType.config.parseQuery(input)
 				: apiCallType.config.method !== "GET" ? {data: input} : {params: input}
 			: null;
+		if (!httpOptions){
+			httpOptions = {};
+		}
+		httpOptions.customHeaders =  apiCallType.config.customHeaders instanceof Function ? apiCallType.config.customHeaders(this.config) : apiCallType.config.customHeaders;
 
 		const requestOptions: AjaxRequest = apiCallType.config.responseType ? {responseType: apiCallType.config.responseType} : null;
 

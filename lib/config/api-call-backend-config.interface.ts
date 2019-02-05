@@ -5,6 +5,7 @@ import {DataQuery} from "../data_access/data-query";
 import { Dictionary } from "lodash";
 
 export interface ApiCallBackendConfigInterface<T = any, TRawData = any>{
+
 	/**
 	 * The URL to use for HTTP requests.
 	 */

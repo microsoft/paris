@@ -47,14 +47,6 @@ export class Http {
 				(<any>currentHttpConfig.headers)["Content-Type"] = "application/json";
 		}
 
-		//handle custom headers
-		if (options && options.customHeaders){
-			this.initializeHeaders(currentHttpConfig);
-			Object.keys(options.customHeaders).forEach(key => {
-				(<any>currentHttpConfig.headers)[key] = options.customHeaders[key];
-			})
-		}
-
 		return (this.ajaxService || ajax)(Object.assign({
 			method: method,
 			url: fullUrl,
@@ -88,7 +80,17 @@ export class Http {
 		if (options && options.data)
 			requestOptions.body = options.data;
 
-		return requestOptions;
+		let requestString = JSON.stringify(httpConfig);
+		let currentRequestOptions : AjaxRequest = JSON.parse(requestString);
+
+		//handle custom headers
+		if (options && options.customHeaders){
+			Object.keys(options.customHeaders).forEach(key => {
+				(<any>currentRequestOptions.headers)[key] = options.customHeaders[key];
+			})
+		}
+
+		return currentRequestOptions;
 	}
 
 	static addParamsToUrl(url: string, params?: UrlParams, separateArrayParams: boolean = false): string {

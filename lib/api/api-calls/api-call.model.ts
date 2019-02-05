@@ -1,5 +1,7 @@
 import {ApiCallBackendConfigInterface} from "../../config/api-call-backend-config.interface";
 import {HttpOptions, RequestMethod} from "../../data_access/http.service";
+import { ParisConfig } from "../../..";
+import { Dictionary } from "lodash";
 
 export class ApiCallModel<TResult = any, TInput = any>{
 	config:ApiCallConfig<TResult, TInput>
@@ -11,6 +13,15 @@ export interface ApiCallType<TResult = any, TInput = any>{
 }
 
 export interface ApiCallConfig<TResult = any, TInput = any> extends ApiCallBackendConfigInterface<TResult> {
+
+	/**
+	 * Custom headers for API call.
+	 * It can be either a dictionary of string, with header names as the keys,
+	 * or a function (which be applied by Paris) which receives config, and returns the headers for the API call.
+	 * @param {DataEntityType<TEntity>} data
+	 * @param {ParisConfig} config
+	 */
+	customHeaders?: ((config?:ParisConfig) => Dictionary<string>) | Dictionary<string>,
 	name:string,
 	parseQuery?:(input:TInput) => HttpOptions,
 	parse?:(data?:any, input?:TInput) => TResult,
