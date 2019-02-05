@@ -80,17 +80,15 @@ export class Http {
 		if (options && options.data)
 			requestOptions.body = options.data;
 
-		let requestString = JSON.stringify(httpConfig);
-		let currentRequestOptions : AjaxRequest = JSON.parse(requestString);
-
 		//handle custom headers
 		if (options && options.customHeaders){
-			Object.keys(options.customHeaders).forEach(key => {
-				(<any>currentRequestOptions.headers)[key] = options.customHeaders[key];
+			const headersObject : any = {};
+            Object.keys(options.customHeaders).forEach(key => {
+                (headersObject[key]) = options.customHeaders[key];
 			})
+			return Object.assign({}, requestOptions, { headers: Object.assign({},headersObject,requestOptions.headers) });;
 		}
-
-		return currentRequestOptions;
+		return requestOptions;
 	}
 
 	static addParamsToUrl(url: string, params?: UrlParams, separateArrayParams: boolean = false): string {
