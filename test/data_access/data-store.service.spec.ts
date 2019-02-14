@@ -14,7 +14,7 @@ describe('DataStore', () => {
 			id: 1
 		},
 		data: {
-			foo: 'bar',
+			foo: 'bar'
 		}
 	};
 
