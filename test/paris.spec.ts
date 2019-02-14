@@ -59,6 +59,14 @@ describe('Paris main', () => {
 			expect(repo.getItemById).toHaveBeenCalledWith(1, defaultDataOptions, undefined);
 		});
 
+		it('should call Http.request with correct default params', () => {
+			expect(paris.dataStore.httpService.request).toHaveBeenCalledWith(
+				'GET',
+				'/todo/1',
+				undefined,
+				{ timeout: 20000 }
+			);
+		});
 
 		it('should call Repository.getItemById with correct params', () => {
 			paris.getItemById(Todo, 1, null, { test: 1 , customHeaders: {'TestHeader': 'TestValue'}});
