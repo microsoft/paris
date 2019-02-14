@@ -181,8 +181,8 @@ describe('Paris main', () => {
 
 		it('should get data from cache if available and configured to', () => {
 			jestGetApiCallCacheSpy.mockRestore();
-			const fakeCache ={ get: jest.fn(() => of(null)) };
-			paris['getApiCallCache'] = jest.fn(() => fakeCache);
+			const fakeCache = { get: jest.fn(() => of(null)) };
+			paris['getApiCallCache'] = jest.fn(() => fakeCache) as any;
 
 			paris.apiCall(CreateTodoListApiCall);
 			expect((<any>paris).makeApiCall).not.toHaveBeenCalled();
