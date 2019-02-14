@@ -18,7 +18,7 @@ import {TodoListState} from "./todo-list-state.value-object";
 	}),
 	cache: {
 		time: 200
-	},
+	}
 })
 export class TodoList extends EntityModelBase<number>{
 	@EntityField()

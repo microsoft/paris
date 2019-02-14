@@ -8,8 +8,7 @@ import {TodoStatus} from "./todo-status.entity";
 	singularName: "Todo item",
 	pluralName: "Todo items",
 	endpoint: "todo",
-	timeout: 20000,
-	customHeaders: ((data, config) => data.name === 'test' ? ({'testCaseHeader': 'testCaseValue'}) : {'notTestCaseHeader': 'notTestCaseValue'})
+	timeout: 20000
 })
 export class Todo extends EntityModelBase<number>{
 	@EntityField()
