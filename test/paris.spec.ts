@@ -238,6 +238,9 @@ describe('Paris main', () => {
 
 		it('should throw an error if no endpoint is configured', () => { });
 
+		it.skip('should call datastore.request', () => {
+			expect(paris.dataStore.request).toHaveBeenCalled();
+
 		it('should call makeApiCall with the right custom headers which are given by a callback', () => {
 			console.log(paris.config);
 			paris.apiCall(CreateTodoListApiCall, undefined, { allowCache: false });
