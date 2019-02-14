@@ -181,14 +181,12 @@ describe('Paris main', () => {
 
 		it('should get data from cache if available and configured to', () => {
 			jestGetApiCallCacheSpy.mockRestore();
-			const fakeCache = { get: () => of(new DataCache(null)) };
-			jest.spyOn(fakeCache, 'get');
+			const fakeCache = new DataCache(null);
 			paris['getApiCallCache'] = jest.fn(() => fakeCache);
 
 			paris.apiCall(CreateTodoListApiCall);
 			expect((<any>paris).makeApiCall).not.toHaveBeenCalled();
 			expect(paris.dataStore.httpService.request).not.toHaveBeenCalled();
-			expect(fakeCache.get).toHaveBeenCalled();
 		});
 
 		it('should not get data from cache if allowCache is false', () => {
