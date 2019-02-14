@@ -240,9 +240,9 @@ describe('Paris main', () => {
 
 		it.skip('should call datastore.request', () => {
 			expect(paris.dataStore.request).toHaveBeenCalled();
+		});
 
 		it('should call makeApiCall with the right custom headers which are given by a callback', () => {
-			console.log(paris.config);
 			paris.apiCall(CreateTodoListApiCall, undefined, { allowCache: false });
 			expect((<any>paris).makeApiCall).toHaveBeenCalled();
 			expect((<any>paris).makeApiCall).toHaveBeenCalledWith(
@@ -255,13 +255,13 @@ describe('Paris main', () => {
 		});
 
 		it('should call makeApiCall with the right custom headers which are given directly', () => {
-			const createToDoListApiCall = Object.assign({}, CreateTodoListApiCall, {customHeaders: {'directTestHeader': 'directTestValue'}});
+			const createToDoListApiCall = Object.assign({}, CreateTodoListApiCall, {config: Object.assign({}, (<any>CreateTodoListApiCall).config, {'customHeaders': {'directTestHeader': 'directTestValue'}})});
 			paris.apiCall(createToDoListApiCall, undefined, { allowCache: false });
 			expect((<any>paris).makeApiCall).toHaveBeenCalled();
 			expect((<any>paris).makeApiCall).toHaveBeenCalledWith(
-				{"cache": true, "customHeaders": jasmine.any(Function), "endpoint": "create_new_list", "method": "POST", "name": "Create a new Todo list"},
+				{"cache": true, "customHeaders": {"directTestHeader": "directTestValue"}, "endpoint": "create_new_list", "method": "POST", "name": "Create a new Todo list"},
 				'POST',
-				{"customHeaders": {"testHeader": "testValue"}},
+				{"customHeaders": {"directTestHeader": "directTestValue"}},
 				undefined,
 				null
 			);
