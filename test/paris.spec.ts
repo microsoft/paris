@@ -180,7 +180,7 @@ describe('Paris main', () => {
 
 		it('should get data from cache if available and configured to', () => {
 			jestGetApiCallCacheSpy.mockRestore();
-			const fakeCache = { get: () => of(null) };
+			const fakeCache = { get: () => of(Paris) };
 			jest.spyOn(fakeCache, 'get');
 			paris['getApiCallCache'] = jest.fn(() => fakeCache);
 
