@@ -45,7 +45,7 @@ describe('Repository', () => {
 
 		beforeEach(() => {
 			errorCallback = jest.fn();
-			DataStoreService.prototype.save = jest.fn(() => of(null));
+			DataStoreService.prototype.save = jest.fn(() => of(newTodoItem));
 		});
 
 		afterEach(() => {
