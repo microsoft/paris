@@ -214,10 +214,10 @@ describe('Modeler', () => {
 				]);
 			};
 
-			DataStoreService.prototype.get = jest.fn<any>((endpoint: string) => createData(endpoint));
-			DataStoreService.prototype.request = jest.fn<any>((method: string, endpoint: string) =>
+			DataStoreService.prototype.get = jest.fn((endpoint: string) => createData(endpoint)) as any;
+			DataStoreService.prototype.request = jest.fn((method: string, endpoint: string) =>
 				createData(endpoint)
-			);
+			) as any;
 		});
 
 		afterEach(() => {
