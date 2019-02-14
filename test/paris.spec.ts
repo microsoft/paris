@@ -163,8 +163,8 @@ describe('Paris main', () => {
 	});
 
 	describe('apiCall', () => {
-		let jestGetApiCallCacheSpy: jest.SpyInstance<Paris>;
-		let jestMakeApiCallSpy: jest.SpyInstance<Observable<Paris>	>;
+		let jestGetApiCallCacheSpy: jest.SpyInstance<Observable<Paris>>;
+		let jestMakeApiCallSpy: jest.SpyInstance<Observable<Paris>>;
 
 		beforeEach(() => {
 			paris = new Paris();
@@ -180,7 +180,7 @@ describe('Paris main', () => {
 
 		it('should get data from cache if available and configured to', () => {
 			jestGetApiCallCacheSpy.mockRestore();
-			const fakeCache = { get: () => of(null) };
+			const fakeCache = { get: () => of(new Paris()) };
 			jest.spyOn(fakeCache, 'get');
 			paris['getApiCallCache'] = jest.fn(() => fakeCache);
 
@@ -196,7 +196,7 @@ describe('Paris main', () => {
 		});
 
 		it('should be able to serialize complex objects with circular dependencies', done => {
-			jestMakeApiCallSpy.mockReturnValue(of(Paris));
+			jestMakeApiCallSpy.mockReturnValue(of(new Paris()));
 
 
 			const todoItem = paris.createItem(Todo, {
