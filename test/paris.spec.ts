@@ -164,7 +164,7 @@ describe('Paris main', () => {
 
 	describe('apiCall', () => {
 		let jestGetApiCallCacheSpy: jest.SpyInstance<Paris>;
-		let jestMakeApiCallSpy: jest.SpyInstance<Paris>;
+		let jestMakeApiCallSpy: jest.SpyInstance<Observable<Paris>	>;
 
 		beforeEach(() => {
 			paris = new Paris();
