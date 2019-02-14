@@ -181,12 +181,13 @@ describe('Paris main', () => {
 
 		it('should get data from cache if available and configured to', () => {
 			jestGetApiCallCacheSpy.mockRestore();
-			const fakeCache = new DataCache(null);
+			const fakeCache ={ get: jest.fn(() => of(null)) };
 			paris['getApiCallCache'] = jest.fn(() => fakeCache);
 
 			paris.apiCall(CreateTodoListApiCall);
 			expect((<any>paris).makeApiCall).not.toHaveBeenCalled();
 			expect(paris.dataStore.httpService.request).not.toHaveBeenCalled();
+			expect(fakeCache.get).toHaveBeenCalled();
 		});
 
 		it('should not get data from cache if allowCache is false', () => {
@@ -195,7 +196,7 @@ describe('Paris main', () => {
 		});
 
 		it('should be able to serialize complex objects with circular dependencies', done => {
-			jestMakeApiCallSpy.mockReturnValue(of(new Paris()));
+			jestMakeApiCallSpy.mockReturnValue(of(new Paris));
 
 
 			const todoItem = paris.createItem(Todo, {
