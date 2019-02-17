@@ -78,7 +78,8 @@ export class Http {
 
 		//handle custom headers
 		if (options && options.customHeaders){
-			return {...requestOptions, ...{headers: {...options.customHeaders, ...requestOptions.headers}} };
+			const headers = {...options.customHeaders, ...requestOptions.headers};
+			return {...requestOptions, headers };
 		}
 		return requestOptions;
 	}

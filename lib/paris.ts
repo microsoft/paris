@@ -171,7 +171,7 @@ export class Paris<TConfigData = any> {
 			httpOptions = {};
 		}
 
-		if (apiCallType.config.customHeaders !== undefined){
+		if (apiCallType.config.customHeaders){
 			httpOptions.customHeaders =  apiCallType.config.customHeaders instanceof Function ? apiCallType.config.customHeaders(input, this.config) : apiCallType.config.customHeaders;
 		}
 
@@ -338,7 +338,7 @@ export class Paris<TConfigData = any> {
 		if (!httpOptions){
 			httpOptions = {};
 		}
-		if (backendConfig.customHeaders !== undefined){
+		if (backendConfig.customHeaders){
 			httpOptions.customHeaders =  backendConfig.customHeaders instanceof Function ? backendConfig.customHeaders(query, this.config) : backendConfig.customHeaders;
 		}
 		const endpoint:string = backendConfig.endpoint instanceof Function ? backendConfig.endpoint(this.config, query) : backendConfig.endpoint;
