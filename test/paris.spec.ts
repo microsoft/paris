@@ -69,16 +69,16 @@ describe('Paris main', () => {
 		});
 
 		it('should call Repository.getItemById with correct params', () => {
-			paris.getItemById(Todo, 1, null, { test: 1 });
-			expect(repo.getItemById).toHaveBeenCalledWith(1, defaultDataOptions, { test: 1 });
+			paris.getItemById(Todo, 1, null, { test: 1 , customHeaders: {'TestHeader': 'TestValue'}});
+			expect(repo.getItemById).toHaveBeenCalledWith(1, defaultDataOptions, { test: 1, customHeaders: {'TestHeader': 'TestValue'} });
 		});
 
 		it('should call Http.request with correct params', () => {
-			paris.getItemById(Todo, 1, null, { test: 1 });
+			paris.getItemById(Todo, 1, null, { test: 1, customHeaders: {'TestHeader': 'TestValue'}});
 			expect(paris.dataStore.httpService.request).toHaveBeenCalledWith(
 				'GET',
 				'/todo/1',
-				{ params: { test: 1 } },
+				{ params: { test: 1, customHeaders: {'TestHeader': 'TestValue'} }},
 				{ timeout: 20000 }
 			);
 		});
@@ -163,8 +163,8 @@ describe('Paris main', () => {
 	});
 
 	describe('apiCall', () => {
-		let jestGetApiCallCacheSpy: jest.SpyInstance<Paris>;
-		let jestMakeApiCallSpy: jest.SpyInstance<Paris>;
+		let jestGetApiCallCacheSpy: jest.SpyInstance<Observable<Paris>>;
+		let jestMakeApiCallSpy: jest.SpyInstance<Observable<Paris>>;
 
 		beforeEach(() => {
 			paris = new Paris();
@@ -180,9 +180,8 @@ describe('Paris main', () => {
 
 		it('should get data from cache if available and configured to', () => {
 			jestGetApiCallCacheSpy.mockRestore();
-			const fakeCache = { get: () => of(null) };
-			jest.spyOn(fakeCache, 'get');
-			paris['getApiCallCache'] = jest.fn(() => fakeCache);
+			const fakeCache = { get: jest.fn(() => of(null)) };
+			paris['getApiCallCache'] = jest.fn(() => fakeCache) as any;
 
 			paris.apiCall(CreateTodoListApiCall);
 			expect((<any>paris).makeApiCall).not.toHaveBeenCalled();
@@ -196,7 +195,7 @@ describe('Paris main', () => {
 		});
 
 		it('should be able to serialize complex objects with circular dependencies', done => {
-			jestMakeApiCallSpy.mockReturnValue(of(null));
+			jestMakeApiCallSpy.mockReturnValue(of(new Paris));
 
 
 			const todoItem = paris.createItem(Todo, {
@@ -241,6 +240,32 @@ describe('Paris main', () => {
 		it.skip('should call datastore.request', () => {
 			expect(paris.dataStore.request).toHaveBeenCalled();
 		});
+
+
+		it('should call makeApiCall with the right custom headers which are given by a callback', () => {
+			paris.apiCall(CreateTodoListApiCall, "test", { allowCache: false });
+			expect((<any>paris).makeApiCall).toHaveBeenCalledWith(
+				{"cache": true, "customHeaders": jasmine.any(Function), "endpoint": "create_new_list", "method": "POST", "name": "Create a new Todo list"},
+				'POST',
+				{"customHeaders": {"testHeader": "testValue"}, "data": "test"},
+				undefined,
+				null
+			);
+		});
+
+		it('should call makeApiCall with the right custom headers which are given directly', () => {
+			const createToDoListApiCall = Object.assign({}, CreateTodoListApiCall, {config: Object.assign({}, (<any>CreateTodoListApiCall).config, {'customHeaders': {'directTestHeader': 'directTestValue'}})});
+			paris.apiCall(createToDoListApiCall, undefined, { allowCache: false });
+			expect((<any>paris).makeApiCall).toHaveBeenCalled();
+			expect((<any>paris).makeApiCall).toHaveBeenCalledWith(
+				{"cache": true, "customHeaders": {"directTestHeader": "directTestValue"}, "endpoint": "create_new_list", "method": "POST", "name": "Create a new Todo list"},
+				'POST',
+				{"customHeaders": {"directTestHeader": "directTestValue"}},
+				undefined,
+				null
+			);
+		});
+
 
 		it('should call Http.request with correct default params', () => { });
 

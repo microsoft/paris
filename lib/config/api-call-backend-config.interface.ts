@@ -3,7 +3,7 @@ import {ParisConfig} from "./paris-config";
 import {DataCacheSettings} from "../data_access/cache";
 import {DataQuery} from "../data_access/data-query";
 
-export interface ApiCallBackendConfigInterface<T = any, TRawData = any>{
+export interface ApiCallBackendConfigInterface<T = any, TRawData = any, TInput = any>{
 	/**
 	 * The URL to use for HTTP requests.
 	 */
@@ -56,4 +56,13 @@ export interface ApiCallBackendConfigInterface<T = any, TRawData = any>{
 	 * @param {DataQuery} query
 	 */
 	parseData?:(data:TRawData, config?:ParisConfig, query?:DataQuery) => T
+
+		/**
+	 * Custom headers for API call.
+	 * It can be either a dictionary of string, with header names as the keys,
+	 * or a function (which be applied by Paris) which receives data and config, and returns the headers for the API call.
+	 * @param {TInput} data
+	 * @param {ParisConfig} config
+	 */
+    customHeaders?: ((data: TInput, config?:ParisConfig) => Record<string,string>) | Record<string,string>,
 }
