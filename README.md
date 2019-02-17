@@ -41,7 +41,7 @@ First, define an Entity:
 ```typescript
 // todo-item.entity.ts
 
-import { Entity, EntityModelBase } from "@microsoft/paris";
+import { Entity, EntityModelBase, EntityField } from "@microsoft/paris";
 
 @Entity({
 	singularName: "Todo Item",
