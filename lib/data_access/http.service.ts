@@ -40,7 +40,8 @@ export class Http {
 		if (options && options.data) {
 			currentHttpConfig = currentHttpConfig || {};
 			if (!currentHttpConfig.headers)
-			currentHttpConfig.headers = {};
+				currentHttpConfig.headers = {};
+
 			// remove content type so the browser sets it automatically. this is required for multipart forms
 			if (options.data instanceof FormData)
 				delete (<any>currentHttpConfig.headers)["Content-Type"];
