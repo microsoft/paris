@@ -38,7 +38,9 @@ export class Http {
 		let currentHttpConfig: AjaxRequest = clone(httpConfig);
 
 		if (options && options.data) {
-			this.initializeHeaders(currentHttpConfig);
+			currentHttpConfig = currentHttpConfig || {};
+			if (!currentHttpConfig.headers)
+			currentHttpConfig.headers = {};
 			// remove content type so the browser sets it automatically. this is required for multipart forms
 			if (options.data instanceof FormData)
 				delete (<any>currentHttpConfig.headers)["Content-Type"];
@@ -64,12 +66,6 @@ export class Http {
 			)
 	}
 
-    initializeHeaders(currentHttpConfig: AjaxRequest){
-		currentHttpConfig = currentHttpConfig || {};
-		if (!currentHttpConfig.headers)
-		currentHttpConfig.headers = {};
-	}
-
 	static httpOptionsToRequestInit(options?: HttpOptions, httpConfig?: AjaxRequest): AjaxRequest {
 		if (!options && !httpConfig)
 			return null;
@@ -81,11 +77,7 @@ export class Http {
 
 		//handle custom headers
 		if (options && options.customHeaders){
-			const headersObject : any = {};
-            Object.keys(options.customHeaders).forEach(key => {
-                (headersObject[key]) = options.customHeaders[key];
-			})
-			return Object.assign({}, requestOptions, { headers: Object.assign({},headersObject,requestOptions.headers) });;
+			return Object.assign({}, requestOptions, { headers: Object.assign({},Object.assign({}, options.customHeaders),requestOptions.headers) });;
 		}
 		return requestOptions;
 	}
