@@ -77,7 +77,7 @@ export class Http {
 
 		//handle custom headers
 		if (options && options.customHeaders){
-			return Object.assign({}, requestOptions, { headers: Object.assign({},Object.assign({}, options.customHeaders),requestOptions.headers) });;
+			return {...requestOptions, ...{headers: {...options.customHeaders, ...requestOptions.headers}} };
 		}
 		return requestOptions;
 	}
