@@ -7,7 +7,6 @@ import {EntityId} from "../modeling/entity-id.type";
 import {DataQuery} from "../data_access/data-query";
 import {DataSet} from "../data_access/dataset";
 import {DataEntityType} from "../api/entity/data-entity.base";
-import { Dictionary } from "lodash";
 
 export class ModelEntity<TEntity extends ModelBase = any, TRawData = any, TId extends EntityId = string, TDataSet = any> extends EntityConfigBase<TEntity, TRawData, TId> implements EntityConfig<TEntity, TRawData, TId> {
 	endpoint:EntityConfigFunctionOrValue;

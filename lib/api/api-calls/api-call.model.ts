@@ -1,7 +1,5 @@
 import {ApiCallBackendConfigInterface} from "../../config/api-call-backend-config.interface";
 import {HttpOptions, RequestMethod} from "../../data_access/http.service";
-import { ParisConfig } from "../../..";
-import { Dictionary } from "lodash";
 
 export class ApiCallModel<TResult = any, TInput = any>{
 	config:ApiCallConfig<TResult, TInput>

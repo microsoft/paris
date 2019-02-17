@@ -15,7 +15,6 @@ import { Todo } from './mock/todo.entity';
 import { UpdateTodoApiCall } from './mock/update-todo.api-call';
 import { setMockData } from "./mock/mock-data.service";
 import { DataSet } from "../lib/data_access/dataset";
-import { DataCache } from '../lib/main';
 
 describe('Paris main', () => {
 	let paris: Paris;
