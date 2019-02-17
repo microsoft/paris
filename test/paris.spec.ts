@@ -243,13 +243,6 @@ describe('Paris main', () => {
 
 
 		it('should call makeApiCall with the right custom headers which are given by a callback', () => {
-			const todoItem = paris.createItem(Todo, {
-				id: 1,
-				text: 'myTodo',
-				time: new Date(),
-				tags: [],
-				status: { name: 'Open' },
-			});
 			paris.apiCall(CreateTodoListApiCall, "test", { allowCache: false });
 			expect((<any>paris).makeApiCall).toHaveBeenCalledWith(
 				{"cache": true, "customHeaders": jasmine.any(Function), "endpoint": "create_new_list", "method": "POST", "name": "Create a new Todo list"},

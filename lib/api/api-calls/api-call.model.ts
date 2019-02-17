@@ -11,7 +11,6 @@ export interface ApiCallType<TResult = any, TInput = any>{
 }
 
 export interface ApiCallConfig<TResult = any, TInput = any> extends ApiCallBackendConfigInterface<TResult> {
-
 	name:string,
 	parseQuery?:(input:TInput) => HttpOptions,
 	parse?:(data?:any, input?:TInput) => TResult,

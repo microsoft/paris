@@ -90,7 +90,6 @@ export interface EntityBackendConfig<TEntity extends ModelBase, TRawData = any, 
 	 */
 	allItemsEndpointTrailingSlash?:boolean,
 
-
 	/**
 	 * A function that returns data to send in the request body when `DELETE`ing entities (by using repository.remove).
 	 * @param {Array<TEntity extends ModelBase>} items The entities that are removed.

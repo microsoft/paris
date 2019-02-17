@@ -61,7 +61,7 @@ export interface ApiCallBackendConfigInterface<T = any, TRawData = any, TInput =
 	 * Custom headers for API call.
 	 * It can be either a dictionary of string, with header names as the keys,
 	 * or a function (which be applied by Paris) which receives data and config, and returns the headers for the API call.
-	 * @param {DataEntityType<TEntity>} data
+	 * @param {TInput} data
 	 * @param {ParisConfig} config
 	 */
     customHeaders?: ((data: TInput, config?:ParisConfig) => Record<string,string>) | Record<string,string>,
