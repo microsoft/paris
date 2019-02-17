@@ -7,7 +7,7 @@ import {Todo} from "./todo.entity";
 	endpoint: "create_new_list",
 	method: "POST",
 	cache: true,
-	customHeaders: (config => config.entityIdProperty === 'id' ? ({"testHeader": "testValue"}) : undefined)
+	customHeaders: ((data, config) => config.entityIdProperty === 'id' && data === "test" ? ({"testHeader": "testValue"}) : undefined)
 })
 export class CreateTodoListApiCall extends ApiCallModel<Array<Todo>, string>{
 }

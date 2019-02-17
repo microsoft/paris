@@ -91,14 +91,6 @@ export interface EntityBackendConfig<TEntity extends ModelBase, TRawData = any, 
 	 */
 	allItemsEndpointTrailingSlash?:boolean,
 
-	/**
-	 * Custom headers for API call.
-	 * It can be either a dictionary of string, with header names as the keys,
-	 * or a function (which be applied by Paris) which receives data and config, and returns the headers for the API call.
-	 * @param {DataEntityType<TEntity>} data
-	 * @param {ParisConfig} config
-	 */
-    customHeaders?: ((data: DataEntityType<TEntity>, config?:ParisConfig) => Dictionary<string>) | Dictionary<string>,
 
 	/**
 	 * A function that returns data to send in the request body when `DELETE`ing entities (by using repository.remove).

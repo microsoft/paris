@@ -14,13 +14,6 @@ export interface ApiCallType<TResult = any, TInput = any>{
 
 export interface ApiCallConfig<TResult = any, TInput = any> extends ApiCallBackendConfigInterface<TResult> {
 
-	/**
-	 * Custom headers for API call.
-	 * It can be either a dictionary of string, with header names as the keys,
-	 * or a function (which be applied by Paris) which receives config, and returns the headers for the API call.
-	 * @param {ParisConfig} config
-	 */
-	customHeaders?: ((config?:ParisConfig) => Dictionary<string>) | Dictionary<string>,
 	name:string,
 	parseQuery?:(input:TInput) => HttpOptions,
 	parse?:(data?:any, input?:TInput) => TResult,

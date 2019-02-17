@@ -170,7 +170,10 @@ export class Paris<TConfigData = any> {
 		if (!httpOptions){
 			httpOptions = {};
 		}
-		httpOptions.customHeaders =  apiCallType.config.customHeaders instanceof Function ? apiCallType.config.customHeaders(this.config) : apiCallType.config.customHeaders;
+
+		if (apiCallType.config.customHeaders !== undefined){
+			httpOptions.customHeaders =  apiCallType.config.customHeaders instanceof Function ? apiCallType.config.customHeaders(input, this.config) : apiCallType.config.customHeaders;
+		}
 
 		const requestOptions: AjaxRequest = apiCallType.config.responseType ? {responseType: apiCallType.config.responseType} : null;
 
@@ -335,7 +338,9 @@ export class Paris<TConfigData = any> {
 		if (!httpOptions){
 			httpOptions = {};
 		}
-		httpOptions.customHeaders =  backendConfig.customHeaders instanceof Function ? backendConfig.customHeaders(entityConstructor, this.config) : backendConfig.customHeaders;
+		if (backendConfig.customHeaders !== undefined){
+			httpOptions.customHeaders =  backendConfig.customHeaders instanceof Function ? backendConfig.customHeaders(query, this.config) : backendConfig.customHeaders;
+		}
 		const endpoint:string = backendConfig.endpoint instanceof Function ? backendConfig.endpoint(this.config, query) : backendConfig.endpoint;
 
 		const apiCallConfig:ApiCallBackendConfigInterface = Object.assign({}, backendConfig, {
