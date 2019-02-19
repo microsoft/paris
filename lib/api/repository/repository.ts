@@ -60,8 +60,11 @@ export class Repository<TEntity extends ModelBase, TRawData = any> extends Reado
 			const saveData: TRawData = this.serializeItem(item, serializationData);
 			const endpointName:string = this.getEndpointName(options && options.params ? { where: options.params } : null);
 			const endpoint:string = this.entityBackendConfig.parseSaveQuery ? this.entityBackendConfig.parseSaveQuery(item, this.entity, this.paris.config, options) : `${endpointName}/${item.id || ''}`;
-
-			return this.paris.dataStore.save(endpoint, this.getSaveMethod(item), Object.assign({}, options, {data: saveData}), this.getBaseUrl(options && {where: options.params}))
+			let httpOptions = {data: saveData};
+			if (this.entityBackendConfig.customHeaders){
+				(<any>httpOptions).customHeaders =  this.entityBackendConfig.customHeaders instanceof Function ? this.entityBackendConfig.customHeaders(item, this.paris.config) : this.entityBackendConfig.customHeaders;
+			}
+			return this.paris.dataStore.save(endpoint, this.getSaveMethod(item), Object.assign({}, options, httpOptions), this.getBaseUrl(options && {where: options.params}))
 				.pipe(
 					catchError((err: AjaxError) => {
 						this.emitEntityHttpErrorEvent(err);
