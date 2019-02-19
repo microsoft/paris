@@ -157,7 +157,7 @@ export class Repository<TEntity extends ModelBase, TRawData = any> extends Reado
 
 					let itemsData:Array<any> = savedItemsData instanceof Array ? savedItemsData : savedItemsData.items;
 					let itemCreators:Array<Observable<TEntity>> = itemsData.map(savedItemData => this.createItem(savedItemData));
-					return combineLatest.apply(this, itemCreators);
+					return combineLatest(itemCreators);
 				})
 			)
 	}

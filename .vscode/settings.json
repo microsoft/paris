@@ -2,5 +2,6 @@
     "cSpell.words": [
         "repo",
         "todolist"
-    ]
+    ],
+    "typescript.tsdk": "node_modules\\typescript\\lib"
 }

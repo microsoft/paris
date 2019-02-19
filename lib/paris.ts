@@ -162,11 +162,18 @@ export class Paris<TConfigData = any> {
 			}
 		}
 
-		const httpOptions: HttpOptions = ((input !== undefined) && (input !== null))
+		let httpOptions: HttpOptions = ((input !== undefined) && (input !== null))
 			? apiCallType.config.parseQuery
 				? apiCallType.config.parseQuery(input)
 				: apiCallType.config.method !== "GET" ? {data: input} : {params: input}
 			: null;
+		if (!httpOptions){
+			httpOptions = {};
+		}
+
+		if (apiCallType.config.customHeaders){
+			httpOptions.customHeaders =  apiCallType.config.customHeaders instanceof Function ? apiCallType.config.customHeaders(input, this.config) : apiCallType.config.customHeaders;
+		}
 
 		const requestOptions: AjaxRequest = apiCallType.config.responseType ? {responseType: apiCallType.config.responseType} : null;
 
@@ -188,7 +195,7 @@ export class Paris<TConfigData = any> {
 
 		if (typeRepository) {
 			apiCall$ = apiCall$.pipe(
-				mergeMap<any, TResult | Array<TResult>>((data: any) => {
+				mergeMap((data: any) => {
 						const createItem$: Observable<TResult | Array<TResult>> = data instanceof Array
 							? this.modeler.modelArray<TResult>(data, apiCallType.config.type, dataOptions)
 							: this.createItem<TResult>(apiCallType.config.type, data, dataOptions);
@@ -327,8 +334,13 @@ export class Paris<TConfigData = any> {
 	 * @returns {Observable<DataSet<TEntity extends ModelBase>>}
 	 */
 	callQuery<TEntity extends ModelBase>(entityConstructor:DataEntityType<TEntity>, backendConfig:EntityBackendConfig<TEntity>, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions):Observable<DataSet<TEntity>>{
-		const httpOptions:HttpOptions = backendConfig.parseDataQuery ? { params: backendConfig.parseDataQuery(query) } : queryToHttpOptions(query);
-
+		let httpOptions:HttpOptions = backendConfig.parseDataQuery ? { params: backendConfig.parseDataQuery(query) } : queryToHttpOptions(query);
+		if (!httpOptions){
+			httpOptions = {};
+		}
+		if (backendConfig.customHeaders){
+			httpOptions.customHeaders =  backendConfig.customHeaders instanceof Function ? backendConfig.customHeaders(query, this.config) : backendConfig.customHeaders;
+		}
 		const endpoint:string = backendConfig.endpoint instanceof Function ? backendConfig.endpoint(this.config, query) : backendConfig.endpoint;
 
 		const apiCallConfig:ApiCallBackendConfigInterface = Object.assign({}, backendConfig, {

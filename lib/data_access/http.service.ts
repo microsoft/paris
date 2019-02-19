@@ -76,6 +76,11 @@ export class Http {
 		if (options && options.data)
 			requestOptions.body = options.data;
 
+		//handle custom headers
+		if (options && options.customHeaders){
+			const headers = {...options.customHeaders, ...requestOptions.headers};
+			return {...requestOptions, headers };
+		}
 		return requestOptions;
 	}
 
@@ -105,6 +110,7 @@ export class Http {
 
 export interface HttpOptions<T = any, U = UrlParams> {
 	data?: T,
+	customHeaders?: Record<string,string>,
 	params?: U,
 	separateArrayParams?: boolean,
 	timeout?: number
