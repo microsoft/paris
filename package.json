@@ -1,6 +1,6 @@
 {
 	"name": "@microsoft/paris",
-	"version": "1.4.0",
+	"version": "1.4.1",
 	"description": "Library for the implementation of Domain Driven Design with TypeScript + RxJS",
 	"repository": {
 		"type": "git",
