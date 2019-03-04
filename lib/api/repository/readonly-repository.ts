@@ -202,7 +202,7 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 
 		const getItem$:Observable<TEntity> = this.paris.dataStore.get(
 			endpoint,
-			Object.assign({}, currentOptions, httpOptions),
+			Object.assign({}, httpOptions, currentOptions),
 			this.getBaseUrl(query),
 			this.entityBackendConfig.timeout ? { timeout: this.entityBackendConfig.timeout } : null).pipe(
 			catchError((err: AjaxError) => {
