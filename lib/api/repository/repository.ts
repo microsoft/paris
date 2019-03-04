@@ -147,8 +147,11 @@ export class Repository<TEntity extends ModelBase, TRawData = any> extends Reado
 			: Object.assign({}, options, {data: {items: itemsData}});
 
 		const endpointName:string = this.getEndpointName(options && options.params ? { where: options.params } : null);
-
-		return this.paris.dataStore.save(`${endpointName}/`, method, saveHttpOptions, this.getBaseUrl(options && {where: options.params}))
+		let currentOptions = {};
+			if (this.entityBackendConfig.customHeaders){
+				(<any>currentOptions).customHeaders =  this.entityBackendConfig.customHeaders instanceof Function ? this.entityBackendConfig.customHeaders(itemsData, this.paris.config) : this.entityBackendConfig.customHeaders;
+		}
+		return this.paris.dataStore.save(`${endpointName}/`, method, Object.assign({}, saveHttpOptions, currentOptions), this.getBaseUrl(options && {where: options.params}))
 			.pipe(
 				catchError((err: AjaxError) => {
 					this.emitEntityHttpErrorEvent(err);
@@ -179,14 +182,17 @@ export class Repository<TEntity extends ModelBase, TRawData = any> extends Reado
 			let httpOptions:HttpOptions = options || { data: {}};
 			if (!httpOptions.data)
 				httpOptions.data = {};
-
+			let currentOptions = {};
+			if (this.entityBackendConfig.customHeaders){
+					(<any>currentOptions).customHeaders =  this.entityBackendConfig.customHeaders instanceof Function ? this.entityBackendConfig.customHeaders(item, this.paris.config) : this.entityBackendConfig.customHeaders;
+			}
 			if (this.entityBackendConfig.getRemoveData)
 				Object.assign(httpOptions.data, this.entityBackendConfig.getRemoveData([item]));
 
 			const endpointName:string = this.getEndpointName(options && options.params ? { where: options.params } : null);
 			const endpoint:string = this.entityBackendConfig.parseRemoveQuery ? this.entityBackendConfig.parseRemoveQuery([item], this.entity, this.paris.config) : `${endpointName}/${item.id || ''}`;
 
-			return this.paris.dataStore.delete(endpoint, httpOptions, this.getBaseUrl(options && {where: options.params}))
+			return this.paris.dataStore.delete(endpoint, Object.assign({}, httpOptions, currentOptions), this.getBaseUrl(options && {where: options.params}))
 				.pipe(
 					catchError((err: AjaxError) => {
 						this.emitEntityHttpErrorEvent(err);
@@ -234,7 +240,10 @@ export class Repository<TEntity extends ModelBase, TRawData = any> extends Reado
 			let httpOptions:HttpOptions = options || { data: {}};
 			if (!httpOptions.data)
 				httpOptions.data = {};
-
+			let currentOptions = {};
+			if (this.entityBackendConfig.customHeaders){
+				(<any>currentOptions).customHeaders =  this.entityBackendConfig.customHeaders instanceof Function ? this.entityBackendConfig.customHeaders(items, this.paris.config) : this.entityBackendConfig.customHeaders;
+			}
 			Object.assign(httpOptions.data, this.entityBackendConfig.getRemoveData
 				? this.entityBackendConfig.getRemoveData(items)
 				: { ids: items.map(item => item.id) }
@@ -243,7 +252,8 @@ export class Repository<TEntity extends ModelBase, TRawData = any> extends Reado
 			const endpointName:string = this.getEndpointName(options && options.params ? { where: options.params } : null);
 			const endpoint:string = this.entityBackendConfig.parseRemoveQuery ? this.entityBackendConfig.parseRemoveQuery(items, this.entity, this.paris.config) : endpointName;
 
-			return this.paris.dataStore.delete(endpoint, httpOptions, this.getBaseUrl(options && {where: options.params}))
+
+			return this.paris.dataStore.delete(endpoint, Object.assign({}, httpOptions, currentOptions), this.getBaseUrl(options && {where: options.params}))
 				.pipe(
 					catchError((err: AjaxError) => {
 						this.emitEntityHttpErrorEvent(err);

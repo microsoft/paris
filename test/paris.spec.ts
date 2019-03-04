@@ -63,7 +63,7 @@ describe('Paris main', () => {
 			expect(paris.dataStore.httpService.request).toHaveBeenCalledWith(
 				'GET',
 				'/todo/1',
-				undefined,
+				{},
 				{ timeout: 20000 }
 			);
 		});
