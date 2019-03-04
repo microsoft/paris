@@ -295,7 +295,7 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 			const endpoint:string = this.entityBackendConfig.parseItemQuery ? this.entityBackendConfig.parseItemQuery(itemId, this.entity, this.paris.config, params) : `${this.getEndpointName({ where: params })}/${itemId}`;
 			let currentOptions = {};
 			if (this.entityBackendConfig.customHeaders){
-				(<any>currentOptions).customHeaders =  this.entityBackendConfig.customHeaders instanceof Function ? this.entityBackendConfig.customHeaders(options, this.paris.config) : this.entityBackendConfig.customHeaders;
+				(<any>currentOptions).customHeaders =  this.entityBackendConfig.customHeaders instanceof Function ? this.entityBackendConfig.customHeaders(itemId, this.paris.config) : this.entityBackendConfig.customHeaders;
 			}
 
 			const getItem$:Observable<TEntity> = this.paris.dataStore.get(
