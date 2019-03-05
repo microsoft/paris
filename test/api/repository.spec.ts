@@ -70,9 +70,8 @@ describe('Repository', () => {
 			expect(errorCallback).not.toBeCalled();
 		});
 
-		let dictionary;
 		it ("filling custom headers to todoList", done => {
-			dictionary = todoListRepo.addCustomHeaders(newTodoList);
+			let dictionary = todoListRepo.addCustomHeaders(newTodoList);
 			done();
 			expect(dictionary).toEqual({"customHeaders": {"headerKey": "headerValue"}});
 		});
