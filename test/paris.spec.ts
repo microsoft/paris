@@ -63,22 +63,22 @@ describe('Paris main', () => {
 			expect(paris.dataStore.httpService.request).toHaveBeenCalledWith(
 				'GET',
 				'/todo/1',
-				{},
+				{"customHeaders": {"keyForRegularTodoItem": "valueForRegularTodoItem"}},
 				{ timeout: 20000 }
 			);
 		});
 
 		it('should call Repository.getItemById with correct params', () => {
-			paris.getItemById(Todo, 1, null, { test: 1 , customHeaders: {'TestHeader': 'TestValue'}});
-			expect(repo.getItemById).toHaveBeenCalledWith(1, defaultDataOptions, { test: 1, customHeaders: {'TestHeader': 'TestValue'} });
+			paris.getItemById(Todo, 1, null, { test: 1 });
+			expect(repo.getItemById).toHaveBeenCalledWith(1, defaultDataOptions, { test: 1 });
 		});
 
 		it('should call Http.request with correct params', () => {
-			paris.getItemById(Todo, 1, null, { test: 1, customHeaders: {'TestHeader': 'TestValue'}});
+			paris.getItemById(Todo, 1, null, { test: 1});
 			expect(paris.dataStore.httpService.request).toHaveBeenCalledWith(
 				'GET',
 				'/todo/1',
-				{ params: { test: 1, customHeaders: {'TestHeader': 'TestValue'} }},
+				{ customHeaders: {'keyForRegularTodoItem': 'valueForRegularTodoItem'}, params: { test: 1 }},
 				{ timeout: 20000 }
 			);
 		});
