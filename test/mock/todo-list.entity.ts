@@ -8,6 +8,7 @@ import {TodoListState} from "./todo-list-state.value-object";
 	singularName: "Todo list",
 	pluralName: "Todo lists",
 	endpoint: (config:ParisConfig<MockConfigData>) => `v${config.data.version}/list`,
+	customHeaders: ({"headerKey": "headerValue"}),
 	parseDataSet: (rawDataSet:TodoListRawDataSet) => ({
 		items: rawDataSet.lists,
 		next: rawDataSet.$nextPage,

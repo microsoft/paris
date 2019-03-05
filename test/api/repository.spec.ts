@@ -69,7 +69,20 @@ describe('Repository', () => {
 
 			expect(errorCallback).not.toBeCalled();
 		});
+
+		it ("filling custom headers to todoList", done => {
+			let dictionary = todoListRepo.addCustomHeaders(newTodoList);
+			done();
+			expect(dictionary).toEqual({"customHeaders": {"headerKey": "headerValue"}});
+		});
+
+		it ("filling custom headers to todo", done => {
+			let dictionary = todoRepo.addCustomHeaders(newTodoItem);
+			done();
+			expect(dictionary).toEqual({"customHeaders": {"keyForNewTodoItem": "valueForNewTodoItem"}});
+		});
 	});
+
 });
 
 interface MockConfigData {

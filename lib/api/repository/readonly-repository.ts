@@ -187,6 +187,7 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 	 */
 	queryItem(query: DataQuery, dataOptions: DataOptions = defaultDataOptions): Observable<TEntity> {
 		let httpOptions:HttpOptions = this.getQueryHttpOptions(query);
+		let currentOptions = this.addCustomHeaders(query);
 
 		let endpoint:string;
 
@@ -197,7 +198,7 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 
 		const getItem$:Observable<TEntity> = this.paris.dataStore.get(
 			endpoint,
-			httpOptions,
+			Object.assign({}, httpOptions, currentOptions),
 			this.getBaseUrl(query),
 			this.entityBackendConfig.timeout ? { timeout: this.entityBackendConfig.timeout } : null).pipe(
 			catchError((err: AjaxError) => {
@@ -288,10 +289,11 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 		}
 		else {
 			const endpoint:string = this.entityBackendConfig.parseItemQuery ? this.entityBackendConfig.parseItemQuery(itemId, this.entity, this.paris.config, params) : `${this.getEndpointName({ where: params })}/${itemId}`;
+			let currentOptions = this.addCustomHeaders(itemId);
 
 			const getItem$:Observable<TEntity> = this.paris.dataStore.get(
 				endpoint,
-				params && {params: params},
+				Object.assign({}, params && {params: params}, currentOptions),
 				this.getBaseUrl({where: params}),
 				this.entityBackendConfig.timeout ? { timeout: this.entityBackendConfig.timeout } : null
 			).pipe(
@@ -307,6 +309,14 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 			else
 				return getItem$;
 		}
+	}
+
+	addCustomHeaders(data: any): Record<string,string>{
+		let currentOptions = {};
+		if (this.entityBackendConfig.customHeaders){
+			(<any>currentOptions).customHeaders =  this.entityBackendConfig.customHeaders instanceof Function ? this.entityBackendConfig.customHeaders(data, this.paris.config) : this.entityBackendConfig.customHeaders;
+		}
+		return currentOptions;
 	}
 
 	/**

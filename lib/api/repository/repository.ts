@@ -60,10 +60,8 @@ export class Repository<TEntity extends ModelBase, TRawData = any> extends Reado
 			const saveData: TRawData = this.serializeItem(item, serializationData);
 			const endpointName:string = this.getEndpointName(options && options.params ? { where: options.params } : null);
 			const endpoint:string = this.entityBackendConfig.parseSaveQuery ? this.entityBackendConfig.parseSaveQuery(item, this.entity, this.paris.config, options) : `${endpointName}/${item.id || ''}`;
-			let httpOptions = {data: saveData};
-			if (this.entityBackendConfig.customHeaders){
-				(<any>httpOptions).customHeaders =  this.entityBackendConfig.customHeaders instanceof Function ? this.entityBackendConfig.customHeaders(item, this.paris.config) : this.entityBackendConfig.customHeaders;
-			}
+			let httpOptions = this.addCustomHeaders(item);
+			(<any>httpOptions).data = saveData;
 			return this.paris.dataStore.save(endpoint, this.getSaveMethod(item), Object.assign({}, options, httpOptions), this.getBaseUrl(options && {where: options.params}))
 				.pipe(
 					catchError((err: AjaxError) => {
@@ -147,8 +145,9 @@ export class Repository<TEntity extends ModelBase, TRawData = any> extends Reado
 			: Object.assign({}, options, {data: {items: itemsData}});
 
 		const endpointName:string = this.getEndpointName(options && options.params ? { where: options.params } : null);
+		let currentOptions = this.addCustomHeaders(itemsData);
 
-		return this.paris.dataStore.save(`${endpointName}/`, method, saveHttpOptions, this.getBaseUrl(options && {where: options.params}))
+		return this.paris.dataStore.save(`${endpointName}/`, method, Object.assign({}, saveHttpOptions, currentOptions), this.getBaseUrl(options && {where: options.params}))
 			.pipe(
 				catchError((err: AjaxError) => {
 					this.emitEntityHttpErrorEvent(err);
@@ -179,14 +178,14 @@ export class Repository<TEntity extends ModelBase, TRawData = any> extends Reado
 			let httpOptions:HttpOptions = options || { data: {}};
 			if (!httpOptions.data)
 				httpOptions.data = {};
-
+			let currentOptions = this.addCustomHeaders(item);
 			if (this.entityBackendConfig.getRemoveData)
 				Object.assign(httpOptions.data, this.entityBackendConfig.getRemoveData([item]));
 
 			const endpointName:string = this.getEndpointName(options && options.params ? { where: options.params } : null);
 			const endpoint:string = this.entityBackendConfig.parseRemoveQuery ? this.entityBackendConfig.parseRemoveQuery([item], this.entity, this.paris.config) : `${endpointName}/${item.id || ''}`;
 
-			return this.paris.dataStore.delete(endpoint, httpOptions, this.getBaseUrl(options && {where: options.params}))
+			return this.paris.dataStore.delete(endpoint, Object.assign({}, httpOptions, currentOptions), this.getBaseUrl(options && {where: options.params}))
 				.pipe(
 					catchError((err: AjaxError) => {
 						this.emitEntityHttpErrorEvent(err);
@@ -234,7 +233,7 @@ export class Repository<TEntity extends ModelBase, TRawData = any> extends Reado
 			let httpOptions:HttpOptions = options || { data: {}};
 			if (!httpOptions.data)
 				httpOptions.data = {};
-
+			let currentOptions = this.addCustomHeaders(items);
 			Object.assign(httpOptions.data, this.entityBackendConfig.getRemoveData
 				? this.entityBackendConfig.getRemoveData(items)
 				: { ids: items.map(item => item.id) }
@@ -243,7 +242,8 @@ export class Repository<TEntity extends ModelBase, TRawData = any> extends Reado
 			const endpointName:string = this.getEndpointName(options && options.params ? { where: options.params } : null);
 			const endpoint:string = this.entityBackendConfig.parseRemoveQuery ? this.entityBackendConfig.parseRemoveQuery(items, this.entity, this.paris.config) : endpointName;
 
-			return this.paris.dataStore.delete(endpoint, httpOptions, this.getBaseUrl(options && {where: options.params}))
+
+			return this.paris.dataStore.delete(endpoint, Object.assign({}, httpOptions, currentOptions), this.getBaseUrl(options && {where: options.params}))
 				.pipe(
 					catchError((err: AjaxError) => {
 						this.emitEntityHttpErrorEvent(err);
