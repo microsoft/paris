@@ -16,6 +16,8 @@ import { UpdateTodoApiCall } from './mock/update-todo.api-call';
 import { DataSet } from "../lib/data_access/dataset";
 import { DataStoreService } from '../lib/data_access/data-store.service';
 import { TodoType } from './mock/todo-type.entity';
+import { RequestMethod } from '../lib/data_access/http.service';
+import { EntityModelBase } from '../lib/config/entity-model.base';
 
 describe('Paris main', () => {
 	let paris: Paris;
@@ -133,25 +135,33 @@ describe('Paris main', () => {
 					type: 1
 				}
 			],
-			next: next
+			next: next,
+			count: 3
 		};
 
-		const typesMockData = [
-			{
-				id: 0,
-				name: 'Human'
-			},
-			{
-				id: 1,
-				name: 'Machine-Generated'
-			}
-		];
+		const typesMockData = {
+			count: 2,
+			items: [
+				{
+					id: 0,
+					name: 'Human'
+				},
+				{
+					id: 1,
+					name: 'Machine-Generated'
+				}
+			]
+		};
 
-		beforeEach(() => {
-			const mockDataFetch = (method:string, url: string) => of(/types/.test(url) ? typesMockData : todoMockData);
+		beforeEach(<T extends EntityModelBase<number>>() => {
+			// @ts-ignore
+			const mockDataFetch:(method: RequestMethod, endpoint: string) => Observable<DataSet<T>> = (method:string, url: string) => of<DataSet<T>>(<DataSet<T>>(/types/.test(url) ? typesMockData : todoMockData));
 
-			DataStoreService.prototype.get = jest.fn(mockDataFetch);
-			DataStoreService.prototype.request = jest.fn(mockDataFetch);
+			// @ts-ignore
+			DataStoreService.prototype.get = jest.fn<Observable<DataSet<T>>, [RequestMethod, string]>(mockDataFetch);
+
+			// @ts-ignore
+			DataStoreService.prototype.request = jest.fn<Observable<DataSet<T>>, [RequestMethod, string]>(mockDataFetch);
 		});
 
 		afterEach(() => {
