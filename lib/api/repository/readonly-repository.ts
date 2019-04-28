@@ -15,11 +15,12 @@ import {HttpOptions} from "../../data_access/http.service";
 import {Paris} from "../../paris";
 import {IReadonlyRepository} from "./repository.interface";
 import {DataQuery} from "../../data_access/data-query";
-import {catchError, map, mergeMap, tap} from "rxjs/operators";
+import { catchError, map, mergeMap, share, tap, take, refCount } from "rxjs/operators";
 import {DataSet} from "../../data_access/dataset";
 import {DataOptions, defaultDataOptions} from "../../data_access/data.options";
 import {DataAvailability} from "../../data_access/data-availability.enum";
 import {queryToHttpOptions} from "../../data_access/query-to-http";
+import { publishReplay } from 'rxjs/internal/operators/publishReplay';
 
 /**
  * A Repository is a service through which all of an Entity's data is fetched, cached and saved back to the backend.
@@ -45,6 +46,7 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 	protected _cache: DataCache<TEntity>;
 	protected _allItemsSubject$: Subject<Array<TEntity>>;
 
+	private _allItemsBeingSet$: Observable<Array<TEntity>>;
 
 	protected getBaseUrl(query?: DataQuery): string {
 		if (!this.entityBackendConfig.baseUrl)
@@ -113,14 +115,22 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 		if (this._allValues)
 			return of(this._allValues);
 
-		return this.query().pipe(
+		if (this._allItemsBeingSet$)
+			return this._allItemsBeingSet$;
+
+		this._allItemsBeingSet$ = this.query().pipe(
+			take(1),
 			tap((dataSet: DataSet<TEntity>) => {
 				this._allValues = dataSet.items;
 				this._allValuesMap = new Map();
 				this._allValues.forEach((value: TEntity) => this._allValuesMap.set(String(value instanceof EntityModelBase ? value.id : value.toString()), value));
 			}),
-			map((dataSet:DataSet<TEntity>) => dataSet.items)
+			map((dataSet:DataSet<TEntity>) => dataSet.items),
+			publishReplay(),
+			refCount()
 		);
+
+		return this._allItemsBeingSet$;
 	}
 
 	/**

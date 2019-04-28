@@ -3,6 +3,7 @@ import {Entity} from "../../lib/config/decorators/entity.decorator";
 import {EntityField} from "../../lib/config/decorators/entity-field.decorator";
 import {Tag} from "./tag.value-object";
 import {TodoStatus} from "./todo-status.entity";
+import { TodoType } from './todo-type.entity';
 
 @Entity({
 	singularName: "Todo item",
@@ -26,4 +27,7 @@ export class Todo extends EntityModelBase<number>{
 
 	@EntityField()
 	status:TodoStatus;
+
+	@EntityField()
+	type: TodoType;
 }

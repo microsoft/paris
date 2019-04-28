@@ -5,7 +5,7 @@ import { Repository } from '../lib/api/repository/repository';
 import { DataQuery } from '../lib/data_access/data-query';
 import { DataOptions, defaultDataOptions } from '../lib/data_access/data.options';
 import { Paris } from '../lib/paris';
-import { mergeMap } from '../node_modules/rxjs/operators';
+import { mergeMap } from 'rxjs/operators';
 import { CreateTodoListApiCall } from './mock/create-new-list.api-call';
 import { Tag } from './mock/tag.value-object';
 import { TodoList } from './mock/todo-list.entity';
@@ -13,8 +13,9 @@ import { TodoListItemsRelationship } from './mock/todo-list.relationships';
 import { TodoStatus } from './mock/todo-status.entity';
 import { Todo } from './mock/todo.entity';
 import { UpdateTodoApiCall } from './mock/update-todo.api-call';
-import { setMockData } from "./mock/mock-data.service";
 import { DataSet } from "../lib/data_access/dataset";
+import { DataStoreService } from '../lib/data_access/data-store.service';
+import { TodoType } from './mock/todo-type.entity';
 
 describe('Paris main', () => {
 	let paris: Paris;
@@ -114,18 +115,47 @@ describe('Paris main', () => {
 
 		const next = 'https://localhost:666/api/todo?p=2';
 
-		setMockData({
+		const todoMockData = {
 			items: [
 				{
 					id: 1,
-					text: 'First'
+					text: 'First',
+					type: 0
 				},
 				{
 					id: 2,
-					text: 'Second'
+					text: 'Second',
+					type: 1
+				},
+				{
+					id: 3,
+					text: 'Third',
+					type: 1
 				}
 			],
 			next: next
+		};
+
+		const typesMockData = [
+			{
+				id: 0,
+				name: 'Human'
+			},
+			{
+				id: 1,
+				name: 'Machine-Generated'
+			}
+		];
+
+		beforeEach(() => {
+			const mockDataFetch = (method:string, url: string) => of(/types/.test(url) ? typesMockData : todoMockData);
+
+			DataStoreService.prototype.get = jest.fn(mockDataFetch);
+			DataStoreService.prototype.request = jest.fn(mockDataFetch);
+		});
+
+		afterEach(() => {
+			jest.restoreAllMocks();
 		});
 
 		beforeEach(() => {
@@ -157,6 +187,20 @@ describe('Paris main', () => {
 		it("should have a 'next' property in the DataSet", done => {
 			paris.query(Todo).subscribe((dataSet: DataSet<Todo>) => {
 				expect(dataSet.next).toEqual(next);
+				done();
+			});
+		});
+
+		it('should have a submodel', done => {
+			paris.query(Todo).subscribe(({ items }: DataSet<Todo>) => {
+				expect(items[0].type).toBeInstanceOf(TodoType);
+				done();
+			});
+		});
+
+		it('should point submodels to the same model when using loadAll', done => {
+			paris.query(Todo).subscribe(({ items }: DataSet<Todo>) => {
+				expect(items[1].type).toBe(items[2].type);
 				done();
 			});
 		});
