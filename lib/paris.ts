@@ -164,7 +164,7 @@ export class Paris<TConfigData = any> {
 
 		let httpOptions: HttpOptions = ((input !== undefined) && (input !== null))
 			? apiCallType.config.parseQuery
-				? apiCallType.config.parseQuery(input)
+				? apiCallType.config.parseQuery(input, this.config)
 				: apiCallType.config.method !== "GET" ? {data: input} : {params: input}
 			: null;
 		if (!httpOptions){
@@ -260,6 +260,25 @@ export class Paris<TConfigData = any> {
 		return apiCall$;
 	}
 
+	/**
+	 * Clears all or specific ApiCallType caches
+	 * @param {ApiCallType<TResult, TInput>} apiCallType Optional ApiCallType class or array of classes. if omitted, all ApiCallType caches will be cleared. otherwise, only the caches of the specified ApiCallType(s) will be cleared.
+	 * @returns {void}
+	 */
+	clearApiCallCache(apiCallType?:ApiCallType | Array<ApiCallType>): void {
+		if (!apiCallType) {
+			this.apiCallsCache.clear();
+			return;
+		}
+		const apiCallTypes = apiCallType instanceof Array ? apiCallType : [apiCallType];
+		apiCallTypes.forEach(apiCallType => {
+			const apiCallTypeCache = this.getApiCallCache(apiCallType);
+			if (apiCallTypeCache) {
+				apiCallTypeCache.clear();
+			}
+		})
+	}
+
 	private getApiCallCache<TResult, TInput>(apiCallType:ApiCallType<TResult, TInput>, addIfNotExists:boolean = false):DataCache<TResult>{
 		let apiCallCache:DataCache<TResult> = this.apiCallsCache.get(apiCallType);
 		if (!apiCallCache && addIfNotExists){
@@ -334,7 +353,7 @@ export class Paris<TConfigData = any> {
 	 * @returns {Observable<DataSet<TEntity extends ModelBase>>}
 	 */
 	callQuery<TEntity extends ModelBase>(entityConstructor:DataEntityType<TEntity>, backendConfig:EntityBackendConfig<TEntity>, query?: DataQuery, dataOptions: DataOptions = defaultDataOptions):Observable<DataSet<TEntity>>{
-		let httpOptions:HttpOptions = backendConfig.parseDataQuery ? { params: backendConfig.parseDataQuery(query) } : queryToHttpOptions(query);
+		let httpOptions:HttpOptions = backendConfig.parseDataQuery ? { params: backendConfig.parseDataQuery(query, this.config) } : queryToHttpOptions(query);
 		if (!httpOptions){
 			httpOptions = {};
 		}

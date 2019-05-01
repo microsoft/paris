@@ -1,5 +1,6 @@
 import {ApiCallBackendConfigInterface} from "../../config/api-call-backend-config.interface";
 import {HttpOptions, RequestMethod} from "../../data_access/http.service";
+import { ParisConfig } from "../../config/paris-config";
 
 export class ApiCallModel<TResult = any, TInput = any>{
 	config:ApiCallConfig<TResult, TInput>
@@ -12,7 +13,7 @@ export interface ApiCallType<TResult = any, TInput = any>{
 
 export interface ApiCallConfig<TResult = any, TInput = any> extends ApiCallBackendConfigInterface<TResult> {
 	name:string,
-	parseQuery?:(input:TInput) => HttpOptions,
+	parseQuery?:(input:TInput, config?: ParisConfig) => HttpOptions,
 	parse?:(data?:any, input?:TInput) => TResult,
 	method?:RequestMethod,
 	responseType?: 'json' | 'blob' | 'text',

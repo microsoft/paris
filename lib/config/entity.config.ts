@@ -101,7 +101,7 @@ export interface EntityBackendConfig<TEntity extends ModelBase, TRawData = any, 
 	 * `parseDataQuery` receives that DataQuery object and allows to modify it, so Paris can send to the API what it expects.
 	 * @param {DataQuery} dataQuery
 	 */
-	parseDataQuery?:(dataQuery:DataQuery) => { [index:string]:any },
+	parseDataQuery?:(dataQuery:DataQuery, config?: ParisConfig) => { [index:string]:any },
 
 	/**
 	 * For query results, Paris accepts either an array of items or an object. That object may contain properties such as 'count', 'next' and 'previous'.
