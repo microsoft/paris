@@ -1,6 +1,6 @@
 {
 	"name": "@microsoft/paris",
-	"version": "1.5.0",
+	"version": "1.5.1",
 	"description": "Library for the implementation of Domain Driven Design with TypeScript + RxJS",
 	"repository": {
 		"type": "git",
@@ -11,7 +11,7 @@
 	"scripts": {
 		"build": "gulp build",
 		"dev": "rollup -c -w",
-		"prepublish": "npm run build && npm run test",
+		"prepublish": "npm run build",
 		"test": "jest",
 		"test:watch": "jest --watch",
 		"docs": "typedoc --options typedocconfig.ts"
