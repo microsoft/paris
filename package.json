@@ -1,6 +1,6 @@
 {
 	"name": "@microsoft/paris",
-	"version": "1.4.2",
+	"version": "1.4.4",
 	"description": "Library for the implementation of Domain Driven Design with TypeScript + RxJS",
 	"repository": {
 		"type": "git",
@@ -99,7 +99,7 @@
 			"/dist/"
 		],
 		"setupTestFrameworkScriptFile": "<rootDir>/jest-setup.ts",
-		"testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|js)$",
+		"testRegex": "(/__tests__/.*|\\.(test|spec)\\.(ts|js)$",
 		"moduleFileExtensions": [
 			"ts",
 			"js",

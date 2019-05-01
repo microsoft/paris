@@ -1,4 +1,4 @@
-import { Observable, of } from 'rxjs';
+import { Observable, of, forkJoin } from 'rxjs';
 import { DataEntityType } from '../lib/api/entity/data-entity.base';
 import { RelationshipRepository } from '../lib/api/repository/relationship-repository';
 import { Repository } from '../lib/api/repository/repository';
@@ -164,7 +164,7 @@ describe('Paris main', () => {
 
 	describe('apiCall', () => {
 		let jestGetApiCallCacheSpy: jest.SpyInstance<Observable<Paris>>;
-		let jestMakeApiCallSpy: jest.SpyInstance<Observable<Paris>>;
+		let jestMakeApiCallSpy: jest.SpyInstance<Observable<any>>;
 
 		beforeEach(() => {
 			paris = new Paris();
@@ -174,8 +174,42 @@ describe('Paris main', () => {
 			jestMakeApiCallSpy = jest.spyOn(paris, 'makeApiCall' as any);
 		});
 
-		it.skip('should add data to cache if configured to', () => {
-			// TODO: we need to subscribe in order for this to work
+		describe('cache behaviour', () => {
+
+			function callTwoDifferentApiCalls() {
+				return forkJoin(paris.apiCall(CreateTodoListApiCall), paris.apiCall(UpdateTodoApiCall));
+			}
+
+			const testObj = {};
+
+			beforeEach(done => {
+				jestMakeApiCallSpy.mockReturnValue(of(testObj));
+				callTwoDifferentApiCalls().subscribe(_ => done());
+			});
+
+			it('should retreive data from cache', done => {
+				callTwoDifferentApiCalls().subscribe(val => {
+					expect(val[0]).toBe(testObj);
+					expect(jestMakeApiCallSpy).toHaveBeenCalledTimes(2);//expecting no additional calls to 'makeApiCall'
+					done();
+				})
+			});
+
+			it('should clear a specific ApiCall cache', done => {
+				paris.clearApiCallCache(CreateTodoListApiCall);
+				callTwoDifferentApiCalls().subscribe(_ => {
+					expect(jestMakeApiCallSpy).toHaveBeenCalledTimes(3);//expecting exactly one additional call to 'makeApiCall'
+					done();
+				})
+			});
+
+			it('should clear all ApiCalls cache', done => {
+				paris.clearApiCallCache();
+				callTwoDifferentApiCalls().subscribe(_ => {
+					expect(jestMakeApiCallSpy).toHaveBeenCalledTimes(4);//expecting exactly two additional calls to 'makeApiCall'
+					done();
+				})
+			});
 		});
 
 		it('should get data from cache if available and configured to', () => {
