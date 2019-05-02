@@ -60,6 +60,13 @@ describe('ReadonlyRepository', () => {
 		});
 	});
 
+	describe('getQueryHttpOptions', () => {
+		it ('sends the separateArrayParams defined in the entity backend config', () => {
+			const queryHttpOptions = todoListRepo.getQueryHttpOptions({ where: { params: { foo: 'bar' } }});
+			expect(queryHttpOptions.separateArrayParams).toBe(true);
+		});
+	});
+
 	describe('caching', () => {
 		setMockData({
 			id: 1,

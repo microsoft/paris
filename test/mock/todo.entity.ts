@@ -10,6 +10,7 @@ import { TodoType } from './todo-type.entity';
 	pluralName: "Todo items",
 	endpoint: "todo",
 	timeout: 20000,
+	separateArrayParams: true,
 	customHeaders: (data, config) => data ? (data.text === "New todo item" ? {"keyForNewTodoItem": "valueForNewTodoItem"} : {"keyForRegularTodoItem": "valueForRegularTodoItem"}) : {}
 })
 export class Todo extends EntityModelBase<number>{

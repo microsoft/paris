@@ -233,16 +233,17 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 	 * @returns {HttpOptions}
 	 */
 	getQueryHttpOptions(query:DataQuery):HttpOptions {
-		let httpOptions:HttpOptions = this.entityBackendConfig.parseDataQuery ? { params: this.entityBackendConfig.parseDataQuery(query) } : queryToHttpOptions(query);
+		const { fixedData, separateArrayParams, parseDataQuery } = this.entityBackendConfig;
 
-		if (this.entityBackendConfig.fixedData){
-			if (!httpOptions)
-				httpOptions = {};
+		const httpOptions:HttpOptions = { separateArrayParams };
 
-			if (!httpOptions.params)
-				httpOptions.params = {};
+		if (parseDataQuery)
+			httpOptions.params = parseDataQuery(query);
+		else
+			Object.assign(httpOptions, queryToHttpOptions(query));
 
-			Object.assign(httpOptions.params, this.entityBackendConfig.fixedData);
+		if (fixedData){
+			httpOptions.params = { ...httpOptions.params, ...fixedData };
 		}
 
 		return httpOptions;
