@@ -62,7 +62,7 @@ describe('ReadonlyRepository', () => {
 
 	describe('getQueryHttpOptions', () => {
 		it ('sends the separateArrayParams defined in the entity backend config', () => {
-			const queryHttpOptions = todoListRepo.getQueryHttpOptions({ where: { params: { foo: 'bar' } }});
+			const queryHttpOptions = todoRepo.getQueryHttpOptions({ where: { params: { foo: 'bar' } }});
 			expect(queryHttpOptions.separateArrayParams).toBe(true);
 		});
 	});
