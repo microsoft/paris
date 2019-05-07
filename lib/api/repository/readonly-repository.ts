@@ -15,12 +15,11 @@ import {HttpOptions} from "../../data_access/http.service";
 import {Paris} from "../../paris";
 import {IReadonlyRepository} from "./repository.interface";
 import {DataQuery} from "../../data_access/data-query";
-import { catchError, map, mergeMap, share, tap, take, refCount } from "rxjs/operators";
+import {catchError, map, mergeMap, publishReplay, refCount, take, tap} from "rxjs/operators";
 import {DataSet} from "../../data_access/dataset";
 import {DataOptions, defaultDataOptions} from "../../data_access/data.options";
 import {DataAvailability} from "../../data_access/data-availability.enum";
 import {queryToHttpOptions} from "../../data_access/query-to-http";
-import { publishReplay } from 'rxjs/internal/operators/publishReplay';
 
 /**
  * A Repository is a service through which all of an Entity's data is fetched, cached and saved back to the backend.
@@ -126,7 +125,7 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 				this._allValues.forEach((value: TEntity) => this._allValuesMap.set(String(value instanceof EntityModelBase ? value.id : value.toString()), value));
 			}),
 			map((dataSet:DataSet<TEntity>) => dataSet.items),
-			publishReplay(),
+			publishReplay(1),
 			refCount()
 		);
 

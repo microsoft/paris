@@ -6,4 +6,9 @@ import {EntityId} from "../modeling/entity-id.type";
 export class EntityModelBase<TId extends EntityId = string> extends ModelBase{
 	@EntityField()
 	id:TId;
+
+
+	constructor(data:EntityModelConfigBase){
+		super(data);
+	}
 }

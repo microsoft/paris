@@ -116,10 +116,6 @@ export class Modeler {
 		function instantiateModel(): TEntity {
 			try {
 				const model = new entity.entityConstructor(modelData, rawData);
-				if (Object.isFrozen(model) || Object.isSealed(model))
-					console.warn(`Can't assign data to ${entity.singularName}, since it's frozen or sealed.`);
-
-				Object.assign(model, modelData);
 				if (model._init)
 					model._init(modelData, rawData);
 
