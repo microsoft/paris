@@ -99,7 +99,7 @@
 			"/dist/"
 		],
 		"setupTestFrameworkScriptFile": "<rootDir>/jest-setup.ts",
-		"testRegex": "(/__tests__/.*|\\.(test|spec)\\.(ts|js)$",
+		"testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|js)$",
 		"moduleFileExtensions": [
 			"ts",
 			"js",
