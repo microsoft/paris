@@ -31,4 +31,12 @@ export class Todo extends EntityModelBase<number>{
 
 	@EntityField()
 	type: TodoType;
+
+	@EntityField({
+		defaultValue: {
+			attachments: [],
+			links: []
+		}
+	})
+	extraData: any;
 }

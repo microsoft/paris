@@ -105,6 +105,19 @@ describe('ReadonlyRepository', () => {
 			expect(todoStatusRepo.values).toEqual(todoStatusValues);
 		});
 	});
+
+	describe('createNewItem', () => {
+		it('should set fields to default values if no value is supplied and a default is available', () => {
+			const todo = paris.getRepository(Todo).createNewItem();
+			expect(todo.extraData).toEqual((<DataEntityType<Todo>>Todo).entityConfig.fields.get('extraData').defaultValue);
+		});
+
+		it('should deep clone default values before adding them to the model', () => {
+			const todo = paris.getRepository(Todo).createNewItem();
+			expect(todo.extraData).not.toBe((<DataEntityType<Todo>>Todo).entityConfig.fields.get('extraData').defaultValue);
+			expect(todo.extraData.attachments).not.toBe((<DataEntityType<Todo>>Todo).entityConfig.fields.get('extraData').defaultValue.attachments);
+		});
+	});
 });
 
 interface MockConfigData {

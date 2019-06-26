@@ -7,7 +7,7 @@ import {valueObjectsService} from "../config/services/value-objects.service";
 import {EntityConfigBase, ModelConfig} from "../config/model-config";
 import {ModelEntity} from "../config/entity.config";
 import {FIELD_DATA_SELF} from "../config/entity-field.config";
-import {get} from "lodash-es";
+import {cloneDeep, get} from "lodash-es";
 import {DataTransformersService} from "./data-transformers.service";
 import {Field} from "../api/entity/entity-field";
 import {EntityModelBase} from "../config/entity-model.base";
@@ -206,7 +206,7 @@ export class Modeler {
 
 			let defaultValue:any = fieldRepository && fieldRepository.modelConfig.getDefaultValue()
 				|| fieldValueObjectType && fieldValueObjectType.getDefaultValue()
-				|| (entityField.isArray ? [] : entityField.defaultValue !== undefined && entityField.defaultValue !== null ? entityField.defaultValue : null);
+				|| (entityField.isArray ? [] : entityField.defaultValue !== undefined && entityField.defaultValue !== null ? cloneDeep(entityField.defaultValue) : null);
 
 			if ((defaultValue === undefined || defaultValue === null) && entityField.required)
 				throw new Error(` Field ${entityField.id} is required but it's ${entityFieldRawData}.`);

@@ -1,4 +1,4 @@
-import {clone} from "lodash-es";
+import {cloneDeep} from "lodash-es";
 import {merge, Observable, of, Subject} from "rxjs";
 import {AjaxError} from "rxjs/ajax";
 import {DataEntityType} from "../entity/data-entity.base";
@@ -142,7 +142,7 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 		let defaultData:Partial<TEntity> = {};
 		this.modelConfig.fieldsArray.forEach((field:Field) => {
 			if (field.defaultValue !== undefined)
-				defaultData[<keyof TEntity>field.id] = clone(field.defaultValue);
+				defaultData[<keyof TEntity>field.id] = cloneDeep(field.defaultValue);
 			else if (field.isArray)
 				defaultData[<keyof TEntity>field.id] = <any>[];
 		});
