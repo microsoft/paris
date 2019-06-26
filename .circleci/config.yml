@@ -1,27 +1,27 @@
-version: 2
+version: 1
 jobs:
-	build:
-		docker:
-			- image: circleci/node:10-browsers
-		working_directory: ~/repo
-		steps:
-			- checkout
+    build:
+        docker:
+            - image: circleci/node:10-browsers
+        working_directory: ~/repo
+        steps:
+            - checkout
 
-			# Download and cache dependencies
-			- restore_cache:
-				  keys:
-					  - v1-dependencies-{{ checksum "package.json" }}
-					  # fallback to using the latest cache if no exact match is found
-					  - v1-dependencies-
+            # Download and cache dependencies
+            - restore_cache:
+                  keys:
+                      - v1-dependencies-{{ checksum "package.json" }}
+                      # fallback to using the latest cache if no exact match is found
+                      - v1-dependencies-
 
-			- run:
-				  name: Install dependencies
-				  command: npm ci
+            - run:
+                  name: Install dependencies
+                  command: npm ci
 
-			- save_cache:
-				  paths:
-					  - node_modules
-				  key: v1-dependencies-{{ checksum "package.json" }}
+            - save_cache:
+                  paths:
+                      - node_modules
+                  key: v1-dependencies-{{ checksum "package.json" }}
 #
 #			- run:
 #				  name: test
@@ -96,11 +96,11 @@ jobs:
 #
 #					  fi
 workflows:
-	version: 1
+    version: 1
 
-	build:
-		jobs:
-			- build
+    build:
+        jobs:
+            - build
 
 #	build_and_publish-docs:
 #		jobs:
