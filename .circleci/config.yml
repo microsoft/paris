@@ -16,20 +16,20 @@ jobs:
 
             - run:
                   name: Install dependencies
-                  command: npm ci
+                  command: npm install
 
             - save_cache:
                   paths:
                       - node_modules
                   key: v1-dependencies-{{ checksum "package.json" }}
-#
-#			- run:
-#				  name: test
-#				  command: npm run test:ci
-#
-#			- run:
-#				  name: build
-#				  command: npm run build
+
+			- run:
+				  name: test
+				  command: npm run test
+
+			- run:
+				  name: build
+				  command: npm run build
 
 #	publish-docs:
 #		docker:
