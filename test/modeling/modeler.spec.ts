@@ -1,4 +1,4 @@
-import {Observable, of} from 'rxjs';
+import {forkJoin, Observable, of} from 'rxjs';
 import {Animal, Person, Thing} from '../mock/thing.entity';
 import {DataStoreService} from '../../lib/data_access/data-store.service';
 import {Paris} from '../../lib/paris';
@@ -196,6 +196,19 @@ describe('Modeler', () => {
 					expect(todoList.state).toBeInstanceOf((<DataEntityType<TodoList>>TodoList).entityConfig.fields.get('state').type);
 					done();
 				});
+			});
+
+			it('deep clones the default value before setting the model value', done => {
+				forkJoin([
+						paris.modeler.modelEntity({ id: 1, text: 'First' }, (<DataEntityType<Todo>>Todo).entityConfig),
+						paris.modeler.modelEntity({ id: 2, text: 'Second' }, (<DataEntityType<Todo>>Todo).entityConfig)
+				]).subscribe(([first, second]) => {
+					//verify that changing one model doesn't affect the other
+					first.extraData.attachments.push('something');
+					expect(second.extraData.attachments).toEqual([]);
+					done();
+				})
+
 			});
 		});
 	});
