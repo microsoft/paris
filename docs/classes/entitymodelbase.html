@@ -89,42 +89,43 @@
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
-						<section class="tsd-index-section ">
+						<section class="tsd-index-section tsd-is-inherited">
 							<h3>Constructors</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite"><a href="entitymodelbase.html#constructor" class="tsd-kind-icon">constructor</a></li>
+								<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><a href="entitymodelbase.html#constructor" class="tsd-kind-icon">constructor</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="entitymodelbase.html#_parent" class="tsd-kind-icon">$parent</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="entitymodelbase.html#_init" class="tsd-kind-icon">_init</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-overwrite"><a href="entitymodelbase.html#id" class="tsd-kind-icon">id</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
-			<section class="tsd-panel-group tsd-member-group ">
+			<section class="tsd-panel-group tsd-member-group tsd-is-inherited">
 				<h2>Constructors</h2>
-				<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
+				<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited">
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
-					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Entity<wbr>Model<wbr>Base<span class="tsd-signature-symbol">(</span>data<span class="tsd-signature-symbol">: </span><a href="../interfaces/entitymodelconfigbase.html" class="tsd-signature-type">EntityModelConfigBase</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="entitymodelbase.html" class="tsd-signature-type">EntityModelBase</a></li>
+					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Entity<wbr>Model<wbr>Base<span class="tsd-signature-symbol">(</span>data<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="entitymodelbase.html" class="tsd-signature-type">EntityModelBase</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Overrides <a href="modelbase.html">ModelBase</a>.<a href="modelbase.html#constructor">constructor</a></p>
+								<p>Inherited from <a href="modelbase.html">ModelBase</a>.<a href="modelbase.html#constructor">constructor</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/config/entity-model.base.ts#L8">config/entity-model.base.ts:8</a></li>
+									<li>Defined in <a href="https://github.com/microsoft/paris/blob/a58ff49/lib/config/model.base.ts#L4">config/model.base.ts:4</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>data: <a href="../interfaces/entitymodelconfigbase.html" class="tsd-signature-type">EntityModelConfigBase</a></h5>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> data: <span class="tsd-signature-type">any</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="entitymodelbase.html" class="tsd-signature-type">EntityModelBase</a></h4>
@@ -141,9 +142,44 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="modelbase.html">ModelBase</a>.<a href="modelbase.html#_parent">$parent</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/config/model.base.ts#L3">config/model.base.ts:3</a></li>
+							<li>Defined in <a href="https://github.com/microsoft/paris/blob/a58ff49/lib/config/model.base.ts#L3">config/model.base.ts:3</a></li>
 						</ul>
 					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+					<a name="_init" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> _init</h3>
+					<div class="tsd-signature tsd-kind-icon">_init<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from <a href="modelbase.html">ModelBase</a>.<a href="modelbase.html#_init">_init</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/microsoft/paris/blob/a58ff49/lib/config/model.base.ts#L4">config/model.base.ts:4</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-siganture">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-property tsd-is-not-exported">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>entityData<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">any</span>, rawData<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">never</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5><span class="tsd-flag ts-flagOptional">Optional</span> entityData: <span class="tsd-signature-type">any</span></h5>
+											</li>
+											<li>
+												<h5><span class="tsd-flag ts-flagOptional">Optional</span> rawData: <span class="tsd-signature-type">any</span></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">never</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-overwrite">
 					<a name="id" class="tsd-anchor"></a>
@@ -152,7 +188,7 @@
 					<aside class="tsd-sources">
 						<p>Overrides <a href="modelbase.html">ModelBase</a>.<a href="modelbase.html#id">id</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/config/entity-model.base.ts#L8">config/entity-model.base.ts:8</a></li>
+							<li>Defined in <a href="https://github.com/microsoft/paris/blob/a58ff49/lib/config/entity-model.base.ts#L8">config/entity-model.base.ts:8</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -173,11 +209,14 @@
 					<li class="current tsd-kind-class tsd-has-type-parameter">
 						<a href="entitymodelbase.html" class="tsd-kind-icon">Entity<wbr>Model<wbr>Base</a>
 						<ul>
-							<li class=" tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
+							<li class=" tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited">
 								<a href="entitymodelbase.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
 								<a href="entitymodelbase.html#_parent" class="tsd-kind-icon">$parent</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+								<a href="entitymodelbase.html#_init" class="tsd-kind-icon">_init</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-overwrite">
 								<a href="entitymodelbase.html#id" class="tsd-kind-icon">id</a>

@@ -57,7 +57,7 @@
 					<a href="apicallbackendconfiginterface.html">ApiCallBackendConfigInterface</a>
 				</li>
 			</ul>
-			<h1>Interface ApiCallBackendConfigInterface&lt;T, TRawData&gt;</h1>
+			<h1>Interface ApiCallBackendConfigInterface&lt;T, TRawData, TInput&gt;</h1>
 		</div>
 	</div>
 </header>
@@ -72,6 +72,9 @@
 					</li>
 					<li>
 						<h4>TRawData</h4>
+					</li>
+					<li>
+						<h4>TInput</h4>
 					</li>
 				</ul>
 			</section>
@@ -100,6 +103,7 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="apicallbackendconfiginterface.html#baseurl" class="tsd-kind-icon">base<wbr>Url</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="apicallbackendconfiginterface.html#cache" class="tsd-kind-icon">cache</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="apicallbackendconfiginterface.html#customheaders" class="tsd-kind-icon">custom<wbr>Headers</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="apicallbackendconfiginterface.html#endpoint" class="tsd-kind-icon">endpoint</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="apicallbackendconfiginterface.html#fixeddata" class="tsd-kind-icon">fixed<wbr>Data</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="apicallbackendconfiginterface.html#parsedata" class="tsd-kind-icon">parse<wbr>Data</a></li>
@@ -117,7 +121,7 @@
 					<div class="tsd-signature tsd-kind-icon">base<wbr>Url<span class="tsd-signature-symbol">:</span> <a href="../globals.html#entityconfigfunctionorvalue" class="tsd-signature-type">EntityConfigFunctionOrValue</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/config/api-call-backend-config.interface.ts#L23">config/api-call-backend-config.interface.ts:23</a></li>
+							<li>Defined in <a href="https://github.com/microsoft/paris/blob/a58ff49/lib/config/api-call-backend-config.interface.ts#L23">config/api-call-backend-config.interface.ts:23</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -134,7 +138,7 @@
 					<div class="tsd-signature tsd-kind-icon">cache<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> | </span><a href="datacachesettings.html" class="tsd-signature-type">DataCacheSettings</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/config/api-call-backend-config.interface.ts#L16">config/api-call-backend-config.interface.ts:16</a></li>
+							<li>Defined in <a href="https://github.com/microsoft/paris/blob/a58ff49/lib/config/api-call-backend-config.interface.ts#L16">config/api-call-backend-config.interface.ts:16</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -145,12 +149,35 @@
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="customheaders" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> custom<wbr>Headers</h3>
+					<div class="tsd-signature tsd-kind-icon">custom<wbr>Headers<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/microsoft/paris/blob/a58ff49/lib/config/api-call-backend-config.interface.ts#L67">config/api-call-backend-config.interface.ts:67</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Custom headers for API call.
+								It can be either a dictionary of string, with header names as the keys,
+							or a function (which be applied by Paris) which receives data and config, and returns the headers for the API call.</p>
+						</div>
+						<dl class="tsd-comment-tags">
+							<dt>param</dt>
+							<dd></dd>
+							<dt>param</dt>
+							<dd></dd>
+						</dl>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="endpoint" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagOptional">Optional</span> endpoint</h3>
 					<div class="tsd-signature tsd-kind-icon">endpoint<span class="tsd-signature-symbol">:</span> <a href="../globals.html#entityconfigfunctionorvalue" class="tsd-signature-type">EntityConfigFunctionOrValue</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/config/api-call-backend-config.interface.ts#L10">config/api-call-backend-config.interface.ts:10</a></li>
+							<li>Defined in <a href="https://github.com/microsoft/paris/blob/a58ff49/lib/config/api-call-backend-config.interface.ts#L10">config/api-call-backend-config.interface.ts:10</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -165,7 +192,7 @@
 					<div class="tsd-signature tsd-kind-icon">fixed<wbr>Data<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/config/api-call-backend-config.interface.ts#L28">config/api-call-backend-config.interface.ts:28</a></li>
+							<li>Defined in <a href="https://github.com/microsoft/paris/blob/a58ff49/lib/config/api-call-backend-config.interface.ts#L28">config/api-call-backend-config.interface.ts:28</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -188,7 +215,7 @@
 					<div class="tsd-signature tsd-kind-icon">parse<wbr>Data<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/config/api-call-backend-config.interface.ts#L58">config/api-call-backend-config.interface.ts:58</a></li>
+							<li>Defined in <a href="https://github.com/microsoft/paris/blob/a58ff49/lib/config/api-call-backend-config.interface.ts#L58">config/api-call-backend-config.interface.ts:58</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -238,7 +265,7 @@
 					<div class="tsd-signature tsd-kind-icon">separate<wbr>Array<wbr>Params<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/config/api-call-backend-config.interface.ts#L50">config/api-call-backend-config.interface.ts:50</a></li>
+							<li>Defined in <a href="https://github.com/microsoft/paris/blob/a58ff49/lib/config/api-call-backend-config.interface.ts#L50">config/api-call-backend-config.interface.ts:50</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -288,6 +315,9 @@ paris.query(MyEntity, { where: { foo: [<span class="hljs-string">'bar'</span>, <
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
 								<a href="apicallbackendconfiginterface.html#cache" class="tsd-kind-icon">cache</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="apicallbackendconfiginterface.html#customheaders" class="tsd-kind-icon">custom<wbr>Headers</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
 								<a href="apicallbackendconfiginterface.html#endpoint" class="tsd-kind-icon">endpoint</a>

@@ -38,8 +38,11 @@ export class Paris<TConfigData = any> {
 	readonly modeler:Modeler;
 
 	readonly dataStore:DataStoreService;
-	readonly config:ParisConfig<TConfigData>;
+	_config:ParisConfig<TConfigData>;
 
+    get config() {
+        return this._config;
+    }
 	/**
 	 * Observable that fires whenever an {@link Entity} is saved
 	 */
@@ -62,7 +65,7 @@ export class Paris<TConfigData = any> {
 	private readonly apiCallsCache:Map<ApiCallType, DataCache> = new Map<ApiCallType, DataCache>();
 
 	constructor(config?:ParisConfig<TConfigData>){
-		this.config = Object.freeze(Object.assign({}, defaultConfig, config));
+		this._config = Object.freeze(Object.assign({}, defaultConfig, config));
 		this.dataStore = new DataStoreService(this.config);
 		this.modeler = new Modeler(this);
 
@@ -535,4 +538,21 @@ export class Paris<TConfigData = any> {
 		else
 			return repository.entity.getValueById(valueId);
 	}
+
+    /**
+     * Clears the reference of the config object
+     */
+	clearConfig(){
+	    this._config = null;
+    }
+
+    /**
+     * Reset the config object to a new config
+     * @param  {ParisConfig} config
+     */
+    resetConfig(config: ParisConfig){
+	    this._config = config;
+    }
+
+
 }
