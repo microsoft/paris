@@ -543,7 +543,7 @@ export class Paris<TConfigData = any> {
      * Clears the reference of the config object
      */
 	clearConfig(){
-	    this._config = null;
+	   this._config = null;
     }
 
     /**
