@@ -93,7 +93,6 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="paris.html#config" class="tsd-kind-icon">config</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="paris.html#datastore" class="tsd-kind-icon">data<wbr>Store</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="paris.html#error_" class="tsd-kind-icon">error$</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="paris.html#modeler" class="tsd-kind-icon">modeler</a></li>
@@ -102,11 +101,18 @@
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
+							<h3>Accessors</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="paris.html#config" class="tsd-kind-icon">config</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter"><a href="paris.html#allitems" class="tsd-kind-icon">all<wbr>Items</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter"><a href="paris.html#apicall" class="tsd-kind-icon">api<wbr>Call</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter"><a href="paris.html#callquery" class="tsd-kind-icon">call<wbr>Query</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="paris.html#clearapicallcache" class="tsd-kind-icon">clear<wbr>Api<wbr>Call<wbr>Cache</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter"><a href="paris.html#createitem" class="tsd-kind-icon">create<wbr>Item</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter"><a href="paris.html#getitembyid" class="tsd-kind-icon">get<wbr>Item<wbr>ById</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="paris.html#getmodelbaseconfig" class="tsd-kind-icon">get<wbr>Model<wbr>Base<wbr>Config</a></li>
@@ -116,6 +122,8 @@
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter"><a href="paris.html#getvalue" class="tsd-kind-icon">get<wbr>Value</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter"><a href="paris.html#query" class="tsd-kind-icon">query</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter"><a href="paris.html#queryforitem" class="tsd-kind-icon">query<wbr>For<wbr>Item</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="paris.html#resetconfig" class="tsd-kind-icon">reset<wbr>Config</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="paris.html#setconfig" class="tsd-kind-icon">set<wbr>Config</a></li>
 							</ul>
 						</section>
 					</div>
@@ -133,7 +141,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/paris.ts#L60">paris.ts:60</a></li>
+									<li>Defined in <a href="https://github.com/microsoft/paris/blob/87d6e18/lib/paris.ts#L65">paris.ts:65</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -150,22 +158,12 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
-					<a name="config" class="tsd-anchor"></a>
-					<h3>config</h3>
-					<div class="tsd-signature tsd-kind-icon">config<span class="tsd-signature-symbol">:</span> <a href="../interfaces/parisconfig.html" class="tsd-signature-type">ParisConfig</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TConfigData</span><span class="tsd-signature-symbol">&gt;</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/paris.ts#L39">paris.ts:39</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="datastore" class="tsd-anchor"></a>
 					<h3>data<wbr>Store</h3>
 					<div class="tsd-signature tsd-kind-icon">data<wbr>Store<span class="tsd-signature-symbol">:</span> <a href="datastoreservice.html" class="tsd-signature-type">DataStoreService</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/paris.ts#L38">paris.ts:38</a></li>
+							<li>Defined in <a href="https://github.com/microsoft/paris/blob/87d6e18/lib/paris.ts#L40">paris.ts:40</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -175,7 +173,7 @@
 					<div class="tsd-signature tsd-kind-icon">error$<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/entityerrorevent.html" class="tsd-signature-type">EntityErrorEvent</a><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/paris.ts#L57">paris.ts:57</a></li>
+							<li>Defined in <a href="https://github.com/microsoft/paris/blob/87d6e18/lib/paris.ts#L62">paris.ts:62</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -191,7 +189,7 @@
 					<div class="tsd-signature tsd-kind-icon">modeler<span class="tsd-signature-symbol">:</span> <a href="modeler.html" class="tsd-signature-type">Modeler</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/paris.ts#L36">paris.ts:36</a></li>
+							<li>Defined in <a href="https://github.com/microsoft/paris/blob/87d6e18/lib/paris.ts#L38">paris.ts:38</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -201,7 +199,7 @@
 					<div class="tsd-signature tsd-kind-icon">remove$<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/removeentitiesevent.html" class="tsd-signature-type">RemoveEntitiesEvent</a><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/paris.ts#L50">paris.ts:50</a></li>
+							<li>Defined in <a href="https://github.com/microsoft/paris/blob/87d6e18/lib/paris.ts#L55">paris.ts:55</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -216,7 +214,7 @@
 					<div class="tsd-signature tsd-kind-icon">save$<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/saveentityevent.html" class="tsd-signature-type">SaveEntityEvent</a><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/paris.ts#L44">paris.ts:44</a></li>
+							<li>Defined in <a href="https://github.com/microsoft/paris/blob/87d6e18/lib/paris.ts#L49">paris.ts:49</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -227,18 +225,38 @@
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
-				<h2>Methods</h2>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
-					<a name="allitems" class="tsd-anchor"></a>
-					<h3>all<wbr>Items</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
-						<li class="tsd-signature tsd-kind-icon">all<wbr>Items&lt;TEntity&gt;<span class="tsd-signature-symbol">(</span>entityConstructor<span class="tsd-signature-symbol">: </span><a href="../interfaces/dataentitytype.html" class="tsd-signature-type">DataEntityType</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></li>
+				<h2>Accessors</h2>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
+					<a name="config" class="tsd-anchor"></a>
+					<h3>config</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> config<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/parisconfig.html" class="tsd-signature-type">ParisConfig</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TConfigData</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/paris.ts#L401">paris.ts:401</a></li>
+									<li>Defined in <a href="https://github.com/microsoft/paris/blob/87d6e18/lib/paris.ts#L43">paris.ts:43</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/parisconfig.html" class="tsd-signature-type">ParisConfig</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TConfigData</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
+					<a name="allitems" class="tsd-anchor"></a>
+					<h3>all<wbr>Items</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
+						<li class="tsd-signature tsd-kind-icon">all<wbr>Items&lt;TEntity, TId&gt;<span class="tsd-signature-symbol">(</span>entityConstructor<span class="tsd-signature-symbol">: </span><a href="../interfaces/dataentitytype.html" class="tsd-signature-type">DataEntityType</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TId</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/microsoft/paris/blob/87d6e18/lib/paris.ts#L440">paris.ts:440</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -249,13 +267,16 @@
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
 							<ul class="tsd-type-parameters">
 								<li>
-									<h4>TEntity<span class="tsd-signature-symbol">: </span><a href="entitymodelbase.html" class="tsd-signature-type">EntityModelBase</a></h4>
+									<h4>TEntity<span class="tsd-signature-symbol">: </span><a href="entitymodelbase.html" class="tsd-signature-type">EntityModelBase</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TId</span><span class="tsd-signature-symbol">&gt;</span></h4>
+								</li>
+								<li>
+									<h4>TId<span class="tsd-signature-symbol">: </span><a href="../globals.html#entityid" class="tsd-signature-type">EntityId</a></h4>
 								</li>
 							</ul>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>entityConstructor: <a href="../interfaces/dataentitytype.html" class="tsd-signature-type">DataEntityType</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">&gt;</span></h5>
+									<h5>entityConstructor: <a href="../interfaces/dataentitytype.html" class="tsd-signature-type">DataEntityType</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TId</span><span class="tsd-signature-symbol">&gt;</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TEntity</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -272,7 +293,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/paris.ts#L148">paris.ts:148</a></li>
+									<li>Defined in <a href="https://github.com/microsoft/paris/blob/87d6e18/lib/paris.ts#L153">paris.ts:153</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -325,7 +346,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/paris.ts#L324">paris.ts:324</a></li>
+									<li>Defined in <a href="https://github.com/microsoft/paris/blob/87d6e18/lib/paris.ts#L358">paris.ts:358</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -358,6 +379,37 @@
 						</li>
 					</ul>
 				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="clearapicallcache" class="tsd-anchor"></a>
+					<h3>clear<wbr>Api<wbr>Call<wbr>Cache</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">clear<wbr>Api<wbr>Call<wbr>Cache<span class="tsd-signature-symbol">(</span>apiCallType<span class="tsd-signature-symbol">?: </span><a href="../interfaces/apicalltype.html" class="tsd-signature-type">ApiCallType</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/apicalltype.html" class="tsd-signature-type">ApiCallType</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/microsoft/paris/blob/87d6e18/lib/paris.ts#L271">paris.ts:271</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Clears all or specific ApiCallType caches</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> apiCallType: <a href="../interfaces/apicalltype.html" class="tsd-signature-type">ApiCallType</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/apicalltype.html" class="tsd-signature-type">ApiCallType</a><span class="tsd-signature-symbol">&gt;</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Optional ApiCallType class or array of classes. if omitted, all ApiCallType caches will be cleared. otherwise, only the caches of the specified ApiCallType(s) will be cleared.</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
 					<a name="createitem" class="tsd-anchor"></a>
 					<h3>create<wbr>Item</h3>
@@ -368,7 +420,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/paris.ts#L368">paris.ts:368</a></li>
+									<li>Defined in <a href="https://github.com/microsoft/paris/blob/87d6e18/lib/paris.ts#L407">paris.ts:407</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -420,7 +472,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/paris.ts#L386">paris.ts:386</a></li>
+									<li>Defined in <a href="https://github.com/microsoft/paris/blob/87d6e18/lib/paris.ts#L425">paris.ts:425</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -482,7 +534,7 @@ toDo$.subscribe(<span class="hljs-function">(<span class="hljs-params">toDo:Todo
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/paris.ts#L122">paris.ts:122</a></li>
+									<li>Defined in <a href="https://github.com/microsoft/paris/blob/87d6e18/lib/paris.ts#L127">paris.ts:127</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -512,7 +564,7 @@ toDo$.subscribe(<span class="hljs-function">(<span class="hljs-params">toDo:Todo
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/paris.ts#L460">paris.ts:460</a></li>
+									<li>Defined in <a href="https://github.com/microsoft/paris/blob/87d6e18/lib/paris.ts#L499">paris.ts:499</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -572,7 +624,7 @@ toDoListHistory$.subscribe(<span class="hljs-function">(<span class="hljs-params
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/paris.ts#L101">paris.ts:101</a></li>
+									<li>Defined in <a href="https://github.com/microsoft/paris/blob/87d6e18/lib/paris.ts#L106">paris.ts:106</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -612,7 +664,7 @@ toDoListHistory$.subscribe(<span class="hljs-function">(<span class="hljs-params
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/paris.ts#L76">paris.ts:76</a></li>
+									<li>Defined in <a href="https://github.com/microsoft/paris/blob/87d6e18/lib/paris.ts#L81">paris.ts:81</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -652,7 +704,7 @@ toDoListHistory$.subscribe(<span class="hljs-function">(<span class="hljs-params
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/paris.ts#L482">paris.ts:482</a></li>
+									<li>Defined in <a href="https://github.com/microsoft/paris/blob/87d6e18/lib/paris.ts#L521">paris.ts:521</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -702,7 +754,7 @@ toDoListHistory$.subscribe(<span class="hljs-function">(<span class="hljs-params
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/paris.ts#L133">paris.ts:133</a></li>
+									<li>Defined in <a href="https://github.com/microsoft/paris/blob/87d6e18/lib/paris.ts#L138">paris.ts:138</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -752,7 +804,7 @@ toDoListHistory$.subscribe(<span class="hljs-function">(<span class="hljs-params
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Microsoft/paris/blob/b78f91f/lib/paris.ts#L430">paris.ts:430</a></li>
+									<li>Defined in <a href="https://github.com/microsoft/paris/blob/87d6e18/lib/paris.ts#L469">paris.ts:469</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -802,6 +854,58 @@ toDoListItems$.subscribe(<span class="hljs-function">(<span class="hljs-params">
 						</li>
 					</ul>
 				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="resetconfig" class="tsd-anchor"></a>
+					<h3>reset<wbr>Config</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">reset<wbr>Config<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/microsoft/paris/blob/87d6e18/lib/paris.ts#L553">paris.ts:553</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Reset the config object back to default</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="setconfig" class="tsd-anchor"></a>
+					<h3>set<wbr>Config</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Config<span class="tsd-signature-symbol">(</span>config<span class="tsd-signature-symbol">: </span><a href="../interfaces/parisconfig.html" class="tsd-signature-type">ParisConfig</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/microsoft/paris/blob/87d6e18/lib/paris.ts#L546">paris.ts:546</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Set the config object, merged with the default config object</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>config: <a href="../interfaces/parisconfig.html" class="tsd-signature-type">ParisConfig</a></h5>
+									<div class="tsd-comment tsd-typography">
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
 			</section>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
@@ -823,9 +927,6 @@ toDoListItems$.subscribe(<span class="hljs-function">(<span class="hljs-params">
 								<a href="paris.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="paris.html#config" class="tsd-kind-icon">config</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="paris.html#datastore" class="tsd-kind-icon">data<wbr>Store</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
@@ -840,6 +941,9 @@ toDoListItems$.subscribe(<span class="hljs-function">(<span class="hljs-params">
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="paris.html#save_" class="tsd-kind-icon">save$</a>
 							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
+								<a href="paris.html#config" class="tsd-kind-icon">config</a>
+							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
 								<a href="paris.html#allitems" class="tsd-kind-icon">all<wbr>Items</a>
 							</li>
@@ -848,6 +952,9 @@ toDoListItems$.subscribe(<span class="hljs-function">(<span class="hljs-params">
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
 								<a href="paris.html#callquery" class="tsd-kind-icon">call<wbr>Query</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="paris.html#clearapicallcache" class="tsd-kind-icon">clear<wbr>Api<wbr>Call<wbr>Cache</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
 								<a href="paris.html#createitem" class="tsd-kind-icon">create<wbr>Item</a>
@@ -875,6 +982,12 @@ toDoListItems$.subscribe(<span class="hljs-function">(<span class="hljs-params">
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
 								<a href="paris.html#queryforitem" class="tsd-kind-icon">query<wbr>For<wbr>Item</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="paris.html#resetconfig" class="tsd-kind-icon">reset<wbr>Config</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="paris.html#setconfig" class="tsd-kind-icon">set<wbr>Config</a>
 							</li>
 						</ul>
 					</li>
