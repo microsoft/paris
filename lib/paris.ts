@@ -38,7 +38,7 @@ export class Paris<TConfigData = any> {
 	readonly modeler:Modeler;
 
 	readonly dataStore:DataStoreService;
-	_config:ParisConfig<TConfigData>;
+	private _config:ParisConfig<TConfigData>;
 
     get config() {
         return this._config;
@@ -65,7 +65,7 @@ export class Paris<TConfigData = any> {
 	private readonly apiCallsCache:Map<ApiCallType, DataCache> = new Map<ApiCallType, DataCache>();
 
 	constructor(config?:ParisConfig<TConfigData>){
-		this._config = Object.freeze(Object.assign({}, defaultConfig, config));
+		this.setConfig(config);
 		this.dataStore = new DataStoreService(this.config);
 		this.modeler = new Modeler(this);
 
@@ -540,18 +540,18 @@ export class Paris<TConfigData = any> {
 	}
 
     /**
-     * Clears the reference of the config object
+     * Set the config object, merged with the default config object
+	 * @param  {ParisConfig} config
      */
-	clearConfig(){
-	   this._config = null;
+	setConfig(config: ParisConfig){
+		this._config = Object.freeze(Object.assign({}, defaultConfig, config));
     }
 
     /**
-     * Reset the config object to a new config
-     * @param  {ParisConfig} config
+     * Reset the config object back to default
      */
-    resetConfig(config: ParisConfig){
-	    this._config = config;
+    resetConfig(){
+		this._config = Object.freeze(Object.assign({}, defaultConfig));
     }
 
 
