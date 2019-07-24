@@ -101,34 +101,35 @@ export class Modeler {
 				map((propertyEntityValues: Array<ModelPropertyValue<TEntity>>) => {
 					propertyEntityValues.forEach((propertyEntityValue: ModelPropertyValue<TEntity>) => Object.assign(modelData, propertyEntityValue));
 
-					const model: TEntity = instantiateModel();
+					let model: TEntity;
+
+					try {
+						model = new entity.entityConstructor(modelData, rawData);
+					} catch (e) {
+						getModelDataError.message = getModelDataError.message + " Error: " + e.message;
+						throw getModelDataError;
+					}
+
 					this.setModelLinks(model);
+
 					return model;
 				})
 			);
 		}
 		else {
-			model$ = of(instantiateModel());
-		}
+			let model: TEntity;
 
-		return entity.readonly ? model$.pipe(map(model => Object.freeze(model))) : model$;
-
-		function instantiateModel(): TEntity {
 			try {
-				const model = new entity.entityConstructor(modelData, rawData);
-				if (Object.isFrozen(model) || Object.isSealed(model))
-					console.warn(`Can't assign data to ${entity.singularName}, since it's frozen or sealed.`);
-
-				Object.assign(model, modelData);
-				if (model._init)
-					model._init(modelData, rawData);
-
-				return model;
+				model = new entity.entityConstructor(modelData, rawData);
 			} catch (e) {
 				getModelDataError.message = getModelDataError.message + " Error: " + e.message;
 				throw getModelDataError;
 			}
+
+			model$ = of(model);
 		}
+
+		return entity.readonly ? model$.pipe(map(model => Object.freeze(model))) : model$;
 	}
 
 	private validateFieldData(entityField:Field, rawData:any):boolean{
