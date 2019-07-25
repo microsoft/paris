@@ -1,6 +1,6 @@
 {
 	"name": "@microsoft/paris",
-	"version": "1.7.1",
+	"version": "1.7.2",
 	"description": "Library for the implementation of Domain Driven Design with TypeScript + RxJS",
 	"repository": {
 		"type": "git",
@@ -57,10 +57,10 @@
 		"@types/systemjs": "^0.20.2",
 		"@types/yargs": "^8.0.2",
 		"core-js": ">=2.4.1",
-		"gulp": "^3.9.1",
+		"gulp": "^4.0.2",
 		"gulp-clean": "^0.3.2",
 		"gulp-concat": "^2.6.1",
-		"gulp-typescript": "^3.1.3",
+		"gulp-typescript": "^5.0.1",
 		"husky": "^1.0.0-rc.13",
 		"intl": "^1.2.5",
 		"jest": "^24.7.1",

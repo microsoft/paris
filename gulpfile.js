@@ -1,14 +1,19 @@
 const gulp = require('gulp');
 const ts = require('gulp-typescript');
 const clean = require('gulp-clean');
-const runSequence = require('run-sequence');
+const merge = require('merge2');
 
-gulp.task('build', ["clean"], function() {
+function cleanTask() {
 	const tsProject = ts.createProject('tsconfig.lib.json');
 
-	const merge = require('merge2');
+	return gulp.src(tsProject.config.compilerOptions.outDir, { read: false, allowEmpty: true })
+		.pipe(clean());
+}
 
-	var tsResult = tsProject.src()
+function build() {
+	const tsProject = ts.createProject('tsconfig.lib.json');
+
+	const tsResult = tsProject.src()
 		.pipe(tsProject());
 
 	return merge([
@@ -17,19 +22,9 @@ gulp.task('build', ["clean"], function() {
 		tsResult.js
 			.pipe(gulp.dest(tsProject.config.compilerOptions.outDir))
 	]);
-});
+}
 
-gulp.task('clean', function () {
-	const tsProject = ts.createProject('tsconfig.lib.json');
-
-	return gulp.src(tsProject.config.compilerOptions.outDir, { read: false })
-		.pipe(clean());
-});
-
-gulp.task('watch', ['default'], function() {
-	gulp.watch('src/*.ts', ['default']);
-});
-
-gulp.task('default', [], function(cb) {
-	runSequence('clean', 'build', cb);
-});
+gulp.task('clean', cleanTask);
+gulp.task('build', gulp.series('clean', build));
+gulp.task('default', gulp.task('build'));
+gulp.task('watch', gulp.series('default'), () => gulp.watch('src/*.ts', ['default']));
