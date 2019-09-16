@@ -358,6 +358,23 @@ describe('Paris main', () => {
 		it('should call Http.request with correct default params', () => { });
 
 		it('should call Http.request with correct params', () => { });
+
+		it('should pass the timeout property as part of the options if it exists', () => {
+			const timeout = 123456;
+			const createToDoListApiCall = {
+				...CreateTodoListApiCall,
+				config: {
+					...(<any>CreateTodoListApiCall).config,
+					timeout
+				}
+			};
+
+			paris.apiCall(<any>createToDoListApiCall, undefined, { allowCache: false });
+
+			const [config, _, httpOptions] = (<any>paris).makeApiCall.mock.calls[0];
+			expect(config.timeout).toBe(timeout);
+			expect(httpOptions.timeout).toBe(timeout);
+		});
 	});
 
 	describe('callQuery', () => {
