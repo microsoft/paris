@@ -117,26 +117,10 @@ describe('Paris main', () => {
 
 		const next = 'https://localhost:666/api/todo?p=2';
 
-		const todoMockData = {
-			items: [
-				{
-					id: 1,
-					text: 'First',
-					type: 0
-				},
-				{
-					id: 2,
-					text: 'Second',
-					type: 1
-				},
-				{
-					id: 3,
-					text: 'Third',
-					type: 1
-				}
-			],
-			next: next,
-			count: 3
+		let todoMockData: {
+			items: {id: number; text: string; type: number}[];
+			next: string;
+			count: number;
 		};
 
 		const typesMockData = {
@@ -162,6 +146,27 @@ describe('Paris main', () => {
 
 			// @ts-ignore
 			DataStoreService.prototype.request = jest.fn<Observable<DataSet<T>>, [RequestMethod, string]>(mockDataFetch);
+			todoMockData = {
+				items: [
+					{
+						id: 1,
+						text: 'First',
+						type: 0
+					},
+					{
+						id: 2,
+						text: 'Second',
+						type: 1
+					},
+					{
+						id: 3,
+						text: 'Third',
+						type: 1
+					}
+				],
+				next: next,
+				count: 3
+			};
 		});
 
 		afterEach(() => {
@@ -213,6 +218,51 @@ describe('Paris main', () => {
 				expect(items[1].type).toBe(items[2].type);
 				done();
 			});
+		});
+
+		function addTodoToMockData(todoItemId: number, todoItemText: string) {
+			todoMockData = {
+				...todoMockData,
+				items: [
+					...todoMockData.items,
+					{
+						id: todoItemId,
+						text: todoItemText,
+						type: 0
+					},
+				],
+				count: todoMockData.count + 1
+			}
+		}
+
+		describe('cache behaviour', () => {
+			it('should optimistically retrieve data from cache if possible', done => {
+				jest.spyOn(paris.dataStore, 'request');
+
+				paris.query(Todo).subscribe(firstResult => {
+
+					//simulate data changes on server
+					addTodoToMockData(123,'New Item');
+
+					let i = 0;
+					paris.query(Todo).subscribe(secondResult => {
+						i++;
+
+						//initially the original data is returned from the cache
+						if (i === 1) {
+							expect(firstResult).toStrictEqual(secondResult);
+						} else {
+							//then updated data is returned
+							expect(firstResult).not.toStrictEqual(secondResult);
+							expect(secondResult.count).toBe(todoMockData.count);
+							expect(secondResult.items[secondResult.items.length - 1].text).toBe('New Item');
+						}
+
+					}, () => {}, done)
+				})
+
+			});
+
 		});
 	});
 

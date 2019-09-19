@@ -1,35 +1,35 @@
 import * as jsonStringify from 'json-stringify-safe';
-import { clone } from "lodash-es";
-import { Observable, of, Subject, throwError } from "rxjs";
-import { catchError, map, mergeMap, switchMap, tap } from "rxjs/operators";
-import { ApiCallType } from "./api/api-calls/api-call.model";
-import { DataEntityType } from "./api/entity/data-entity.base";
-import { EntityRelationshipRepositoryType } from "./api/entity/entity-relationship-repository-type";
-import { EntityErrorEvent, EntityErrorTypes } from "./api/events/entity-error.event";
-import { RemoveEntitiesEvent } from "./api/events/remove-entities.event";
-import { SaveEntityEvent } from "./api/events/save-entity.event";
-import { ReadonlyRepository } from "./api/repository/readonly-repository";
-import { IRelationshipRepository, RelationshipRepository } from "./api/repository/relationship-repository";
-import { Repository } from "./api/repository/repository";
-import { IRepository } from "./api/repository/repository.interface";
-import { ApiCallBackendConfigInterface } from "./config/api-call-backend-config.interface";
-import { EntityModelBase } from "./config/entity-model.base";
-import { EntityBackendConfig, EntityConfig } from "./config/entity.config";
-import { EntityConfigBase } from "./config/model-config";
-import { ModelBase } from "./config/model.base";
-import { defaultConfig, ParisConfig } from "./config/paris-config";
-import { entitiesService } from "./config/services/entities.service";
-import { valueObjectsService } from "./config/services/value-objects.service";
-import { DataCache, DataCacheSettings } from "./data_access/cache";
-import { DataQuery } from "./data_access/data-query";
-import { DataStoreService } from "./data_access/data-store.service";
-import { DataOptions, defaultDataOptions } from "./data_access/data.options";
-import { DataSet } from "./data_access/dataset";
-import { HttpOptions, RequestMethod, UrlParams } from "./data_access/http.service";
-import { queryToHttpOptions } from "./data_access/query-to-http";
-import { DataTransformersService } from "./modeling/data-transformers.service";
-import { EntityId } from "./modeling/entity-id.type";
-import { Modeler } from "./modeling/modeler";
+import {clone} from "lodash-es";
+import {concat, Observable, of, Subject, throwError} from "rxjs";
+import {catchError, map, mergeMap, switchMap, tap} from "rxjs/operators";
+import {ApiCallModel, ApiCallType} from "./api/api-calls/api-call.model";
+import {DataEntityType} from "./api/entity/data-entity.base";
+import {EntityRelationshipRepositoryType} from "./api/entity/entity-relationship-repository-type";
+import {EntityErrorEvent, EntityErrorTypes} from "./api/events/entity-error.event";
+import {RemoveEntitiesEvent} from "./api/events/remove-entities.event";
+import {SaveEntityEvent} from "./api/events/save-entity.event";
+import {ReadonlyRepository} from "./api/repository/readonly-repository";
+import {IRelationshipRepository, RelationshipRepository} from "./api/repository/relationship-repository";
+import {Repository} from "./api/repository/repository";
+import {IRepository} from "./api/repository/repository.interface";
+import {ApiCallBackendConfigInterface} from "./config/api-call-backend-config.interface";
+import {EntityModelBase} from "./config/entity-model.base";
+import {EntityBackendConfig, EntityConfig} from "./config/entity.config";
+import {EntityConfigBase} from "./config/model-config";
+import {ModelBase} from "./config/model.base";
+import {defaultConfig, ParisConfig} from "./config/paris-config";
+import {entitiesService} from "./config/services/entities.service";
+import {valueObjectsService} from "./config/services/value-objects.service";
+import {DataCache, DataCacheSettings} from "./data_access/cache";
+import {DataQuery} from "./data_access/data-query";
+import {DataStoreService} from "./data_access/data-store.service";
+import {DataOptions, defaultDataOptions} from "./data_access/data.options";
+import {DataSet} from "./data_access/dataset";
+import {HttpOptions, RequestMethod, UrlParams} from "./data_access/http.service";
+import {queryToHttpOptions} from "./data_access/query-to-http";
+import {DataTransformersService} from "./modeling/data-transformers.service";
+import {EntityId} from "./modeling/entity-id.type";
+import {Modeler} from "./modeling/modeler";
 import {AjaxRequest} from "rxjs/ajax";
 
 export class Paris<TConfigData = any> {
@@ -63,6 +63,7 @@ export class Paris<TConfigData = any> {
 	private readonly _errorSubject$:Subject<EntityErrorEvent> = new Subject;
 
 	private readonly apiCallsCache:Map<ApiCallType, DataCache> = new Map<ApiCallType, DataCache>();
+	private optimisticHttpCache: DataCache = new DataCache<any>({max: 15});
 
 	constructor(config?:ParisConfig<TConfigData>){
 		this.setConfig(config);
@@ -296,59 +297,85 @@ export class Paris<TConfigData = any> {
 		return apiCallCache;
 	}
 
-	private makeApiCall<TResult, TParams = UrlParams, TData = any, TRawDataResult = TResult>(backendConfig:ApiCallBackendConfigInterface<TResult, TRawDataResult>, method:RequestMethod, httpOptions:Readonly<HttpOptions<TData, TParams>>, query?: DataQuery, requestOptions?: AjaxRequest):Observable<TResult>{
-		const dataQuery: DataQuery = query || { where: httpOptions && httpOptions.params };
-		let endpoint:string;
-		if (backendConfig.endpoint instanceof Function)
-			endpoint = backendConfig.endpoint(this.config, dataQuery);
-		else if (backendConfig.endpoint)
-			endpoint = backendConfig.endpoint;
-		else
-			throw new Error(`Can't call API, no endpoint specified.`);
+	private makeApiCall<TResult, TParams = UrlParams, TData = any, TRawDataResult = TResult>(backendConfig:ApiCallBackendConfigInterface<TResult, TRawDataResult>,
+																							 method:RequestMethod,
+																							 httpOptions:Readonly<HttpOptions<TData, TParams>>,
+																							 query?: DataQuery,
+																							 requestOptions?: AjaxRequest,
+																							 optimisticallyReturnCachedResults: boolean = false):Observable<TResult>{
 
-		const baseUrl:string = backendConfig.baseUrl instanceof Function ? backendConfig.baseUrl(this.config, dataQuery) : backendConfig.baseUrl;
-		let apiCallHttpOptions:HttpOptions<TData> = clone(httpOptions) || {};
+		const cacheKey = JSON.stringify({method, query, httpOptions, backendConfig, requestOptions});
 
-		if (backendConfig.separateArrayParams) {
-			apiCallHttpOptions.separateArrayParams = true;
-		}
-
-		if (backendConfig.fixedData){
-			if (!apiCallHttpOptions.params)
-				apiCallHttpOptions.params = <TParams>{};
-
-			Object.assign(apiCallHttpOptions.params, backendConfig.fixedData);
-		}
-
-		const self = this;
-		function makeRequest$<T>(): Observable<T> {
-			return self.dataStore.request<T>(method || "GET", endpoint, apiCallHttpOptions, baseUrl, requestOptions).pipe(
-				catchError(err => {
-					return throwError({
-						originalError: err,
-						type: EntityErrorTypes.HttpError,
-						entity: null
-					})
-				}))
-		}
-
-		if (backendConfig.parseData) {
-			return makeRequest$<TRawDataResult>().pipe(
-				map((rawData: TRawDataResult) => {
-					try {
-						return backendConfig.parseData(rawData, this.config, dataQuery)
-					} catch (err) {
-						throw {
-							originalError: err,
-							type: EntityErrorTypes.DataParseError,
-							entity: null
-						}
-					}
-				}),
+		if (optimisticallyReturnCachedResults) {
+			return this.optimisticHttpCache.get(cacheKey).pipe(
+				switchMap((value:any) => concat(
+						...[
+							value && of(value),
+							this.makeApiCall(backendConfig, method, httpOptions, query, requestOptions, false)
+						].filter(Boolean)
+					)
+				)
 			);
-		}
+		} else {
+			const dataQuery: DataQuery = query || { where: httpOptions && httpOptions.params };
+			let endpoint:string;
+			if (backendConfig.endpoint instanceof Function)
+				endpoint = backendConfig.endpoint(this.config, dataQuery);
+			else if (backendConfig.endpoint)
+				endpoint = backendConfig.endpoint;
+			else
+				throw new Error(`Can't call API, no endpoint specified.`);
 
-		return makeRequest$<TResult>()
+			const baseUrl:string = backendConfig.baseUrl instanceof Function ? backendConfig.baseUrl(this.config, dataQuery) : backendConfig.baseUrl;
+			let apiCallHttpOptions:HttpOptions<TData> = clone(httpOptions) || {};
+
+			if (backendConfig.separateArrayParams) {
+				apiCallHttpOptions.separateArrayParams = true;
+			}
+
+			if (backendConfig.fixedData){
+				if (!apiCallHttpOptions.params)
+					apiCallHttpOptions.params = <TParams>{};
+
+				Object.assign(apiCallHttpOptions.params, backendConfig.fixedData);
+			}
+
+			const makeRequest$ = <T>(): Observable<T> => this.dataStore
+				.request<T>(method || "GET", endpoint, apiCallHttpOptions, baseUrl, requestOptions).pipe(
+					catchError(err => {
+						return throwError({
+							originalError: err,
+							type: EntityErrorTypes.HttpError,
+							entity: null
+						})
+					})
+				);
+
+			if (backendConfig.parseData) {
+				return makeRequest$<TRawDataResult>().pipe(
+					map((rawData: TRawDataResult) => {
+						try {
+							return backendConfig.parseData(rawData, this.config, dataQuery)
+						} catch (err) {
+							throw {
+								originalError: err,
+								type: EntityErrorTypes.DataParseError,
+								entity: null
+							}
+						}
+					}),
+					tap((data:any) => {
+						this.optimisticHttpCache.add(cacheKey, data);
+					})
+				);
+			}
+
+			return makeRequest$<TResult>().pipe(
+				tap((data:any) => {
+					this.optimisticHttpCache.add(cacheKey, data);
+				})
+			)
+		}
 	}
 
 	/**
@@ -373,7 +400,7 @@ export class Paris<TConfigData = any> {
 			endpoint: `${endpoint}${backendConfig.allItemsEndpointTrailingSlash !== false && !backendConfig.allItemsEndpoint ? '/' : ''}${backendConfig.allItemsEndpoint || ''}`
 		});
 
-		return this.makeApiCall<TEntity>(apiCallConfig, "GET", httpOptions, query).pipe(
+		return this.makeApiCall<TEntity>(apiCallConfig, "GET", httpOptions, query, null, true).pipe(
 			catchError((error: EntityErrorEvent) => {
 					this._errorSubject$.next(Object.assign({}, error, {entity: entityConstructor}));
 					return throwError(error.originalError || error)
