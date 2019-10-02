@@ -178,11 +178,10 @@ export class Paris<TConfigData = any> {
 			httpOptions.customHeaders =  apiCallType.config.customHeaders instanceof Function ? apiCallType.config.customHeaders(input, this.config) : apiCallType.config.customHeaders;
 		}
 
-		if (apiCallType.config.timeout) {
-			httpOptions.timeout = apiCallType.config.timeout;
-		}
-
-		const requestOptions: AjaxRequest = apiCallType.config.responseType ? {responseType: apiCallType.config.responseType} : null;
+		const requestOptions: AjaxRequest = {
+			responseType: apiCallType.config.responseType,
+			timeout: apiCallType.config.timeout
+		};
 
 		let apiCall$: Observable<any> = this.makeApiCall(
 			apiCallType.config,

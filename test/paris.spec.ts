@@ -337,7 +337,7 @@ describe('Paris main', () => {
 				'POST',
 				{"customHeaders": {"testHeader": "testValue"}, "data": "test"},
 				undefined,
-				null
+				{requestHeaders: undefined, timeout: undefined}
 			);
 		});
 
@@ -350,7 +350,7 @@ describe('Paris main', () => {
 				'POST',
 				{"customHeaders": {"directTestHeader": "directTestValue"}},
 				undefined,
-				null
+				{requestHeaders: undefined, timeout: undefined}
 			);
 		});
 
@@ -371,9 +371,8 @@ describe('Paris main', () => {
 
 			paris.apiCall(<any>createToDoListApiCall, undefined, { allowCache: false });
 
-			const [config, _, httpOptions] = (<any>paris).makeApiCall.mock.calls[0];
-			expect(config.timeout).toBe(timeout);
-			expect(httpOptions.timeout).toBe(timeout);
+			const [, , , , requestOptions] = (<any>paris).makeApiCall.mock.calls[0];
+			expect(requestOptions.timeout).toBe(timeout);
 		});
 	});
 
