@@ -30,7 +30,7 @@ import { queryToHttpOptions } from "./data_access/query-to-http";
 import { DataTransformersService } from "./modeling/data-transformers.service";
 import { EntityId } from "./modeling/entity-id.type";
 import { Modeler } from "./modeling/modeler";
-import {AjaxRequest} from "rxjs/ajax";
+import { AjaxRequest } from "rxjs/ajax";
 
 export class Paris<TConfigData = any> {
 	private readonly repositories:Map<DataEntityType, IRepository<ModelBase>> = new Map;
@@ -178,11 +178,10 @@ export class Paris<TConfigData = any> {
 			httpOptions.customHeaders =  apiCallType.config.customHeaders instanceof Function ? apiCallType.config.customHeaders(input, this.config) : apiCallType.config.customHeaders;
 		}
 
+		let requestOptions: AjaxRequest = apiCallType.config.responseType ? {responseType: apiCallType.config.responseType} : null;
 		if (apiCallType.config.timeout) {
-			httpOptions.timeout = apiCallType.config.timeout;
+			requestOptions = Object.assign({}, requestOptions, {timeout: apiCallType.config.timeout});
 		}
-
-		const requestOptions: AjaxRequest = apiCallType.config.responseType ? {responseType: apiCallType.config.responseType} : null;
 
 		let apiCall$: Observable<any> = this.makeApiCall(
 			apiCallType.config,
@@ -373,7 +372,12 @@ export class Paris<TConfigData = any> {
 			endpoint: `${endpoint}${backendConfig.allItemsEndpointTrailingSlash !== false && !backendConfig.allItemsEndpoint ? '/' : ''}${backendConfig.allItemsEndpoint || ''}`
 		});
 
-		return this.makeApiCall<TEntity>(apiCallConfig, "GET", httpOptions, query).pipe(
+		let requestOptions: AjaxRequest;
+		if (backendConfig.timeout) {
+			requestOptions = {timeout: backendConfig.timeout};
+		}
+
+		return this.makeApiCall<TEntity>(apiCallConfig, "GET", httpOptions, query, requestOptions).pipe(
 			catchError((error: EntityErrorEvent) => {
 					this._errorSubject$.next(Object.assign({}, error, {entity: entityConstructor}));
 					return throwError(error.originalError || error)
