@@ -462,16 +462,15 @@ describe('Paris main', () => {
 		});
 
 		it('should add custom headers om intercept', () => {
-			const createToDoListApiCall = Object.assign({}, CreateTodoListApiCall, {config: Object.assign({}, (<any>CreateTodoListApiCall).config, {'customHeaders': {'directTestHeader': 'directTestValue'}})});
-			paris.apiCall(createToDoListApiCall, undefined, { allowCache: false });
-			expect((<any>paris).makeApiCall).toHaveBeenCalled();
+			paris.apiCall(CreateTodoListApiCall, "test", { allowCache: false });
 			expect((<any>paris).makeApiCall).toHaveBeenCalledWith(
-				{"cache": true, "customHeaders": {"directTestHeader": "directTestValue", "test": "this actually works"}, "endpoint": "create_new_list", "method": "POST", "name": "Create a new Todo list"},
+				{"cache": true, "customHeaders": jasmine.any(Function), "endpoint": "create_new_list", "method": "POST", "name": "Create a new Todo list"},
 				'POST',
-				{"customHeaders": {"directTestHeader": "directTestValue", "test": "this actually works"}},
+				{"customHeaders": {"testHeader": "testValue", "test": "this actually works"}, "data": "test"},
 				undefined,
 				null
 			);
+
 		})
 
 	});
