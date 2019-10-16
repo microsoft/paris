@@ -358,12 +358,36 @@ describe('Paris main', () => {
 		it('should call Http.request with correct default params', () => { });
 
 		it('should call Http.request with correct params', () => { });
+
+		it('should pass the timeout property as part of the options if it exists', () => {
+			const timeout = 123456;
+			const createToDoListApiCall = {
+				...CreateTodoListApiCall,
+				config: {
+					...(<any>CreateTodoListApiCall).config,
+					timeout
+				}
+			};
+
+			paris.apiCall(<any>createToDoListApiCall, undefined, { allowCache: false });
+
+			const [, , , , requestOptions] = (<any>paris).makeApiCall.mock.calls[0];
+			expect(requestOptions.timeout).toBe(timeout);
+		});
 	});
 
 	describe('callQuery', () => {
+		let jestGetApiCallCacheSpy: jest.SpyInstance<Observable<Paris>>;
+		let jestMakeApiCallSpy: jest.SpyInstance<Observable<any>>;
+
 		beforeEach(() => {
 			paris = new Paris();
+
+			jest.spyOn(paris.dataStore.httpService, 'request');
+			jestGetApiCallCacheSpy = jest.spyOn(paris, 'getApiCallCache' as any);
+			jestMakeApiCallSpy = jest.spyOn(paris, 'makeApiCall' as any);
 		});
+
 		it('should call makeApiCall with correct params', () => { });
 
 		it('should call makeApiCall with correct default params', () => { });
@@ -381,6 +405,22 @@ describe('Paris main', () => {
 		it('should call Http.request with correct default params', () => { });
 
 		it('should call Http.request with correct params', () => { });
+
+		it('should pass the timeout property as part of the options if it exists', () => {
+			const timeout = 123456;
+			const createToDoListApiCall = {
+				...CreateTodoListApiCall,
+				config: {
+					...(<any>CreateTodoListApiCall).config,
+					timeout
+				}
+			};
+
+			paris.callQuery(<any>createToDoListApiCall, createToDoListApiCall.config);
+
+			const [, , , , requestOptions] = (<any>paris).makeApiCall.mock.calls[0];
+			expect(requestOptions.timeout).toBe(timeout);
+		});
 	});
 
 	describe('createItem', () => {
