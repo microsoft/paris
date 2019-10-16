@@ -168,6 +168,7 @@ describe('Paris main', () => {
 			jest.restoreAllMocks();
 		});
 
+
 		beforeEach(() => {
 			paris = new Paris();
 			repo = paris.getRepository(Todo);
