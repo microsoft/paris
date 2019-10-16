@@ -10,7 +10,7 @@ export class DataStoreService {
 	readonly httpService: Http;
 
 	constructor(private config: ParisConfig) {
-		this.httpService = new Http(config.ajaxService);
+		this.httpService = new Http(config);
 	}
 
 	get<T = any>(endpoint: string, data?: HttpOptions, baseUrl?: string, httpConfig?: AjaxRequest): Observable<T> {

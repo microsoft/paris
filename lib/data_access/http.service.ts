@@ -1,15 +1,15 @@
-import { Observable } from "rxjs";
+import { Observable, of } from "rxjs";
 import { ajax, AjaxError, AjaxRequest, AjaxResponse } from "rxjs/ajax";
-import { catchError, map } from "rxjs/operators";
+import {catchError, flatMap, map} from "rxjs/operators";
 import { clone } from "lodash-es";
-import { AjaxService } from "../config/paris-config";
+import { ParisConfig } from "../config/paris-config";
 
 export type SaveRequestMethod = "POST" | "PUT" | "PATCH";
 export type RequestMethod = "GET" | "DELETE" | SaveRequestMethod;
 const DEFAULT_TIMEOUT = 60000;
 
 export class Http {
-	constructor(private ajaxService?: AjaxService) {
+	constructor(private config?: ParisConfig) {
 	}
 
 	get(url: string, options?: HttpOptions, httpConfig?: AjaxRequest): Observable<any> {
@@ -47,24 +47,29 @@ export class Http {
 				delete (<any>currentHttpConfig.headers)["Content-Type"];
 			else
 				(<any>currentHttpConfig.headers)["Content-Type"] = "application/json";
-		}
 
-		return (this.ajaxService || ajax)(Object.assign({
+		}
+		const intercept = this.config.intercept || ((_req: AjaxRequest) => of(_req));
+		const req = Object.assign({
 			method: method,
 			url: fullUrl,
 			body: options && options.data,
 			timeout: currentHttpConfig && currentHttpConfig.timeout || DEFAULT_TIMEOUT
-		}, Http.httpOptionsToRequestInit(options, currentHttpConfig)))
-			.pipe(
-				catchError((err: AjaxError) => {
-					if (err.response && ~['json', 'text', 'arraybuffer', ''].indexOf(err.responseType))
-						err.message = err.response;
-					else
-						err.message = `Failed to ${method} from ${url}. Status code: ${err.status}`;
-					throw err;
-				}),
-				map((e: AjaxResponse) => e.response)
-			)
+		}, Http.httpOptionsToRequestInit(options, currentHttpConfig));
+
+		return intercept(req).pipe(flatMap((_req?: AjaxRequest) => {
+			return (this.config.ajaxService || ajax)(_req)
+				.pipe(
+					catchError((err: AjaxError) => {
+						if (err.response && ~['json', 'text', 'arraybuffer', ''].indexOf(err.responseType))
+							err.message = err.response;
+						else
+							err.message = `Failed to ${method} from ${url}. Status code: ${err.status}`;
+						throw err;
+					}),
+					map((e: AjaxResponse) => e.response)
+				)
+		}))
 	}
 
 	static httpOptionsToRequestInit(options?: HttpOptions, httpConfig?: AjaxRequest): AjaxRequest {
