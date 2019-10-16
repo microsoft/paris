@@ -18,6 +18,7 @@ import { DataStoreService } from '../lib/data_access/data-store.service';
 import { TodoType } from './mock/todo-type.entity';
 import { RequestMethod } from '../lib/data_access/http.service';
 import { EntityModelBase } from '../lib/config/entity-model.base';
+import {AjaxRequest} from "rxjs/ajax";
 
 describe('Paris main', () => {
 	let paris: Paris;
@@ -441,6 +442,37 @@ describe('Paris main', () => {
 				done();
 			});
 		});
+	});
+
+	describe('test intercept', () => {
+		let jestGetApiCallCacheSpy: jest.SpyInstance<Observable<Paris>>;
+		let jestMakeApiCallSpy: jest.SpyInstance<Observable<any>>;
+
+		beforeEach(() => {
+			paris = new Paris({
+				intercept: (req: AjaxRequest) => {
+					(req.headers as any).test = 'this actually works'
+				}
+			});
+
+			jest.spyOn(paris.dataStore.httpService, 'request');
+			jestGetApiCallCacheSpy = jest.spyOn(paris, 'getApiCallCache' as any);
+			jestMakeApiCallSpy = jest.spyOn(paris, 'makeApiCall' as any);
+		});
+
+		it('should add custom headers om intercept', () => {
+			const createToDoListApiCall = Object.assign({}, CreateTodoListApiCall, {config: Object.assign({}, (<any>CreateTodoListApiCall).config, {'customHeaders': {'directTestHeader': 'directTestValue'}})});
+			paris.apiCall(createToDoListApiCall, undefined, { allowCache: false });
+			expect((<any>paris).makeApiCall).toHaveBeenCalled();
+			expect((<any>paris).makeApiCall).toHaveBeenCalledWith(
+				{"cache": true, "customHeaders": {"directTestHeader": "directTestValue", "test": "this actually works"}, "endpoint": "create_new_list", "method": "POST", "name": "Create a new Todo list"},
+				'POST',
+				{"customHeaders": {"directTestHeader": "directTestValue", "test": "this actually works"}},
+				undefined,
+				null
+			);
+		})
+
 	});
 
 	describe('queryForItem', () => {

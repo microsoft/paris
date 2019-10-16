@@ -12,6 +12,7 @@ export interface ParisConfig<TConfigData = any> {
 	data?: TConfigData,
 	http?: AjaxRequest,
 	ajaxService?: AjaxService
+	intercept?: (req: AjaxRequest) => Observable<any>;
 }
 
 export const defaultConfig: Partial<ParisConfig> = {
