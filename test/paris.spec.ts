@@ -451,7 +451,8 @@ describe('Paris main', () => {
 		beforeEach(() => {
 			paris = new Paris({
 				intercept: (req: AjaxRequest) => {
-					(req.headers as any).test = 'this actually works'
+					(req.headers as any).test = 'this actually works';
+					return of(req);
 				}
 			});
 
