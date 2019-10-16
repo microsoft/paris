@@ -18,7 +18,6 @@ import { DataStoreService } from '../lib/data_access/data-store.service';
 import { TodoType } from './mock/todo-type.entity';
 import { RequestMethod } from '../lib/data_access/http.service';
 import { EntityModelBase } from '../lib/config/entity-model.base';
-import {AjaxRequest} from "rxjs/ajax";
 
 describe('Paris main', () => {
 	let paris: Paris;
@@ -359,36 +358,12 @@ describe('Paris main', () => {
 		it('should call Http.request with correct default params', () => { });
 
 		it('should call Http.request with correct params', () => { });
-
-		it('should pass the timeout property as part of the options if it exists', () => {
-			const timeout = 123456;
-			const createToDoListApiCall = {
-				...CreateTodoListApiCall,
-				config: {
-					...(<any>CreateTodoListApiCall).config,
-					timeout
-				}
-			};
-
-			paris.apiCall(<any>createToDoListApiCall, undefined, { allowCache: false });
-
-			const [, , , , requestOptions] = (<any>paris).makeApiCall.mock.calls[0];
-			expect(requestOptions.timeout).toBe(timeout);
-		});
 	});
 
 	describe('callQuery', () => {
-		let jestGetApiCallCacheSpy: jest.SpyInstance<Observable<Paris>>;
-		let jestMakeApiCallSpy: jest.SpyInstance<Observable<any>>;
-
 		beforeEach(() => {
 			paris = new Paris();
-
-			jest.spyOn(paris.dataStore.httpService, 'request');
-			jestGetApiCallCacheSpy = jest.spyOn(paris, 'getApiCallCache' as any);
-			jestMakeApiCallSpy = jest.spyOn(paris, 'makeApiCall' as any);
 		});
-
 		it('should call makeApiCall with correct params', () => { });
 
 		it('should call makeApiCall with correct default params', () => { });
@@ -406,22 +381,6 @@ describe('Paris main', () => {
 		it('should call Http.request with correct default params', () => { });
 
 		it('should call Http.request with correct params', () => { });
-
-		it('should pass the timeout property as part of the options if it exists', () => {
-			const timeout = 123456;
-			const createToDoListApiCall = {
-				...CreateTodoListApiCall,
-				config: {
-					...(<any>CreateTodoListApiCall).config,
-					timeout
-				}
-			};
-
-			paris.callQuery(<any>createToDoListApiCall, createToDoListApiCall.config);
-
-			const [, , , , requestOptions] = (<any>paris).makeApiCall.mock.calls[0];
-			expect(requestOptions.timeout).toBe(timeout);
-		});
 	});
 
 	describe('createItem', () => {
@@ -442,37 +401,6 @@ describe('Paris main', () => {
 				done();
 			});
 		});
-	});
-
-	describe('test intercept', () => {
-		let jestGetApiCallCacheSpy: jest.SpyInstance<Observable<Paris>>;
-		let jestMakeApiCallSpy: jest.SpyInstance<Observable<any>>;
-
-		beforeEach(() => {
-			paris = new Paris({
-				intercept: (req: AjaxRequest) => {
-					(req.headers as any).test = 'this actually works';
-					return of(req);
-				}
-			});
-
-			jest.spyOn(paris.dataStore.httpService, 'request');
-			jestGetApiCallCacheSpy = jest.spyOn(paris, 'getApiCallCache' as any);
-			jestMakeApiCallSpy = jest.spyOn(paris, 'makeApiCall' as any);
-		});
-
-		it('should add custom headers om intercept', () => {
-			paris.apiCall(CreateTodoListApiCall, "test", { allowCache: false });
-			expect((<any>paris).makeApiCall).toHaveBeenCalledWith(
-				{"cache": true, "customHeaders": jasmine.any(Function), "endpoint": "create_new_list", "method": "POST", "name": "Create a new Todo list"},
-				'POST',
-				{"customHeaders": {"testHeader": "testValue", "test": "this actually works"}, "data": "test"},
-				undefined,
-				null
-			);
-
-		})
-
 	});
 
 	describe('queryForItem', () => {
