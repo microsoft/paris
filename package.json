@@ -1,6 +1,6 @@
 {
 	"name": "@microsoft/paris",
-	"version": "1.8.0",
+	"version": "1.9.0",
 	"description": "Library for the implementation of Domain Driven Design with TypeScript + RxJS",
 	"repository": {
 		"type": "git",
@@ -74,7 +74,7 @@
 		"rollup-plugin-node-resolve": "^3.0.0",
 		"rollup-plugin-typescript": "^0.8.1",
 		"run-sequence": "^2.2.0",
-		"rxjs": "^6.0.0",
+		"rxjs": "^6.4.0",
 		"standard-version": "^3.0.0",
 		"systemjs": ">=0.20.12",
 		"ts-jest": "^24.0.0",
@@ -84,7 +84,7 @@
 		"zone.js": ">=0.8.7"
 	},
 	"peerDependencies": {
-		"rxjs": ">=6.0.0",
+		"rxjs": ">=6.4.0",
 		"lodash-es": "4.5.0"
 	},
 	"bundledDependencies": [
