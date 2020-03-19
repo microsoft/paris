@@ -15,7 +15,7 @@ import {HttpOptions} from "../../data_access/http.service";
 import {Paris} from "../../paris";
 import {IReadonlyRepository} from "./repository.interface";
 import {DataQuery} from "../../data_access/data-query";
-import {catchError, map, mergeMap, shareReplay, take, tap} from "rxjs/operators";
+import {catchError, finalize, map, mergeMap, shareReplay, take, tap} from "rxjs/operators";
 import {DataSet} from "../../data_access/dataset";
 import {DataOptions, defaultDataOptions} from "../../data_access/data.options";
 import {DataAvailability} from "../../data_access/data-availability.enum";
@@ -126,6 +126,7 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 			}),
 			map((dataSet:DataSet<TEntity>) => dataSet.items),
 			shareReplay({refCount: true}),
+			finalize(() => this._allItemsBeingSet$ = null)
 		);
 
 		return this._allItemsBeingSet$;
