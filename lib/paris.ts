@@ -106,10 +106,9 @@ export class Paris<TConfigData = any> {
 	getRelationshipRepository<T extends ModelBase, U extends ModelBase>(relationshipConstructor:Function):RelationshipRepository<T, U>{
 		const relationship:EntityRelationshipRepositoryType<T, U> = <EntityRelationshipRepositoryType<T, U>>relationshipConstructor;
 
-		let sourceEntityName:string = relationship.sourceEntityType.singularName.replace(/\s/g, ""),
-			dataEntityName:string = relationship.dataEntityType.singularName.replace(/\s/g, "");
-
-		let relationshipId:string = `${sourceEntityName}_${dataEntityName}`;
+		const sourceEntityName:string = relationship.sourceEntityType.name,
+			dataEntityName:string = relationship.dataEntityType.name,
+			relationshipId:string = `${sourceEntityName}_${dataEntityName}`;
 
 		let repository:RelationshipRepository<T, U> = <RelationshipRepository<T, U>>this.relationshipRepositories.get(relationshipId);
 		if (!repository) {
