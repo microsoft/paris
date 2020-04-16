@@ -18,13 +18,13 @@ export abstract class EntitiesServiceBase<T extends EntityConfigBase, TRawData =
 	}
 
 	getEntityByName(entitySingularName:string):T{
-		return this._allEntitiesByName.get(entitySingularName.replace(/\s/g, ""));
+		return this._allEntitiesByName.get(entitySingularName);
 	}
 
 	addEntity(dataEntityType:DataEntityType, entity:T):T{
 		if (!this._allEntities.has(dataEntityType)) {
 			this._allEntities.set(dataEntityType, entity);
-			this._allEntitiesByName.set(dataEntityType.singularName.replace(/\s/g, ""), entity);
+			this._allEntitiesByName.set(dataEntityType.name, entity);
 		}
 
 		entity.fields = this.getDataEntityTypeFields(dataEntityType);

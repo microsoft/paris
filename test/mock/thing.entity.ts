@@ -48,6 +48,12 @@ export class Person extends Thing {
 	singularName: 'Animal',
 	pluralName: 'Animals',
 	endpoint: 'things',
+	modelWith: (_, query) => {
+		if (query && query.where && (<{ [index: string]: any }>query.where)['isDog']) {
+			return 'Dog'
+		}
+		return null
+	}
 })
 export class Animal extends Thing {
 	@EntityField()

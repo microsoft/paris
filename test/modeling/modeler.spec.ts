@@ -18,6 +18,7 @@ import {TodoStatus} from "../mock/todo-status.entity";
 import {ModelBase} from "../../lib/config/model.base";
 import {ValueObject} from "../../lib/config/decorators/value-object.decorator";
 import {ModelConfig} from "../../lib/config/model-config";
+import {Dog} from "../mock/dog.entity";
 
 describe('Modeler', () => {
 	let paris: Paris;
@@ -248,6 +249,13 @@ describe('Modeler', () => {
 		it('should support derived entity (single) with query', done => {
 			paris.getItemById(Person, 1, undefined, {"fullMoon": true}).subscribe(item => {
 				expect(item).toBeInstanceOf(Animal);
+				done();
+			});
+		});
+
+		it('should support derived entity (single) by class name', done => {
+			paris.getItemById(Animal, 1, undefined, {"isDog": true}).subscribe(item => {
+				expect(item).toBeInstanceOf(Dog);
 				done();
 			});
 		});

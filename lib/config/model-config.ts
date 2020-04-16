@@ -200,7 +200,7 @@ paris.getRepository(Base).query().subscribe(dataSet => {
 });
 ```
 	 */
-	modelWith?: (data: TRawData, query?: DataQuery) => DataEntityType<any>;
+	modelWith?: (data: TRawData, query?: DataQuery) => string | DataEntityType<any>;
 }
 
 export interface ModelConfig<TEntity extends ModelBase, TRawData = any, TId extends EntityId = string> extends IEntityConfigBase<TEntity, TRawData, TId> {
