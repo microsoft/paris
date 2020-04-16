@@ -18,6 +18,7 @@ import {TodoStatus} from "../mock/todo-status.entity";
 import {ModelBase} from "../../lib/config/model.base";
 import {ValueObject} from "../../lib/config/decorators/value-object.decorator";
 import {ModelConfig} from "../../lib/config/model-config";
+import {Dog} from "../mock/dog.entity";
 
 describe('Modeler', () => {
 	let paris: Paris;
@@ -224,6 +225,7 @@ describe('Modeler', () => {
 				return of([
 					{ type: 'animal', name: 'woof', kind: 'dog' },
 					{ type: 'person', name: 'Joe', address: '1 Generic st.' },
+					{ type: 'thing', name: 'It'},
 				]);
 			};
 
@@ -244,14 +246,29 @@ describe('Modeler', () => {
 			});
 		});
 
+		it('should support derived entity (single) with query', done => {
+			paris.getItemById(Person, 1, undefined, {"fullMoon": true}).subscribe(item => {
+				expect(item).toBeInstanceOf(Animal);
+				done();
+			});
+		});
+
+		it('should support derived entity (single) by class name', done => {
+			paris.getItemById(Animal, 1, undefined, {"isDog": true}).subscribe(item => {
+				expect(item).toBeInstanceOf(Dog);
+				done();
+			});
+		});
+
 		it('should support derived entity (multiple)', done => {
 			const repository = paris.getRepository(Thing);
 			repository.query().subscribe(({ items }) => {
-				expect(items).toHaveLength(2);
+				expect(items).toHaveLength(3);
 
-				const [animal, person] = items;
+				const [animal, person, thing] = items;
 				expect(animal).toBeInstanceOf(Animal);
 				expect(person).toBeInstanceOf(Person);
+				expect(thing).toBeInstanceOf(Thing);
 
 				done();
 			});

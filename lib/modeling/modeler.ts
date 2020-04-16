@@ -15,6 +15,7 @@ import {DataOptions, defaultDataOptions} from "../data_access/data.options";
 import {DataQuery} from "../data_access/data-query";
 import {ReadonlyRepository} from "../api/repository/readonly-repository";
 import {DataSet} from "../data_access/dataset";
+import {entitiesService} from "../config/services/entities.service";
 
 const DEFAULT_ALL_ITEMS_PROPERTY = 'items';
 
@@ -46,12 +47,17 @@ export class Modeler {
 		let getModelDataError:Error = new Error(`Failed to create ${entity.singularName}.`);
 
 		if (typeof entity.modelWith === 'function') {
-			const modelWithEntity = entity.modelWith(rawData);
-			if (modelWithEntity) {
+			const modelWithEntityOrString = entity.modelWith(rawData, query);
+			if (modelWithEntityOrString) {
+				const modelWithEntity = typeof modelWithEntityOrString === "string" ?
+					(entitiesService.getEntityByName(modelWithEntityOrString) ||
+						valueObjectsService.getEntityByName(modelWithEntityOrString)) :
+					(modelWithEntityOrString.entityConfig || modelWithEntityOrString.valueObjectConfig);
 				return this.modelEntity<TConcreteEntity, TRawData>(
 					rawData,
-					modelWithEntity.entityConfig || modelWithEntity.valueObjectConfig,
-					options
+					modelWithEntity,
+					options,
+					query
 				);
 			}
 		}
