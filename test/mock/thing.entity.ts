@@ -33,7 +33,7 @@ export class Thing extends EntityModelBase<number> {
 	pluralName: 'Persons',
 	endpoint: 'things',
 	modelWith: (_, query) => {
-		if (query.where && query.where['fullMoon']){
+		if (query.where && (<{[index: string]: any}>query.where)['fullMoon']){
 			return Animal;
 		}
 		return null;
