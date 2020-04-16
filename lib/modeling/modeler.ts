@@ -46,7 +46,7 @@ export class Modeler {
 		let getModelDataError:Error = new Error(`Failed to create ${entity.singularName}.`);
 
 		if (typeof entity.modelWith === 'function') {
-			const modelWithEntity = entity.modelWith(rawData);
+			const modelWithEntity = entity.modelWith(rawData, query);
 			if (modelWithEntity) {
 				return this.modelEntity<TConcreteEntity, TRawData>(
 					rawData,

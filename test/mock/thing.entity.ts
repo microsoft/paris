@@ -13,6 +13,8 @@ import {EntityModelBase} from '../../lib/config/entity-model.base';
 				return Animal;
 			case 'person':
 				return Person;
+			case 'thing':
+				return null;
 			default:
 				throw new Error(`Invalid type for 'Thing' (got ${rawData.type})`);
 		}
@@ -30,6 +32,12 @@ export class Thing extends EntityModelBase<number> {
 	singularName: 'Person',
 	pluralName: 'Persons',
 	endpoint: 'things',
+	modelWith: (_, query) => {
+		if (query.where && query.where['fullMoon']){
+			return Animal;
+		}
+		return null;
+	}
 })
 export class Person extends Thing {
 	@EntityField()

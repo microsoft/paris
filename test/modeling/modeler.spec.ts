@@ -224,6 +224,7 @@ describe('Modeler', () => {
 				return of([
 					{ type: 'animal', name: 'woof', kind: 'dog' },
 					{ type: 'person', name: 'Joe', address: '1 Generic st.' },
+					{ type: 'thing', name: 'It'},
 				]);
 			};
 
@@ -244,14 +245,22 @@ describe('Modeler', () => {
 			});
 		});
 
+		it('should support derived entity (single) with query', done => {
+			paris.getItemById(Person, 1, undefined, {"fullMoon": true}).subscribe(item => {
+				expect(item).toBeInstanceOf(Animal);
+				done();
+			});
+		});
+
 		it('should support derived entity (multiple)', done => {
 			const repository = paris.getRepository(Thing);
 			repository.query().subscribe(({ items }) => {
-				expect(items).toHaveLength(2);
+				expect(items).toHaveLength(3);
 
-				const [animal, person] = items;
+				const [animal, person, thing] = items;
 				expect(animal).toBeInstanceOf(Animal);
 				expect(person).toBeInstanceOf(Person);
+				expect(thing).toBeInstanceOf(Thing);
 
 				done();
 			});

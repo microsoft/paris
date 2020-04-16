@@ -6,6 +6,7 @@ import {Immutability} from "../modeling/immutability";
 import {DataEntityType} from "../api/entity/data-entity.base";
 import {Field} from "../api/entity/entity-field";
 import {EntityFields} from "../api/entity/entity-fields";
+import {DataQuery} from "../data_access/data-query";
 
 const DEFAULT_ID_PROPERTY = 'id';
 const DEFAULT_VALUE_ID = "__default";
@@ -199,7 +200,7 @@ paris.getRepository(Base).query().subscribe(dataSet => {
 });
 ```
 	 */
-	modelWith?: (data: TRawData) => DataEntityType<any>;
+	modelWith?: (data: TRawData, query: DataQuery) => DataEntityType<any>;
 }
 
 export interface ModelConfig<TEntity extends ModelBase, TRawData = any, TId extends EntityId = string> extends IEntityConfigBase<TEntity, TRawData, TId> {
