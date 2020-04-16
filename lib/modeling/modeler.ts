@@ -51,7 +51,8 @@ export class Modeler {
 				return this.modelEntity<TConcreteEntity, TRawData>(
 					rawData,
 					modelWithEntity.entityConfig || modelWithEntity.valueObjectConfig,
-					options
+					options,
+					query
 				);
 			}
 		}
