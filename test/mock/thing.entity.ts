@@ -13,6 +13,8 @@ import {EntityModelBase} from '../../lib/config/entity-model.base';
 				return Animal;
 			case 'person':
 				return Person;
+			case 'thing':
+				return Thing;
 			default:
 				throw new Error(`Invalid type for 'Thing' (got ${rawData.type})`);
 		}
