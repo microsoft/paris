@@ -311,7 +311,13 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 					this.emitEntityHttpErrorEvent(err);
 					throw err
 				}),
-				mergeMap(data => this.createItem(data, options, { where: Object.assign({ itemId: itemId }, params) }))
+				mergeMap(data =>
+					this.createItem(
+						this.entityBackendConfig.parseData ? this.entityBackendConfig.parseData(data) : data,
+						options,
+						{ where: Object.assign({ itemId: itemId }, params) }
+						)
+				)
 			);
 
 			if (options.allowCache !== false && this.entityBackendConfig.cache)
