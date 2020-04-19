@@ -11,7 +11,16 @@ import { TodoType } from './todo-type.entity';
 	endpoint: "todo",
 	timeout: 20000,
 	separateArrayParams: true,
-	customHeaders: (data, config) => data ? (data.text === "New todo item" ? {"keyForNewTodoItem": "valueForNewTodoItem"} : {"keyForRegularTodoItem": "valueForRegularTodoItem"}) : {}
+	customHeaders: (data, config) => data ? (data.text === "New todo item" ? {"keyForNewTodoItem": "valueForNewTodoItem"} : {"keyForRegularTodoItem": "valueForRegularTodoItem"}) : {},
+	parseData: (data, config, query) => {
+		if (data.isDataObject){
+			return data.dataObject;
+		}
+		if (query && query.where && (<{[index:string]:any }>query.where)['isDataObject']){
+			return data.dataObject;
+		}
+		return data;
+	}
 })
 export class Todo extends EntityModelBase<number>{
 	@EntityField()
