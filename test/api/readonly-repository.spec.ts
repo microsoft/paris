@@ -118,6 +118,34 @@ describe('ReadonlyRepository', () => {
 			expect(todo.extraData.attachments).not.toBe((<DataEntityType<Todo>>Todo).entityConfig.fields.get('extraData').defaultValue.attachments);
 		});
 	});
+
+	describe('parseData', () => {
+		const text = "testParseData";
+		it('should set parse the raw data according to the original response', () => {
+			setMockData({
+				isDataObject: true,
+				dataObject: {
+					id: 1,
+					text: text
+				}
+			});
+			todoRepo.getItemById(1).subscribe(todoItem => {
+				expect(todoItem.text).toEqual(text)
+			});
+		});
+
+		it('should set parse the raw data according to the query', () => {
+			setMockData({
+				dataObject: {
+					id: 1,
+					text: text
+				}
+			});
+			todoRepo.getItemById(1, undefined, {isDataObject: true}).subscribe(todoItem => {
+				expect(todoItem.text).toEqual(text)
+			});
+		});
+	});
 });
 
 interface MockConfigData {

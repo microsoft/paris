@@ -214,7 +214,8 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 				this.emitEntityHttpErrorEvent(err);
 				throw err
 			}),
-			map(data => this.entityBackendConfig.parseData ? this.entityBackendConfig.parseData(data) : data),
+			map(data => this.entityBackendConfig.parseData ?
+				this.entityBackendConfig.parseData(data, this.paris.config, query) : data),
 			mergeMap(data => this.createItem(data, dataOptions, query))
 		);
 
@@ -298,20 +299,28 @@ export class ReadonlyRepository<TEntity extends ModelBase, TRawData = any> imple
 			);
 		}
 		else {
-			const endpoint:string = this.entityBackendConfig.parseItemQuery ? this.entityBackendConfig.parseItemQuery(itemId, this.entity, this.paris.config, params) : `${this.getEndpointName({ where: params })}/${itemId}`;
+			const query: DataQuery = { where: params };
+			const endpoint:string = this.entityBackendConfig.parseItemQuery ? this.entityBackendConfig.parseItemQuery(itemId, this.entity, this.paris.config, params) : `${this.getEndpointName(query)}/${itemId}`;
 			let currentOptions = this.addCustomHeaders(itemId);
 
 			const getItem$:Observable<TEntity> = this.paris.dataStore.get(
 				endpoint,
 				Object.assign({}, params && {params: params}, currentOptions),
-				this.getBaseUrl({where: params}),
+				this.getBaseUrl(query),
 				this.entityBackendConfig.timeout ? { timeout: this.entityBackendConfig.timeout } : null
 			).pipe(
 				catchError((err: AjaxError) => {
 					this.emitEntityHttpErrorEvent(err);
 					throw err
 				}),
-				mergeMap(data => this.createItem(data, options, { where: Object.assign({ itemId: itemId }, params) }))
+				mergeMap(data =>
+					this.createItem(
+						this.entityBackendConfig.parseData ?
+							this.entityBackendConfig.parseData(data, this.paris.config, query) : data,
+						options,
+						{ where: Object.assign({ itemId: itemId }, params) }
+						)
+				)
 			);
 
 			if (options.allowCache !== false && this.entityBackendConfig.cache)
