@@ -14,6 +14,7 @@ const DEFAULT_VALUE_ID = "__default";
 export class EntityConfigBase<TEntity extends ModelBase = any, TRawData = any, TId extends EntityId = string> implements ModelConfig<TEntity, TRawData, TId>{
 	singularName:string;
 	pluralName:string;
+	forwardRefName:string;
 	fields?:EntityFields;
 	idProperty?:keyof TRawData;
 	readonly:boolean = false;
@@ -102,6 +103,12 @@ export interface IEntityConfigBase<TEntity extends ModelBase = any, TRawData = a
 	 * Used internally for error messages, for example, or can be used in reflection.
 	 */
 	pluralName:string,
+
+	/**
+	 * Unique name used to reference an entity
+	 * If not supplied, the singularName is used
+	 */
+	forwardRefName?:string,
 
 	/**
 	 * The property in the raw data used for the Entity's ID.

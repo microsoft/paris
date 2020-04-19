@@ -7,6 +7,7 @@ export function ValueObject(config:IEntityConfigBase){
 		let valueObjectConfig:EntityConfigBase = new EntityConfigBase(config, target.prototype.constructor);
 		target.singularName = valueObjectConfig.singularName;
 		target.pluralName = valueObjectConfig.pluralName;
+		target.forwardRefName = valueObjectConfig.forwardRefName;
 		target.valueObjectConfig = valueObjectConfig;
 		valueObjectsService.addEntity(target, valueObjectConfig);
 	}

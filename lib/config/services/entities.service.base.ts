@@ -17,14 +17,14 @@ export abstract class EntitiesServiceBase<T extends EntityConfigBase, TRawData =
 		return this._allEntities.get(dataEntityType) || this._allEntities.get(dataEntityType.prototype);
 	}
 
-	getEntityByName(entitySingularName:string):T{
-		return this._allEntitiesByName.get(entitySingularName);
+	getEntityByName(forwardRefName:string):T{
+		return this._allEntitiesByName.get(forwardRefName.replace(/\s/g, ""));
 	}
 
 	addEntity(dataEntityType:DataEntityType, entity:T):T{
 		if (!this._allEntities.has(dataEntityType)) {
 			this._allEntities.set(dataEntityType, entity);
-			this._allEntitiesByName.set(dataEntityType.name, entity);
+			this._allEntitiesByName.set(dataEntityType.forwardRefName || dataEntityType.singularName.replace(/\s/g, ""), entity);
 		}
 
 		entity.fields = this.getDataEntityTypeFields(dataEntityType);

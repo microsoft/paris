@@ -4,7 +4,10 @@ import { Observable, of, Subject, throwError } from "rxjs";
 import { catchError, map, mergeMap, switchMap, tap } from "rxjs/operators";
 import { ApiCallType } from "./api/api-calls/api-call.model";
 import { DataEntityType } from "./api/entity/data-entity.base";
-import { EntityRelationshipRepositoryType } from "./api/entity/entity-relationship-repository-type";
+import {
+	EntityRelationshipRepositoryType,
+	IEntityRelationshipRepositoryType
+} from "./api/entity/entity-relationship-repository-type";
 import { EntityErrorEvent, EntityErrorTypes } from "./api/events/entity-error.event";
 import { RemoveEntitiesEvent } from "./api/events/remove-entities.event";
 import { SaveEntityEvent } from "./api/events/save-entity.event";
@@ -34,7 +37,7 @@ import { AjaxRequest } from "rxjs/ajax";
 
 export class Paris<TConfigData = any> {
 	private readonly repositories:Map<DataEntityType, IRepository<ModelBase>> = new Map;
-	private readonly relationshipRepositories:Map<string, IRelationshipRepository<ModelBase>> = new Map;
+	private readonly relationshipRepositories:Map<IEntityRelationshipRepositoryType<ModelBase, ModelBase>, IRelationshipRepository<ModelBase>> = new Map;
 	readonly modeler:Modeler;
 
 	readonly dataStore:DataStoreService;
@@ -106,14 +109,10 @@ export class Paris<TConfigData = any> {
 	getRelationshipRepository<T extends ModelBase, U extends ModelBase>(relationshipConstructor:Function):RelationshipRepository<T, U>{
 		const relationship:EntityRelationshipRepositoryType<T, U> = <EntityRelationshipRepositoryType<T, U>>relationshipConstructor;
 
-		const sourceEntityName:string = relationship.sourceEntityType.name,
-			dataEntityName:string = relationship.dataEntityType.name,
-			relationshipId:string = `${sourceEntityName}_${dataEntityName}`;
-
-		let repository:RelationshipRepository<T, U> = <RelationshipRepository<T, U>>this.relationshipRepositories.get(relationshipId);
+		let repository:RelationshipRepository<T, U> = <RelationshipRepository<T, U>>this.relationshipRepositories.get(relationship);
 		if (!repository) {
 			repository = new RelationshipRepository<T, U>(relationship.sourceEntityType, relationship.dataEntityType, relationship.allowedTypes, this);
-			this.relationshipRepositories.set(relationshipId, repository);
+			this.relationshipRepositories.set(relationship, repository);
 		}
 
 		return repository;

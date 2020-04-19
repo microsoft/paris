@@ -53,6 +53,10 @@ export class Modeler {
 					(entitiesService.getEntityByName(modelWithEntityOrString) ||
 						valueObjectsService.getEntityByName(modelWithEntityOrString)) :
 					(modelWithEntityOrString.entityConfig || modelWithEntityOrString.valueObjectConfig);
+				if (!modelWithEntity){
+					getModelDataError.message = `${getModelDataError.message} modelWith: Couldn't find '${modelWithEntity}'. Did you add a 'forwardRefName' to the corresponding entity config?`;
+					throw getModelDataError;
+				}
 				return this.modelEntity<TConcreteEntity, TRawData>(
 					rawData,
 					modelWithEntity,
