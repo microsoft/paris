@@ -8,6 +8,7 @@ export function Entity(config:EntityConfig<any, any, any, any>){
 		target.entityConfig = entity;
 		target.singularName = config.singularName;
 		target.pluralName = config.pluralName;
+		target.forwardRefName = config.forwardRefName;
 		entitiesService.addEntity(target, entity);
 	}
 }

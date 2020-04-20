@@ -15,6 +15,7 @@ export interface DataEntityType<TEntity extends ModelBase = any, TRawData = any,
 	new(entityData?:any, rawData?:TRawData):TEntity,
 	singularName?:string,
 	pluralName?:string,
+	forwardRefName?:string,
 	entityConfig?:ModelEntity<TEntity, TRawData, TId>,
 	valueObjectConfig?:EntityConfigBase,
 }

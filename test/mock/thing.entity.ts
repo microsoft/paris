@@ -50,7 +50,7 @@ export class Person extends Thing {
 	endpoint: 'things',
 	modelWith: (_, query) => {
 		if (query && query.where && (<{ [index: string]: any }>query.where)['isDog']) {
-			return 'Dog'
+			return 'DogEntity'
 		}
 		return null
 	}
