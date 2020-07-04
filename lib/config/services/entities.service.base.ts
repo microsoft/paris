@@ -38,7 +38,7 @@ export abstract class EntitiesServiceBase<T extends EntityConfigBase, TRawData =
 		if (!dataEntityType)
 			return null;
 
-		let parentEntityDataType:DataEntityType = Object.getPrototypeOf(dataEntityType).prototype,
+		let parentEntityDataType:DataEntityType = Object.getPrototypeOf(dataEntityType),
 			parentEntity:T = this._allEntities.get(parentEntityDataType),
 			parentDataTypeFields:EntityFields = parentEntity && parentEntity.fields || this.getDataEntityTypeFields(parentEntityDataType) || null;
 
