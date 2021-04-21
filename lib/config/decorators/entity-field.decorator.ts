@@ -11,9 +11,9 @@ import {Field} from "../../api/entity/entity-field";
  */
 export function EntityField(fieldConfig?:FieldConfig):PropertyDecorator {
 	return function (entityPrototype: DataEntityType, propertyKey: string | symbol) {
-		let propertyConstructor:Function = (<any>Reflect).getMetadata("design:type", entityPrototype, propertyKey);
 
 		fieldConfig = fieldConfig || {};
+		let propertyConstructor:Function = fieldConfig.type || (<any>Reflect).getMetadata("design:type", entityPrototype, propertyKey);
 		let field:Field = Object.assign({}, fieldConfig);
 		if (!field.id)
 			field.id = String(propertyKey);
