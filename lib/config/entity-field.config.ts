@@ -17,6 +17,11 @@ export interface FieldConfig{
 	name?:string,
 
 	/**
+	 * Optional type constructor to override the type Paris gets from decoratorMetadata. Useful for using Paris without emitDecoratorMetadata
+	 */
+	type?:any
+
+	/**
 	 * Specifies which property in the raw data should be assigned to the model's property.
 	 * By default, Paris looks for a property of the same name as the property in the model. i.e:
 	 *
