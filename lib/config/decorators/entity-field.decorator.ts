@@ -19,7 +19,7 @@ export function EntityField(fieldConfig?:FieldConfig):PropertyDecorator {
 			field.id = String(propertyKey);
 
 		field.type = fieldConfig.arrayOf || propertyConstructor;
-		field.isArray = propertyConstructor === Array;
+		field.isArray = propertyConstructor === Array || Boolean(fieldConfig.arrayOf);
 		entityFieldsService.addField(entityPrototype, field);
 	}
 }
