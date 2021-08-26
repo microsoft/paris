@@ -1,11 +1,16 @@
+
+**🚧🚧🚧Danger🚧🚧🚧:**  Paris is unmaintained. The new decorators proposal, the new RxJS syntax, `useDeclareForClassFields` in modern TypeScript and modern decorator metadata meant that in order to property maintain Paris it'd need an effective rewrite. We no longer use Angular for new code internally and our React/MobX code does not use RxJS.
+
+We are gradually migrating our internal code from it to our new next-gen data modeling framework. It _may_ eventually be open source but honestly that's a lot of work so we'll see. It is inspired by Paris but does not share any code with it.
+
+You are free to use this code and we _will_ take pull requests but we will not regularly fix bugs or draft new releases.
+
 # Paris
 
 [![Build Status](https://travis-ci.org/Microsoft/paris.svg?branch=master)](https://travis-ci.org/Microsoft/paris)
 [![npm version](https://badge.fury.io/js/%40microsoft%2Fparis.svg)](https://badge.fury.io/js/%40microsoft%2Fparis)
 
 Paris is a data management library for webapps, using TypeScript and RxJS to implement Domain-Driven Design.
-
-*Paris, fashion capital of the world, where all the **models** want to be*.
  
 
 ## Installation
