@@ -1,5 +1,7 @@
 
-**🚧🚧🚧Danger🚧🚧🚧:**  Paris is unmaintained. The new decorators proposal, the new RxJS syntax, `useDeclareForClassFields` in modern TypeScript and modern decorator metadata meant that in order to property maintain Paris it'd need an effective rewrite. We no longer use Angular for new code internally and our React/MobX code does not use RxJS.
+**🚧🚧🚧Danger🚧🚧🚧:**
+
+Paris is unmaintained. The new decorators proposal, the new RxJS syntax, `useDeclareForClassFields` in modern TypeScript and modern decorator metadata meant that in order to property maintain Paris it'd need an effective rewrite. We no longer use Angular for new code internally and our React/MobX code does not use RxJS.
 
 We are gradually migrating our internal code from it to our new next-gen data modeling framework. It _may_ eventually be open source but honestly that's a lot of work so we'll see. It is inspired by Paris but does not share any code with it.
 
