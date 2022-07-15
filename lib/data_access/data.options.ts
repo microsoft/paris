@@ -10,6 +10,15 @@ export interface DataOptions{
 	allowCache?:boolean,
 
 	/**
+	 * If true, the entity fields parsing will be case insensitive (and so for all sub-entities).
+	 * e.g, a value for a field named "ProviderName" will be parsed into fields: "providerName", "providername", "ProviderName", "PROVIDERNAME",
+	 * and any other class field that satisfies field.toLowerCase() === "ProviderName".toLowerCase().
+	 * Notice that casing of fields on the raw "fieldData" object passed to the entity's "parse" function, will remain as is.
+	 * @default false
+	 */
+	ignoreFieldsCasing?:boolean,
+
+	/**
 	 * The {DataAvailability} mode for fetching data.
 	 */
 	availability?: DataAvailability
