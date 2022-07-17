@@ -167,7 +167,7 @@ describe('Modeler', () => {
 			})
 		});
 
-		describe('ignorePropertiesCase', () => {
+		describe('ignoreFieldsCasing', () => {
 			const commentRawData = {
 				CommentId: 'comment1',
 				COMMENT: 'Hello world!',
