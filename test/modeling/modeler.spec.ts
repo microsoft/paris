@@ -3,7 +3,7 @@ import {Animal, Person, Thing} from '../mock/thing.entity';
 import {DataStoreService} from '../../lib/data_access/data-store.service';
 import {Paris} from '../../lib/paris';
 import {Todo} from "../mock/todo.entity";
-import {Comment} from "../mock/commet.entity";
+import {Comment} from "../mock/comment.entity";
 import {DataEntityType} from "../../lib/api/entity/data-entity.base";
 import {Tag} from "../mock/tag.value-object";
 import {Modeler} from "../../lib/modeling/modeler";
