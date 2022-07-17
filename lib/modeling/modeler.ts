@@ -41,8 +41,10 @@ export class Modeler {
 			modelData: Partial<TEntity> = {},
 			subModels: Array<Observable<ModelPropertyValue<TEntity>>> = [];
 
-		if (entity instanceof ModelEntity)
-			modelData.id = rawData[entityIdProperty];
+		if (options.ignoreFieldsCasing) {
+			rawData = Modeler.lowercaseKeysOfRawData(rawData);
+			entityIdProperty = typeof(entityIdProperty) === "string" ? entityIdProperty.toLowerCase() : entityIdProperty;
+		}
 
 		let getModelDataError:Error = new Error(`Failed to create ${entity.singularName}.`);
 
@@ -72,7 +74,7 @@ export class Modeler {
 				return;
 			}
 
-			let entityFieldRawData: any = Modeler.getFieldRawData<TRawData>(entityField, rawData);
+			let entityFieldRawData: any = Modeler.getFieldRawData<TRawData>(entityField, rawData, options.ignoreFieldsCasing);
 
 			if (entityField.parse) {
 				try {
@@ -103,6 +105,9 @@ export class Modeler {
 				throw getModelDataError;
 			}
 		});
+
+		if (entity instanceof ModelEntity)
+			modelData.id = rawData[entityIdProperty];
 
 		let model$:Observable<TEntity>;
 
@@ -183,24 +188,43 @@ export class Modeler {
 	}
 
 	/**
+	 * If @rawData is an object, this method will return the same object, with all its keys lowercased.
+	 * The function is not recursive, since it's anyway called on each sub-model.
+	 */
+	static lowercaseKeysOfRawData<TRawData extends any = any>(rawData:TRawData):any {
+		if (rawData instanceof Object && !(rawData instanceof Array)) {
+			const newRawData: any = {};
+			for (const key in rawData) {
+				if (rawData.hasOwnProperty(key)) {
+					newRawData[key.toLowerCase()] = rawData[key];
+				}
+			}
+			return newRawData;
+		}
+		else {
+			return rawData;
+		}
+	}
+
+	/**
 	 * Given an EntityField configuration and the raw data provided to the entity's modeler, returns the raw data to use for that field.
 	 */
-	static getFieldRawData<TRawData extends any = any>(entityField: Field, rawData:TRawData):any{
+	static getFieldRawData<TRawData extends any = any>(entityField: Field, rawData:TRawData, ignoreCase: boolean):any{
 		let fieldRawData: any;
 		if (entityField.data) {
 			if (entityField.data instanceof Array) {
 				for (let i = 0, path:string; i < entityField.data.length && fieldRawData === undefined; i++) {
-					path = entityField.data[i];
+					path = ignoreCase ? entityField.data[i].toLowerCase() : entityField.data[i];
 					const value = path === FIELD_DATA_SELF ? rawData : get(rawData, path);
 					if (value !== undefined && value !== null)
 						fieldRawData = value;
 				}
 			}
 			else
-				fieldRawData = entityField.data === FIELD_DATA_SELF ? rawData : get(rawData, entityField.data);
+				fieldRawData = entityField.data === FIELD_DATA_SELF ? rawData : get(rawData, ignoreCase ? entityField.data.toLowerCase() : entityField.data);
 		}
 		else
-			fieldRawData = rawData[entityField.id];
+			fieldRawData = rawData[ignoreCase ? entityField.id.toLowerCase() : entityField.id];
 
 		return fieldRawData;
 	}

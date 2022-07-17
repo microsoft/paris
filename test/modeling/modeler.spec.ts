@@ -3,6 +3,7 @@ import {Animal, Person, Thing} from '../mock/thing.entity';
 import {DataStoreService} from '../../lib/data_access/data-store.service';
 import {Paris} from '../../lib/paris';
 import {Todo} from "../mock/todo.entity";
+import {Comment} from "../mock/comment.entity";
 import {DataEntityType} from "../../lib/api/entity/data-entity.base";
 import {Tag} from "../mock/tag.value-object";
 import {Modeler} from "../../lib/modeling/modeler";
@@ -19,6 +20,8 @@ import {ModelBase} from "../../lib/config/model.base";
 import {ValueObject} from "../../lib/config/decorators/value-object.decorator";
 import {ModelConfig} from "../../lib/config/model-config";
 import {Dog} from "../mock/dog.entity";
+import {User, UserType} from "../mock/user.entity";
+import {commentStatusValues} from "../mock/comment-status.entity";
 
 describe('Modeler', () => {
 	let paris: Paris;
@@ -135,34 +138,127 @@ describe('Modeler', () => {
 			});
 
 			it('uses the id of the field if no data was specified', () => {
-				expect(Modeler.getFieldRawData(baseField, rawData)).toEqual(rawData.name);
+				expect(Modeler.getFieldRawData(baseField, rawData, false)).toEqual(rawData.name);
 			});
 
 			it('uses the "data" of the field as the path of the data to use', () => {
 				const fieldConfig = Object.assign({ data: 'alias' }, baseField);
-				expect(Modeler.getFieldRawData(fieldConfig, rawData)).toEqual(rawData[fieldConfig.data]);
+				expect(Modeler.getFieldRawData(fieldConfig, rawData, false)).toEqual(rawData[fieldConfig.data]);
 			});
 
 			it('uses the "data" of the field as the path of the data to use, even inside objects', () => {
 				const fieldConfig = Object.assign({ data: 'fullName.firstName' }, baseField);
-				expect(Modeler.getFieldRawData(fieldConfig, rawData)).toEqual(rawData.fullName.firstName);
+				expect(Modeler.getFieldRawData(fieldConfig, rawData, false)).toEqual(rawData.fullName.firstName);
 			});
 
 			it('uses the "data" of the field to prioritize raw data properties', () => {
 				const fieldConfig = Object.assign({ data: ['exactName', 'alias', "name"] }, baseField);
-				expect(Modeler.getFieldRawData(fieldConfig, rawData)).toEqual(rawData.alias);
+				expect(Modeler.getFieldRawData(fieldConfig, rawData, false)).toEqual(rawData.alias);
 			});
 
 			it('uses the "data" of the field to prioritize raw data properties, event for paths', () => {
 				const fieldConfig = Object.assign({ data: ['exactName', 'fullName.firstName', 'alias', "name"] }, baseField);
-				expect(Modeler.getFieldRawData(fieldConfig, rawData)).toEqual(rawData.fullName.firstName);
+				expect(Modeler.getFieldRawData(fieldConfig, rawData, false)).toEqual(rawData.fullName.firstName);
 			});
 
 			it('uses the special "FIELD_DATA_SELF" data config to use the whole rawData', () => {
 				const fieldConfig = Object.assign({ data: FIELD_DATA_SELF }, baseField);
-				expect(Modeler.getFieldRawData(fieldConfig, rawData)).toEqual(rawData);
+				expect(Modeler.getFieldRawData(fieldConfig, rawData, false)).toEqual(rawData);
 			})
 		});
+
+		describe('ignoreFieldsCasing', () => {
+			const commentRawData = {
+				CommentId: 'comment1',
+				COMMENT: 'Hello world!',
+				StatuS: 2,
+				createdBy: {
+					UserName: 'nitsanamit',
+					age: 26,
+					NickNames: ['nits', 'namit'],
+					address: {
+						city: 'Herzliya',
+					},
+					user_type: UserType.ADMIN
+				},
+				liked: [
+					{
+						username: 'billgates',
+						AGE: 56,
+						Address: {
+							city: 'California',
+						}
+					},
+					{
+						Name: 'Robert',
+						UserName: 'Spongbob',
+						age: 5,
+						NickNames: ['Squarepants'],
+						address: {
+							City: 'Bikini Bottom',
+						},
+						User_Type: UserType.USER
+					},
+
+				]
+			};
+
+			const commentEntityConfig = (<DataEntityType<Comment>>Comment).entityConfig;
+
+			let commentItem$:Observable<Comment>;
+
+			beforeEach(() => {
+				commentItem$ = paris.modeler.modelEntity(commentRawData, commentEntityConfig, {ignoreFieldsCasing: true});
+			});
+
+			afterEach(() => {
+				jest.restoreAllMocks();
+			});
+
+			it('ignores casing of simple entity fields', done => {
+				commentItem$.subscribe((comment: Comment) => {
+					expect(comment.id).toEqual(commentRawData.CommentId);
+					expect(comment.comment).toEqual(commentRawData.COMMENT);
+					expect(comment.status).toEqual(commentStatusValues[commentRawData.StatuS]);
+					done();
+				});
+			});
+
+			it('ignores casing of recursive entity models', done => {
+				commentItem$.subscribe((comment: Comment) => {
+					expect(comment.CreatedBy.name).toEqual(commentRawData.createdBy.UserName);
+					expect(comment.CreatedBy.Age).toEqual(commentRawData.createdBy.age);
+					expect(comment.CreatedBy.nickNames).toEqual(commentRawData.createdBy.NickNames);
+					expect(comment.CreatedBy.city).toEqual(commentRawData.createdBy.address.city);
+					expect(comment.CreatedBy.USER_TYPE).toEqual(commentRawData.createdBy.user_type);
+					done();
+				});
+			});
+
+			it('ignores casing of array properties', done => {
+				commentItem$.subscribe((comment: Comment) => {
+					expect(comment.Liked[0].name).toEqual(commentRawData.liked[0].username);
+					expect(comment.Liked[0].Age).toEqual(commentRawData.liked[0].AGE);
+					expect(comment.Liked[0].nickNames).toStrictEqual([]);
+					expect(comment.Liked[0].city).toEqual(commentRawData.liked[0].Address.city);
+					expect(comment.Liked[0].USER_TYPE).toEqual((<DataEntityType<User>>User).entityConfig.fields.get('USER_TYPE').defaultValue);
+					expect(comment.Liked[1].name).toEqual(commentRawData.liked[1].UserName);
+					expect(comment.Liked[1].Age).toEqual(commentRawData.liked[1].age);
+					expect(comment.Liked[1].nickNames).toEqual(commentRawData.liked[1].NickNames);
+					expect(comment.Liked[1].USER_TYPE).toEqual(commentRawData.liked[1].User_Type);
+					done();
+				});
+			});
+
+			it('keeps the fieldsData original casing for entity fields with a "parse" function', done => {
+				commentItem$.subscribe((comment: Comment) => {
+					expect(comment.Liked[1].city).toBeNull();
+					done();
+				});
+			});
+
+		});
+
 
 		describe('defaultValue', () => {
 			it("doesn't set default value to a field that has value", done => {
