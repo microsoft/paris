@@ -8,8 +8,7 @@ import {CommentStatus} from "./comment-status.entity";
 @Entity({
     singularName: 'Comment',
     pluralName: 'Comments',
-    endpoint: 'comments',
-    idProperty: 'commentID',
+    endpoint: 'comments'
 })
 export class Comment extends EntityModelBase {
 

@@ -169,7 +169,7 @@ describe('Modeler', () => {
 
 		describe('ignoreFieldsCasing', () => {
 			const commentRawData = {
-				CommentId: 'comment1',
+				id: 'comment1',
 				COMMENT: 'Hello world!',
 				StatuS: 2,
 				createdBy: {
@@ -217,7 +217,7 @@ describe('Modeler', () => {
 
 			it('ignores casing of simple entity fields', done => {
 				commentItem$.subscribe((comment: Comment) => {
-					expect(comment.id).toEqual(commentRawData.CommentId);
+					expect(comment.id).toEqual(commentRawData.id);
 					expect(comment.comment).toEqual(commentRawData.COMMENT);
 					expect(comment.status).toEqual(commentStatusValues[commentRawData.StatuS]);
 					done();

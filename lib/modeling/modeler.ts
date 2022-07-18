@@ -46,6 +46,9 @@ export class Modeler {
 			entityIdProperty = typeof(entityIdProperty) === "string" ? entityIdProperty.toLowerCase() : entityIdProperty;
 		}
 
+		if (entity instanceof ModelEntity)
+			modelData.id = rawData[entityIdProperty];
+
 		let getModelDataError:Error = new Error(`Failed to create ${entity.singularName}.`);
 
 		if (typeof entity.modelWith === 'function') {
@@ -105,9 +108,6 @@ export class Modeler {
 				throw getModelDataError;
 			}
 		});
-
-		if (entity instanceof ModelEntity)
-			modelData.id = rawData[entityIdProperty];
 
 		let model$:Observable<TEntity>;
 
