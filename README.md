@@ -55,7 +55,7 @@ import { Entity, EntityModelBase, EntityField } from "@microsoft/paris";
 	pluralName: "Todo Items",
 	endpoint: "todo/items"
 })
-export class TodoItem extends EntityModelBase{
+export class TodoItem extends EntityModelBase {
 	@EntityField()
 	text: string;
 
